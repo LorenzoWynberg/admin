@@ -1,7 +1,6 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import HttpApi, { HttpBackendOptions } from 'i18next-http-backend';
-import { Lang } from '@/services/langService';
 
 const fallbackLng = 'en';
 const namespaces = [
@@ -19,6 +18,34 @@ const namespaces = [
   'validation',
 ];
 
+const getStoredLang = (): string => {
+  if (typeof window === 'undefined') return fallbackLng;
+  try {
+    const stored = localStorage.getItem('lang-storage');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return parsed.state?.lang || fallbackLng;
+    }
+  } catch {
+    // ignore
+  }
+  return fallbackLng;
+};
+
+const getStoredVersion = (lang: string): string => {
+  if (typeof window === 'undefined') return 'latest';
+  try {
+    const stored = localStorage.getItem('lang-storage');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return parsed.state?.versions?.[lang]?.hash || 'latest';
+    }
+  } catch {
+    // ignore
+  }
+  return 'latest';
+};
+
 export const initI18n = async () => {
   const backendUrl = process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -26,7 +53,7 @@ export const initI18n = async () => {
     .use(HttpApi)
     .use(initReactI18next)
     .init<HttpBackendOptions>({
-      lng: Lang.getActive(),
+      lng: getStoredLang(),
       fallbackLng,
       ns: namespaces,
       defaultNS: 'common',
@@ -34,7 +61,7 @@ export const initI18n = async () => {
         loadPath: (lngs: string[], namespaces: string[]): string => {
           const lng = lngs[0];
           const ns = namespaces[0];
-          const version = Lang.getVersion(lng);
+          const version = getStoredVersion(lng);
           return `${backendUrl}/locales/${lng}/${ns}.json?v=${version}`;
         },
       },

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import i18next, { initI18n } from '@/config/i18next';
-import { useLang } from '@/hooks/useLang';
 import { useFetchVersions } from '@/hooks/useFetchVersions';
 
 interface I18nProviderProps {
@@ -12,19 +11,23 @@ interface I18nProviderProps {
 
 export function I18nProvider({ children }: I18nProviderProps) {
   const [ready, setReady] = useState(false);
-  const Lang = useLang();
 
   // Fetch translation versions
   useFetchVersions();
 
-  // Initialize i18next when hydrated
+  // Initialize i18next on mount
   useEffect(() => {
-    if (Lang.hydrated && !i18next.isInitialized) {
-      initI18n().then(() => setReady(true));
-    } else if (i18next.isInitialized) {
+    if (!i18next.isInitialized) {
+      initI18n()
+        .then(() => setReady(true))
+        .catch((err) => {
+          console.error('Failed to initialize i18n:', err);
+          setReady(true); // Continue anyway with fallbacks
+        });
+    } else {
       setReady(true);
     }
-  }, [Lang.hydrated]);
+  }, []);
 
   // Show loading state while initializing
   if (!ready) {
