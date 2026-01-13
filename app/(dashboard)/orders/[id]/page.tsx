@@ -124,6 +124,8 @@ export default function OrderDetailPage() {
             <CreateQuoteDialog
               orderId={orderId}
               defaultCurrency={order.currencyCode || 'CRC'}
+              fromAddress={order.fromAddress}
+              toAddress={order.toAddress}
             />
           )}
           {canApproveOrDeny && (
@@ -315,6 +317,8 @@ export default function OrderDetailPage() {
                   <CreateQuoteDialog
                     orderId={orderId}
                     defaultCurrency={order.currencyCode || 'CRC'}
+                    fromAddress={order.fromAddress}
+                    toAddress={order.toAddress}
                   />
                 )}
               </div>

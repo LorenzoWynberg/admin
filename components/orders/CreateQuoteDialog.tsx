@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCreateQuote, useSendQuote } from '@/hooks/quotes';
+import { GeoService } from '@/services/geoService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,15 +23,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FileText, Send } from 'lucide-react';
+import { FileText, Send, MapPin, Loader2 } from 'lucide-react';
 
 interface CreateQuoteDialogProps {
   orderId: number;
   defaultCurrency?: string;
+  fromAddress?: {
+    latitude: number;
+    longitude: number;
+  } | null;
+  toAddress?: {
+    latitude: number;
+    longitude: number;
+  } | null;
 }
 
-export function CreateQuoteDialog({ orderId, defaultCurrency = 'CRC' }: CreateQuoteDialogProps) {
+export function CreateQuoteDialog({
+  orderId,
+  defaultCurrency = 'CRC',
+  fromAddress,
+  toAddress,
+}: CreateQuoteDialogProps) {
   const [open, setOpen] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
   const createQuote = useCreateQuote();
   const sendQuote = useSendQuote();
 
@@ -47,9 +62,43 @@ export function CreateQuoteDialog({ orderId, defaultCurrency = 'CRC' }: CreateQu
     validUntil: '',
   });
 
+  const [drivingMinutes, setDrivingMinutes] = useState<number | null>(null);
+
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  const calculateDistance = async () => {
+    if (!fromAddress || !toAddress) return;
+
+    setIsCalculating(true);
+    try {
+      const result = await GeoService.getDistance({
+        fromLat: fromAddress.latitude,
+        fromLng: fromAddress.longitude,
+        toLat: toAddress.latitude,
+        toLng: toAddress.longitude,
+        driving: true,
+      });
+
+      const distance = result.driving_km ?? result.straight_line_km;
+      setFormData((prev) => ({
+        ...prev,
+        distanceKm: distance.toString(),
+      }));
+      setDrivingMinutes(result.driving_minutes);
+    } catch (error) {
+      console.error('Failed to calculate distance:', error);
+    } finally {
+      setIsCalculating(false);
+    }
+  };
+
+  useEffect(() => {
+    if (open && fromAddress && toAddress && !formData.distanceKm) {
+      calculateDistance();
+    }
+  }, [open]);
 
   const handleSubmit = async (andSend: boolean) => {
     const now = new Date();
@@ -85,6 +134,7 @@ export function CreateQuoteDialog({ orderId, defaultCurrency = 'CRC' }: CreateQu
   };
 
   const isPending = createQuote.isPending || sendQuote.isPending;
+  const canCalculate = fromAddress && toAddress;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -119,18 +169,43 @@ export function CreateQuoteDialog({ orderId, defaultCurrency = 'CRC' }: CreateQu
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
+          <div className="grid gap-2">
+            <div className="flex items-center justify-between">
               <Label htmlFor="distanceKm">Distance (km)</Label>
-              <Input
-                id="distanceKm"
-                type="number"
-                step="0.1"
-                placeholder="0.0"
-                value={formData.distanceKm}
-                onChange={(e) => handleChange('distanceKm', e.target.value)}
-              />
+              {canCalculate && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={calculateDistance}
+                  disabled={isCalculating}
+                  className="h-auto py-1 px-2 text-xs"
+                >
+                  {isCalculating ? (
+                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                  ) : (
+                    <MapPin className="mr-1 h-3 w-3" />
+                  )}
+                  Calculate
+                </Button>
+              )}
             </div>
+            <Input
+              id="distanceKm"
+              type="number"
+              step="0.1"
+              placeholder="0.0"
+              value={formData.distanceKm}
+              onChange={(e) => handleChange('distanceKm', e.target.value)}
+            />
+            {drivingMinutes && (
+              <p className="text-xs text-muted-foreground">
+                Estimated driving time: {drivingMinutes} min
+              </p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="distanceFee">Distance Fee</Label>
               <Input
@@ -142,9 +217,6 @@ export function CreateQuoteDialog({ orderId, defaultCurrency = 'CRC' }: CreateQu
                 onChange={(e) => handleChange('distanceFee', e.target.value)}
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="timeFee">Time Fee</Label>
               <Input
@@ -156,6 +228,9 @@ export function CreateQuoteDialog({ orderId, defaultCurrency = 'CRC' }: CreateQu
                 onChange={(e) => handleChange('timeFee', e.target.value)}
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="surcharge">Surcharge</Label>
               <Input
@@ -167,18 +242,17 @@ export function CreateQuoteDialog({ orderId, defaultCurrency = 'CRC' }: CreateQu
                 onChange={(e) => handleChange('surcharge', e.target.value)}
               />
             </div>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="discountRate">Discount (%)</Label>
-            <Input
-              id="discountRate"
-              type="number"
-              step="1"
-              placeholder="0"
-              value={formData.discountRate}
-              onChange={(e) => handleChange('discountRate', e.target.value)}
-            />
+            <div className="grid gap-2">
+              <Label htmlFor="discountRate">Discount (%)</Label>
+              <Input
+                id="discountRate"
+                type="number"
+                step="1"
+                placeholder="0"
+                value={formData.discountRate}
+                onChange={(e) => handleChange('discountRate', e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="grid gap-2">
