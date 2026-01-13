@@ -13,10 +13,14 @@ const statusConfig: Record<
   canceled: { label: 'Canceled', variant: 'outline' },
   assigned: { label: 'Assigned', variant: 'default' },
   picking_up: { label: 'Picking Up', variant: 'default' },
+  arrived_at_pickup: { label: 'At Pickup', variant: 'default' },
+  picked_up: { label: 'Picked Up', variant: 'default' },
   in_transit: { label: 'In Transit', variant: 'default' },
   arrived_at_drop_off: { label: 'Arrived', variant: 'default' },
+  waiting_confirmation: { label: 'Awaiting Confirm', variant: 'secondary' },
   completed: { label: 'Completed', variant: 'default' },
   delivery_failed: { label: 'Failed', variant: 'destructive' },
+  returned_to_sender: { label: 'Returned', variant: 'outline' },
 };
 
 interface OrderStatusBadgeProps {

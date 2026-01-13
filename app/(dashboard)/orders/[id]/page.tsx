@@ -341,8 +341,6 @@ export default function OrderDetailPage() {
                   <CreateQuoteDialog
                     orderId={orderId}
                     defaultCurrency={order.currencyCode || 'CRC'}
-                    fromAddress={order.fromAddress}
-                    toAddress={order.toAddress}
                     orderDistanceKm={order.distanceKm}
                     orderEstimatedMinutes={order.estimatedMinutes}
                   />
@@ -375,10 +373,10 @@ export default function OrderDetailPage() {
                   <p className="text-sm text-muted-foreground">Name</p>
                 </div>
               </div>
-              {order.driver.licensePlate && (
+              {order.driver.licensePlateNumber && (
                 <div>
                   <p className="text-sm text-muted-foreground">License Plate</p>
-                  <p className="font-medium">{order.driver.licensePlate}</p>
+                  <p className="font-medium">{order.driver.licensePlateNumber}</p>
                 </div>
               )}
             </CardContent>
