@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Auth } from '@/services/authService';
 
@@ -9,29 +9,18 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const hydrated = useAuthStore((state) => state.hydrated);
   const token = useAuthStore((state) => state.token);
-  const [ready, setReady] = useState(false);
+  const hydrated = useAuthStore((state) => state.hydrated);
 
   useEffect(() => {
-    if (!hydrated) return;
-
-    // If we have a token, refresh user data
-    if (token) {
-      Auth.refresh().finally(() => setReady(true));
-    } else {
-      setReady(true);
+    // Only refresh if we have a token and store is hydrated
+    if (hydrated && token) {
+      Auth.refresh().catch(() => {
+        // Token invalid, will be cleared by refresh()
+      });
     }
   }, [hydrated, token]);
 
-  // Wait for hydration and initial auth check
-  if (!hydrated || !ready) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
-  }
-
+  // Don't block render - just render children immediately
   return <>{children}</>;
 }
