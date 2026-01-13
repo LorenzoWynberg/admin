@@ -1,8 +1,9 @@
 # Mandados Admin - Project Reference
 
-## Git Preferences
+## Version Control
 
-- **Commit frequently** - Make smaller, focused commits rather than large batches
+- **Use jj (Jujutsu)** - Default version control tool instead of raw git
+- **Atomic commits** - One logical change per commit, very small and focused
 - **No co-authored-by** - Do not add "Co-Authored-By: Claude" to commit messages
 - **Conventional commits** - Use prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`
 
