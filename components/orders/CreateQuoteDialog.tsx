@@ -36,6 +36,8 @@ interface CreateQuoteDialogProps {
     latitude: number;
     longitude: number;
   } | null;
+  orderDistanceKm?: number | null;
+  orderEstimatedMinutes?: number | null;
 }
 
 export function CreateQuoteDialog({
@@ -43,6 +45,8 @@ export function CreateQuoteDialog({
   defaultCurrency = 'CRC',
   fromAddress,
   toAddress,
+  orderDistanceKm,
+  orderEstimatedMinutes,
 }: CreateQuoteDialogProps) {
   const [open, setOpen] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -51,7 +55,7 @@ export function CreateQuoteDialog({
 
   const [formData, setFormData] = useState({
     currencyCode: defaultCurrency,
-    distanceKm: '',
+    distanceKm: orderDistanceKm?.toString() || '',
     distanceFee: '',
     timeFee: '',
     surcharge: '',
@@ -62,7 +66,7 @@ export function CreateQuoteDialog({
     validUntil: '',
   });
 
-  const [drivingMinutes, setDrivingMinutes] = useState<number | null>(null);
+  const [drivingMinutes, setDrivingMinutes] = useState<number | null>(orderEstimatedMinutes ?? null);
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -95,7 +99,8 @@ export function CreateQuoteDialog({
   };
 
   useEffect(() => {
-    if (open && fromAddress && toAddress && !formData.distanceKm) {
+    // Only auto-calculate if no distance from order and dialog is open
+    if (open && fromAddress && toAddress && !formData.distanceKm && !orderDistanceKm) {
       calculateDistance();
     }
   }, [open]);

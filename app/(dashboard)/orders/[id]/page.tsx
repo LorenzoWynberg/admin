@@ -20,6 +20,8 @@ import {
   CheckCircle,
   XCircle,
   Trash2,
+  Route,
+  Clock,
 } from 'lucide-react';
 
 type OrderStatus = App.Enums.OrderStatus;
@@ -126,6 +128,8 @@ export default function OrderDetailPage() {
               defaultCurrency={order.currencyCode || 'CRC'}
               fromAddress={order.fromAddress}
               toAddress={order.toAddress}
+              orderDistanceKm={order.distanceKm}
+              orderEstimatedMinutes={order.estimatedMinutes}
             />
           )}
           {canApproveOrDeny && (
@@ -233,6 +237,28 @@ export default function OrderDetailPage() {
                 <p className="font-medium">{order.description}</p>
               </div>
             )}
+            {(order.distanceKm || order.estimatedMinutes) && (
+              <div className="flex gap-6">
+                {order.distanceKm && (
+                  <div className="flex items-start gap-3">
+                    <Route className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">{order.distanceKm} km</p>
+                      <p className="text-sm text-muted-foreground">Distance</p>
+                    </div>
+                  </div>
+                )}
+                {order.estimatedMinutes && (
+                  <div className="flex items-start gap-3">
+                    <Clock className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">{order.estimatedMinutes} min</p>
+                      <p className="text-sm text-muted-foreground">Est. Trip Time</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             <div className="flex gap-4">
               {order.requiresPin && (
                 <Badge variant="secondary">Requires PIN</Badge>
@@ -319,6 +345,8 @@ export default function OrderDetailPage() {
                     defaultCurrency={order.currencyCode || 'CRC'}
                     fromAddress={order.fromAddress}
                     toAddress={order.toAddress}
+                    orderDistanceKm={order.distanceKm}
+                    orderEstimatedMinutes={order.estimatedMinutes}
                   />
                 )}
               </div>
