@@ -1,16 +1,7 @@
 'use client';
 
-import { useAuth } from '@/stores/useAuthStore';
-import { Auth } from '@/services/authService';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, FileText, Users, Truck, Building2, MapPin } from 'lucide-react';
 
 const stats = [
@@ -65,31 +56,17 @@ const stats = [
 ];
 
 export default function DashboardPage() {
-  const { user } = useAuth();
   const router = useRouter();
 
-  const handleLogout = async () => {
-    await Auth.logout();
-    router.push('/login');
-    router.refresh();
-  };
-
   return (
-    <div className="min-h-screen bg-muted/40 p-6">
-      {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.name || 'Admin'}
-          </p>
-        </div>
-        <Button variant="outline" onClick={handleLogout}>
-          Sign out
-        </Button>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Welcome to the Mandados admin dashboard
+        </p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
           <Card
