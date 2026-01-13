@@ -143,9 +143,9 @@ export function CreateQuoteDialog({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="distanceFee">Distance Fee</Label>
+              <Label htmlFor="distanceFee">Distance Fee ({formData.currencyCode})</Label>
               <Input
                 id="distanceFee"
                 type="number"
@@ -156,7 +156,7 @@ export function CreateQuoteDialog({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="timeFee">Time Fee</Label>
+              <Label htmlFor="timeFee">Time Fee ({formData.currencyCode})</Label>
               <Input
                 id="timeFee"
                 type="number"
@@ -166,11 +166,8 @@ export function CreateQuoteDialog({
                 onChange={(e) => handleChange('timeFee', e.target.value)}
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="surcharge">Surcharge</Label>
+              <Label htmlFor="surcharge">Surcharge ({formData.currencyCode})</Label>
               <Input
                 id="surcharge"
                 type="number"
@@ -180,17 +177,18 @@ export function CreateQuoteDialog({
                 onChange={(e) => handleChange('surcharge', e.target.value)}
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="discountRate">Discount (%)</Label>
-              <Input
-                id="discountRate"
-                type="number"
-                step="1"
-                placeholder="0"
-                value={formData.discountRate}
-                onChange={(e) => handleChange('discountRate', e.target.value)}
-              />
-            </div>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="discountRate">Discount (%)</Label>
+            <Input
+              id="discountRate"
+              type="number"
+              step="1"
+              placeholder="0"
+              value={formData.discountRate}
+              onChange={(e) => handleChange('discountRate', e.target.value)}
+            />
           </div>
 
           <div className="grid gap-2">
