@@ -3,6 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useOrder, useApproveOrder, useDenyOrder, useDeleteOrder } from '@/hooks/orders';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
+import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -98,6 +99,7 @@ export default function OrderDetailPage() {
   }
 
   const canApproveOrDeny = order.status === 'estimated';
+  const canCreateQuote = order.status === 'pending' && !order.currentQuote;
 
   return (
     <div className="space-y-6">
@@ -118,6 +120,12 @@ export default function OrderDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          {canCreateQuote && (
+            <CreateQuoteDialog
+              orderId={orderId}
+              defaultCurrency={order.currencyCode || 'CRC'}
+            />
+          )}
           {canApproveOrDeny && (
             <>
               <Button
@@ -276,11 +284,11 @@ export default function OrderDetailPage() {
                     </span>
                   </div>
                 )}
-                {order.currentQuote.surgeFee && order.currentQuote.surgeFee > 0 && (
+                {order.currentQuote.surcharge && order.currentQuote.surcharge > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Surge Fee</span>
+                    <span className="text-muted-foreground">Surcharge</span>
                     <span className="font-medium">
-                      {order.currencyCode} {order.currentQuote.surgeFee.toFixed(2)}
+                      {order.currencyCode} {order.currentQuote.surcharge.toFixed(2)}
                     </span>
                   </div>
                 )}
@@ -292,9 +300,24 @@ export default function OrderDetailPage() {
                     </span>
                   </div>
                 </div>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => router.push(`/quotes/${order.currentQuote?.id}`)}
+                >
+                  View Quote Details
+                </Button>
               </>
             ) : (
-              <p className="text-muted-foreground">No quote available</p>
+              <div className="text-center">
+                <p className="text-muted-foreground mb-4">No quote available</p>
+                {canCreateQuote && (
+                  <CreateQuoteDialog
+                    orderId={orderId}
+                    defaultCurrency={order.currencyCode || 'CRC'}
+                  />
+                )}
+              </div>
             )}
             <div className="flex justify-between border-t pt-2">
               <span className="text-muted-foreground">Payment Status</span>
