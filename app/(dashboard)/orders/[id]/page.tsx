@@ -126,8 +126,6 @@ export default function OrderDetailPage() {
             <CreateQuoteDialog
               orderId={orderId}
               defaultCurrency={order.currencyCode || 'CRC'}
-              fromAddress={order.fromAddress}
-              toAddress={order.toAddress}
               orderDistanceKm={order.distanceKm}
               orderEstimatedMinutes={order.estimatedMinutes}
             />
