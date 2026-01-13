@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const publicPaths = ['/login'];
 
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Get auth token from cookie
