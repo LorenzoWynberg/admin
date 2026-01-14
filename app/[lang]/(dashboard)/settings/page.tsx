@@ -21,11 +21,16 @@ const languages = [
 ];
 
 export default function SettingsPage() {
-  const { t } = useTranslation();
+  const { t, ready } = useTranslation();
   const params = useParams();
   const router = useRouter();
   const pathname = usePathname();
   const currentLang = (params?.lang as string) || 'en';
+
+  // Wait for translations to load
+  if (!ready) {
+    return null;
+  }
 
   const handleLanguageChange = async (nextLang: string) => {
     // Build new path with new language

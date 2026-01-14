@@ -2,10 +2,11 @@
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import LanguageDetector, { type DetectorOptions } from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
 
 const defaultLocale = 'en';
-const supportedLngs = ['en', 'es', 'fr'];
+const supportedLngs = ['en', 'es', 'fr'] as const;
 const namespaces = [
   'addresses',
   'auth',
@@ -26,7 +27,7 @@ let initialized = false;
 function detectLocaleFromPath(pathname: string): string {
   if (!pathname) return defaultLocale;
   const seg = pathname.split('/').filter(Boolean)[0];
-  return supportedLngs.includes(seg) ? seg : defaultLocale;
+  return (supportedLngs as readonly string[]).includes(seg) ? seg : defaultLocale;
 }
 
 export async function initI18n(pathname?: string) {
@@ -39,6 +40,7 @@ export async function initI18n(pathname?: string) {
 
   await i18n
     .use(initReactI18next)
+    .use(LanguageDetector)
     .use(
       resourcesToBackend((language: string, namespace: string) =>
         fetch(`/locales/${language}/${namespace}.json`).then((res) => res.json())
@@ -47,10 +49,15 @@ export async function initI18n(pathname?: string) {
     .init({
       lng,
       fallbackLng: defaultLocale,
-      supportedLngs,
+      supportedLngs: Array.from(supportedLngs),
       ns: namespaces,
       defaultNS: 'common',
       interpolation: { escapeValue: false },
+      detection: {
+        order: ['path', 'cookie', 'navigator'],
+        lookupFromPathIndex: 0,
+        cookieName: 'lang',
+      } as DetectorOptions,
       react: {
         useSuspense: false,
       },
