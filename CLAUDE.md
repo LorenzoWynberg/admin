@@ -36,8 +36,8 @@ jj undo                             # Undo last operation
 
 ### Documentation Logs
 
-- **CHANGELOG.md** - Update for releases (Keep a Changelog format)
-- **ACTIVITY.md** - Update on EVERY commit (append at top with timestamp)
+- **Changelog**: `logs/CHANGELOG.md` - High-level changes grouped by date/version
+- **Activity Log**: `logs/activity/YYYY-MM-DD.md` - Detailed append-only log of every task, one file per day
 
 See main `CLAUDE.md` for full details.
 
