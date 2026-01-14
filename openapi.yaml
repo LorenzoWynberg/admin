@@ -7,9 +7,9 @@ info:
     name: Mandados Support
 
 servers:
-  - url: http://localhost:8000/api
+  - url: http://api.mandados.test:60
     description: Local development
-  - url: https://api.mandados.app/api
+  - url: https://api.mandados.cr
     description: Production
 
 tags:

@@ -129,8 +129,11 @@ export default function PricingRuleDetailPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{rule.name}</h1>
+            <h1 className="text-3xl font-bold">{rule.name}</h1>
+            <div className="text-muted-foreground flex items-center gap-2">
+              <span>
+                {rule.currencyCode} - v{rule.version}
+              </span>
               {rule.isActive ? (
                 <Badge variant="default" className="bg-green-600">
                   {t('status_active')}
@@ -139,9 +142,6 @@ export default function PricingRuleDetailPage() {
                 <Badge variant="secondary">{t('status_inactive')}</Badge>
               )}
             </div>
-            <p className="text-muted-foreground">
-              {rule.currencyCode} - v{rule.version}
-            </p>
           </div>
         </div>
         <div className="flex gap-2">
