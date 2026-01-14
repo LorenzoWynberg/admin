@@ -1,35 +1,40 @@
-import { create, StateCreator } from 'zustand';
-import { immer } from 'zustand/middleware/immer';
-import { persist, createJSONStorage } from 'zustand/middleware';
+'use client';
 
-type LangStore = {
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+
+export type LangCode = 'en' | 'es' | 'fr';
+
+export type LangState = {
   hydrated: boolean;
-  lang: string;
-  setLang: (lang: string) => void;
+  lang: LangCode;
+  setLang: (lang: LangCode) => void;
 };
 
-type MW = [['zustand/immer', never], ['zustand/persist', unknown]];
-
-const creator: StateCreator<LangStore, MW> = (set) => ({
+const initialState: Omit<LangState, 'setLang'> = {
   hydrated: false,
   lang: 'en',
-  setLang: (lang) =>
-    set((s) => {
-      s.lang = lang;
-    }),
-});
+};
 
-export const useLangStore = create<LangStore>()(
-  immer(
-    persist(creator, {
+export const useLangStore = create<LangState>()(
+  persist(
+    immer((set) => ({
+      ...initialState,
+      setLang: (lang: LangCode) =>
+        set((s) => {
+          s.lang = lang;
+        }),
+    })),
+    {
       name: 'lang-storage',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state): Pick<LangStore, 'lang'> => ({
-        lang: state.lang,
-      }),
+      partialize: (state) => ({ lang: state.lang }),
       onRehydrateStorage: () => () => {
-        useLangStore.setState({ hydrated: true });
+        setTimeout(() => {
+          useLangStore.setState({ hydrated: true } as Partial<LangState>);
+        }, 0);
       },
-    })
+    }
   )
 );

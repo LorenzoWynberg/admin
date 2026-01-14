@@ -1,17 +1,17 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 
 type QuoteStatus = App.Enums.QuoteStatus;
 
-const statusConfig: Record<
-  QuoteStatus,
-  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
-> = {
-  draft: { label: 'Draft', variant: 'secondary' },
-  sent: { label: 'Sent', variant: 'default' },
-  accepted: { label: 'Accepted', variant: 'default' },
-  rejected: { label: 'Rejected', variant: 'destructive' },
-  expired: { label: 'Expired', variant: 'outline' },
-  finalized: { label: 'Finalized', variant: 'default' },
+const statusVariants: Record<QuoteStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+  draft: 'secondary',
+  sent: 'default',
+  accepted: 'default',
+  rejected: 'destructive',
+  expired: 'outline',
+  finalized: 'default',
 };
 
 interface QuoteStatusBadgeProps {
@@ -19,7 +19,10 @@ interface QuoteStatusBadgeProps {
 }
 
 export function QuoteStatusBadge({ status }: QuoteStatusBadgeProps) {
-  const config = statusConfig[status] || { label: status, variant: 'outline' as const };
+  const { t } = useTranslation();
 
-  return <Badge variant={config.variant}>{config.label}</Badge>;
+  const variant = statusVariants[status] || 'outline';
+  const label = t(`quotes:status.${status}`, { defaultValue: status });
+
+  return <Badge variant={variant}>{label}</Badge>;
 }

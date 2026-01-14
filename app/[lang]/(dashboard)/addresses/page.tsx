@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAddressList } from '@/hooks/addresses';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { capitalize } from '@/utils/lang';
 import {
   Table,
   TableBody,
@@ -30,6 +32,7 @@ function formatDate(dateString?: string): string {
 }
 
 export default function AddressesPage() {
+  const { t, ready } = useTranslation();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
@@ -42,24 +45,28 @@ export default function AddressesPage() {
   const addresses = data?.items || [];
   const meta = data?.meta;
 
+  if (!ready) {
+    return null;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Addresses</h1>
-          <p className="text-muted-foreground">View saved addresses</p>
+          <h1 className="text-3xl font-bold">{capitalize(t('models:address_other', { defaultValue: 'Addresses' }))}</h1>
+          <p className="text-muted-foreground">{t('addresses:manage_description', { defaultValue: 'View saved addresses' })}</p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search addresses..."
+              placeholder={t('addresses:search_placeholder', { defaultValue: 'Search addresses...' })}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -79,22 +86,22 @@ export default function AddressesPage() {
             </div>
           ) : error ? (
             <div className="py-12 text-center text-destructive">
-              Failed to load addresses
+              {t('addresses:failed_to_load', { defaultValue: 'Failed to load addresses' })}
             </div>
           ) : addresses.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <MapPin className="mb-4 h-12 w-12" />
-              <p>No addresses found</p>
+              <p>{t('addresses:no_addresses', { defaultValue: 'No addresses found' })}</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Label</TableHead>
-                  <TableHead>Address</TableHead>
-                  <TableHead>City</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>{t('addresses:label', { defaultValue: 'Label' })}</TableHead>
+                  <TableHead>{t('models:address_one', { defaultValue: 'Address' })}</TableHead>
+                  <TableHead>{t('addresses:city', { defaultValue: 'City' })}</TableHead>
+                  <TableHead>{t('common:type', { defaultValue: 'Type' })}</TableHead>
+                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -104,7 +111,7 @@ export default function AddressesPage() {
                       {address.label || '-'}
                       {address.isPrimary && (
                         <Badge variant="secondary" className="ml-2">
-                          Primary
+                          {t('addresses:primary', { defaultValue: 'Primary' })}
                         </Badge>
                       )}
                     </TableCell>
@@ -126,7 +133,7 @@ export default function AddressesPage() {
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Page {meta.currentPage} of {meta.lastPage} ({meta.total} addresses)
+              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} addresses)` })}
             </p>
             <div className="flex gap-2">
               <Button
@@ -136,7 +143,7 @@ export default function AddressesPage() {
                 disabled={page <= 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
+                {t('pagination:previous', { defaultValue: 'Previous' })}
               </Button>
               <Button
                 variant="outline"
@@ -144,7 +151,7 @@ export default function AddressesPage() {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= meta.lastPage}
               >
-                Next
+                {t('pagination:next', { defaultValue: 'Next' })}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>

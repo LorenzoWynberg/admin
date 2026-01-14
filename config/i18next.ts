@@ -10,17 +10,21 @@ const supportedLngs = ['en', 'es', 'fr'] as const;
 const namespaces = [
   'addresses',
   'auth',
-  'cache',
+  'businesses',
+  'catalogs',
   'common',
+  'drivers',
   'http',
   'models',
   'orders',
   'pagination',
-  'languages',
   'passwords',
+  'quotes',
   'resource',
+  'users',
   'validation',
-];
+] as const;
+const defaultNS = 'common';
 
 let initialized = false;
 
@@ -30,7 +34,7 @@ function detectLocaleFromPath(pathname: string): string {
   return (supportedLngs as readonly string[]).includes(seg) ? seg : defaultLocale;
 }
 
-export async function initI18n(pathname?: string) {
+export async function ensureI18nInitialized(pathname?: string) {
   if (initialized) return i18n;
 
   const lng =
@@ -50,7 +54,7 @@ export async function initI18n(pathname?: string) {
       lng,
       fallbackLng: defaultLocale,
       supportedLngs: Array.from(supportedLngs),
-      ns: namespaces,
+      ns: Array.from(namespaces),
       defaultNS: 'common',
       interpolation: { escapeValue: false },
       detection: {

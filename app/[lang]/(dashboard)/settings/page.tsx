@@ -12,13 +12,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Globe } from 'lucide-react';
-import { i18n } from '@/config/i18next';
+import { Lang } from '@/services/langService';
+import type { LangCode } from '@/stores/useLangStore';
 
-const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Español' },
-  { code: 'fr', name: 'Français' },
-];
+const languageCodes = ['en', 'es', 'fr'] as const;
 
 export default function SettingsPage() {
   const { t, ready } = useTranslation();
@@ -38,15 +35,15 @@ export default function SettingsPage() {
     const rest = segments.slice(1).join('/');
     const nextPath = `/${nextLang}${rest ? '/' + rest : ''}`;
 
-    // Change i18next language and navigate
-    await i18n.changeLanguage(nextLang);
+    // Change language via service and navigate
+    await Lang.setActive(nextLang as LangCode);
     router.push(nextPath);
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{t('common:settings_one', { defaultValue: 'Settings' })}</h1>
+        <h1 className="text-3xl font-bold">{t('common:settings_other', { defaultValue: 'Settings' })}</h1>
         <p className="text-muted-foreground">
           {t('common:settings_description', { defaultValue: 'Manage your admin preferences' })}
         </p>
@@ -70,9 +67,9 @@ export default function SettingsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {languages.map((lang) => (
-                  <SelectItem key={lang.code} value={lang.code}>
-                    {lang.name}
+                {languageCodes.map((code) => (
+                  <SelectItem key={code} value={code}>
+                    {t(`languages:${code}`, { defaultValue: code.toUpperCase() })}
                   </SelectItem>
                 ))}
               </SelectContent>

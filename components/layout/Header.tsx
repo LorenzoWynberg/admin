@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useAuth } from '@/stores/useAuthStore';
 import { Auth } from '@/services/authService';
@@ -16,6 +17,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, User } from 'lucide-react';
 
 export function Header() {
+  const { t } = useTranslation();
   const router = useLocalizedRouter();
   const { user } = useAuth();
 
@@ -50,7 +52,7 @@ export function Header() {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{user?.name || 'Admin'}</p>
+              <p className="text-sm font-medium leading-none">{user?.name || t('common:unknown', { defaultValue: 'Admin' })}</p>
               <p className="text-xs leading-none text-muted-foreground">
                 {user?.email || 'admin@example.com'}
               </p>
@@ -59,12 +61,12 @@ export function Header() {
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => router.push('/settings')}>
             <User className="mr-2 h-4 w-4" />
-            Profile
+            {t('common:profile', { defaultValue: 'Profile' })}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
-            Log out
+            {t('auth:logout', { defaultValue: 'Log out' })}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

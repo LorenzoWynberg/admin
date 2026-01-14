@@ -20,7 +20,7 @@ export default function LangLayout({ children }: Readonly<{ children: ReactNode 
   }, [validLang]);
 
   return (
-    <I18nProvider lang={validLang}>
+    <I18nProvider>
       <AuthProvider>{children}</AuthProvider>
     </I18nProvider>
   );

@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useUserList } from '@/hooks/users';
 import { RoleBadge } from '@/components/users/RoleBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { capitalize } from '@/utils/lang';
 import {
   Table,
   TableBody,
@@ -26,15 +28,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 
 type Role = App.Enums.Role;
-
-const roleOptions: { value: string; label: string }[] = [
-  { value: 'all', label: 'All Roles' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'business.owner', label: 'Business Owner' },
-  { value: 'business.user', label: 'Business User' },
-  { value: 'client', label: 'Client' },
-  { value: 'driver', label: 'Driver' },
-];
 
 function formatDate(dateString?: string): string {
   if (!dateString) return '-';
@@ -60,6 +53,7 @@ function getInitials(name?: string): string {
 }
 
 export default function UsersPage() {
+  const { t, ready } = useTranslation();
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [role, setRole] = useState<string>('all');
@@ -75,27 +69,40 @@ export default function UsersPage() {
   const users = data?.items || [];
   const meta = data?.meta;
 
+  if (!ready) {
+    return null;
+  }
+
+  const roleOptions = [
+    { value: 'all', label: t('users:role.all', { defaultValue: 'All Roles' }) },
+    { value: 'admin', label: t('users:role.admin', { defaultValue: 'Admin' }) },
+    { value: 'business.owner', label: t('users:role.business_owner', { defaultValue: 'Business Owner' }) },
+    { value: 'business.user', label: t('users:role.business_user', { defaultValue: 'Business User' }) },
+    { value: 'client', label: t('users:role.client', { defaultValue: 'Client' }) },
+    { value: 'driver', label: t('users:role.driver', { defaultValue: 'Driver' }) },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Users</h1>
-          <p className="text-muted-foreground">Manage user accounts</p>
+          <h1 className="text-3xl font-bold">{capitalize(t('models:user_other', { defaultValue: 'Users' }))}</h1>
+          <p className="text-muted-foreground">{t('users:manage_description', { defaultValue: 'Manage user accounts' })}</p>
         </div>
       </div>
 
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search users..."
+                placeholder={t('users:search_placeholder', { defaultValue: 'Search users...' })}
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -112,7 +119,7 @@ export default function UsersPage() {
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by role" />
+                <SelectValue placeholder={t('users:filter_by_role', { defaultValue: 'Filter by role' })} />
               </SelectTrigger>
               <SelectContent>
                 {roleOptions.map((option) => (
@@ -135,22 +142,22 @@ export default function UsersPage() {
             </div>
           ) : error ? (
             <div className="py-12 text-center text-destructive">
-              Failed to load users
+              {t('users:failed_to_load', { defaultValue: 'Failed to load users' })}
             </div>
           ) : users.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <Users className="mb-4 h-12 w-12" />
-              <p>No users found</p>
+              <p>{t('users:no_users', { defaultValue: 'No users found' })}</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>{t('models:user_one', { defaultValue: 'User' })}</TableHead>
+                  <TableHead>{t('common:email', { defaultValue: 'Email' })}</TableHead>
+                  <TableHead>{t('common:role', { defaultValue: 'Role' })}</TableHead>
+                  <TableHead>{t('common:phone', { defaultValue: 'Phone' })}</TableHead>
+                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -186,7 +193,7 @@ export default function UsersPage() {
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Page {meta.currentPage} of {meta.lastPage} ({meta.total} users)
+              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} users)` })}
             </p>
             <div className="flex gap-2">
               <Button
@@ -196,7 +203,7 @@ export default function UsersPage() {
                 disabled={page <= 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
+                {t('pagination:previous', { defaultValue: 'Previous' })}
               </Button>
               <Button
                 variant="outline"
@@ -204,7 +211,7 @@ export default function UsersPage() {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= meta.lastPage}
               >
-                Next
+                {t('pagination:next', { defaultValue: 'Next' })}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>

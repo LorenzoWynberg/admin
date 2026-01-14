@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useQuoteList } from '@/hooks/quotes';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { capitalize } from '@/utils/lang';
 import {
   Table,
   TableBody,
@@ -25,16 +27,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, FileText } from 'lucide-react';
 
 type QuoteStatus = App.Enums.QuoteStatus;
-
-const statusOptions: { value: string; label: string }[] = [
-  { value: 'all', label: 'All Statuses' },
-  { value: 'draft', label: 'Draft' },
-  { value: 'sent', label: 'Sent' },
-  { value: 'accepted', label: 'Accepted' },
-  { value: 'rejected', label: 'Rejected' },
-  { value: 'expired', label: 'Expired' },
-  { value: 'finalized', label: 'Finalized' },
-];
 
 function formatDate(dateString?: string | null): string {
   if (!dateString) return '-';
@@ -58,6 +50,7 @@ function formatCurrency(amount?: number | null, currency?: string | null): strin
 }
 
 export default function QuotesPage() {
+  const { t, ready } = useTranslation();
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<string>('all');
@@ -73,14 +66,28 @@ export default function QuotesPage() {
   const quotes = data?.items || [];
   const meta = data?.meta;
 
+  if (!ready) {
+    return null;
+  }
+
+  const statusOptions = [
+    { value: 'all', label: t('quotes:status.all', { defaultValue: 'All Statuses' }) },
+    { value: 'draft', label: t('quotes:status.draft', { defaultValue: 'Draft' }) },
+    { value: 'sent', label: t('quotes:status.sent', { defaultValue: 'Sent' }) },
+    { value: 'accepted', label: t('quotes:status.accepted', { defaultValue: 'Accepted' }) },
+    { value: 'rejected', label: t('quotes:status.rejected', { defaultValue: 'Rejected' }) },
+    { value: 'expired', label: t('quotes:status.expired', { defaultValue: 'Expired' }) },
+    { value: 'finalized', label: t('quotes:status.finalized', { defaultValue: 'Finalized' }) },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Quotes</h1>
+          <h1 className="text-3xl font-bold">{capitalize(t('models:quote_other', { defaultValue: 'Quotes' }))}</h1>
           <p className="text-muted-foreground">
-            Create and manage delivery quotes
+            {t('quotes:manage_description', { defaultValue: 'Create and manage delivery quotes' })}
           </p>
         </div>
       </div>
@@ -88,14 +95,14 @@ export default function QuotesPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search quotes..."
+                placeholder={t('quotes:search_placeholder', { defaultValue: 'Search quotes...' })}
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -112,7 +119,7 @@ export default function QuotesPage() {
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder={t('quotes:filter_by_status', { defaultValue: 'Filter by status' })} />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
@@ -135,23 +142,23 @@ export default function QuotesPage() {
             </div>
           ) : error ? (
             <div className="py-12 text-center text-destructive">
-              Failed to load quotes
+              {t('quotes:failed_to_load', { defaultValue: 'Failed to load quotes' })}
             </div>
           ) : quotes.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <FileText className="mb-4 h-12 w-12" />
-              <p>No quotes found</p>
+              <p>{t('quotes:no_quotes', { defaultValue: 'No quotes found' })}</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Order</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Valid Until</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>{t('common:id', { defaultValue: 'ID' })}</TableHead>
+                  <TableHead>{t('models:order_one', { defaultValue: 'Order' })}</TableHead>
+                  <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
+                  <TableHead>{t('common:total', { defaultValue: 'Total' })}</TableHead>
+                  <TableHead>{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</TableHead>
+                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -172,7 +179,7 @@ export default function QuotesPage() {
                             router.push(`/orders/${quote.orderId}`);
                           }}
                         >
-                          Order #{quote.orderId}
+                          {t('orders:order_id', { id: quote.orderId, defaultValue: `Order #${quote.orderId}` })}
                         </Button>
                       ) : (
                         '-'
@@ -197,7 +204,7 @@ export default function QuotesPage() {
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Page {meta.currentPage} of {meta.lastPage} ({meta.total} quotes)
+              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} quotes)` })}
             </p>
             <div className="flex gap-2">
               <Button
@@ -207,7 +214,7 @@ export default function QuotesPage() {
                 disabled={page <= 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
+                {t('pagination:previous', { defaultValue: 'Previous' })}
               </Button>
               <Button
                 variant="outline"
@@ -215,7 +222,7 @@ export default function QuotesPage() {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= meta.lastPage}
               >
-                Next
+                {t('pagination:next', { defaultValue: 'Next' })}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useDriver, useDeleteDriver } from '@/hooks/drivers';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ import {
   Calendar,
   Trash2,
 } from 'lucide-react';
+import { capitalize } from '@/utils/lang';
 
 function formatDate(dateString?: string | null): string {
   if (!dateString) return '-';
@@ -46,6 +48,7 @@ function isLicenseExpired(date?: string): boolean {
 
 export default function DriverDetailPage() {
   const params = useParams();
+  const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
   const driverId = Number(params.id);
 
@@ -53,14 +56,14 @@ export default function DriverDetailPage() {
   const deleteDriver = useDeleteDriver();
 
   const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this driver? This cannot be undone.')) {
+    if (confirm(t('drivers:detail.confirm_delete', { defaultValue: 'Are you sure you want to delete this driver? This cannot be undone.' }))) {
       deleteDriver.mutate(driverId, {
         onSuccess: () => router.push('/drivers'),
       });
     }
   };
 
-  if (isLoading) {
+  if (!ready || isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -71,9 +74,9 @@ export default function DriverDetailPage() {
   if (error || !driver) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">Failed to load driver</p>
+        <p className="text-destructive">{t('drivers:failed_to_load', { defaultValue: 'Failed to load driver' })}</p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
-          Go Back
+          {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
       </div>
     );
@@ -93,8 +96,8 @@ export default function DriverDetailPage() {
             <AvatarFallback>{getInitials(driver.user?.name)}</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-3xl font-bold">{driver.user?.name || 'Unknown'}</h1>
-            <p className="text-muted-foreground">Driver #{driver.id}</p>
+            <h1 className="text-3xl font-bold">{driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}</h1>
+            <p className="text-muted-foreground">{capitalize(t('models:driver_one', { defaultValue: 'Driver' }))} #{driver.id}</p>
           </div>
         </div>
         <Button
@@ -103,7 +106,7 @@ export default function DriverDetailPage() {
           disabled={deleteDriver.isPending}
         >
           <Trash2 className="mr-2 h-4 w-4" />
-          Delete
+          {t('common:delete', { defaultValue: 'Delete' })}
         </Button>
       </div>
 
@@ -112,20 +115,20 @@ export default function DriverDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              User Account
+              {t('drivers:detail.user_account', { defaultValue: 'User Account' })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Name</span>
+              <span className="text-muted-foreground">{t('common:name', { defaultValue: 'Name' })}</span>
               <span className="font-medium">{driver.user?.name || '-'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Email</span>
+              <span className="text-muted-foreground">{t('common:email', { defaultValue: 'Email' })}</span>
               <span className="font-medium">{driver.user?.email || '-'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Phone</span>
+              <span className="text-muted-foreground">{t('common:phone', { defaultValue: 'Phone' })}</span>
               <span className="font-medium">{driver.user?.phone || '-'}</span>
             </div>
             {driver.userId && (
@@ -134,7 +137,7 @@ export default function DriverDetailPage() {
                 className="w-full"
                 onClick={() => router.push(`/users/${driver.userId}`)}
               >
-                View User Profile
+                {t('drivers:detail.view_user_profile', { defaultValue: 'View User Profile' })}
               </Button>
             )}
           </CardContent>
@@ -144,21 +147,21 @@ export default function DriverDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              License Information
+              {t('drivers:detail.license_info', { defaultValue: 'License Information' })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">License Number</span>
+              <span className="text-muted-foreground">{t('drivers:license_number', { defaultValue: 'License Number' })}</span>
               <span className="font-medium">{driver.licenseNumber || '-'}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Expiration Date</span>
+              <span className="text-muted-foreground">{t('drivers:detail.expiration_date', { defaultValue: 'Expiration Date' })}</span>
               <div className="flex items-center gap-2">
                 <span className="font-medium">
                   {formatDate(driver.licenseExpirationDate)}
                 </span>
-                {expired && <Badge variant="destructive">Expired</Badge>}
+                {expired && <Badge variant="destructive">{t('drivers:detail.expired', { defaultValue: 'Expired' })}</Badge>}
               </div>
             </div>
           </CardContent>
@@ -168,12 +171,12 @@ export default function DriverDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Car className="h-5 w-5" />
-              Vehicle Information
+              {t('drivers:detail.vehicle_info', { defaultValue: 'Vehicle Information' })}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">License Plate</span>
+              <span className="text-muted-foreground">{t('drivers:license_plate', { defaultValue: 'License Plate' })}</span>
               <span className="font-medium">{driver.licensePlateNumber || '-'}</span>
             </div>
           </CardContent>
@@ -183,16 +186,16 @@ export default function DriverDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Timestamps
+              {t('drivers:detail.timestamps', { defaultValue: 'Timestamps' })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Created</span>
+              <span className="text-muted-foreground">{t('common:created', { defaultValue: 'Created' })}</span>
               <span className="font-medium">{formatDate(driver.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Updated</span>
+              <span className="text-muted-foreground">{t('common:updated', { defaultValue: 'Updated' })}</span>
               <span className="font-medium">{formatDate(driver.updatedAt)}</span>
             </div>
           </CardContent>

@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useOrderList } from '@/hooks/orders';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { capitalize } from '@/utils/lang';
 import {
   Table,
   TableBody,
@@ -25,20 +27,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, Package } from 'lucide-react';
 
 type OrderStatus = App.Enums.OrderStatus;
-
-const statusOptions: { value: string; label: string }[] = [
-  { value: 'all', label: 'All Statuses' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'estimated', label: 'Quote Ready' },
-  { value: 'approved', label: 'Approved' },
-  { value: 'denied', label: 'Denied' },
-  { value: 'assigned', label: 'Assigned' },
-  { value: 'picking_up', label: 'Picking Up' },
-  { value: 'in_transit', label: 'In Transit' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'delivery_failed', label: 'Failed' },
-  { value: 'canceled', label: 'Canceled' },
-];
 
 function formatDate(dateString?: string): string {
   if (!dateString) return '-';
@@ -65,6 +53,7 @@ function formatAddress(address?: App.Data.Address.AddressData | null): string {
 }
 
 export default function OrdersPage() {
+  const { t, ready } = useTranslation();
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<string>('all');
@@ -80,14 +69,32 @@ export default function OrdersPage() {
   const orders = data?.items || [];
   const meta = data?.meta;
 
+  if (!ready) {
+    return null;
+  }
+
+  const statusOptions = [
+    { value: 'all', label: t('orders:status.all', { defaultValue: 'All Statuses' }) },
+    { value: 'pending', label: t('orders:status.pending', { defaultValue: 'Pending' }) },
+    { value: 'estimated', label: t('orders:status.estimated', { defaultValue: 'Quote Ready' }) },
+    { value: 'approved', label: t('orders:status.approved', { defaultValue: 'Approved' }) },
+    { value: 'denied', label: t('orders:status.denied', { defaultValue: 'Denied' }) },
+    { value: 'assigned', label: t('orders:status.assigned', { defaultValue: 'Assigned' }) },
+    { value: 'picking_up', label: t('orders:status.picking_up', { defaultValue: 'Picking Up' }) },
+    { value: 'in_transit', label: t('orders:status.in_transit', { defaultValue: 'In Transit' }) },
+    { value: 'completed', label: t('orders:status.completed', { defaultValue: 'Completed' }) },
+    { value: 'delivery_failed', label: t('orders:status.delivery_failed', { defaultValue: 'Failed' }) },
+    { value: 'canceled', label: t('orders:status.canceled', { defaultValue: 'Canceled' }) },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Orders</h1>
+          <h1 className="text-3xl font-bold">{capitalize(t('models:order_other', { defaultValue: 'Orders' }))}</h1>
           <p className="text-muted-foreground">
-            Manage delivery orders and quotes
+            {t('orders:manage_description', { defaultValue: 'Manage delivery orders and quotes' })}
           </p>
         </div>
       </div>
@@ -95,14 +102,14 @@ export default function OrdersPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search orders..."
+                placeholder={t('orders:search_placeholder', { defaultValue: 'Search orders...' })}
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -119,7 +126,7 @@ export default function OrdersPage() {
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder={t('orders:filter_by_status', { defaultValue: 'Filter by status' })} />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
@@ -142,23 +149,23 @@ export default function OrdersPage() {
             </div>
           ) : error ? (
             <div className="py-12 text-center text-destructive">
-              Failed to load orders
+              {t('orders:failed_to_load', { defaultValue: 'Failed to load orders' })}
             </div>
           ) : orders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <Package className="mb-4 h-12 w-12" />
-              <p>No orders found</p>
+              <p>{t('orders:no_orders', { defaultValue: 'No orders found' })}</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>From</TableHead>
-                  <TableHead>To</TableHead>
-                  <TableHead>Quote</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>{t('common:id', { defaultValue: 'ID' })}</TableHead>
+                  <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
+                  <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
+                  <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
+                  <TableHead>{t('models:quote_one', { defaultValue: 'Quote' })}</TableHead>
+                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -195,7 +202,7 @@ export default function OrdersPage() {
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Page {meta.currentPage} of {meta.lastPage} ({meta.total} orders)
+              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} orders)` })}
             </p>
             <div className="flex gap-2">
               <Button
@@ -205,7 +212,7 @@ export default function OrdersPage() {
                 disabled={page <= 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
+                {t('pagination:previous', { defaultValue: 'Previous' })}
               </Button>
               <Button
                 variant="outline"
@@ -213,7 +220,7 @@ export default function OrdersPage() {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= meta.lastPage}
               >
-                Next
+                {t('pagination:next', { defaultValue: 'Next' })}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>

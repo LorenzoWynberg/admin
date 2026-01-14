@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useQuote, useSendQuote, useDeleteQuote } from '@/hooks/quotes';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
@@ -15,6 +16,7 @@ import {
   Trash2,
   Package,
 } from 'lucide-react';
+import { capitalize } from '@/utils/lang';
 
 type QuoteStatus = App.Enums.QuoteStatus;
 
@@ -41,6 +43,7 @@ function formatCurrency(amount?: number | null, currency?: string | null): strin
 
 export default function QuoteDetailPage() {
   const params = useParams();
+  const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
   const quoteId = Number(params.id);
 
@@ -49,20 +52,20 @@ export default function QuoteDetailPage() {
   const deleteQuote = useDeleteQuote();
 
   const handleSend = () => {
-    if (confirm('Are you sure you want to send this quote to the customer?')) {
+    if (confirm(t('quotes:detail.confirm_send', { defaultValue: 'Are you sure you want to send this quote to the customer?' }))) {
       sendQuote.mutate(quoteId);
     }
   };
 
   const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this quote? This cannot be undone.')) {
+    if (confirm(t('quotes:detail.confirm_delete', { defaultValue: 'Are you sure you want to delete this quote? This cannot be undone.' }))) {
       deleteQuote.mutate(quoteId, {
         onSuccess: () => router.push('/quotes'),
       });
     }
   };
 
-  if (isLoading) {
+  if (!ready || isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -73,9 +76,9 @@ export default function QuoteDetailPage() {
   if (error || !quote) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">Failed to load quote</p>
+        <p className="text-destructive">{t('quotes:failed_to_load', { defaultValue: 'Failed to load quote' })}</p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
-          Go Back
+          {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
       </div>
     );
@@ -95,11 +98,11 @@ export default function QuoteDetailPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">Quote #{quote.id}</h1>
+              <h1 className="text-3xl font-bold">{capitalize(t('models:quote_one', { defaultValue: 'Quote' }))} #{quote.id}</h1>
               <QuoteStatusBadge status={quote.status as QuoteStatus} />
             </div>
             <p className="text-muted-foreground">
-              Created {formatDate(quote.createdAt)}
+              {t('common:created', { defaultValue: 'Created' })} {formatDate(quote.createdAt)}
             </p>
           </div>
         </div>
@@ -107,7 +110,7 @@ export default function QuoteDetailPage() {
           {canSend && (
             <Button onClick={handleSend} disabled={sendQuote.isPending}>
               <Send className="mr-2 h-4 w-4" />
-              Send to Customer
+              {t('quotes:detail.send_to_customer', { defaultValue: 'Send to Customer' })}
             </Button>
           )}
           {canDelete && (
@@ -117,7 +120,7 @@ export default function QuoteDetailPage() {
               disabled={deleteQuote.isPending}
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              Delete
+              {t('common:delete', { defaultValue: 'Delete' })}
             </Button>
           )}
         </div>
@@ -129,40 +132,40 @@ export default function QuoteDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Quote Details
+              {t('quotes:detail.title', { defaultValue: 'Quote Details' })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Version</span>
+              <span className="text-muted-foreground">{t('quotes:detail.version', { defaultValue: 'Version' })}</span>
               <span className="font-medium">{quote.version || 1}</span>
             </div>
             {quote.orderId && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Order</span>
+                <span className="text-muted-foreground">{t('models:order_one', { defaultValue: 'Order' })}</span>
                 <Button
                   variant="link"
                   className="h-auto p-0"
                   onClick={() => router.push(`/orders/${quote.orderId}`)}
                 >
                   <Package className="mr-1 h-4 w-4" />
-                  Order #{quote.orderId}
+                  {t('orders:order_id', { id: quote.orderId, defaultValue: `Order #${quote.orderId}` })}
                 </Button>
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Final</span>
-              <span className="font-medium">{quote.isFinal ? 'Yes' : 'No'}</span>
+              <span className="text-muted-foreground">{t('quotes:detail.is_final', { defaultValue: 'Final' })}</span>
+              <span className="font-medium">{quote.isFinal ? t('common:yes', { defaultValue: 'Yes' }) : t('common:no', { defaultValue: 'No' })}</span>
             </div>
             {quote.finalizedAt && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Finalized At</span>
+                <span className="text-muted-foreground">{t('quotes:detail.finalized_at', { defaultValue: 'Finalized At' })}</span>
                 <span className="font-medium">{formatDate(quote.finalizedAt)}</span>
               </div>
             )}
             {quote.notes && (
               <div className="border-t pt-4">
-                <p className="text-sm text-muted-foreground">Notes</p>
+                <p className="text-sm text-muted-foreground">{t('quotes:detail.notes', { defaultValue: 'Notes' })}</p>
                 <p className="mt-1">{quote.notes}</p>
               </div>
             )}
@@ -174,25 +177,25 @@ export default function QuoteDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5" />
-              Pricing Breakdown
+              {t('quotes:detail.pricing', { defaultValue: 'Pricing Breakdown' })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Base Fare</span>
+              <span className="text-muted-foreground">{t('quotes:detail.base_fare', { defaultValue: 'Base Fare' })}</span>
               <span className="font-medium">
                 {formatCurrency(quote.baseFare, quote.currencyCode)}
               </span>
             </div>
             {quote.distanceKm != null && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Distance</span>
+                <span className="text-muted-foreground">{t('quotes:detail.distance', { defaultValue: 'Distance' })}</span>
                 <span className="font-medium">{quote.distanceKm.toFixed(1)} km</span>
               </div>
             )}
             {quote.distanceFee != null && quote.distanceFee > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Distance Fee</span>
+                <span className="text-muted-foreground">{t('quotes:detail.distance_fee', { defaultValue: 'Distance Fee' })}</span>
                 <span className="font-medium">
                   {formatCurrency(quote.distanceFee, quote.currencyCode)}
                 </span>
@@ -200,7 +203,7 @@ export default function QuoteDetailPage() {
             )}
             {quote.timeFee != null && quote.timeFee > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Time Fee</span>
+                <span className="text-muted-foreground">{t('quotes:detail.time_fee', { defaultValue: 'Time Fee' })}</span>
                 <span className="font-medium">
                   {formatCurrency(quote.timeFee, quote.currencyCode)}
                 </span>
@@ -208,7 +211,7 @@ export default function QuoteDetailPage() {
             )}
             {quote.surcharge != null && quote.surcharge > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Surcharge</span>
+                <span className="text-muted-foreground">{t('quotes:detail.surcharge', { defaultValue: 'Surcharge' })}</span>
                 <span className="font-medium">
                   {formatCurrency(quote.surcharge, quote.currencyCode)}
                 </span>
@@ -216,7 +219,7 @@ export default function QuoteDetailPage() {
             )}
             {quote.discountRate != null && quote.discountRate > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Discount</span>
+                <span className="text-muted-foreground">{t('quotes:detail.discount', { defaultValue: 'Discount' })}</span>
                 <span className="font-medium text-green-600">
                   -{quote.discountRate}%
                 </span>
@@ -224,7 +227,7 @@ export default function QuoteDetailPage() {
             )}
             {quote.taxRate != null && quote.taxRate > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Tax ({quote.taxRate}%)</span>
+                <span className="text-muted-foreground">{t('quotes:detail.tax', { defaultValue: 'Tax' })} ({quote.taxRate}%)</span>
                 <span className="font-medium">
                   {formatCurrency(quote.taxTotal, quote.currencyCode)}
                 </span>
@@ -232,7 +235,7 @@ export default function QuoteDetailPage() {
             )}
             <div className="border-t pt-3">
               <div className="flex justify-between text-lg font-bold">
-                <span>Total</span>
+                <span>{t('common:total', { defaultValue: 'Total' })}</span>
                 <span>{formatCurrency(quote.total, quote.currencyCode)}</span>
               </div>
             </div>
@@ -244,20 +247,20 @@ export default function QuoteDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Schedule
+              {t('quotes:detail.schedule', { defaultValue: 'Schedule' })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Pickup Proposed</span>
+              <span className="text-muted-foreground">{t('quotes:detail.pickup_proposed', { defaultValue: 'Pickup Proposed' })}</span>
               <span className="font-medium">{formatDate(quote.pickupProposedFor)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Delivery Proposed</span>
+              <span className="text-muted-foreground">{t('quotes:detail.delivery_proposed', { defaultValue: 'Delivery Proposed' })}</span>
               <span className="font-medium">{formatDate(quote.deliveryProposedFor)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Valid Until</span>
+              <span className="text-muted-foreground">{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</span>
               <span className="font-medium">{formatDate(quote.validUntil)}</span>
             </div>
           </CardContent>
@@ -266,15 +269,15 @@ export default function QuoteDetailPage() {
         {/* Timestamps */}
         <Card>
           <CardHeader>
-            <CardTitle>Timestamps</CardTitle>
+            <CardTitle>{t('quotes:detail.timestamps', { defaultValue: 'Timestamps' })}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Created</span>
+              <span className="text-muted-foreground">{t('common:created', { defaultValue: 'Created' })}</span>
               <span className="font-medium">{formatDate(quote.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Updated</span>
+              <span className="text-muted-foreground">{t('common:updated', { defaultValue: 'Updated' })}</span>
               <span className="font-medium">{formatDate(quote.updatedAt)}</span>
             </div>
           </CardContent>

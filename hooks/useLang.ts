@@ -1,5 +1,5 @@
 import { Lang } from '@/services/langService';
-import { useLangStore } from '@/stores/useLangStore';
+import { useLangStore, type LangCode } from '@/stores/useLangStore';
 
 /**
  * useLang Hook - Reactive hook for language state
@@ -10,10 +10,10 @@ export const useLang = () => {
 
   return {
     active: lang ?? 'en',
-    isActive: Lang.isActive,
     set: Lang.setActive,
     hydrated,
   };
 };
 
 export default useLang;
+export type { LangCode };

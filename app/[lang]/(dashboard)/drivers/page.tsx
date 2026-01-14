@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useDriverList } from '@/hooks/drivers';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { capitalize } from '@/utils/lang';
 import {
   Table,
   TableBody,
@@ -41,6 +43,7 @@ function getInitials(name?: string): string {
 }
 
 export default function DriversPage() {
+  const { t, ready } = useTranslation();
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -54,24 +57,28 @@ export default function DriversPage() {
   const drivers = data?.items || [];
   const meta = data?.meta;
 
+  if (!ready) {
+    return null;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Drivers</h1>
-          <p className="text-muted-foreground">Manage driver accounts</p>
+          <h1 className="text-3xl font-bold">{capitalize(t('models:driver_other', { defaultValue: 'Drivers' }))}</h1>
+          <p className="text-muted-foreground">{t('drivers:manage_description', { defaultValue: 'Manage driver accounts' })}</p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search drivers..."
+              placeholder={t('drivers:search_placeholder', { defaultValue: 'Search drivers...' })}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -91,22 +98,22 @@ export default function DriversPage() {
             </div>
           ) : error ? (
             <div className="py-12 text-center text-destructive">
-              Failed to load drivers
+              {t('drivers:failed_to_load', { defaultValue: 'Failed to load drivers' })}
             </div>
           ) : drivers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <Truck className="mb-4 h-12 w-12" />
-              <p>No drivers found</p>
+              <p>{t('drivers:no_drivers', { defaultValue: 'No drivers found' })}</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Driver</TableHead>
-                  <TableHead>License Number</TableHead>
-                  <TableHead>License Plate</TableHead>
-                  <TableHead>License Expires</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>{t('models:driver_one', { defaultValue: 'Driver' })}</TableHead>
+                  <TableHead>{t('drivers:license_number', { defaultValue: 'License Number' })}</TableHead>
+                  <TableHead>{t('drivers:license_plate', { defaultValue: 'License Plate' })}</TableHead>
+                  <TableHead>{t('drivers:license_expires', { defaultValue: 'License Expires' })}</TableHead>
+                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -125,7 +132,7 @@ export default function DriversPage() {
                           </AvatarFallback>
                         </Avatar>
                         <span className="font-medium">
-                          {driver.user?.name || 'Unknown'}
+                          {driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}
                         </span>
                       </div>
                     </TableCell>
@@ -143,7 +150,7 @@ export default function DriversPage() {
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Page {meta.currentPage} of {meta.lastPage} ({meta.total} drivers)
+              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} drivers)` })}
             </p>
             <div className="flex gap-2">
               <Button
@@ -153,7 +160,7 @@ export default function DriversPage() {
                 disabled={page <= 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
+                {t('pagination:previous', { defaultValue: 'Previous' })}
               </Button>
               <Button
                 variant="outline"
@@ -161,7 +168,7 @@ export default function DriversPage() {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= meta.lastPage}
               >
-                Next
+                {t('pagination:next', { defaultValue: 'Next' })}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>

@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useCatalogList } from '@/hooks/catalogs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { capitalize } from '@/utils/lang';
 import {
   Table,
   TableBody,
@@ -31,6 +33,7 @@ function formatDate(dateString?: string): string {
 }
 
 export default function CatalogsPage() {
+  const { t, ready } = useTranslation();
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -44,24 +47,28 @@ export default function CatalogsPage() {
   const catalogs = data?.items || [];
   const meta = data?.meta;
 
+  if (!ready) {
+    return null;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Catalogs</h1>
-          <p className="text-muted-foreground">Manage catalog data</p>
+          <h1 className="text-3xl font-bold">{capitalize(t('models:catalog_other', { defaultValue: 'Catalogs' }))}</h1>
+          <p className="text-muted-foreground">{t('catalogs:manage_description', { defaultValue: 'Manage catalog data' })}</p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search catalogs..."
+              placeholder={t('catalogs:search_placeholder', { defaultValue: 'Search catalogs...' })}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -81,21 +88,21 @@ export default function CatalogsPage() {
             </div>
           ) : error ? (
             <div className="py-12 text-center text-destructive">
-              Failed to load catalogs
+              {t('catalogs:failed_to_load', { defaultValue: 'Failed to load catalogs' })}
             </div>
           ) : catalogs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <Database className="mb-4 h-12 w-12" />
-              <p>No catalogs found</p>
+              <p>{t('catalogs:no_catalogs', { defaultValue: 'No catalogs found' })}</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Elements</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>{t('catalogs:code', { defaultValue: 'Code' })}</TableHead>
+                  <TableHead>{t('common:name', { defaultValue: 'Name' })}</TableHead>
+                  <TableHead>{t('catalogs:elements', { defaultValue: 'Elements' })}</TableHead>
+                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -121,7 +128,7 @@ export default function CatalogsPage() {
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Page {meta.currentPage} of {meta.lastPage} ({meta.total} catalogs)
+              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} catalogs)` })}
             </p>
             <div className="flex gap-2">
               <Button
@@ -131,7 +138,7 @@ export default function CatalogsPage() {
                 disabled={page <= 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
+                {t('pagination:previous', { defaultValue: 'Previous' })}
               </Button>
               <Button
                 variant="outline"
@@ -139,7 +146,7 @@ export default function CatalogsPage() {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= meta.lastPage}
               >
-                Next
+                {t('pagination:next', { defaultValue: 'Next' })}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>

@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { capitalize } from '@/utils/lang';
 import {
   LayoutDashboard,
   Package,
@@ -16,17 +18,18 @@ import {
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Orders', href: '/orders', icon: Package },
-  { name: 'Quotes', href: '/quotes', icon: FileText },
-  { name: 'Users', href: '/users', icon: Users },
-  { name: 'Drivers', href: '/drivers', icon: Truck },
-  { name: 'Businesses', href: '/businesses', icon: Building2 },
-  { name: 'Addresses', href: '/addresses', icon: MapPin },
-  { name: 'Catalogs', href: '/catalogs', icon: Database },
+  { modelKey: 'dashboard', href: '/', icon: LayoutDashboard, isModel: false },
+  { modelKey: 'order', href: '/orders', icon: Package, isModel: true },
+  { modelKey: 'quote', href: '/quotes', icon: FileText, isModel: true },
+  { modelKey: 'user', href: '/users', icon: Users, isModel: true },
+  { modelKey: 'driver', href: '/drivers', icon: Truck, isModel: true },
+  { modelKey: 'business', href: '/businesses', icon: Building2, isModel: true },
+  { modelKey: 'address', href: '/addresses', icon: MapPin, isModel: true },
+  { modelKey: 'catalog', href: '/catalogs', icon: Database, isModel: true },
 ];
 
 export function Sidebar() {
+  const { t, ready } = useTranslation();
   const pathname = usePathname();
   const params = useParams();
   const lang = (params?.lang as string) || 'en';
@@ -36,6 +39,14 @@ export function Sidebar() {
 
   // Get path without language prefix for active state check
   const pathWithoutLang = pathname.replace(new RegExp(`^/${lang}`), '') || '/';
+
+  const getNavLabel = (item: typeof navigation[0]) => {
+    if (!ready) return '';
+    const label = item.isModel
+      ? t(`models:${item.modelKey}_other`, { defaultValue: item.modelKey })
+      : t(`common:${item.modelKey}`, { defaultValue: item.modelKey });
+    return capitalize(label);
+  };
 
   return (
     <aside className="hidden w-64 flex-shrink-0 border-r bg-card lg:block">
@@ -57,7 +68,7 @@ export function Sidebar() {
 
             return (
               <Link
-                key={item.name}
+                key={item.modelKey}
                 href={withLang(item.href)}
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
@@ -67,7 +78,7 @@ export function Sidebar() {
                 )}
               >
                 <item.icon className="h-5 w-5" />
-                {item.name}
+                {getNavLabel(item)}
               </Link>
             );
           })}
@@ -85,7 +96,7 @@ export function Sidebar() {
             )}
           >
             <Settings className="h-5 w-5" />
-            Settings
+            {ready ? capitalize(t('common:settings_other', { defaultValue: 'Settings' })) : ''}
           </Link>
         </div>
       </div>

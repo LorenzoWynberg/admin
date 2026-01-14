@@ -1,28 +1,26 @@
 'use client';
 
-import { i18n, initI18n } from '@/config/i18next';
-import { useLangStore } from '@/stores/useLangStore';
+import { useLangStore, type LangCode } from '@/stores/useLangStore';
+import { ensureI18nInitialized, i18n } from '@/config/i18next';
 
-/**
- * LangService - Language management singleton
- */
+function setLangCookie(lang: LangCode) {
+  try {
+    document.cookie = `lang=${lang}; Path=/; Max-Age=31536000; SameSite=Lax`;
+  } catch {}
+}
+
 export const Lang = {
-  getActive(): string {
+  getActive(): LangCode {
     return useLangStore.getState().lang ?? 'en';
   },
 
-  isActive(lang: string): boolean {
-    return useLangStore.getState().lang === lang;
-  },
-
-  async setActive(lang: string): Promise<void> {
-    await initI18n();
+  async setActive(lang: LangCode): Promise<void> {
+    await ensureI18nInitialized();
     useLangStore.getState().setLang(lang);
+    setLangCookie(lang);
     try {
       await i18n.changeLanguage(lang);
-    } catch {
-      // ignore
-    }
+    } catch {}
   },
 
   hydrated(): boolean {
