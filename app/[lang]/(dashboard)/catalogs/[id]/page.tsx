@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
-import { useCatalog } from '@/hooks/catalogs';
+import { useCatalog, useCatalogElements } from '@/hooks/catalogs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +38,10 @@ export default function CatalogDetailPage() {
   const catalogId = Number(params.id);
 
   const { data: catalog, isLoading, error } = useCatalog(catalogId);
+  const { data: elementsData, isLoading: elementsLoading } = useCatalogElements(
+    catalog?.code || '',
+    { enabled: !!catalog?.code }
+  );
 
   if (!ready || isLoading) {
     return (
@@ -58,7 +62,7 @@ export default function CatalogDetailPage() {
     );
   }
 
-  const elements = catalog.elements || [];
+  const elements = elementsData?.items || [];
 
   return (
     <div className="space-y-6">
