@@ -8,11 +8,28 @@ Next.js 16 admin dashboard with TypeScript, Zustand, React Query, React Hook For
 
 ## Version Control
 
-- **Use jj (Jujutsu)** - Default version control tool instead of raw git
+- **Use jj (Jujutsu)** - Default version control tool instead of raw git ([docs](https://docs.jj-vcs.dev/latest/))
 - **Atomic commits** - One logical change per commit, very small and focused
 - **No co-authored-by** - Do not add "Co-Authored-By: Claude" to commit messages
 - **Conventional commits** - Use prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`
 - **Branch strategy:** `feature/*` → `release/*` → `dev` → `main` (see main CLAUDE.md)
+
+### jj Essential Commands
+
+```bash
+jj new                              # Create new commit
+jj describe -m "message"            # Set commit message
+jj status / jj diff / jj log        # View state
+jj bookmark create NAME -r @        # Create bookmark
+jj bookmark set NAME -r @           # Move bookmark (use --allow-backwards if needed)
+jj bookmark track NAME --remote=origin  # Track before first push
+jj git push --bookmark NAME         # Push bookmark
+jj git fetch                        # Fetch from remote
+jj squash                           # Squash into parent
+jj undo                             # Undo last operation
+```
+
+**Note:** `--allow-new` is deprecated. Track bookmarks before pushing: `jj bookmark track NAME --remote=origin`
 
 ---
 
