@@ -2,6 +2,8 @@ import { api } from '@/lib/api/client';
 
 type CatalogData = App.Data.Catalog.CatalogData;
 type CatalogElementData = App.Data.CatalogElement.CatalogElementData;
+type StoreCatalogElementData = App.Data.CatalogElement.StoreCatalogElementData;
+type UpdateCatalogElementData = App.Data.CatalogElement.UpdateCatalogElementData;
 type Single<T> = Api.Response.Single<T>;
 type Paginated<T> = Api.Response.Paginated<T>;
 
@@ -33,5 +35,20 @@ export const CatalogService = {
 
   async getElementsByCode(code: string): Promise<Paginated<CatalogElementData>> {
     return api.get<Paginated<CatalogElementData>>(`/catalogs/${code}/elements/translated`);
+  },
+
+  // Element CRUD
+  async createElement(catalogId: number, data: Omit<StoreCatalogElementData, 'catalogId'>): Promise<CatalogElementData> {
+    const response = await api.post<Single<CatalogElementData>>(`/catalogs/${catalogId}/elements`, data);
+    return response.item;
+  },
+
+  async updateElement(catalogId: number, elementId: number, data: Omit<UpdateCatalogElementData, 'catalogId'>): Promise<CatalogElementData> {
+    const response = await api.patch<Single<CatalogElementData>>(`/catalogs/${catalogId}/elements/${elementId}`, data);
+    return response.item;
+  },
+
+  async deleteElement(catalogId: number, elementId: number): Promise<void> {
+    await api.destroy(`/catalogs/${catalogId}/elements/${elementId}`);
   },
 };

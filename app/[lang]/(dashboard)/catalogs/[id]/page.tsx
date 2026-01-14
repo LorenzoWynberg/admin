@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
@@ -15,8 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ArrowLeft, Database, List, Calendar } from 'lucide-react';
+import { ArrowLeft, Database, List, Calendar, Pencil } from 'lucide-react';
 import { capitalize } from '@/utils/lang';
+import { ElementEditDialog } from '@/components/catalogs/ElementEditDialog';
+
+type CatalogElementData = App.Data.CatalogElement.CatalogElementData;
 
 function formatDate(dateString?: string | null): string {
   if (!dateString) return '-';
@@ -37,11 +41,19 @@ export default function CatalogDetailPage() {
   const router = useLocalizedRouter();
   const catalogId = Number(params.id);
 
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedElement, setSelectedElement] = useState<CatalogElementData | null>(null);
+
   const { data: catalog, isLoading, error } = useCatalog(catalogId);
   const { data: elementsData, isLoading: elementsLoading } = useCatalogElements(
     catalog?.code || '',
     { enabled: !!catalog?.code }
   );
+
+  const handleEditElement = (element: CatalogElementData) => {
+    setSelectedElement(element);
+    setEditDialogOpen(true);
+  };
 
   if (!ready || isLoading) {
     return (
@@ -145,6 +157,7 @@ export default function CatalogDetailPage() {
                   <TableHead>{t('catalogs:code', { defaultValue: 'Code' })}</TableHead>
                   <TableHead>{t('common:name', { defaultValue: 'Name' })}</TableHead>
                   <TableHead>{t('catalogs:detail.order', { defaultValue: 'Order' })}</TableHead>
+                  <TableHead className="w-20">{t('common:actions', { defaultValue: 'Actions' })}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -155,6 +168,15 @@ export default function CatalogDetailPage() {
                     </TableCell>
                     <TableCell className="font-medium">{element.name}</TableCell>
                     <TableCell>{element.order ?? '-'}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEditElement(element)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -162,6 +184,14 @@ export default function CatalogDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      <ElementEditDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        element={selectedElement}
+        catalogId={catalogId}
+        catalogCode={catalog?.code || ''}
+      />
     </div>
   );
 }
