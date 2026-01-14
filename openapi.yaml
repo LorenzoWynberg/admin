@@ -567,7 +567,10 @@ paths:
   /auth/token:
     post:
       tags: [Auth]
-      summary: Login and get token
+      summary: Login for app users (mobile app)
+      description: |
+        Login endpoint for the mobile app (front-end). Only allows users with
+        client, business.owner, or business.user roles.
       operationId: login
       requestBody:
         required: true
@@ -576,7 +579,7 @@ paths:
             schema:
               $ref: '#/components/schemas/LoginRequest'
       responses:
-        '200':
+        '201':
           description: Login successful
           content:
             application/json:
@@ -587,8 +590,14 @@ paths:
                     properties:
                       token:
                         type: string
+        '403':
+          description: Role not allowed for this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '422':
-          description: Validation error
+          description: Validation error (invalid credentials)
           content:
             application/json:
               schema:
@@ -606,6 +615,82 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessBasic'
+
+  /auth/admin/token:
+    post:
+      tags: [Auth]
+      summary: Login for admin users (admin panel)
+      description: |
+        Login endpoint for the admin panel. Only allows users with the admin role.
+      operationId: loginAdmin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '201':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessBasic'
+                  - type: object
+                    properties:
+                      token:
+                        type: string
+        '403':
+          description: Role not allowed for this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error (invalid credentials)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/driver/token:
+    post:
+      tags: [Auth]
+      summary: Login for driver users (driver app)
+      description: |
+        Login endpoint for the driver app. Only allows users with the driver role.
+      operationId: loginDriver
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '201':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessBasic'
+                  - type: object
+                    properties:
+                      token:
+                        type: string
+        '403':
+          description: Role not allowed for this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error (invalid credentials)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /auth/token/user:
     get:

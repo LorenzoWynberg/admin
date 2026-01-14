@@ -17,14 +17,15 @@ interface LoginCredentials {
 export const Auth = {
   /**
    * Login with email and password
+   * Uses the admin-specific endpoint that only allows admin role
    */
   async login(credentials: LoginCredentials): Promise<UserData> {
     const store = useAuthStore.getState();
     store.setLoading(true);
 
     try {
-      // Get token from API
-      const response = await api.post<LoginResponse>('/auth/token', credentials);
+      // Get token from admin-specific endpoint (only allows admin role)
+      const response = await api.post<LoginResponse>('/auth/admin/token', credentials);
       const token = response.token;
 
       // Store token
@@ -36,14 +37,6 @@ export const Auth = {
       // Fetch user data
       const userResponse = await api.get<SingleUser>('/auth/token/user');
       const user = userResponse.item;
-
-      // Verify user is admin
-      if (user.role !== 'admin') {
-        // Clear everything if not admin
-        store.logout();
-        document.cookie = 'auth-token=; path=/; max-age=0';
-        throw new Error('Access denied. Admin privileges required.');
-      }
 
       store.setUser(user);
       return user;
@@ -84,13 +77,6 @@ export const Auth = {
     try {
       const response = await api.get<SingleUser>('/auth/token/user');
       const user = response.item;
-
-      // Verify still admin
-      if (user.role !== 'admin') {
-        store.logout();
-        document.cookie = 'auth-token=; path=/; max-age=0';
-        return null;
-      }
 
       store.setUser(user);
       return user;
