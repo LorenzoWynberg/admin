@@ -331,7 +331,12 @@ crudErrorMessage('delete', 'order')        // "Failed to delete order"
 ## i18n
 
 ### Configuration
-Translations loaded from backend at `/locales/{lng}/{ns}.json`
+**Translations are managed in the backend** at `api/lang/` (PHP files). This app fetches them at runtime from `/locales/{lng}/{ns}.json`.
+
+To add or modify translations:
+1. Edit PHP files in `../api/lang/en/*.php` or `../api/lang/es/*.php`
+2. Run `langs` command from the API directory to regenerate JSON files
+3. No manual sync needed - translations are fetched at runtime
 
 ### Namespaces
 `addresses`, `auth`, `cache`, `common`, `http`, `models`, `orders`, `pagination`, `languages`, `passwords`, `resource`, `validation`
