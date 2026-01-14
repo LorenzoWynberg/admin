@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Auth } from '@/services/authService';
@@ -27,7 +28,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 

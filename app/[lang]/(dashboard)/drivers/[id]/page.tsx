@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useDriver, useDeleteDriver } from '@/hooks/drivers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,7 +46,7 @@ function isLicenseExpired(date?: string): boolean {
 
 export default function DriverDetailPage() {
   const params = useParams();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const driverId = Number(params.id);
 
   const { data: driver, isLoading, error } = useDriver(driverId);

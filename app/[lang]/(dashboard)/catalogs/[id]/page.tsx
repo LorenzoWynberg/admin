@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useCatalog } from '@/hooks/catalogs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,7 +31,7 @@ function formatDate(dateString?: string | null): string {
 
 export default function CatalogDetailPage() {
   const params = useParams();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const catalogId = Number(params.id);
 
   const { data: catalog, isLoading, error } = useCatalog(catalogId);

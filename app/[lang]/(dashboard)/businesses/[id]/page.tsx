@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useBusiness, useDeleteBusiness } from '@/hooks/businesses';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,7 +39,7 @@ function formatAddress(address?: App.Data.Address.AddressData | null): string {
 
 export default function BusinessDetailPage() {
   const params = useParams();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const businessId = Number(params.id);
 
   const { data: business, isLoading, error } = useBusiness(businessId);

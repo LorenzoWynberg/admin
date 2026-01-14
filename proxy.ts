@@ -1,42 +1,76 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-const publicPaths = ['/login'];
+// Next.js v16 proxy for language routing
 
-export default function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+const PUBLIC_FILE = /\.(.*)$/;
+const locales = ['en', 'es', 'fr'] as const;
+const defaultLocale = 'en' as const;
 
-  // Get auth token from cookie
-  const token = request.cookies.get('auth-token')?.value;
+type Locale = (typeof locales)[number];
 
-  // Allow public paths
-  if (publicPaths.some((path) => pathname.startsWith(path))) {
-    // If already logged in, redirect to dashboard
-    if (token) {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
+function parseCookie(req: Request): Record<string, string> {
+  const header = req.headers.get('cookie') ?? '';
+  return header.split('; ').reduce<Record<string, string>>((acc, part) => {
+    if (!part) return acc;
+    const eq = part.indexOf('=');
+    if (eq === -1) return acc;
+    const k = part.slice(0, eq);
+    acc[k] = part.slice(eq + 1);
+    return acc;
+  }, {});
+}
+
+function getCookieLang(req: Request): Locale | undefined {
+  const cookies = parseCookie(req);
+  const lang = cookies['lang'];
+  if (lang && (locales as readonly string[]).includes(lang)) return lang as Locale;
+  return undefined;
+}
+
+export default function proxy(req: Request) {
+  const url = new URL(req.url);
+  const { pathname } = url;
+
+  // Ignore public files and specific paths that shouldn't be localized
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    PUBLIC_FILE.test(pathname) ||
+    pathname.startsWith('/locales/')
+  ) {
     return NextResponse.next();
   }
 
-  // Require auth for all other paths
-  if (!token) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('callbackUrl', pathname);
-    return NextResponse.redirect(loginUrl);
+  // Handle paths that incorrectly have locale prefix before _next
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const maybeLocale = pathSegments[0];
+  if (
+    (locales as readonly string[]).includes(maybeLocale) &&
+    pathSegments[1] === '_next'
+  ) {
+    url.pathname = '/' + pathSegments.slice(1).join('/');
+    return NextResponse.rewrite(url);
   }
 
-  return NextResponse.next();
+  // If path already includes a locale, set cookie and continue
+  if ((locales as readonly string[]).includes(maybeLocale)) {
+    const res = NextResponse.next();
+    const existing = getCookieLang(req);
+    if (existing !== (maybeLocale as Locale)) {
+      res.headers.append(
+        'Set-Cookie',
+        `lang=${maybeLocale}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`
+      );
+    }
+    return res;
+  }
+
+  // Redirect non-localized paths to preferred or default locale
+  const cookieLang = getCookieLang(req) || defaultLocale;
+  url.pathname = `/${cookieLang}${pathname}`;
+  return NextResponse.redirect(url);
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|_next).*)',
-  ],
+  matcher: ['/:path*'],
 };

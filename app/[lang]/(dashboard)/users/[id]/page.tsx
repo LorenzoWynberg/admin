@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useUser, useDeleteUser } from '@/hooks/users';
 import { RoleBadge } from '@/components/users/RoleBadge';
 import { Button } from '@/components/ui/button';
@@ -45,7 +46,7 @@ function getInitials(name?: string): string {
 
 export default function UserDetailPage() {
   const params = useParams();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const userId = Number(params.id);
 
   const { data: user, isLoading, error } = useUser(userId);

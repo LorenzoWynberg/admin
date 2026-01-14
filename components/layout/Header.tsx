@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useAuth } from '@/stores/useAuthStore';
 import { Auth } from '@/services/authService';
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,12 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, User } from 'lucide-react';
 
 export function Header() {
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const { user } = useAuth();
 
   const handleLogout = async () => {
     await Auth.logout();
     router.push('/login');
-    router.refresh();
   };
 
   const initials = user?.name

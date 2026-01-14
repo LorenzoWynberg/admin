@@ -1,42 +1,31 @@
-import i18n from '@/config/i18next';
+'use client';
+
+import { i18n, initI18n } from '@/config/i18next';
 import { useLangStore } from '@/stores/useLangStore';
 
 /**
- * LangService
- *
- * Provides a safe, non-reactive interface for managing language state globally.
- * Use this in services, utilities, or any non-React context where hooks are not allowed.
+ * LangService - Language management singleton
  */
 export const Lang = {
-  isActive: (lang: string) => useLangStore.getState().lang === lang,
+  getActive(): string {
+    return useLangStore.getState().lang ?? 'en';
+  },
 
-  getActive: () => useLangStore.getState().lang ?? 'en',
+  isActive(lang: string): boolean {
+    return useLangStore.getState().lang === lang;
+  },
 
-  setActive: async (lang: string): Promise<void> => {
-    if (Lang.isActive(lang)) {
-      return;
-    }
-
-    useLangStore.getState().setLoading(true);
-
+  async setActive(lang: string): Promise<void> {
+    await initI18n();
+    useLangStore.getState().setLang(lang);
     try {
-      useLangStore.getState().setLang(lang);
       await i18n.changeLanguage(lang);
-    } finally {
-      useLangStore.getState().setLoading(false);
+    } catch {
+      // ignore
     }
   },
 
-  getVersion: (lang?: string) =>
-    useLangStore.getState().getVersion(lang ?? useLangStore.getState().lang),
-
-  getVersions: () => useLangStore.getState().versions,
-
-  setVersions: (versions: Record<string, { hash: string; last_updated: string }>) =>
-    useLangStore.getState().setVersions(versions),
-
-  loading: () => useLangStore.getState().loading,
-  setLoading: (loading: boolean) => useLangStore.getState().setLoading(loading),
-
-  hydrated: () => useLangStore.getState().hydrated,
+  hydrated(): boolean {
+    return useLangStore.getState().hydrated;
+  },
 };

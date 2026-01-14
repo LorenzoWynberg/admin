@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useQuote, useSendQuote, useDeleteQuote } from '@/hooks/quotes';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { Button } from '@/components/ui/button';
@@ -40,7 +41,7 @@ function formatCurrency(amount?: number | null, currency?: string | null): strin
 
 export default function QuoteDetailPage() {
   const params = useParams();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const quoteId = Number(params.id);
 
   const { data: quote, isLoading, error } = useQuote(quoteId);

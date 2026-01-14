@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useOrder, useApproveOrder, useDenyOrder, useDeleteOrder } from '@/hooks/orders';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
@@ -53,7 +54,7 @@ function formatAddress(address?: App.Data.Address.AddressData | null): string {
 
 export default function OrderDetailPage() {
   const params = useParams();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const orderId = Number(params.id);
 
   const { data: order, isLoading, error } = useOrder({ id: orderId });
