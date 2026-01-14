@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
@@ -18,7 +18,15 @@ import {
   FormControl,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useUpdateCatalogElement } from '@/hooks/catalogs';
 import { applyApiErrorsToForm } from '@/utils/form';
@@ -26,6 +34,9 @@ import { applyApiErrorsToForm } from '@/utils/form';
 type CatalogElementData = App.Data.CatalogElement.CatalogElementData;
 type PartialLangData = App.Data.Shared.PartialLangData;
 type FullLangData = App.Data.Shared.FullLangData;
+
+const LANGUAGES = ['en', 'es', 'fr'] as const;
+type Language = (typeof LANGUAGES)[number];
 
 const emptyLang: FullLangData = { en: '', es: '', fr: '' };
 
@@ -38,12 +49,8 @@ interface ElementEditDialogProps {
 }
 
 interface FormValues {
-  nameEn: string;
-  nameEs: string;
-  nameFr: string;
-  descriptionEn: string;
-  descriptionEs: string;
-  descriptionFr: string;
+  name: FullLangData;
+  description: FullLangData;
   order: string;
 }
 
@@ -54,17 +61,14 @@ export function ElementEditDialog({
   catalogId,
   catalogCode,
 }: ElementEditDialogProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const updateElement = useUpdateCatalogElement();
+  const [selectedLang, setSelectedLang] = useState<Language>((i18n.language as Language) || 'en');
 
   const form = useForm<FormValues>({
     defaultValues: {
-      nameEn: '',
-      nameEs: '',
-      nameFr: '',
-      descriptionEn: '',
-      descriptionEs: '',
-      descriptionFr: '',
+      name: { ...emptyLang },
+      description: { ...emptyLang },
       order: '',
     },
   });
@@ -74,29 +78,35 @@ export function ElementEditDialog({
       const nameTranslations = element.nameTranslations || emptyLang;
       const descTranslations = element.descriptionTranslations || emptyLang;
       form.reset({
-        nameEn: nameTranslations.en || '',
-        nameEs: nameTranslations.es || '',
-        nameFr: nameTranslations.fr || '',
-        descriptionEn: descTranslations.en || '',
-        descriptionEs: descTranslations.es || '',
-        descriptionFr: descTranslations.fr || '',
+        name: {
+          en: nameTranslations.en || '',
+          es: nameTranslations.es || '',
+          fr: nameTranslations.fr || '',
+        },
+        description: {
+          en: descTranslations.en || '',
+          es: descTranslations.es || '',
+          fr: descTranslations.fr || '',
+        },
         order: element.order?.toString() || '',
       });
+      // Reset to current language when opening
+      setSelectedLang((i18n.language as Language) || 'en');
     }
-  }, [element, open, form]);
+  }, [element, open, form, i18n.language]);
 
   const onSubmit = async (values: FormValues) => {
     if (!element?.id) return;
 
     const name: PartialLangData = {};
-    if (values.nameEn) name.en = values.nameEn;
-    if (values.nameEs) name.es = values.nameEs;
-    if (values.nameFr) name.fr = values.nameFr;
+    if (values.name.en) name.en = values.name.en;
+    if (values.name.es) name.es = values.name.es;
+    if (values.name.fr) name.fr = values.name.fr;
 
     const description: PartialLangData = {};
-    if (values.descriptionEn) description.en = values.descriptionEn;
-    if (values.descriptionEs) description.es = values.descriptionEs;
-    if (values.descriptionFr) description.fr = values.descriptionFr;
+    if (values.description.en) description.en = values.description.en;
+    if (values.description.es) description.es = values.description.es;
+    if (values.description.fr) description.fr = values.description.fr;
 
     try {
       await updateElement.mutateAsync({
@@ -115,9 +125,15 @@ export function ElementEditDialog({
     }
   };
 
+  const languageLabels: Record<Language, string> = {
+    en: t('languages:en', { defaultValue: 'English' }),
+    es: t('languages:es', { defaultValue: 'Spanish' }),
+    fr: t('languages:fr', { defaultValue: 'French' }),
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {t('catalogs:edit_element', { defaultValue: 'Edit Element' })}
@@ -127,99 +143,55 @@ export function ElementEditDialog({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground">
-                {t('common:name', { defaultValue: 'Name' })}
-              </h3>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <FormField
-                  control={form.control}
-                  name="nameEn"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('languages:en', { defaultValue: 'English' })}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="nameEs"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('languages:es', { defaultValue: 'Spanish' })}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="nameFr"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('languages:fr', { defaultValue: 'French' })}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                {t('common:language', { defaultValue: 'Language' })}:
+              </span>
+              <Select value={selectedLang} onValueChange={(v) => setSelectedLang(v as Language)}>
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LANGUAGES.map((lang) => (
+                    <SelectItem key={lang} value={lang}>
+                      {languageLabels[lang]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground">
-                {t('common:description', { defaultValue: 'Description' })}
-              </h3>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <FormField
-                  control={form.control}
-                  name="descriptionEn"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('languages:en', { defaultValue: 'English' })}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="descriptionEs"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('languages:es', { defaultValue: 'Spanish' })}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="descriptionFr"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('languages:fr', { defaultValue: 'French' })}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
+            <FormField
+              control={form.control}
+              name={`name.${selectedLang}`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('common:name', { defaultValue: 'Name' })}</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder={`${t('common:name', { defaultValue: 'Name' })} (${languageLabels[selectedLang]})`} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name={`description.${selectedLang}`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('common:description', { defaultValue: 'Description' })}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder={`${t('common:description', { defaultValue: 'Description' })} (${languageLabels[selectedLang]})`}
+                      rows={3}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
