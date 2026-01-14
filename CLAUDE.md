@@ -46,19 +46,20 @@ See main `CLAUDE.md` for full details.
 
 ## Code Quality (IMPORTANT)
 
-**Before committing ANY code, you MUST run formatting and linting:**
+**Before committing ANY code, run checks in this order:**
+
+1. **Lint/Typecheck first** - Fix any errors
+2. **Format last** - Always run Prettier as the final step before committing
 
 ```bash
-npm run format                 # Format with Prettier
-npm run lint                   # ESLint
-npm run typecheck              # TypeScript check
-# Or run all at once:
-npm run check                  # format:check + lint + typecheck
+npm run lint                   # 1. ESLint - fix errors first
+npm run typecheck              # 2. TypeScript check - fix errors
+npm run format                 # 3. Format with Prettier - LAST before commit
 ```
 
 **DO NOT commit code that fails formatting or linting checks.**
 
-**Push constantly:** After commits pass all checks (format, lint, typecheck), push immediately. Don't accumulate local commits.
+**Push constantly:** After commits pass all checks, push immediately. Don't accumulate local commits.
 
 ### Type Safety
 
