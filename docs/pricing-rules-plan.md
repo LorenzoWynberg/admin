@@ -1,9 +1,11 @@
 # Pricing Rules Configuration System
 
 ## Overview
+
 Admin-configurable pricing rules with distance-based tiers, per-currency support, and version history tracking.
 
 ## Requirements
+
 - **Per-currency rules**: Separate distance tiers for CRC and USD
 - **Distance tiers**: e.g., 0-5km = ₡1500, 5-10km = ₡2500, 10+ km = ₡500/km
 - **Simple versioning**: Track changes, only latest version active
@@ -12,6 +14,7 @@ Admin-configurable pricing rules with distance-based tiers, per-currency support
 ## Data Model
 
 ### PricingRule (main configuration)
+
 ```
 pricing_rules
 ├── id
@@ -27,6 +30,7 @@ pricing_rules
 ```
 
 ### PricingTier (distance-based fees)
+
 ```
 pricing_tiers
 ├── id
@@ -40,6 +44,7 @@ pricing_tiers
 ```
 
 ### Example Data
+
 ```
 CRC Pricing Rule (v1, active):
 ├── base_fare: 1500
@@ -63,35 +68,40 @@ USD Pricing Rule (v1, active):
 ### Files to Create
 
 **Models:**
+
 - `app/Models/PricingRule.php`
 - `app/Models/PricingTier.php`
 
 **DTOs:**
+
 - `app/Data/Pricing/PricingRuleData.php`
 - `app/Data/Pricing/PricingTierData.php`
 - `app/Data/Pricing/StorePricingRuleData.php`
 - `app/Data/Pricing/UpdatePricingRuleData.php`
 
 **Controller:**
+
 - `app/Http/Controllers/PricingRuleController.php`
 
 **Service:**
+
 - `app/Services/PricingService.php` - calculate fees from rules
 
 **Migration:**
+
 - `database/migrations/xxxx_create_pricing_rules_table.php`
 
 ### API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/pricing-rules` | List all rules (with versions) |
-| GET | `/pricing-rules/active` | Get active rules per currency |
-| GET | `/pricing-rules/{id}` | Get rule with tiers |
-| POST | `/pricing-rules` | Create new rule (auto-version) |
-| PATCH | `/pricing-rules/{id}` | Update rule |
-| POST | `/pricing-rules/{id}/activate` | Set as active for currency |
-| DELETE | `/pricing-rules/{id}` | Soft delete |
+| Method | Endpoint                       | Description                    |
+| ------ | ------------------------------ | ------------------------------ |
+| GET    | `/pricing-rules`               | List all rules (with versions) |
+| GET    | `/pricing-rules/active`        | Get active rules per currency  |
+| GET    | `/pricing-rules/{id}`          | Get rule with tiers            |
+| POST   | `/pricing-rules`               | Create new rule (auto-version) |
+| PATCH  | `/pricing-rules/{id}`          | Update rule                    |
+| POST   | `/pricing-rules/{id}/activate` | Set as active for currency     |
+| DELETE | `/pricing-rules/{id}`          | Soft delete                    |
 
 ### PricingService
 
@@ -118,6 +128,7 @@ class PricingService
 ### Quote Integration
 
 Update `StoreQuoteData.php` to use PricingService:
+
 - If `distanceFee` not provided, auto-calculate from active pricing rule
 - Store which pricing_rule_id was used on quote (optional audit field)
 
@@ -126,20 +137,24 @@ Update `StoreQuoteData.php` to use PricingService:
 ### Files to Create
 
 **Service:**
+
 - `services/pricingService.ts`
 
 **Hooks:**
+
 - `hooks/pricing/index.ts`
 - `hooks/pricing/usePricingRules.ts`
 - `hooks/pricing/usePricingRule.ts`
 - `hooks/pricing/usePricingMutations.ts`
 
 **Pages:**
+
 - `app/(dashboard)/pricing/page.tsx` - List rules
 - `app/(dashboard)/pricing/[id]/page.tsx` - Edit rule with tiers
 - `app/(dashboard)/pricing/create/page.tsx` - Create new rule
 
 **Components:**
+
 - `components/pricing/PricingTierForm.tsx` - Add/edit tier rows
 - `components/pricing/PricingRuleCard.tsx` - Display rule summary
 
@@ -164,6 +179,7 @@ Update `StoreQuoteData.php` to use PricingService:
 ## File Changes Summary
 
 ### Backend (app/api)
+
 ```
 app/
 ├── Models/
@@ -187,6 +203,7 @@ routes/
 ```
 
 ### Admin (app/admin)
+
 ```
 app/(dashboard)/pricing/
 ├── page.tsx (NEW)
@@ -209,6 +226,7 @@ hooks/pricing/
 ## Verification Plan
 
 ### Backend
+
 1. Run migration: `php artisan migrate`
 2. Create test pricing rule via tinker
 3. Test API endpoints with curl/Postman
@@ -216,6 +234,7 @@ hooks/pricing/
 5. Verify version auto-increment
 
 ### Admin
+
 1. Navigate to /pricing
 2. Create new CRC pricing rule with 3 tiers
 3. Create new USD pricing rule
@@ -224,12 +243,14 @@ hooks/pricing/
 6. Verify CreateQuoteDialog shows calculated fee
 
 ### Integration
+
 1. Create order with known distance
 2. Open CreateQuoteDialog
 3. Verify distance fee pre-calculated from active rule
 4. Create quote, verify pricing applied correctly
 
 ## Future Enhancements (Out of Scope)
+
 - Time-based surcharges (rush hour)
 - Geographic zones
 - Business-specific pricing

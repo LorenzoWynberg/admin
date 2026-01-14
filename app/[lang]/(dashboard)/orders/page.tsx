@@ -1,28 +1,29 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
-import { useOrderList } from '@/hooks/orders';
-import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { capitalize } from '@/utils/lang';
 import {
-  Table,
+  TableHeader,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableRow,
+  Table,
 } from '@/components/ui/table';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
+  SelectContent,
   SelectValue,
+  SelectItem,
+  Select,
 } from '@/components/ui/select';
+
+import { useState } from 'react';
+import { capitalize } from '@/utils/lang';
+import { Input } from '@/components/ui/input';
+import { useOrderList } from '@/hooks/orders';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, Package } from 'lucide-react';
 
@@ -83,7 +84,10 @@ export default function OrdersPage() {
     { value: 'picking_up', label: t('orders:status.picking_up', { defaultValue: 'Picking Up' }) },
     { value: 'in_transit', label: t('orders:status.in_transit', { defaultValue: 'In Transit' }) },
     { value: 'completed', label: t('orders:status.completed', { defaultValue: 'Completed' }) },
-    { value: 'delivery_failed', label: t('orders:status.delivery_failed', { defaultValue: 'Failed' }) },
+    {
+      value: 'delivery_failed',
+      label: t('orders:status.delivery_failed', { defaultValue: 'Failed' }),
+    },
     { value: 'canceled', label: t('orders:status.canceled', { defaultValue: 'Canceled' }) },
   ];
 
@@ -92,7 +96,9 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(t('models:order_other', { defaultValue: 'Orders' }))}</h1>
+          <h1 className="text-3xl font-bold">
+            {capitalize(t('models:order_other', { defaultValue: 'Orders' }))}
+          </h1>
           <p className="text-muted-foreground">
             {t('orders:manage_description', { defaultValue: 'Manage delivery orders and quotes' })}
           </p>
@@ -102,12 +108,14 @@ export default function OrdersPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
+          <CardTitle className="text-lg">
+            {t('common:filters', { defaultValue: 'Filters' })}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative min-w-[200px] flex-1">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
                 placeholder={t('orders:search_placeholder', { defaultValue: 'Search orders...' })}
                 value={search}
@@ -126,7 +134,9 @@ export default function OrdersPage() {
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t('orders:filter_by_status', { defaultValue: 'Filter by status' })} />
+                <SelectValue
+                  placeholder={t('orders:filter_by_status', { defaultValue: 'Filter by status' })}
+                />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
@@ -145,14 +155,14 @@ export default function OrdersPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
             </div>
           ) : error ? (
-            <div className="py-12 text-center text-destructive">
+            <div className="text-destructive py-12 text-center">
               {t('orders:failed_to_load', { defaultValue: 'Failed to load orders' })}
             </div>
           ) : orders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <Package className="mb-4 h-12 w-12" />
               <p>{t('orders:no_orders', { defaultValue: 'No orders found' })}</p>
             </div>
@@ -172,7 +182,7 @@ export default function OrdersPage() {
                 {orders.map((order) => (
                   <TableRow
                     key={order.id}
-                    className="cursor-pointer hover:bg-muted/50"
+                    className="hover:bg-muted/50 cursor-pointer"
                     onClick={() => router.push(`/orders/${order.id}`)}
                   >
                     <TableCell className="font-medium">#{order.id}</TableCell>
@@ -201,8 +211,13 @@ export default function OrdersPage() {
         {/* Pagination */}
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
-              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} orders)` })}
+            <p className="text-muted-foreground text-sm">
+              {t('pagination:page_info', {
+                current: meta.currentPage,
+                last: meta.lastPage,
+                total: meta.total,
+                defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} orders)`,
+              })}
             </p>
             <div className="flex gap-2">
               <Button

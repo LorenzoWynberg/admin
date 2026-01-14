@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useCreatePricingRule } from '@/hooks/pricing';
@@ -223,7 +222,7 @@ export default function CreatePricingRulePage() {
                 control={form.control}
                 name="activate"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
@@ -242,14 +241,20 @@ export default function CreatePricingRulePage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>{t('tiers')}</CardTitle>
-                <p className="text-sm text-muted-foreground">{t('tiers_help')}</p>
+                <p className="text-muted-foreground text-sm">{t('tiers_help')}</p>
               </div>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() =>
-                  append({ minKm: 0, maxKm: null, flatFee: null, perKmRate: null, order: fields.length })
+                  append({
+                    minKm: 0,
+                    maxKm: null,
+                    flatFee: null,
+                    perKmRate: null,
+                    order: fields.length,
+                  })
                 }
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -287,7 +292,9 @@ export default function CreatePricingRulePage() {
                             placeholder={t('no_max')}
                             {...field}
                             value={field.value ?? ''}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value ? Number(e.target.value) : null)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -308,7 +315,9 @@ export default function CreatePricingRulePage() {
                             min="0"
                             {...field}
                             value={field.value ?? ''}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value ? Number(e.target.value) : null)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -329,7 +338,9 @@ export default function CreatePricingRulePage() {
                             min="0"
                             {...field}
                             value={field.value ?? ''}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value ? Number(e.target.value) : null)
+                            }
                           />
                         </FormControl>
                         <FormMessage />

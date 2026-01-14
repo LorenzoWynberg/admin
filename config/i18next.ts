@@ -25,7 +25,6 @@ const namespaces = [
   'users',
   'validation',
 ] as const;
-const defaultNS = 'common';
 
 let initialized = false;
 

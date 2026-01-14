@@ -95,7 +95,9 @@ export const PricingService = {
    * Duplicate a pricing rule
    */
   async duplicate(id: number, name?: string): Promise<PricingRuleData> {
-    const response = await api.post<Single<PricingRuleData>>(`/pricing-rules/${id}/duplicate`, { name });
+    const response = await api.post<Single<PricingRuleData>>(`/pricing-rules/${id}/duplicate`, {
+      name,
+    });
     return response.item;
   },
 

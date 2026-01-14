@@ -1,21 +1,22 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useAddressList } from '@/hooks/addresses';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { capitalize } from '@/utils/lang';
 import {
-  Table,
+  TableHeader,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableRow,
+  Table,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { useState } from 'react';
+import { capitalize } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { useAddressList } from '@/hooks/addresses';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, MapPin } from 'lucide-react';
 
 function formatDate(dateString?: string): string {
@@ -54,9 +55,7 @@ export default function AddressesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {capitalize(
-              t('models:address_other', { defaultValue: 'Addresses' })
-            )}
+            {capitalize(t('models:address_other', { defaultValue: 'Addresses' }))}
           </h1>
           <p className="text-muted-foreground">
             {t('addresses:manage_description', {
@@ -74,7 +73,7 @@ export default function AddressesPage() {
         </CardHeader>
         <CardContent>
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder={t('addresses:search_placeholder', {
                 defaultValue: 'Search addresses...',
@@ -94,16 +93,16 @@ export default function AddressesPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
             </div>
           ) : error ? (
-            <div className="py-12 text-center text-destructive">
+            <div className="text-destructive py-12 text-center">
               {t('addresses:failed_to_load', {
                 defaultValue: 'Failed to load addresses',
               })}
             </div>
           ) : addresses.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <MapPin className="mb-4 h-12 w-12" />
               <p>
                 {t('addresses:no_addresses', {
@@ -115,21 +114,11 @@ export default function AddressesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>
-                    {t('addresses:label', { defaultValue: 'Label' })}
-                  </TableHead>
-                  <TableHead>
-                    {t('models:address_one', { defaultValue: 'Address' })}
-                  </TableHead>
-                  <TableHead>
-                    {t('addresses:city', { defaultValue: 'City' })}
-                  </TableHead>
-                  <TableHead>
-                    {t('common:type', { defaultValue: 'Type' })}
-                  </TableHead>
-                  <TableHead>
-                    {t('common:created', { defaultValue: 'Created' })}
-                  </TableHead>
+                  <TableHead>{t('addresses:label', { defaultValue: 'Label' })}</TableHead>
+                  <TableHead>{t('models:address_one', { defaultValue: 'Address' })}</TableHead>
+                  <TableHead>{t('addresses:city', { defaultValue: 'City' })}</TableHead>
+                  <TableHead>{t('common:type', { defaultValue: 'Type' })}</TableHead>
+                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -144,9 +133,7 @@ export default function AddressesPage() {
                       )}
                     </TableCell>
                     <TableCell className="max-w-[300px] truncate">
-                      {address.humanReadableAddress ||
-                        address.streetAddress ||
-                        '-'}
+                      {address.humanReadableAddress || address.streetAddress || '-'}
                     </TableCell>
                     <TableCell>{address.city?.name || '-'}</TableCell>
                     <TableCell>
@@ -162,7 +149,7 @@ export default function AddressesPage() {
 
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {t('pagination:page_info', {
                 current: meta.currentPage,
                 last: meta.lastPage,

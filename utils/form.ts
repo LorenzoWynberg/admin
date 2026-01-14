@@ -60,7 +60,7 @@ export function applyApiErrorsToForm<T extends FieldValues>(
     defaultFieldMessage = 'This field is invalid',
     defaultToastTitle = 'An error occurred',
     includeDetailsInToast = true,
-  }: ApplyErrorsOptions = {}
+  }: ApplyErrorsOptions = {},
 ): { appliedFieldErrors: boolean; showedToast: boolean } {
   let appliedFieldErrors = false;
   let showedToast = false;
@@ -72,18 +72,14 @@ export function applyApiErrorsToForm<T extends FieldValues>(
 
   const apiError = err as ApiError;
   const hasErrorsObject =
-    apiError.errors &&
-    typeof apiError.errors === 'object' &&
-    !Array.isArray(apiError.errors);
+    apiError.errors && typeof apiError.errors === 'object' && !Array.isArray(apiError.errors);
 
   // Apply field errors
   if (hasErrorsObject) {
     for (const [apiKey, raw] of Object.entries(apiError.errors!)) {
       const field = (fieldMap[apiKey] ?? apiKey) as Path<T>;
       const messages = Array.isArray(raw) ? raw : raw ? [String(raw)] : [];
-      const message = messages.length
-        ? messages.join(joinWith)
-        : defaultFieldMessage;
+      const message = messages.length ? messages.join(joinWith) : defaultFieldMessage;
       setError(field, { type: 'server', message });
       appliedFieldErrors = true;
     }
@@ -95,8 +91,7 @@ export function applyApiErrorsToForm<T extends FieldValues>(
   const forceToast = toastStatuses.includes(status);
 
   const title = apiError.message || defaultToastTitle;
-  const description =
-    includeDetailsInToast && apiError.details ? apiError.details : undefined;
+  const description = includeDetailsInToast && apiError.details ? apiError.details : undefined;
 
   if (!appliedFieldErrors || !is422 || showToastOn422 || forceToast) {
     toast.error(title, { description });
@@ -109,10 +104,7 @@ export function applyApiErrorsToForm<T extends FieldValues>(
 /**
  * Extract first error message from ApiError for a specific field
  */
-export function getFieldError(
-  error: unknown,
-  field: string
-): string | undefined {
+export function getFieldError(error: unknown, field: string): string | undefined {
   if (!isApiError(error)) return undefined;
   const messages = error.errors?.[field];
   return Array.isArray(messages) ? messages[0] : undefined;

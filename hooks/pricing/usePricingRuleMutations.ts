@@ -113,8 +113,7 @@ export function useDuplicatePricingRule() {
   const { t } = useTranslation('pricing');
 
   return useMutation({
-    mutationFn: ({ id, name }: { id: number; name?: string }) =>
-      PricingService.duplicate(id, name),
+    mutationFn: ({ id, name }: { id: number; name?: string }) => PricingService.duplicate(id, name),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pricing-rules'] });
       toast.success(t('duplicated'));

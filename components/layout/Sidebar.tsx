@@ -27,7 +27,13 @@ const navigation = [
   { modelKey: 'business', href: '/businesses', icon: Building2, isModel: true },
   { modelKey: 'address', href: '/addresses', icon: MapPin, isModel: true },
   { modelKey: 'catalog', href: '/catalogs', icon: Database, isModel: true },
-  { modelKey: 'pricing', href: '/pricing', icon: DollarSign, isModel: false, translationKey: 'pricing:title' },
+  {
+    modelKey: 'pricing',
+    href: '/pricing',
+    icon: DollarSign,
+    isModel: false,
+    translationKey: 'pricing:title',
+  },
 ];
 
 export function Sidebar() {
@@ -42,7 +48,7 @@ export function Sidebar() {
   // Get path without language prefix for active state check
   const pathWithoutLang = pathname.replace(new RegExp(`^/${lang}`), '') || '/';
 
-  const getNavLabel = (item: typeof navigation[0]) => {
+  const getNavLabel = (item: (typeof navigation)[0]) => {
     if (!ready) return '';
     let label: string;
     if ('translationKey' in item && item.translationKey) {
@@ -56,12 +62,12 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="hidden w-64 flex-shrink-0 border-r bg-card lg:block">
+    <aside className="bg-card hidden w-64 flex-shrink-0 border-r lg:block">
       <div className="flex h-full flex-col">
         {/* Logo */}
         <div className="flex h-16 items-center border-b px-6">
           <Link href={withLang('/')} className="flex items-center gap-2">
-            <Package className="h-6 w-6 text-primary" />
+            <Package className="text-primary h-6 w-6" />
             <span className="text-xl font-bold">Mandados</span>
           </Link>
         </div>
@@ -81,7 +87,7 @@ export function Sidebar() {
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   isActive
                     ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -99,7 +105,7 @@ export function Sidebar() {
               'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
               pathWithoutLang === '/settings'
                 ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
             )}
           >
             <Settings className="h-5 w-5" />

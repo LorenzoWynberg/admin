@@ -7,7 +7,7 @@
  * Type guard for responses with a single `item`
  */
 export const hasItem = <T>(
-  response: Api.Response.SuccessBasic | Api.Response.Single<T>
+  response: Api.Response.SuccessBasic | Api.Response.Single<T>,
 ): response is Api.Response.Single<T> => {
   return (
     typeof (response as Api.Response.Single<T>)?.item !== 'undefined' &&
@@ -24,7 +24,7 @@ export const hasItems = <T>(
     | Api.Response.SimplePaginated<T>
     | Api.Response.Paginated<T>
     | Api.Response.CursorPaginated<T>
-    | Api.Response.SuccessBasic
+    | Api.Response.SuccessBasic,
 ): response is
   | Api.Response.Multiple<T>
   | Api.Response.SimplePaginated<T>
@@ -39,9 +39,7 @@ export const hasItems = <T>(
 /**
  * Check if response has pagination metadata
  */
-export const hasPagination = <T>(
-  response: unknown
-): response is Api.Response.Paginated<T> => {
+export const hasPagination = <T>(response: unknown): response is Api.Response.Paginated<T> => {
   const res = response as Api.Response.Paginated<T>;
   return (
     res?.meta !== undefined &&
@@ -56,7 +54,7 @@ export const hasPagination = <T>(
 export const successBasic = (
   message = '',
   extra: Record<string, unknown> = {},
-  status = 200
+  status = 200,
 ): Api.Response.SuccessBasic => ({
   message,
   status,
@@ -71,7 +69,7 @@ export const toBasicSuccess = <T>(
     | Api.Response.Single<T>
     | Api.Response.Multiple<T>
     | Api.Response.Paginated<T>
-    | Api.Response.SuccessBasic
+    | Api.Response.SuccessBasic,
 ): Api.Response.SuccessBasic => ({
   message: response.message,
   status: response.status,

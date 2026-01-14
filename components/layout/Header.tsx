@@ -26,18 +26,17 @@ export function Header() {
     router.push('/login');
   };
 
-  const initials = user?.name
-    ?.split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || 'AD';
+  const initials =
+    user?.name
+      ?.split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || 'AD';
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-card px-6">
-      <div className="lg:hidden">
-        {/* Mobile menu button would go here */}
-      </div>
+    <header className="bg-card flex h-16 items-center justify-between border-b px-6">
+      <div className="lg:hidden">{/* Mobile menu button would go here */}</div>
 
       <div className="flex-1" />
 
@@ -52,8 +51,10 @@ export function Header() {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{user?.name || t('common:unknown', { defaultValue: 'Admin' })}</p>
-              <p className="text-xs leading-none text-muted-foreground">
+              <p className="text-sm leading-none font-medium">
+                {user?.name || t('common:unknown', { defaultValue: 'Admin' })}
+              </p>
+              <p className="text-muted-foreground text-xs leading-none">
                 {user?.email || 'admin@example.com'}
               </p>
             </div>

@@ -1,30 +1,31 @@
 'use client';
 
+import {
+  CheckCircle,
+  DollarSign,
+  Building2,
+  ArrowLeft,
+  Calendar,
+  XCircle,
+  Package,
+  Trash2,
+  MapPin,
+  Route,
+  Phone,
+  Clock,
+  Truck,
+  User,
+} from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
-import { useOrder, useApproveOrder, useDenyOrder, useDeleteOrder } from '@/hooks/orders';
-import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
-import { Button } from '@/components/ui/button';
+import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import {
-  ArrowLeft,
-  MapPin,
-  User,
-  Phone,
-  Package,
-  Calendar,
-  DollarSign,
-  Truck,
-  Building2,
-  CheckCircle,
-  XCircle,
-  Trash2,
-  Route,
-  Clock,
-} from 'lucide-react';
+import { useOrder, useApproveOrder, useDenyOrder, useDeleteOrder } from '@/hooks/orders';
 
 type OrderStatus = App.Enums.OrderStatus;
 
@@ -66,19 +67,37 @@ export default function OrderDetailPage() {
   };
 
   const handleApprove = () => {
-    if (confirm(t('orders:detail.confirm_approve', { defaultValue: 'Are you sure you want to approve this order?' }))) {
+    if (
+      confirm(
+        t('orders:detail.confirm_approve', {
+          defaultValue: 'Are you sure you want to approve this order?',
+        }),
+      )
+    ) {
       approveOrder.mutate(orderId);
     }
   };
 
   const handleDeny = () => {
-    if (confirm(t('orders:detail.confirm_deny', { defaultValue: 'Are you sure you want to deny this order?' }))) {
+    if (
+      confirm(
+        t('orders:detail.confirm_deny', {
+          defaultValue: 'Are you sure you want to deny this order?',
+        }),
+      )
+    ) {
       denyOrder.mutate(orderId);
     }
   };
 
   const handleDelete = () => {
-    if (confirm(t('orders:detail.confirm_delete', { defaultValue: 'Are you sure you want to delete this order? This cannot be undone.' }))) {
+    if (
+      confirm(
+        t('orders:detail.confirm_delete', {
+          defaultValue: 'Are you sure you want to delete this order? This cannot be undone.',
+        }),
+      )
+    ) {
       deleteOrder.mutate(orderId, {
         onSuccess: () => router.push('/orders'),
       });
@@ -88,7 +107,7 @@ export default function OrderDetailPage() {
   if (!ready || isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
       </div>
     );
   }
@@ -96,7 +115,9 @@ export default function OrderDetailPage() {
   if (error || !order) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">{t('orders:failed_to_load', { defaultValue: 'Failed to load order' })}</p>
+        <p className="text-destructive">
+          {t('orders:failed_to_load', { defaultValue: 'Failed to load order' })}
+        </p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
           {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
@@ -117,7 +138,9 @@ export default function OrderDetailPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{t('orders:order_id', { id: order.id, defaultValue: `Order #${order.id}` })}</h1>
+              <h1 className="text-3xl font-bold">
+                {t('orders:order_id', { id: order.id, defaultValue: `Order #${order.id}` })}
+              </h1>
               <OrderStatusBadge status={order.status as OrderStatus} />
             </div>
             <p className="text-muted-foreground">
@@ -136,11 +159,7 @@ export default function OrderDetailPage() {
           )}
           {canApproveOrDeny && (
             <>
-              <Button
-                variant="outline"
-                onClick={handleDeny}
-                disabled={denyOrder.isPending}
-              >
+              <Button variant="outline" onClick={handleDeny} disabled={denyOrder.isPending}>
                 <XCircle className="mr-2 h-4 w-4" />
                 {t('orders:detail.deny_action', { defaultValue: 'Deny' })}
               </Button>
@@ -168,24 +187,36 @@ export default function OrderDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start gap-3">
-              <User className="mt-0.5 h-4 w-4 text-muted-foreground" />
+              <User className="text-muted-foreground mt-0.5 h-4 w-4" />
               <div>
-                <p className="font-medium">{order.fromName || t('orders:detail.not_specified', { defaultValue: 'Not specified' })}</p>
-                <p className="text-sm text-muted-foreground">{t('orders:detail.contact_name', { defaultValue: 'Contact Name' })}</p>
+                <p className="font-medium">
+                  {order.fromName ||
+                    t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {t('orders:detail.contact_name', { defaultValue: 'Contact Name' })}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Phone className="mt-0.5 h-4 w-4 text-muted-foreground" />
+              <Phone className="text-muted-foreground mt-0.5 h-4 w-4" />
               <div>
-                <p className="font-medium">{order.fromPhone || t('orders:detail.not_specified', { defaultValue: 'Not specified' })}</p>
-                <p className="text-sm text-muted-foreground">{t('common:phone', { defaultValue: 'Phone' })}</p>
+                <p className="font-medium">
+                  {order.fromPhone ||
+                    t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {t('common:phone', { defaultValue: 'Phone' })}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
+              <MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
               <div>
                 <p className="font-medium">{formatAddress(order.fromAddress)}</p>
-                <p className="text-sm text-muted-foreground">{t('orders:detail.address', { defaultValue: 'Address' })}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t('orders:detail.address', { defaultValue: 'Address' })}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -201,24 +232,36 @@ export default function OrderDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start gap-3">
-              <User className="mt-0.5 h-4 w-4 text-muted-foreground" />
+              <User className="text-muted-foreground mt-0.5 h-4 w-4" />
               <div>
-                <p className="font-medium">{order.toName || t('orders:detail.not_specified', { defaultValue: 'Not specified' })}</p>
-                <p className="text-sm text-muted-foreground">{t('orders:detail.contact_name', { defaultValue: 'Contact Name' })}</p>
+                <p className="font-medium">
+                  {order.toName ||
+                    t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {t('orders:detail.contact_name', { defaultValue: 'Contact Name' })}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Phone className="mt-0.5 h-4 w-4 text-muted-foreground" />
+              <Phone className="text-muted-foreground mt-0.5 h-4 w-4" />
               <div>
-                <p className="font-medium">{order.toPhone || t('orders:detail.not_specified', { defaultValue: 'Not specified' })}</p>
-                <p className="text-sm text-muted-foreground">{t('common:phone', { defaultValue: 'Phone' })}</p>
+                <p className="font-medium">
+                  {order.toPhone ||
+                    t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {t('common:phone', { defaultValue: 'Phone' })}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
+              <MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
               <div>
                 <p className="font-medium">{formatAddress(order.toAddress)}</p>
-                <p className="text-sm text-muted-foreground">{t('orders:detail.address', { defaultValue: 'Address' })}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t('orders:detail.address', { defaultValue: 'Address' })}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -235,7 +278,9 @@ export default function OrderDetailPage() {
           <CardContent className="space-y-4">
             {order.description && (
               <div>
-                <p className="text-sm text-muted-foreground">{t('orders:detail.description', { defaultValue: 'Description' })}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t('orders:detail.description', { defaultValue: 'Description' })}
+                </p>
                 <p className="font-medium">{order.description}</p>
               </div>
             )}
@@ -243,19 +288,23 @@ export default function OrderDetailPage() {
               <div className="flex gap-6">
                 {order.distanceKm && (
                   <div className="flex items-start gap-3">
-                    <Route className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                    <Route className="text-muted-foreground mt-0.5 h-4 w-4" />
                     <div>
                       <p className="font-medium">{order.distanceKm} km</p>
-                      <p className="text-sm text-muted-foreground">{t('orders:detail.distance', { defaultValue: 'Distance' })}</p>
+                      <p className="text-muted-foreground text-sm">
+                        {t('orders:detail.distance', { defaultValue: 'Distance' })}
+                      </p>
                     </div>
                   </div>
                 )}
                 {order.estimatedMinutes && (
                   <div className="flex items-start gap-3">
-                    <Clock className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                    <Clock className="text-muted-foreground mt-0.5 h-4 w-4" />
                     <div>
                       <p className="font-medium">{order.estimatedMinutes} min</p>
-                      <p className="text-sm text-muted-foreground">{t('orders:detail.est_trip_time', { defaultValue: 'Est. Trip Time' })}</p>
+                      <p className="text-muted-foreground text-sm">
+                        {t('orders:detail.est_trip_time', { defaultValue: 'Est. Trip Time' })}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -263,18 +312,24 @@ export default function OrderDetailPage() {
             )}
             <div className="flex gap-4">
               {order.requiresPin && (
-                <Badge variant="secondary">{t('orders:detail.requiresPin', { defaultValue: 'Requires PIN' })}</Badge>
+                <Badge variant="secondary">
+                  {t('orders:detail.requiresPin', { defaultValue: 'Requires PIN' })}
+                </Badge>
               )}
               {order.isContactless && (
-                <Badge variant="secondary">{t('orders:detail.isContactless', { defaultValue: 'Contactless' })}</Badge>
+                <Badge variant="secondary">
+                  {t('orders:detail.isContactless', { defaultValue: 'Contactless' })}
+                </Badge>
               )}
             </div>
             {order.fulfilledBefore && (
               <div className="flex items-start gap-3">
-                <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                <Calendar className="text-muted-foreground mt-0.5 h-4 w-4" />
                 <div>
                   <p className="font-medium">{formatDate(order.fulfilledBefore)}</p>
-                  <p className="text-sm text-muted-foreground">{t('orders:detail.deliver_by', { defaultValue: 'Deliver By' })}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {t('orders:detail.deliver_by', { defaultValue: 'Deliver By' })}
+                  </p>
                 </div>
               </div>
             )}
@@ -293,14 +348,18 @@ export default function OrderDetailPage() {
             {order.currentQuote ? (
               <>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('orders:detail.base_fare', { defaultValue: 'Base Fare' })}</span>
+                  <span className="text-muted-foreground">
+                    {t('orders:detail.base_fare', { defaultValue: 'Base Fare' })}
+                  </span>
                   <span className="font-medium">
                     {order.currencyCode} {order.currentQuote.baseFare?.toFixed(2) || '0.00'}
                   </span>
                 </div>
                 {order.currentQuote.distanceFee && order.currentQuote.distanceFee > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('orders:detail.distance_fee', { defaultValue: 'Distance Fee' })}</span>
+                    <span className="text-muted-foreground">
+                      {t('orders:detail.distance_fee', { defaultValue: 'Distance Fee' })}
+                    </span>
                     <span className="font-medium">
                       {order.currencyCode} {order.currentQuote.distanceFee.toFixed(2)}
                     </span>
@@ -308,7 +367,9 @@ export default function OrderDetailPage() {
                 )}
                 {order.currentQuote.timeFee && order.currentQuote.timeFee > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('orders:detail.time_fee', { defaultValue: 'Time Fee' })}</span>
+                    <span className="text-muted-foreground">
+                      {t('orders:detail.time_fee', { defaultValue: 'Time Fee' })}
+                    </span>
                     <span className="font-medium">
                       {order.currencyCode} {order.currentQuote.timeFee.toFixed(2)}
                     </span>
@@ -316,7 +377,9 @@ export default function OrderDetailPage() {
                 )}
                 {order.currentQuote.surcharge && order.currentQuote.surcharge > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('orders:detail.surcharge', { defaultValue: 'Surcharge' })}</span>
+                    <span className="text-muted-foreground">
+                      {t('orders:detail.surcharge', { defaultValue: 'Surcharge' })}
+                    </span>
                     <span className="font-medium">
                       {order.currencyCode} {order.currentQuote.surcharge.toFixed(2)}
                     </span>
@@ -340,7 +403,9 @@ export default function OrderDetailPage() {
               </>
             ) : (
               <div className="text-center">
-                <p className="text-muted-foreground mb-4">{t('orders:detail.no_quote', { defaultValue: 'No quote available' })}</p>
+                <p className="text-muted-foreground mb-4">
+                  {t('orders:detail.no_quote', { defaultValue: 'No quote available' })}
+                </p>
                 {canCreateQuote && (
                   <CreateQuoteDialog
                     orderId={orderId}
@@ -352,7 +417,9 @@ export default function OrderDetailPage() {
               </div>
             )}
             <div className="flex justify-between border-t pt-2">
-              <span className="text-muted-foreground">{t('orders:detail.payment_status', { defaultValue: 'Payment Status' })}</span>
+              <span className="text-muted-foreground">
+                {t('orders:detail.payment_status', { defaultValue: 'Payment Status' })}
+              </span>
               <Badge variant={order.paymentStatus === 'paid' ? 'default' : 'secondary'}>
                 {order.paymentStatus || t('orders:detail.unpaid', { defaultValue: 'Unpaid' })}
               </Badge>
@@ -371,15 +438,21 @@ export default function OrderDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
-                <User className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                <User className="text-muted-foreground mt-0.5 h-4 w-4" />
                 <div>
-                  <p className="font-medium">{order.driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}</p>
-                  <p className="text-sm text-muted-foreground">{t('common:name', { defaultValue: 'Name' })}</p>
+                  <p className="font-medium">
+                    {order.driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}
+                  </p>
+                  <p className="text-muted-foreground text-sm">
+                    {t('common:name', { defaultValue: 'Name' })}
+                  </p>
                 </div>
               </div>
               {order.driver.licensePlateNumber && (
                 <div>
-                  <p className="text-sm text-muted-foreground">{t('drivers:license_plate', { defaultValue: 'License Plate' })}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {t('drivers:license_plate', { defaultValue: 'License Plate' })}
+                  </p>
                   <p className="font-medium">{order.driver.licensePlateNumber}</p>
                 </div>
               )}

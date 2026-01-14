@@ -97,14 +97,14 @@ export default function PricingRuleDetailPage() {
         onSuccess: (newRule) => {
           router.push(`/pricing/${newRule.id}`);
         },
-      }
+      },
     );
   };
 
   if (!ready || isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
       </div>
     );
   }
@@ -145,7 +145,11 @@ export default function PricingRuleDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleDuplicate} disabled={duplicateMutation.isPending}>
+          <Button
+            variant="outline"
+            onClick={handleDuplicate}
+            disabled={duplicateMutation.isPending}
+          >
             <Copy className="mr-2 h-4 w-4" />
             {t('duplicate')}
           </Button>
@@ -195,7 +199,9 @@ export default function PricingRuleDetailPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('column_base_fare')}</span>
-              <span className="font-medium">{formatCurrency(rule.baseFare, rule.currencyCode)}</span>
+              <span className="font-medium">
+                {formatCurrency(rule.baseFare, rule.currencyCode)}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('column_tax_rate')}</span>
@@ -221,7 +227,7 @@ export default function PricingRuleDetailPage() {
             </div>
             {rule.notes && (
               <div className="border-t pt-4">
-                <p className="text-sm text-muted-foreground">{t('notes')}</p>
+                <p className="text-muted-foreground text-sm">{t('notes')}</p>
                 <p className="mt-1">{rule.notes}</p>
               </div>
             )}
@@ -253,14 +259,16 @@ export default function PricingRuleDetailPage() {
                         {tier.flatFee ? formatCurrency(tier.flatFee, rule.currencyCode) : '-'}
                       </TableCell>
                       <TableCell>
-                        {tier.perKmRate ? formatCurrency(tier.perKmRate, rule.currencyCode) + '/km' : '-'}
+                        {tier.perKmRate
+                          ? formatCurrency(tier.perKmRate, rule.currencyCode) + '/km'
+                          : '-'}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-center text-muted-foreground py-4">
+              <p className="text-muted-foreground py-4 text-center">
                 {t('common:no_items', { defaultValue: 'No tiers configured' })}
               </p>
             )}
@@ -291,7 +299,10 @@ export default function PricingRuleDetailPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground"
+            >
               {t('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -6,9 +6,28 @@ Format: Each entry includes the date, affected component(s), and a brief descrip
 
 ---
 
+## 2026-01-14
+
+### Admin
+
+- **feat: pricing rules admin UI**
+  - List page with status/currency filters
+  - Create/edit pages with distance tier management
+  - Detail page with tier visualization
+  - Activate/deactivate/duplicate actions
+
+- **chore: code quality tooling**
+  - Added Prettier config (.prettierrc, .prettierignore)
+  - Added format/lint/typecheck npm scripts
+  - Runtime enum generation from TypeScript types
+  - Import sorting convention (ASC for single-line imports)
+
+---
+
 ## 2026-01-13
 
 ### Admin
+
 - **fix: switch from resourcesToBackend to http-backend for i18n**
   - `i18next-resources-to-backend` was corrupting translation data when storing (converting objects to arrays)
   - Switched to `i18next-http-backend` which correctly loads and stores translations
@@ -16,6 +35,7 @@ Format: Each entry includes the date, affected component(s), and a brief descrip
   - All translations now load correctly (Filters → Filtros, Settings → Configuración, etc.)
 
 ### Admin + API
+
 - **feat: i18n translations across admin dashboard**
   - Added `useTranslation` hook to all dashboard pages (list and detail views)
   - Implemented `capitalize()` utility for model names in navigation, titles, and subtitles
@@ -28,6 +48,7 @@ Format: Each entry includes the date, affected component(s), and a brief descrip
   - Added common translations: `filters`, `timestamps`, `go_back`, `failed_to_load`, etc.
 
 ### Files Modified (Admin)
+
 - `app/[lang]/(dashboard)/**/page.tsx` - All list and detail pages
 - `components/layout/Sidebar.tsx` - Navigation translations
 - `components/layout/Header.tsx` - Header translations
@@ -37,6 +58,7 @@ Format: Each entry includes the date, affected component(s), and a brief descrip
 - `config/i18next.ts`, `providers/I18nProvider.tsx`, `hooks/useLang.ts`, `stores/useLangStore.ts`
 
 ### Files Modified (API)
+
 - `lang/en/*.php` - English translation files
 - `lang/es/*.php` - Spanish translation files
 - New files: `businesses.php`, `catalogs.php`, `drivers.php`, `quotes.php`, `users.php` (EN + ES)

@@ -137,7 +137,7 @@ export function CreateQuoteDialog({
               onChange={(e) => handleChange('distanceKm', e.target.value)}
             />
             {orderEstimatedMinutes && (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Estimated driving time: {orderEstimatedMinutes} min
               </p>
             )}
@@ -203,11 +203,7 @@ export function CreateQuoteDialog({
         </div>
 
         <DialogFooter className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => handleSubmit(false)}
-            disabled={isPending}
-          >
+          <Button variant="outline" onClick={() => handleSubmit(false)} disabled={isPending}>
             Save as Draft
           </Button>
           <Button onClick={() => handleSubmit(true)} disabled={isPending}>

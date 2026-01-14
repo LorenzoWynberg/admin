@@ -45,7 +45,7 @@ declare namespace Api.Response {
     prevPageUrl: string | null;
   }
 
-  export interface SuccessBasic extends Common {}
+  export type SuccessBasic = Common;
 
   export interface Single<T> extends SuccessBasic {
     item: T;

@@ -117,7 +117,7 @@ export default function EditPricingRulePage() {
   if (!ready || isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
       </div>
     );
   }
@@ -235,14 +235,20 @@ export default function EditPricingRulePage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>{t('tiers')}</CardTitle>
-                <p className="text-sm text-muted-foreground">{t('tiers_help')}</p>
+                <p className="text-muted-foreground text-sm">{t('tiers_help')}</p>
               </div>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() =>
-                  append({ minKm: 0, maxKm: null, flatFee: null, perKmRate: null, order: fields.length })
+                  append({
+                    minKm: 0,
+                    maxKm: null,
+                    flatFee: null,
+                    perKmRate: null,
+                    order: fields.length,
+                  })
                 }
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -280,7 +286,9 @@ export default function EditPricingRulePage() {
                             placeholder={t('no_max')}
                             {...field}
                             value={field.value ?? ''}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value ? Number(e.target.value) : null)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -301,7 +309,9 @@ export default function EditPricingRulePage() {
                             min="0"
                             {...field}
                             value={field.value ?? ''}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value ? Number(e.target.value) : null)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -322,7 +332,9 @@ export default function EditPricingRulePage() {
                             min="0"
                             {...field}
                             value={field.value ?? ''}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value ? Number(e.target.value) : null)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -343,7 +355,7 @@ export default function EditPricingRulePage() {
               ))}
 
               {fields.length === 0 && (
-                <p className="text-center text-muted-foreground py-4">
+                <p className="text-muted-foreground py-4 text-center">
                   {t('common:no_items', { defaultValue: 'No tiers. Click "Add Tier" to add one.' })}
                 </p>
               )}

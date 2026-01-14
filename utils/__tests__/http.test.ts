@@ -1,11 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  hasItem,
-  hasItems,
-  hasPagination,
-  successBasic,
-  toBasicSuccess,
-} from '../http';
+import { hasItem, hasItems, hasPagination, successBasic, toBasicSuccess } from '../http';
 
 describe('http utils', () => {
   describe('hasItem', () => {
@@ -53,6 +47,7 @@ describe('http utils', () => {
 
     it('returns false when items is not an array', () => {
       const response = { items: 'not-array', message: 'ok', status: 200, extra: {} };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(hasItems(response as any)).toBe(false);
     });
   });

@@ -43,7 +43,9 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{t('common:settings_other', { defaultValue: 'Settings' })}</h1>
+        <h1 className="text-3xl font-bold">
+          {t('common:settings_other', { defaultValue: 'Settings' })}
+        </h1>
         <p className="text-muted-foreground">
           {t('common:settings_description', { defaultValue: 'Manage your admin preferences' })}
         </p>
@@ -61,7 +63,9 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-2">
-            <Label htmlFor="language">{t('common:language_one', { defaultValue: 'Language' })}</Label>
+            <Label htmlFor="language">
+              {t('common:language_one', { defaultValue: 'Language' })}
+            </Label>
             <Select value={currentLang} onValueChange={handleLanguageChange}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue />

@@ -81,9 +81,9 @@ export const useAuthStore = create<AuthStore>()(
           // Always set hydrated to true after rehydration attempt
           useAuthStore.setState({ hydrated: true });
         },
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 /**

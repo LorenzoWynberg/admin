@@ -1,55 +1,56 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
-import { usePricingRuleList, useActivatePricingRule, useDeletePricingRule } from '@/hooks/pricing';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
-  Table,
+  AlertDialogDescription,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogTitle,
+  AlertDialog,
+} from '@/components/ui/alert-dialog';
+import {
+  DropdownMenuSeparator,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenu,
+} from '@/components/ui/dropdown-menu';
+import {
+  TableHeader,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableRow,
+  Table,
 } from '@/components/ui/table';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
+  SelectContent,
   SelectValue,
+  SelectItem,
+  Select,
 } from '@/components/ui/select';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  ChevronLeft,
-  ChevronRight,
-  DollarSign,
-  Plus,
   MoreHorizontal,
-  Pencil,
+  ChevronRight,
+  ChevronLeft,
+  DollarSign,
   Trash2,
-  Copy,
+  Pencil,
   Power,
+  Copy,
+  Plus,
 } from 'lucide-react';
+
+import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { usePricingRuleList, useActivatePricingRule, useDeletePricingRule } from '@/hooks/pricing';
 
 type PricingRuleData = App.Data.Pricing.PricingRuleData;
 
@@ -121,7 +122,9 @@ export default function PricingPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
+          <CardTitle className="text-lg">
+            {t('common:filters', { defaultValue: 'Filters' })}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
@@ -150,12 +153,12 @@ export default function PricingPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
             </div>
           ) : error ? (
-            <div className="py-12 text-center text-destructive">{t('failed_to_load')}</div>
+            <div className="text-destructive py-12 text-center">{t('failed_to_load')}</div>
           ) : rules.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <DollarSign className="mb-4 h-12 w-12" />
               <p>{t('no_rules')}</p>
             </div>
@@ -177,7 +180,7 @@ export default function PricingPage() {
                 {rules.map((rule) => (
                   <TableRow
                     key={rule.id}
-                    className="cursor-pointer hover:bg-muted/50"
+                    className="hover:bg-muted/50 cursor-pointer"
                     onClick={() => router.push(`/pricing/${rule.id}`)}
                   >
                     <TableCell className="font-medium">{rule.name}</TableCell>
@@ -207,7 +210,9 @@ export default function PricingPage() {
                             <Pencil className="mr-2 h-4 w-4" />
                             {t('edit')}
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => router.push(`/pricing/${rule.id}/duplicate`)}>
+                          <DropdownMenuItem
+                            onClick={() => router.push(`/pricing/${rule.id}/duplicate`)}
+                          >
                             <Copy className="mr-2 h-4 w-4" />
                             {t('duplicate')}
                           </DropdownMenuItem>
@@ -246,7 +251,7 @@ export default function PricingPage() {
         {/* Pagination */}
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {t('pagination:page_info', {
                 current: meta.currentPage,
                 last: meta.lastPage,
@@ -301,7 +306,10 @@ export default function PricingPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground"
+            >
               {t('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>

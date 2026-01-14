@@ -38,8 +38,101 @@ jj undo                             # Undo last operation
 
 - **Changelog**: `logs/CHANGELOG.md` - High-level changes grouped by date/version
 - **Activity Log**: `logs/activity/YYYY-MM-DD.md` - Detailed append-only log of every task, one file per day
+- **Timestamps**: Always use Costa Rica time (UTC-6)
 
 See main `CLAUDE.md` for full details.
+
+---
+
+## Code Quality (IMPORTANT)
+
+**Before committing ANY code, you MUST run formatting and linting:**
+
+```bash
+npm run format                 # Format with Prettier
+npm run lint                   # ESLint
+npm run typecheck              # TypeScript check
+# Or run all at once:
+npm run check                  # format:check + lint + typecheck
+```
+
+**DO NOT commit code that fails formatting or linting checks.**
+
+**Push constantly:** After commits pass all checks (format, lint, typecheck), push immediately. Don't accumulate local commits.
+
+### Type Safety
+
+**Always fix TypeScript errors.** Type safety is critical for maintainability.
+
+**Important:** Never edit `types/generated.d.ts` directly - it's auto-generated from backend DTOs. If types need to change:
+
+1. Modify the DTO in `api/app/Data/`
+2. Run `types` command in api to regenerate
+3. Format with `npx prettier --write types/generated.d.ts`
+4. Copy to this project: `cp ../api/types/generated.d.ts types/generated.d.ts`
+5. Regenerate runtime enums: `npm run gen:enums`
+6. Commit in both repos
+
+### Runtime Enums
+
+TypeScript enums in `types/generated.d.ts` are compile-time only. To use enum values at runtime (e.g., `Enums.OrderStatus.PENDING`), we generate a runtime module.
+
+**Generated file:** `data/app-enums.ts` - AUTO-GENERATED, do not edit manually.
+
+**Regeneration:** Runtime enums are auto-regenerated on `npm run dev` and `npm run build`. To manually regenerate:
+
+```bash
+npm run gen:enums
+```
+
+**Usage:**
+
+```typescript
+import { Enums } from '@/data/app-enums';
+
+// Use enum values at runtime
+if (order.status === Enums.OrderStatus.PENDING) {
+  // ...
+}
+
+// Type-safe comparisons
+const status: App.Enums.OrderStatus = Enums.OrderStatus.APPROVED;
+```
+
+**After syncing types from backend:** Always run `npm run gen:enums` to regenerate runtime enums, or just run `npm run dev` which does it automatically.
+
+### Import Conventions
+
+**Sorting order (top to bottom):**
+
+1. **Multi-line imports first** - When Prettier wraps imports across multiple lines, place these at the top, separated by a blank line. Named imports inside sorted by length DESC.
+2. **Single-line imports by length ASC** - Sort remaining imports by line length, shortest first
+3. **CSS imports last** - Separated by a blank line
+
+```typescript
+// Multi-line imports at top (named imports sorted by length DESC inside)
+import {
+  TableHeader,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Table,
+} from '@/components/ui/table';
+
+// Single-line imports sorted by length ASC (shortest first)
+import { useState } from 'react';
+import { useOrderList } from '@/hooks/orders';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
+
+// CSS imports last, separated by blank line
+import '@/app/globals.css';
+```
 
 ---
 
@@ -69,7 +162,7 @@ app/admin/
 │   │   ├── drivers/      # Driver management
 │   │   ├── businesses/   # Business management
 │   │   ├── catalogs/     # Catalog management
-│   │   ├── pricing/      # Pricing rules (planned)
+│   │   ├── pricing/      # Pricing rules
 │   │   └── settings/     # Admin settings
 │   └── layout.tsx        # Root layout with providers
 ├── components/
@@ -78,6 +171,8 @@ app/admin/
 │   └── [resource]/       # Resource-specific components
 ├── config/
 │   └── i18next.ts        # i18n configuration
+├── data/
+│   └── app-enums.ts      # AUTO-GENERATED runtime enums
 ├── hooks/                # React Query hooks per resource
 │   ├── orders/
 │   ├── quotes/
@@ -88,6 +183,8 @@ app/admin/
 │   └── catalogs/
 ├── lib/api/              # API client + error handling
 ├── providers/            # React context providers
+├── scripts/
+│   └── build-app-runtime.cjs  # Generates runtime enums
 ├── services/             # Business logic layer (non-reactive)
 ├── stores/               # Zustand stores
 ├── types/                # Shared with mobile app
@@ -132,50 +229,55 @@ useLangStore(): {
 ## Services (Non-reactive singletons)
 
 ### Auth Service
-```typescript
-import { Auth } from '@/services/authService'
 
-Auth.login({ email, password })     // POST /auth/token → sets token + user
-Auth.logout()                       // DELETE /auth/token → clears state
-Auth.refresh()                      // GET /auth/token/user → refreshes user
-Auth.check()                        // Returns boolean
-Auth.user()                         // Returns UserData | null
-Auth.token()                        // Returns string | null
+```typescript
+import { Auth } from '@/services/authService';
+
+Auth.login({ email, password }); // POST /auth/token → sets token + user
+Auth.logout(); // DELETE /auth/token → clears state
+Auth.refresh(); // GET /auth/token/user → refreshes user
+Auth.check(); // Returns boolean
+Auth.user(); // Returns UserData | null
+Auth.token(); // Returns string | null
 ```
 
 ### Order Service
-```typescript
-import { OrderService } from '@/services/orderService'
 
-OrderService.list({ page, perPage, status, search })  // GET /orders
-OrderService.getById(id)                               // GET /orders/{id}
-OrderService.approve(id)                               // POST /orders/{id}/approve
-OrderService.deny(id)                                  // POST /orders/{id}/deny
-OrderService.destroy(id)                               // DELETE /orders/{id}
+```typescript
+import { OrderService } from '@/services/orderService';
+
+OrderService.list({ page, perPage, status, search }); // GET /orders
+OrderService.getById(id); // GET /orders/{id}
+OrderService.approve(id); // POST /orders/{id}/approve
+OrderService.deny(id); // POST /orders/{id}/deny
+OrderService.destroy(id); // DELETE /orders/{id}
 ```
 
 ### Quote Service
-```typescript
-import { QuoteService } from '@/services/quoteService'
 
-QuoteService.list({ page, perPage, orderId })  // GET /quotes
-QuoteService.getById(id)                        // GET /quotes/{id}
-QuoteService.create(payload)                    // POST /quotes
-QuoteService.update(id, payload)                // PATCH /quotes/{id}
-QuoteService.destroy(id)                        // DELETE /quotes/{id}
+```typescript
+import { QuoteService } from '@/services/quoteService';
+
+QuoteService.list({ page, perPage, orderId }); // GET /quotes
+QuoteService.getById(id); // GET /quotes/{id}
+QuoteService.create(payload); // POST /quotes
+QuoteService.update(id, payload); // PATCH /quotes/{id}
+QuoteService.destroy(id); // DELETE /quotes/{id}
 ```
 
 ### User Service
-```typescript
-import { UserService } from '@/services/userService'
 
-UserService.list({ page, perPage, role, search })  // GET /users
-UserService.getById(id)                             // GET /users/{id}
-UserService.update(id, payload)                     // PATCH /users/{id}
-UserService.destroy(id)                             // DELETE /users/{id}
+```typescript
+import { UserService } from '@/services/userService';
+
+UserService.list({ page, perPage, role, search }); // GET /users
+UserService.getById(id); // GET /users/{id}
+UserService.update(id, payload); // PATCH /users/{id}
+UserService.destroy(id); // DELETE /users/{id}
 ```
 
 ### Other Services
+
 - `DriverService` - Driver CRUD + approval
 - `BusinessService` - Business CRUD
 - `AddressService` - Address CRUD
@@ -187,27 +289,29 @@ UserService.destroy(id)                             // DELETE /users/{id}
 ## API Layer
 
 ### Making Requests
+
 ```typescript
-import { api } from '@/lib/api/client'
+import { api } from '@/lib/api/client';
 
 // GET with type
-const res = await api.get<Api.Response.Paginated<OrderData>>('/orders')
+const res = await api.get<Api.Response.Paginated<OrderData>>('/orders');
 
 // POST with body
 const res = await api.post<Api.Response.Single<QuoteData>>('/quotes', {
   orderId: 123,
   baseFare: 1500,
   // ...
-})
+});
 
 // PATCH
-await api.patch<Api.Response.Single<UserData>>(`/users/${id}`, payload)
+await api.patch<Api.Response.Single<UserData>>(`/users/${id}`, payload);
 
 // DELETE
-await api.destroy<Api.Response.SuccessBasic>(`/orders/${id}`)
+await api.destroy<Api.Response.SuccessBasic>(`/orders/${id}`);
 ```
 
 ### Response Types
+
 ```typescript
 // Single item
 Api.Response.Single<T> = { item: T, message, status, extra }
@@ -227,38 +331,40 @@ Api.Response.Error = { message, status, details?, errors?: Record<string, string
 ```
 
 ### Error Handling
+
 ```typescript
-import { ApiError, isApiError } from '@/lib/api/error'
+import { ApiError, isApiError } from '@/lib/api/error';
 
 try {
-  await api.post('/orders', data)
+  await api.post('/orders', data);
 } catch (err) {
   if (isApiError(err)) {
-    err.status      // HTTP status code
-    err.message     // Error message
-    err.errors      // Field validation errors: { field: ['error1', 'error2'] }
-    err.details     // Additional details
+    err.status; // HTTP status code
+    err.message; // Error message
+    err.errors; // Field validation errors: { field: ['error1', 'error2'] }
+    err.details; // Additional details
   }
 }
 ```
 
 ### Apply API Errors to React Hook Form
-```typescript
-import { applyApiErrorsToForm } from '@/utils/form'
 
-const form = useForm<FormValues>()
+```typescript
+import { applyApiErrorsToForm } from '@/utils/form';
+
+const form = useForm<FormValues>();
 
 const onSubmit = async (values: FormValues) => {
   try {
-    await QuoteService.create(values)
+    await QuoteService.create(values);
   } catch (err) {
     applyApiErrorsToForm(err, form.setError, {
       // Optional: map API field names to form field names
       base_fare: 'baseFare',
       distance_fee: 'distanceFee',
-    })
+    });
   }
-}
+};
 ```
 
 ---
@@ -266,50 +372,81 @@ const onSubmit = async (values: FormValues) => {
 ## Hooks (React Query)
 
 ### Pattern
+
 Each resource has its own hooks directory with:
+
 - `use[Resource]List.ts` - Paginated list query
 - `use[Resource].ts` - Single item query
 - `use[Resource]Mutations.ts` - Create/update/delete mutations
 - `index.ts` - Re-exports
 
 ### Orders
+
 ```typescript
-import { useOrderList, useOrder, useApproveOrder, useDenyOrder, useDeleteOrder } from '@/hooks/orders'
+import {
+  useOrderList,
+  useOrder,
+  useApproveOrder,
+  useDenyOrder,
+  useDeleteOrder,
+} from '@/hooks/orders';
 
 // List with filters
 const { data, isLoading, error } = useOrderList({
   page: 1,
   perPage: 10,
   status: 'pending',
-  search: 'john'
-})
+  search: 'john',
+});
 
 // Single order
-const { data: order, isLoading } = useOrder({ id: 123 })
+const { data: order, isLoading } = useOrder({ id: 123 });
 
 // Mutations
-const approveOrder = useApproveOrder()
-approveOrder.mutate(orderId)
+const approveOrder = useApproveOrder();
+approveOrder.mutate(orderId);
 ```
 
 ### Quotes
+
 ```typescript
-import { useQuoteList, useQuote, useCreateQuote, useUpdateQuote, useDeleteQuote } from '@/hooks/quotes'
+import {
+  useQuoteList,
+  useQuote,
+  useCreateQuote,
+  useUpdateQuote,
+  useDeleteQuote,
+} from '@/hooks/quotes';
 ```
 
 ### Users
+
 ```typescript
-import { useUserList, useUser, useUpdateUser, useDeleteUser } from '@/hooks/users'
+import { useUserList, useUser, useUpdateUser, useDeleteUser } from '@/hooks/users';
 ```
 
 ### Drivers
+
 ```typescript
-import { useDriverList, useDriver, useApproveDriver, useUpdateDriver, useDeleteDriver } from '@/hooks/drivers'
+import {
+  useDriverList,
+  useDriver,
+  useApproveDriver,
+  useUpdateDriver,
+  useDeleteDriver,
+} from '@/hooks/drivers';
 ```
 
 ### Businesses
+
 ```typescript
-import { useBusinessList, useBusiness, useCreateBusiness, useUpdateBusiness, useDeleteBusiness } from '@/hooks/businesses'
+import {
+  useBusinessList,
+  useBusiness,
+  useCreateBusiness,
+  useUpdateBusiness,
+  useDeleteBusiness,
+} from '@/hooks/businesses';
 ```
 
 ---
@@ -317,26 +454,28 @@ import { useBusinessList, useBusiness, useCreateBusiness, useUpdateBusiness, use
 ## Utils
 
 ### HTTP Response Helpers
+
 ```typescript
-import { hasItem, hasItems, hasPagination, successBasic, toBasicSuccess } from '@/utils/http'
+import { hasItem, hasItems, hasPagination, successBasic, toBasicSuccess } from '@/utils/http';
 
 if (hasItem(response)) {
-  console.log(response.item)
+  console.log(response.item);
 }
 if (hasItems(response)) {
-  console.log(response.items)
+  console.log(response.items);
 }
 ```
 
 ### Form Error Helpers
+
 ```typescript
-import { applyApiErrorsToForm, getFieldError, hasValidationErrors } from '@/utils/form'
+import { applyApiErrorsToForm, getFieldError, hasValidationErrors } from '@/utils/form';
 
 // Apply all errors to form
-applyApiErrorsToForm(err, form.setError)
+applyApiErrorsToForm(err, form.setError);
 
 // Get specific field error
-const emailError = getFieldError(err, 'email')
+const emailError = getFieldError(err, 'email');
 
 // Check if has validation errors
 if (hasValidationErrors(err)) {
@@ -345,13 +484,19 @@ if (hasValidationErrors(err)) {
 ```
 
 ### i18n Message Helpers
-```typescript
-import { validationMessage, resourceMessage, crudSuccessMessage, crudErrorMessage } from '@/utils/lang'
 
-validationMessage('required', 'email')     // "The email field is required"
-resourceMessage('created', 'order')        // "Order created"
-crudSuccessMessage('created', 'order')     // "Order created successfully"
-crudErrorMessage('delete', 'order')        // "Failed to delete order"
+```typescript
+import {
+  validationMessage,
+  resourceMessage,
+  crudSuccessMessage,
+  crudErrorMessage,
+} from '@/utils/lang';
+
+validationMessage('required', 'email'); // "The email field is required"
+resourceMessage('created', 'order'); // "Order created"
+crudSuccessMessage('created', 'order'); // "Order created successfully"
+crudErrorMessage('delete', 'order'); // "Failed to delete order"
 ```
 
 ---
@@ -359,30 +504,34 @@ crudErrorMessage('delete', 'order')        // "Failed to delete order"
 ## i18n
 
 ### Configuration
+
 **Translations are managed in the backend** at `api/lang/` (PHP files). This app fetches them at runtime from `/locales/{lng}/{ns}.json`.
 
 To add or modify translations:
+
 1. Edit PHP files in `../api/lang/en/*.php` or `../api/lang/es/*.php`
 2. Run `langs` command from the API directory to regenerate JSON files
 3. No manual sync needed - translations are fetched at runtime
 
 ### Namespaces
+
 `addresses`, `auth`, `cache`, `common`, `http`, `models`, `orders`, `pagination`, `languages`, `passwords`, `resource`, `validation`
 
 ### Usage
-```typescript
-import { useTranslation } from 'react-i18next'
 
-const { t } = useTranslation('orders')
+```typescript
+import { useTranslation } from 'react-i18next';
+
+const { t } = useTranslation('orders');
 
 // Simple key
-t('create.title')
+t('create.title');
 
 // With interpolation
-t('create.fulfilledBefore', { defaultValue: 'Deliver by (optional)' })
+t('create.fulfilledBefore', { defaultValue: 'Deliver by (optional)' });
 
 // Cross-namespace
-t('validation:required', { attribute: t('models:user.email') })
+t('validation:required', { attribute: t('models:user.email') });
 ```
 
 ---
@@ -390,6 +539,7 @@ t('validation:required', { attribute: t('models:user.email') })
 ## Forms (React Hook Form + Zod)
 
 ### Pattern
+
 ```typescript
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -431,25 +581,27 @@ function MyForm() {
 ## Types
 
 ### Generated Types (types/generated.d.ts)
+
 ```typescript
-App.Data.User.UserData
-App.Data.Address.AddressData
-App.Data.Order.OrderData
-App.Data.Quote.QuoteData
-App.Data.Business.BusinessData
-App.Data.Driver.DriverData
-App.Data.Catalog.CatalogData
-App.Enums.OrderStatus
-App.Enums.PaymentStatus
+App.Data.User.UserData;
+App.Data.Address.AddressData;
+App.Data.Order.OrderData;
+App.Data.Quote.QuoteData;
+App.Data.Business.BusinessData;
+App.Data.Driver.DriverData;
+App.Data.Catalog.CatalogData;
+App.Enums.OrderStatus;
+App.Enums.PaymentStatus;
 ```
 
 ### Response Types (types/response.d.ts)
+
 ```typescript
-Api.Response.Single<T>
-Api.Response.Paginated<T>
-Api.Response.SuccessBasic
-Api.Response.Error
-Api.Response.Login
+Api.Response.Single<T>;
+Api.Response.Paginated<T>;
+Api.Response.SuccessBasic;
+Api.Response.Error;
+Api.Response.Login;
 ```
 
 ---
@@ -457,17 +609,20 @@ Api.Response.Login
 ## Architecture Patterns
 
 ### Three-Layer Architecture
+
 1. **API Layer** (`lib/api/client.ts`) - HTTP wrapper with auth
 2. **Service Layer** (`services/`) - Business logic, can use outside React
 3. **Hook Layer** (`hooks/`) - React Query hooks for components
 
 ### Auth Flow
+
 1. Login via `Auth.login()` → stores token in Zustand + cookie
 2. Middleware checks cookie for route protection
 3. AuthProvider handles hydration and token refresh
 4. Admin role verified on login
 
 ### State Management
+
 - **Zustand + Immer**: For auth and UI state
 - **React Query**: For server state (API data)
 - **Persist**: Token/user persisted to localStorage
@@ -477,9 +632,11 @@ Api.Response.Login
 ## Commands
 
 ```bash
-npm run dev      # Start dev server (port 3001)
-npm run build    # Production build
-npm run lint     # ESLint
+npm run dev        # Start dev server (port 3111) - auto-regenerates enums
+npm run build      # Production build - auto-regenerates enums
+npm run lint       # ESLint
+npm run gen:enums  # Manually regenerate runtime enums from types/generated.d.ts
+npm run check      # Run format:check + lint + typecheck
 ```
 
 ---
@@ -500,7 +657,9 @@ npm run lint     # ESLint
 ## Planned Features
 
 ### Pricing Rules System
+
 See `docs/pricing-rules-plan.md` for full implementation plan:
+
 - Per-currency pricing rules (CRC, USD)
 - Distance-based fee tiers
 - Version history tracking

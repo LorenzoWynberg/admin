@@ -77,9 +77,13 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{t('common:dashboard', { defaultValue: 'Dashboard' })}</h1>
+        <h1 className="text-3xl font-bold">
+          {t('common:dashboard', { defaultValue: 'Dashboard' })}
+        </h1>
         <p className="text-muted-foreground">
-          {t('common:dashboard_welcome', { defaultValue: 'Welcome to the Mandados admin dashboard' })}
+          {t('common:dashboard_welcome', {
+            defaultValue: 'Welcome to the Mandados admin dashboard',
+          })}
         </p>
       </div>
 
@@ -100,8 +104,11 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                {t('common:click_to_manage', { resource: stat.name, defaultValue: `Click to manage ${stat.name}` })}
+              <p className="text-muted-foreground text-sm">
+                {t('common:click_to_manage', {
+                  resource: stat.name,
+                  defaultValue: `Click to manage ${stat.name}`,
+                })}
               </p>
             </CardContent>
           </Card>

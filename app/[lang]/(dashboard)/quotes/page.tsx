@@ -1,28 +1,29 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
-import { useQuoteList } from '@/hooks/quotes';
-import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { capitalize } from '@/utils/lang';
 import {
-  Table,
+  TableHeader,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableRow,
+  Table,
 } from '@/components/ui/table';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
+  SelectContent,
   SelectValue,
+  SelectItem,
+  Select,
 } from '@/components/ui/select';
+
+import { useState } from 'react';
+import { capitalize } from '@/utils/lang';
+import { Input } from '@/components/ui/input';
+import { useQuoteList } from '@/hooks/quotes';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, FileText } from 'lucide-react';
 
@@ -85,7 +86,9 @@ export default function QuotesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(t('models:quote_other', { defaultValue: 'Quotes' }))}</h1>
+          <h1 className="text-3xl font-bold">
+            {capitalize(t('models:quote_other', { defaultValue: 'Quotes' }))}
+          </h1>
           <p className="text-muted-foreground">
             {t('quotes:manage_description', { defaultValue: 'Create and manage delivery quotes' })}
           </p>
@@ -95,12 +98,14 @@ export default function QuotesPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
+          <CardTitle className="text-lg">
+            {t('common:filters', { defaultValue: 'Filters' })}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative min-w-[200px] flex-1">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
                 placeholder={t('quotes:search_placeholder', { defaultValue: 'Search quotes...' })}
                 value={search}
@@ -119,7 +124,9 @@ export default function QuotesPage() {
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t('quotes:filter_by_status', { defaultValue: 'Filter by status' })} />
+                <SelectValue
+                  placeholder={t('quotes:filter_by_status', { defaultValue: 'Filter by status' })}
+                />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
@@ -138,14 +145,14 @@ export default function QuotesPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
             </div>
           ) : error ? (
-            <div className="py-12 text-center text-destructive">
+            <div className="text-destructive py-12 text-center">
               {t('quotes:failed_to_load', { defaultValue: 'Failed to load quotes' })}
             </div>
           ) : quotes.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <FileText className="mb-4 h-12 w-12" />
               <p>{t('quotes:no_quotes', { defaultValue: 'No quotes found' })}</p>
             </div>
@@ -165,7 +172,7 @@ export default function QuotesPage() {
                 {quotes.map((quote) => (
                   <TableRow
                     key={quote.id}
-                    className="cursor-pointer hover:bg-muted/50"
+                    className="hover:bg-muted/50 cursor-pointer"
                     onClick={() => router.push(`/quotes/${quote.id}`)}
                   >
                     <TableCell className="font-medium">#{quote.id}</TableCell>
@@ -179,7 +186,10 @@ export default function QuotesPage() {
                             router.push(`/orders/${quote.orderId}`);
                           }}
                         >
-                          {t('orders:order_id', { id: quote.orderId, defaultValue: `Order #${quote.orderId}` })}
+                          {t('orders:order_id', {
+                            id: quote.orderId,
+                            defaultValue: `Order #${quote.orderId}`,
+                          })}
                         </Button>
                       ) : (
                         '-'
@@ -188,9 +198,7 @@ export default function QuotesPage() {
                     <TableCell>
                       <QuoteStatusBadge status={quote.status as QuoteStatus} />
                     </TableCell>
-                    <TableCell>
-                      {formatCurrency(quote.total, quote.currencyCode)}
-                    </TableCell>
+                    <TableCell>{formatCurrency(quote.total, quote.currencyCode)}</TableCell>
                     <TableCell>{formatDate(quote.validUntil)}</TableCell>
                     <TableCell>{formatDate(quote.createdAt)}</TableCell>
                   </TableRow>
@@ -203,8 +211,13 @@ export default function QuotesPage() {
         {/* Pagination */}
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
-              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} quotes)` })}
+            <p className="text-muted-foreground text-sm">
+              {t('pagination:page_info', {
+                current: meta.currentPage,
+                last: meta.lastPage,
+                total: meta.total,
+                defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} quotes)`,
+              })}
             </p>
             <div className="flex gap-2">
               <Button

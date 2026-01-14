@@ -90,7 +90,8 @@ export function ElementEditDialog({
         },
         order: element.order?.toString() || '',
       });
-      // Reset to current language when opening
+      // Reset to current language when opening - intentional sync on dialog open
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedLang((i18n.language as Language) || 'en');
     }
   }, [element, open, form, i18n.language]);
@@ -144,7 +145,7 @@ export function ElementEditDialog({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
+              <span className="text-muted-foreground text-sm">
                 {t('common:language', { defaultValue: 'Language' })}:
               </span>
               <Select value={selectedLang} onValueChange={(v) => setSelectedLang(v as Language)}>
@@ -168,7 +169,10 @@ export function ElementEditDialog({
                 <FormItem>
                   <FormLabel>{t('common:name', { defaultValue: 'Name' })}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder={`${t('common:name', { defaultValue: 'Name' })} (${languageLabels[selectedLang]})`} />
+                    <Input
+                      {...field}
+                      placeholder={`${t('common:name', { defaultValue: 'Name' })} (${languageLabels[selectedLang]})`}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -208,11 +212,7 @@ export function ElementEditDialog({
             />
 
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 {t('common:cancel', { defaultValue: 'Cancel' })}
               </Button>
               <Button type="submit" disabled={updateElement.isPending}>

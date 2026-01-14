@@ -1,22 +1,14 @@
 'use client';
 
+import { capitalize } from '@/utils/lang';
 import { useParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
-import { useQuote, useSendQuote, useDeleteQuote } from '@/hooks/quotes';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
-import { Button } from '@/components/ui/button';
+import { useQuote, useSendQuote, useDeleteQuote } from '@/hooks/quotes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  ArrowLeft,
-  FileText,
-  DollarSign,
-  Calendar,
-  Send,
-  Trash2,
-  Package,
-} from 'lucide-react';
-import { capitalize } from '@/utils/lang';
+import { ArrowLeft, FileText, DollarSign, Calendar, Send, Trash2, Package } from 'lucide-react';
 
 type QuoteStatus = App.Enums.QuoteStatus;
 
@@ -52,13 +44,25 @@ export default function QuoteDetailPage() {
   const deleteQuote = useDeleteQuote();
 
   const handleSend = () => {
-    if (confirm(t('quotes:detail.confirm_send', { defaultValue: 'Are you sure you want to send this quote to the customer?' }))) {
+    if (
+      confirm(
+        t('quotes:detail.confirm_send', {
+          defaultValue: 'Are you sure you want to send this quote to the customer?',
+        }),
+      )
+    ) {
       sendQuote.mutate(quoteId);
     }
   };
 
   const handleDelete = () => {
-    if (confirm(t('quotes:detail.confirm_delete', { defaultValue: 'Are you sure you want to delete this quote? This cannot be undone.' }))) {
+    if (
+      confirm(
+        t('quotes:detail.confirm_delete', {
+          defaultValue: 'Are you sure you want to delete this quote? This cannot be undone.',
+        }),
+      )
+    ) {
       deleteQuote.mutate(quoteId, {
         onSuccess: () => router.push('/quotes'),
       });
@@ -68,7 +72,7 @@ export default function QuoteDetailPage() {
   if (!ready || isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
       </div>
     );
   }
@@ -76,7 +80,9 @@ export default function QuoteDetailPage() {
   if (error || !quote) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">{t('quotes:failed_to_load', { defaultValue: 'Failed to load quote' })}</p>
+        <p className="text-destructive">
+          {t('quotes:failed_to_load', { defaultValue: 'Failed to load quote' })}
+        </p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
           {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
@@ -98,7 +104,9 @@ export default function QuoteDetailPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{capitalize(t('models:quote_one', { defaultValue: 'Quote' }))} #{quote.id}</h1>
+              <h1 className="text-3xl font-bold">
+                {capitalize(t('models:quote_one', { defaultValue: 'Quote' }))} #{quote.id}
+              </h1>
               <QuoteStatusBadge status={quote.status as QuoteStatus} />
             </div>
             <p className="text-muted-foreground">
@@ -114,11 +122,7 @@ export default function QuoteDetailPage() {
             </Button>
           )}
           {canDelete && (
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleteQuote.isPending}
-            >
+            <Button variant="destructive" onClick={handleDelete} disabled={deleteQuote.isPending}>
               <Trash2 className="mr-2 h-4 w-4" />
               {t('common:delete', { defaultValue: 'Delete' })}
             </Button>
@@ -137,35 +141,52 @@ export default function QuoteDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('quotes:detail.version', { defaultValue: 'Version' })}</span>
+              <span className="text-muted-foreground">
+                {t('quotes:detail.version', { defaultValue: 'Version' })}
+              </span>
               <span className="font-medium">{quote.version || 1}</span>
             </div>
             {quote.orderId && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('models:order_one', { defaultValue: 'Order' })}</span>
+                <span className="text-muted-foreground">
+                  {t('models:order_one', { defaultValue: 'Order' })}
+                </span>
                 <Button
                   variant="link"
                   className="h-auto p-0"
                   onClick={() => router.push(`/orders/${quote.orderId}`)}
                 >
                   <Package className="mr-1 h-4 w-4" />
-                  {t('orders:order_id', { id: quote.orderId, defaultValue: `Order #${quote.orderId}` })}
+                  {t('orders:order_id', {
+                    id: quote.orderId,
+                    defaultValue: `Order #${quote.orderId}`,
+                  })}
                 </Button>
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('quotes:detail.is_final', { defaultValue: 'Final' })}</span>
-              <span className="font-medium">{quote.isFinal ? t('common:yes', { defaultValue: 'Yes' }) : t('common:no', { defaultValue: 'No' })}</span>
+              <span className="text-muted-foreground">
+                {t('quotes:detail.is_final', { defaultValue: 'Final' })}
+              </span>
+              <span className="font-medium">
+                {quote.isFinal
+                  ? t('common:yes', { defaultValue: 'Yes' })
+                  : t('common:no', { defaultValue: 'No' })}
+              </span>
             </div>
             {quote.finalizedAt && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('quotes:detail.finalized_at', { defaultValue: 'Finalized At' })}</span>
+                <span className="text-muted-foreground">
+                  {t('quotes:detail.finalized_at', { defaultValue: 'Finalized At' })}
+                </span>
                 <span className="font-medium">{formatDate(quote.finalizedAt)}</span>
               </div>
             )}
             {quote.notes && (
               <div className="border-t pt-4">
-                <p className="text-sm text-muted-foreground">{t('quotes:detail.notes', { defaultValue: 'Notes' })}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t('quotes:detail.notes', { defaultValue: 'Notes' })}
+                </p>
                 <p className="mt-1">{quote.notes}</p>
               </div>
             )}
@@ -182,20 +203,26 @@ export default function QuoteDetailPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('quotes:detail.base_fare', { defaultValue: 'Base Fare' })}</span>
+              <span className="text-muted-foreground">
+                {t('quotes:detail.base_fare', { defaultValue: 'Base Fare' })}
+              </span>
               <span className="font-medium">
                 {formatCurrency(quote.baseFare, quote.currencyCode)}
               </span>
             </div>
             {quote.distanceKm != null && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('quotes:detail.distance', { defaultValue: 'Distance' })}</span>
+                <span className="text-muted-foreground">
+                  {t('quotes:detail.distance', { defaultValue: 'Distance' })}
+                </span>
                 <span className="font-medium">{quote.distanceKm.toFixed(1)} km</span>
               </div>
             )}
             {quote.distanceFee != null && quote.distanceFee > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('quotes:detail.distance_fee', { defaultValue: 'Distance Fee' })}</span>
+                <span className="text-muted-foreground">
+                  {t('quotes:detail.distance_fee', { defaultValue: 'Distance Fee' })}
+                </span>
                 <span className="font-medium">
                   {formatCurrency(quote.distanceFee, quote.currencyCode)}
                 </span>
@@ -203,7 +230,9 @@ export default function QuoteDetailPage() {
             )}
             {quote.timeFee != null && quote.timeFee > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('quotes:detail.time_fee', { defaultValue: 'Time Fee' })}</span>
+                <span className="text-muted-foreground">
+                  {t('quotes:detail.time_fee', { defaultValue: 'Time Fee' })}
+                </span>
                 <span className="font-medium">
                   {formatCurrency(quote.timeFee, quote.currencyCode)}
                 </span>
@@ -211,7 +240,9 @@ export default function QuoteDetailPage() {
             )}
             {quote.surcharge != null && quote.surcharge > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('quotes:detail.surcharge', { defaultValue: 'Surcharge' })}</span>
+                <span className="text-muted-foreground">
+                  {t('quotes:detail.surcharge', { defaultValue: 'Surcharge' })}
+                </span>
                 <span className="font-medium">
                   {formatCurrency(quote.surcharge, quote.currencyCode)}
                 </span>
@@ -219,15 +250,17 @@ export default function QuoteDetailPage() {
             )}
             {quote.discountRate != null && quote.discountRate > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('quotes:detail.discount', { defaultValue: 'Discount' })}</span>
-                <span className="font-medium text-green-600">
-                  -{quote.discountRate}%
+                <span className="text-muted-foreground">
+                  {t('quotes:detail.discount', { defaultValue: 'Discount' })}
                 </span>
+                <span className="font-medium text-green-600">-{quote.discountRate}%</span>
               </div>
             )}
             {quote.taxRate != null && quote.taxRate > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('quotes:detail.tax', { defaultValue: 'Tax' })} ({quote.taxRate}%)</span>
+                <span className="text-muted-foreground">
+                  {t('quotes:detail.tax', { defaultValue: 'Tax' })} ({quote.taxRate}%)
+                </span>
                 <span className="font-medium">
                   {formatCurrency(quote.taxTotal, quote.currencyCode)}
                 </span>
@@ -252,15 +285,21 @@ export default function QuoteDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('quotes:detail.pickup_proposed', { defaultValue: 'Pickup Proposed' })}</span>
+              <span className="text-muted-foreground">
+                {t('quotes:detail.pickup_proposed', { defaultValue: 'Pickup Proposed' })}
+              </span>
               <span className="font-medium">{formatDate(quote.pickupProposedFor)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('quotes:detail.delivery_proposed', { defaultValue: 'Delivery Proposed' })}</span>
+              <span className="text-muted-foreground">
+                {t('quotes:detail.delivery_proposed', { defaultValue: 'Delivery Proposed' })}
+              </span>
               <span className="font-medium">{formatDate(quote.deliveryProposedFor)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</span>
+              <span className="text-muted-foreground">
+                {t('quotes:valid_until', { defaultValue: 'Valid Until' })}
+              </span>
               <span className="font-medium">{formatDate(quote.validUntil)}</span>
             </div>
           </CardContent>
@@ -273,11 +312,15 @@ export default function QuoteDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('common:created', { defaultValue: 'Created' })}</span>
+              <span className="text-muted-foreground">
+                {t('common:created', { defaultValue: 'Created' })}
+              </span>
               <span className="font-medium">{formatDate(quote.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('common:updated', { defaultValue: 'Updated' })}</span>
+              <span className="text-muted-foreground">
+                {t('common:updated', { defaultValue: 'Updated' })}
+              </span>
               <span className="font-medium">{formatDate(quote.updatedAt)}</span>
             </div>
           </CardContent>

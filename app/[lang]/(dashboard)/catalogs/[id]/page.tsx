@@ -45,10 +45,9 @@ export default function CatalogDetailPage() {
   const [selectedElement, setSelectedElement] = useState<CatalogElementData | null>(null);
 
   const { data: catalog, isLoading, error } = useCatalog(catalogId);
-  const { data: elementsData, isLoading: elementsLoading } = useCatalogElements(
-    catalog?.code || '',
-    { enabled: !!catalog?.code }
-  );
+  const { data: elementsData } = useCatalogElements(catalog?.code || '', {
+    enabled: !!catalog?.code,
+  });
 
   const handleEditElement = (element: CatalogElementData) => {
     setSelectedElement(element);
@@ -58,7 +57,7 @@ export default function CatalogDetailPage() {
   if (!ready || isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
       </div>
     );
   }
@@ -66,7 +65,9 @@ export default function CatalogDetailPage() {
   if (error || !catalog) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">{t('catalogs:failed_to_load', { defaultValue: 'Failed to load catalog' })}</p>
+        <p className="text-destructive">
+          {t('catalogs:failed_to_load', { defaultValue: 'Failed to load catalog' })}
+        </p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
           {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
@@ -87,7 +88,9 @@ export default function CatalogDetailPage() {
             <h1 className="text-3xl font-bold">{catalog.name}</h1>
             <Badge variant="outline">{catalog.code}</Badge>
           </div>
-          <p className="text-muted-foreground">{capitalize(t('models:catalog_one', { defaultValue: 'Catalog' }))} #{catalog.id}</p>
+          <p className="text-muted-foreground">
+            {capitalize(t('models:catalog_one', { defaultValue: 'Catalog' }))} #{catalog.id}
+          </p>
         </div>
       </div>
 
@@ -101,16 +104,22 @@ export default function CatalogDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('catalogs:code', { defaultValue: 'Code' })}</span>
+              <span className="text-muted-foreground">
+                {t('catalogs:code', { defaultValue: 'Code' })}
+              </span>
               <Badge variant="outline">{catalog.code}</Badge>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('common:name', { defaultValue: 'Name' })}</span>
+              <span className="text-muted-foreground">
+                {t('common:name', { defaultValue: 'Name' })}
+              </span>
               <span className="font-medium">{catalog.name}</span>
             </div>
             {catalog.description && (
               <div>
-                <p className="text-sm text-muted-foreground">{t('catalogs:detail.description', { defaultValue: 'Description' })}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t('catalogs:detail.description', { defaultValue: 'Description' })}
+                </p>
                 <p className="mt-1">{catalog.description}</p>
               </div>
             )}
@@ -126,11 +135,15 @@ export default function CatalogDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('common:created', { defaultValue: 'Created' })}</span>
+              <span className="text-muted-foreground">
+                {t('common:created', { defaultValue: 'Created' })}
+              </span>
               <span className="font-medium">{formatDate(catalog.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('common:updated', { defaultValue: 'Updated' })}</span>
+              <span className="text-muted-foreground">
+                {t('common:updated', { defaultValue: 'Updated' })}
+              </span>
               <span className="font-medium">{formatDate(catalog.updatedAt)}</span>
             </div>
           </CardContent>
@@ -141,14 +154,19 @@ export default function CatalogDetailPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <List className="h-5 w-5" />
-            {t('catalogs:detail.elements_count', { count: elements.length, defaultValue: `Elements (${elements.length})` })}
+            {t('catalogs:detail.elements_count', {
+              count: elements.length,
+              defaultValue: `Elements (${elements.length})`,
+            })}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {elements.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <List className="mb-4 h-12 w-12" />
-              <p>{t('catalogs:detail.no_elements', { defaultValue: 'No elements in this catalog' })}</p>
+              <p>
+                {t('catalogs:detail.no_elements', { defaultValue: 'No elements in this catalog' })}
+              </p>
             </div>
           ) : (
             <Table>
@@ -157,7 +175,9 @@ export default function CatalogDetailPage() {
                   <TableHead>{t('catalogs:code', { defaultValue: 'Code' })}</TableHead>
                   <TableHead>{t('common:name', { defaultValue: 'Name' })}</TableHead>
                   <TableHead>{t('catalogs:detail.order', { defaultValue: 'Order' })}</TableHead>
-                  <TableHead className="w-20">{t('common:actions', { defaultValue: 'Actions' })}</TableHead>
+                  <TableHead className="w-20">
+                    {t('common:actions', { defaultValue: 'Actions' })}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

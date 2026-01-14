@@ -12,13 +12,7 @@ import { isApiError } from '@/lib/api/error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 
 type LoginFormData = {
@@ -35,8 +29,12 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const loginSchema = z.object({
-    email: z.string().email(t('auth:invalid_email', { defaultValue: 'Please enter a valid email address' })),
-    password: z.string().min(1, t('auth:password_required', { defaultValue: 'Password is required' })),
+    email: z
+      .string()
+      .email(t('auth:invalid_email', { defaultValue: 'Please enter a valid email address' })),
+    password: z
+      .string()
+      .min(1, t('auth:password_required', { defaultValue: 'Password is required' })),
   });
 
   const {
@@ -90,12 +88,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+    <div className="bg-muted/40 flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">{t('common:app_name', { defaultValue: 'Mandados Admin' })}</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            {t('common:app_name', { defaultValue: 'Mandados Admin' })}
+          </CardTitle>
           <CardDescription>
-            {t('auth:login_description', { defaultValue: 'Enter your credentials to access the admin dashboard' })}
+            {t('auth:login_description', {
+              defaultValue: 'Enter your credentials to access the admin dashboard',
+            })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -110,9 +112,7 @@ export default function LoginPage() {
                 disabled={isLoading}
                 {...register('email')}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-destructive text-sm">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -126,14 +126,14 @@ export default function LoginPage() {
                 {...register('password')}
               />
               {errors.password && (
-                <p className="text-sm text-destructive">
-                  {errors.password.message}
-                </p>
+                <p className="text-destructive text-sm">{errors.password.message}</p>
               )}
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? t('auth:signing_in', { defaultValue: 'Signing in...' }) : t('auth:sign_in', { defaultValue: 'Sign in' })}
+              {isLoading
+                ? t('auth:signing_in', { defaultValue: 'Signing in...' })
+                : t('auth:sign_in', { defaultValue: 'Sign in' })}
             </Button>
           </form>
         </CardContent>

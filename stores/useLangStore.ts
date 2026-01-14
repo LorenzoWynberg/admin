@@ -35,6 +35,6 @@ export const useLangStore = create<LangState>()(
           useLangStore.setState({ hydrated: true } as Partial<LangState>);
         }, 0);
       },
-    }
-  )
+    },
+  ),
 );

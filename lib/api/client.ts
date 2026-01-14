@@ -32,7 +32,7 @@ function getToken(): string | null {
 function buildRequestOptions(
   method: RequestMethod,
   body?: unknown,
-  options: FetchOptions = {}
+  options: FetchOptions = {},
 ): RequestInit {
   const token = getToken();
   const headers: Record<string, string> = {

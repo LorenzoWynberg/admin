@@ -17,7 +17,7 @@ export class ApiError extends Error {
       errors?: Record<string, string[]>;
       extra?: Record<string, unknown>;
       raw?: unknown;
-    }
+    },
   ) {
     super(message);
     this.name = 'ApiError';
