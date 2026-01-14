@@ -12,6 +12,7 @@ Next.js 16 admin dashboard with TypeScript, Zustand, React Query, React Hook For
 - **Atomic commits** - One logical change per commit, very small and focused
 - **No co-authored-by** - Do not add "Co-Authored-By: Claude" to commit messages
 - **Conventional commits** - Use prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`
+- **Branch strategy:** `feature/*` → `release/*` → `dev` → `main` (see main CLAUDE.md)
 
 ---
 
