@@ -14,6 +14,7 @@ import {
   Building2,
   MapPin,
   Database,
+  DollarSign,
   Settings,
 } from 'lucide-react';
 
@@ -26,6 +27,7 @@ const navigation = [
   { modelKey: 'business', href: '/businesses', icon: Building2, isModel: true },
   { modelKey: 'address', href: '/addresses', icon: MapPin, isModel: true },
   { modelKey: 'catalog', href: '/catalogs', icon: Database, isModel: true },
+  { modelKey: 'pricing', href: '/pricing', icon: DollarSign, isModel: false, translationKey: 'pricing:title' },
 ];
 
 export function Sidebar() {
@@ -42,9 +44,14 @@ export function Sidebar() {
 
   const getNavLabel = (item: typeof navigation[0]) => {
     if (!ready) return '';
-    const label = item.isModel
-      ? t(`models:${item.modelKey}_other`, { defaultValue: item.modelKey })
-      : t(`common:${item.modelKey}`, { defaultValue: item.modelKey });
+    let label: string;
+    if ('translationKey' in item && item.translationKey) {
+      label = t(item.translationKey, { defaultValue: item.modelKey });
+    } else if (item.isModel) {
+      label = t(`models:${item.modelKey}_other`, { defaultValue: item.modelKey });
+    } else {
+      label = t(`common:${item.modelKey}`, { defaultValue: item.modelKey });
+    }
     return capitalize(label);
   };
 
