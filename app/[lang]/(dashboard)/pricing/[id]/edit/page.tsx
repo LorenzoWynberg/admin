@@ -25,17 +25,17 @@ import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { applyApiErrorsToForm } from '@/utils/form';
 
 const tierSchema = z.object({
-  minKm: z.coerce.number().min(0),
-  maxKm: z.coerce.number().min(0).nullable(),
-  flatFee: z.coerce.number().min(0).nullable(),
-  perKmRate: z.coerce.number().min(0).nullable(),
-  order: z.coerce.number().min(0),
+  minKm: z.number().min(0),
+  maxKm: z.number().min(0).nullable(),
+  flatFee: z.number().min(0).nullable(),
+  perKmRate: z.number().min(0).nullable(),
+  order: z.number().min(0),
 });
 
 const formSchema = z.object({
   name: z.string().min(1).max(255),
-  baseFare: z.coerce.number().min(0),
-  taxRate: z.coerce.number().min(0).max(1),
+  baseFare: z.number().min(0),
+  taxRate: z.number().min(0).max(1),
   notes: z.string().nullable(),
   tiers: z.array(tierSchema),
 });
