@@ -53,20 +53,32 @@ export default function AddressesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(t('models:address_other', { defaultValue: 'Addresses' }))}</h1>
-          <p className="text-muted-foreground">{t('addresses:manage_description', { defaultValue: 'View saved addresses' })}</p>
+          <h1 className="text-3xl font-bold">
+            {capitalize(
+              t('models:address_other', { defaultValue: 'Addresses' })
+            )}
+          </h1>
+          <p className="text-muted-foreground">
+            {t('addresses:manage_description', {
+              defaultValue: 'View saved addresses',
+            })}
+          </p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
+          <CardTitle className="text-lg">
+            {t('common:filters', { defaultValue: 'Filters' })}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder={t('addresses:search_placeholder', { defaultValue: 'Search addresses...' })}
+              placeholder={t('addresses:search_placeholder', {
+                defaultValue: 'Search addresses...',
+              })}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -86,22 +98,38 @@ export default function AddressesPage() {
             </div>
           ) : error ? (
             <div className="py-12 text-center text-destructive">
-              {t('addresses:failed_to_load', { defaultValue: 'Failed to load addresses' })}
+              {t('addresses:failed_to_load', {
+                defaultValue: 'Failed to load addresses',
+              })}
             </div>
           ) : addresses.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <MapPin className="mb-4 h-12 w-12" />
-              <p>{t('addresses:no_addresses', { defaultValue: 'No addresses found' })}</p>
+              <p>
+                {t('addresses:no_addresses', {
+                  defaultValue: 'No addresses found',
+                })}
+              </p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('addresses:label', { defaultValue: 'Label' })}</TableHead>
-                  <TableHead>{t('models:address_one', { defaultValue: 'Address' })}</TableHead>
-                  <TableHead>{t('addresses:city', { defaultValue: 'City' })}</TableHead>
-                  <TableHead>{t('common:type', { defaultValue: 'Type' })}</TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>
+                    {t('addresses:label', { defaultValue: 'Label' })}
+                  </TableHead>
+                  <TableHead>
+                    {t('models:address_one', { defaultValue: 'Address' })}
+                  </TableHead>
+                  <TableHead>
+                    {t('addresses:city', { defaultValue: 'City' })}
+                  </TableHead>
+                  <TableHead>
+                    {t('common:type', { defaultValue: 'Type' })}
+                  </TableHead>
+                  <TableHead>
+                    {t('common:created', { defaultValue: 'Created' })}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -116,7 +144,9 @@ export default function AddressesPage() {
                       )}
                     </TableCell>
                     <TableCell className="max-w-[300px] truncate">
-                      {address.humanReadableAddress || address.streetAddress || '-'}
+                      {address.humanReadableAddress ||
+                        address.streetAddress ||
+                        '-'}
                     </TableCell>
                     <TableCell>{address.city?.name || '-'}</TableCell>
                     <TableCell>
@@ -133,7 +163,12 @@ export default function AddressesPage() {
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} addresses)` })}
+              {t('pagination:page_info', {
+                current: meta.currentPage,
+                last: meta.lastPage,
+                total: meta.total,
+                defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} addresses)`,
+              })}
             </p>
             <div className="flex gap-2">
               <Button

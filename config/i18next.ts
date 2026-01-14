@@ -3,7 +3,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector, { type DetectorOptions } from 'i18next-browser-languagedetector';
-import resourcesToBackend from 'i18next-resources-to-backend';
+import HttpBackend from 'i18next-http-backend';
 
 const defaultLocale = 'en';
 const supportedLngs = ['en', 'es', 'fr'] as const;
@@ -46,23 +46,23 @@ export async function ensureI18nInitialized(pathname?: string) {
   await i18n
     .use(initReactI18next)
     .use(LanguageDetector)
-    .use(
-      resourcesToBackend((language: string, namespace: string) =>
-        fetch(`/locales/${language}/${namespace}.json`, { cache: 'no-store' }).then((res) => res.json())
-      )
-    )
+    .use(HttpBackend)
     .init({
       lng,
       fallbackLng: defaultLocale,
       supportedLngs: Array.from(supportedLngs),
       ns: Array.from(namespaces),
       defaultNS: 'common',
+      preload: [lng],
       interpolation: { escapeValue: false },
       detection: {
         order: ['path', 'cookie', 'navigator'],
         lookupFromPathIndex: 0,
         cookieName: 'lang',
       } as DetectorOptions,
+      backend: {
+        loadPath: '/locales/{{lng}}/{{ns}}.json',
+      },
       react: {
         useSuspense: false,
       },

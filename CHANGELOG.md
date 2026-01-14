@@ -8,6 +8,13 @@ Format: Each entry includes the date, affected component(s), and a brief descrip
 
 ## 2026-01-13
 
+### Admin
+- **fix: switch from resourcesToBackend to http-backend for i18n**
+  - `i18next-resources-to-backend` was corrupting translation data when storing (converting objects to arrays)
+  - Switched to `i18next-http-backend` which correctly loads and stores translations
+  - Added `languages` namespace to i18next config
+  - All translations now load correctly (Filters → Filtros, Settings → Configuración, etc.)
+
 ### Admin + API
 - **feat: i18n translations across admin dashboard**
   - Added `useTranslation` hook to all dashboard pages (list and detail views)
