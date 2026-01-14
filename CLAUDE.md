@@ -31,6 +31,13 @@ jj undo                             # Undo last operation
 
 **Note:** `--allow-new` is deprecated. Track bookmarks before pushing: `jj bookmark track NAME --remote=origin`
 
+### Documentation Logs
+
+- **CHANGELOG.md** - Update for releases (Keep a Changelog format)
+- **ACTIVITY.md** - Update on EVERY commit (append at top with timestamp)
+
+See main `CLAUDE.md` for full details.
+
 ---
 
 ## Tech Stack
