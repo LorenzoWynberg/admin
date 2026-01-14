@@ -6,6 +6,10 @@ Append-only log of all changes. New entries are added at the top.
 
 ## 2026-01-14
 
+### 00:35 - docs: add protected branches rule
+- Added rule to never push to main/dev/release directly
+- Only push to feature/* or hotfix/* unless asked
+
 ### 00:30 - docs: add jj empty commit pitfall warning
 - Documented the pitfall of using @ after push
 - Added warning to use change ID instead
