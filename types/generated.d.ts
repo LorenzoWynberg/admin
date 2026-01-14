@@ -289,6 +289,57 @@ requiresPin: boolean;
 isContactless: boolean;
 };
 }
+declare namespace App.Data.Pricing {
+export type PricingRuleData = {
+id?: number;
+currencyCode?: string;
+name?: string;
+baseFare?: number;
+taxRate?: number;
+version?: number;
+isActive?: boolean;
+effectiveFrom?: string | null;
+notes?: string | null;
+createdAt?: string;
+updatedAt?: string;
+deletedAt?: string | null;
+tiers?: Array<App.Data.Pricing.PricingTierData>;
+};
+export type PricingTierData = {
+id?: number;
+pricingRuleId?: number;
+minKm?: number;
+maxKm?: number | null;
+flatFee?: number | null;
+perKmRate?: number | null;
+order?: number;
+createdAt?: string;
+updatedAt?: string;
+};
+export type StorePricingRuleData = {
+currencyCode: string;
+name: string;
+baseFare: number;
+taxRate: number;
+notes: string | null;
+activate: boolean;
+tiers?: Array<App.Data.Pricing.StorePricingTierData>;
+};
+export type StorePricingTierData = {
+minKm: number;
+maxKm: number | null;
+flatFee: number | null;
+perKmRate: number | null;
+order: number;
+};
+export type UpdatePricingRuleData = {
+name?: string;
+baseFare?: number;
+taxRate?: number;
+notes?: string | null;
+tiers?: Array<App.Data.Pricing.StorePricingTierData>;
+};
+}
 declare namespace App.Data.Quote {
 export type QuoteData = {
 id?: number;
@@ -410,9 +461,10 @@ export enum CrudAction { Retrieved = 'retrieved', Created = 'created', Updated =
 export enum ErrorAction { Retrieving = 'retrieving', Creating = 'creating', Updating = 'updating', Editing = 'editing', Deleting = 'deleting', Restoring = 'restoring', ForceDeleting = 'force_deleting' };
 export enum HttpStatus { OK = 200, Created = 201, Accepted = 202, NoContent = 204, BadRequest = 400, Unauthorized = 401, Forbidden = 403, NotFound = 404, Conflict = 409, UnprocessableEntity = 422, TooManyRequests = 429, InternalServerError = 500, ServiceUnavailable = 503 };
 export enum LogLevel { Emergency = 'emergency', Alert = 'alert', Critical = 'critical', Error = 'error', Warning = 'warning', Notice = 'notice', Info = 'info', Debug = 'debug' };
-export enum ModelKey { Catalog = 'catalog', CatalogElement = 'element', Business = 'business', Driver = 'driver', User = 'user', Address = 'address', Location = 'location', Currency = 'currency', Order = 'order', Quote = 'quote' };
+export enum ModelKey { Catalog = 'catalog', CatalogElement = 'element', Business = 'business', Driver = 'driver', User = 'user', Address = 'address', Location = 'location', Currency = 'currency', Order = 'order', Quote = 'quote', PricingRule = 'pricing_rule', PricingTier = 'pricing_tier' };
 export enum OrderStatus { PENDING = 'pending', ESTIMATED = 'estimated', APPROVED = 'approved', DENIED = 'denied', ASSIGNED = 'assigned', PICKING_UP = 'picking_up', ARRIVED_AT_PICKUP = 'arrived_at_pickup', PICKED_UP = 'picked_up', IN_TRANSIT = 'in_transit', ARRIVED_AT_DROP_OFF = 'arrived_at_drop_off', WAITING_CONFIRMATION = 'waiting_confirmation', COMPLETED = 'completed', DELIVERY_FAILED = 'delivery_failed', RETURNED_TO_SENDER = 'returned_to_sender', CANCELED = 'canceled' };
 export enum PaymentStatus { UNPAID = 'unpaid', PAID = 'paid', RECONCILING = 'reconciling', REFUND_DUE = 'refund_due', REFUNDED = 'refunded', SURCHARGE_DUE = 'surcharge_due', PAID_IN_FULL = 'paid_in_full', CHARGEBACK = 'chargeback' };
+export enum PricingRuleStatus { DRAFT = 'draft', ACTIVE = 'active', ARCHIVED = 'archived' };
 export enum QuoteCurrency { CRC = 'CRC', USD = 'USD' };
 export enum QuoteStatus { DRAFT = 'draft', SENT = 'sent', ACCEPTED = 'accepted', REJECTED = 'rejected', EXPIRED = 'expired', FINALIZED = 'finalized' };
 export enum Role { BUSINESS_OWNER = 'business.owner', BUSINESS_USER = 'business.user', CLIENT = 'client', DRIVER = 'driver', ADMIN = 'admin' };
