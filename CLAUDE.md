@@ -31,6 +31,8 @@ jj undo                             # Undo last operation
 
 **Note:** `--allow-new` is deprecated. Track bookmarks before pushing: `jj bookmark track NAME --remote=origin`
 
+**⚠️ Pitfall:** After push, `@` points to a new empty commit. Use the change ID (e.g., `rpoznltr`) instead of `@` when moving bookmarks post-push.
+
 ### Documentation Logs
 
 - **CHANGELOG.md** - Update for releases (Keep a Changelog format)

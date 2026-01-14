@@ -6,6 +6,10 @@ Append-only log of all changes. New entries are added at the top.
 
 ## 2026-01-14
 
+### 00:30 - docs: add jj empty commit pitfall warning
+- Documented the pitfall of using @ after push
+- Added warning to use change ID instead
+
 ### 00:22 - docs: add changelog and activity logs
 - Created ACTIVITY.md file
 - Added documentation logs section to CLAUDE.md
