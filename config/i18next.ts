@@ -15,6 +15,7 @@ const namespaces = [
   'common',
   'drivers',
   'http',
+  'languages',
   'models',
   'orders',
   'pagination',
@@ -47,7 +48,7 @@ export async function ensureI18nInitialized(pathname?: string) {
     .use(LanguageDetector)
     .use(
       resourcesToBackend((language: string, namespace: string) =>
-        fetch(`/locales/${language}/${namespace}.json`).then((res) => res.json())
+        fetch(`/locales/${language}/${namespace}.json`, { cache: 'no-store' }).then((res) => res.json())
       )
     )
     .init({
