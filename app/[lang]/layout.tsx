@@ -10,16 +10,17 @@ const supportedLangs = ['en', 'es', 'fr'];
 export default function LangLayout({ children }: Readonly<{ children: ReactNode }>) {
   const params = useParams();
   const lang = (params?.lang as string) || 'en';
+  const validLang = supportedLangs.includes(lang) ? lang : 'en';
 
   // Update html lang attribute
   useEffect(() => {
-    if (typeof document !== 'undefined' && supportedLangs.includes(lang)) {
-      document.documentElement.lang = lang;
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = validLang;
     }
-  }, [lang]);
+  }, [validLang]);
 
   return (
-    <I18nProvider>
+    <I18nProvider lang={validLang}>
       <AuthProvider>{children}</AuthProvider>
     </I18nProvider>
   );
