@@ -56,7 +56,7 @@ export default function proxy(req: Request) {
     if (existing !== (maybeLocale as Locale)) {
       res.headers.append(
         'Set-Cookie',
-        `lang=${maybeLocale}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`,
+        `lang=${maybeLocale}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`
       );
     }
     return res;

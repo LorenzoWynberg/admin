@@ -47,7 +47,7 @@ export default function BusinessDetailPage() {
       confirm(
         t('businesses:detail.confirm_delete', {
           defaultValue: 'Are you sure you want to delete this business? This cannot be undone.',
-        }),
+        })
       )
     ) {
       deleteBusiness.mutate(businessId, {

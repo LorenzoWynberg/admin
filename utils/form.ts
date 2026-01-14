@@ -60,7 +60,7 @@ export function applyApiErrorsToForm<T extends FieldValues>(
     defaultFieldMessage = 'This field is invalid',
     defaultToastTitle = 'An error occurred',
     includeDetailsInToast = true,
-  }: ApplyErrorsOptions = {},
+  }: ApplyErrorsOptions = {}
 ): { appliedFieldErrors: boolean; showedToast: boolean } {
   let appliedFieldErrors = false;
   let showedToast = false;

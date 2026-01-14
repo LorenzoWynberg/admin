@@ -51,7 +51,7 @@ export default function UserDetailPage() {
       confirm(
         t('users:detail.confirm_delete', {
           defaultValue: 'Are you sure you want to delete this user? This cannot be undone.',
-        }),
+        })
       )
     ) {
       deleteUser.mutate(userId, {

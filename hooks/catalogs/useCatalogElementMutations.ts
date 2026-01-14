@@ -42,7 +42,7 @@ export function useCreateCatalogElement() {
         toast.error(error.message);
       } else {
         toast.error(
-          t('catalogs:element_create_failed', { defaultValue: 'Failed to create element' }),
+          t('catalogs:element_create_failed', { defaultValue: 'Failed to create element' })
         );
       }
     },
@@ -65,7 +65,7 @@ export function useUpdateCatalogElement() {
         toast.error(error.message);
       } else {
         toast.error(
-          t('catalogs:element_update_failed', { defaultValue: 'Failed to update element' }),
+          t('catalogs:element_update_failed', { defaultValue: 'Failed to update element' })
         );
       }
     },
@@ -88,7 +88,7 @@ export function useDeleteCatalogElement() {
         toast.error(error.message);
       } else {
         toast.error(
-          t('catalogs:element_delete_failed', { defaultValue: 'Failed to delete element' }),
+          t('catalogs:element_delete_failed', { defaultValue: 'Failed to delete element' })
         );
       }
     },

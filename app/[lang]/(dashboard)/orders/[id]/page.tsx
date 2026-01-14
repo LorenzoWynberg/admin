@@ -71,7 +71,7 @@ export default function OrderDetailPage() {
       confirm(
         t('orders:detail.confirm_approve', {
           defaultValue: 'Are you sure you want to approve this order?',
-        }),
+        })
       )
     ) {
       approveOrder.mutate(orderId);
@@ -83,7 +83,7 @@ export default function OrderDetailPage() {
       confirm(
         t('orders:detail.confirm_deny', {
           defaultValue: 'Are you sure you want to deny this order?',
-        }),
+        })
       )
     ) {
       denyOrder.mutate(orderId);
@@ -95,7 +95,7 @@ export default function OrderDetailPage() {
       confirm(
         t('orders:detail.confirm_delete', {
           defaultValue: 'Are you sure you want to delete this order? This cannot be undone.',
-        }),
+        })
       )
     ) {
       deleteOrder.mutate(orderId, {

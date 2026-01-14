@@ -97,7 +97,7 @@ export default function PricingRuleDetailPage() {
         onSuccess: (newRule) => {
           router.push(`/pricing/${newRule.id}`);
         },
-      },
+      }
     );
   };
 

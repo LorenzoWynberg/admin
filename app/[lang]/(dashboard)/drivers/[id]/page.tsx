@@ -53,7 +53,7 @@ export default function DriverDetailPage() {
       confirm(
         t('drivers:detail.confirm_delete', {
           defaultValue: 'Are you sure you want to delete this driver? This cannot be undone.',
-        }),
+        })
       )
     ) {
       deleteDriver.mutate(driverId, {

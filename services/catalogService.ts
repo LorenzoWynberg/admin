@@ -40,11 +40,11 @@ export const CatalogService = {
   // Element CRUD
   async createElement(
     catalogId: number,
-    data: Omit<StoreCatalogElementData, 'catalogId'>,
+    data: Omit<StoreCatalogElementData, 'catalogId'>
   ): Promise<CatalogElementData> {
     const response = await api.post<Single<CatalogElementData>>(
       `/catalogs/${catalogId}/elements`,
-      data,
+      data
     );
     return response.item;
   },
@@ -52,11 +52,11 @@ export const CatalogService = {
   async updateElement(
     catalogId: number,
     elementId: number,
-    data: Omit<UpdateCatalogElementData, 'catalogId'>,
+    data: Omit<UpdateCatalogElementData, 'catalogId'>
   ): Promise<CatalogElementData> {
     const response = await api.patch<Single<CatalogElementData>>(
       `/catalogs/${catalogId}/elements/${elementId}`,
-      data,
+      data
     );
     return response.item;
   },

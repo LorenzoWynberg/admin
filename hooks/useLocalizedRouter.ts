@@ -17,7 +17,7 @@ export function useLocalizedRouter() {
       if (href.startsWith('http')) return href;
       return `/${lang}${href.startsWith('/') ? href : '/' + href}`;
     },
-    [lang],
+    [lang]
   );
 
   const push = useCallback((href: string) => router.push(withLang(href)), [router, withLang]);
@@ -34,6 +34,6 @@ export function useLocalizedRouter() {
       forward: router.forward,
       refresh: router.refresh,
     }),
-    [push, replace, withLang, lang, router],
+    [push, replace, withLang, lang, router]
   );
 }

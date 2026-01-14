@@ -48,7 +48,7 @@ export default function QuoteDetailPage() {
       confirm(
         t('quotes:detail.confirm_send', {
           defaultValue: 'Are you sure you want to send this quote to the customer?',
-        }),
+        })
       )
     ) {
       sendQuote.mutate(quoteId);
@@ -60,7 +60,7 @@ export default function QuoteDetailPage() {
       confirm(
         t('quotes:detail.confirm_delete', {
           defaultValue: 'Are you sure you want to delete this quote? This cannot be undone.',
-        }),
+        })
       )
     ) {
       deleteQuote.mutate(quoteId, {
