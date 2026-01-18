@@ -75,6 +75,12 @@ async function handleResponse<T>(response: Response): Promise<T> {
     // Clear auth state on 401 Unauthorized
     if (response.status === 401) {
       useAuthStore.getState().logout();
+      // Clear auth cookie
+      if (typeof document !== 'undefined') {
+        document.cookie = 'auth-token=; path=/; max-age=0';
+        // Redirect to login
+        window.location.href = '/login';
+      }
     }
 
     let errorData: unknown = null;
