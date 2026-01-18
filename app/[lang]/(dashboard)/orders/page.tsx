@@ -74,21 +74,30 @@ export default function OrdersPage() {
     return null;
   }
 
+  const quoteModel = t('models:quote', { defaultValue: 'Quote' });
+  const driverModel = t('models:driver', { defaultValue: 'Driver' });
+
   const statusOptions = [
-    { value: 'all', label: t('orders:status.all', { defaultValue: 'All Statuses' }) },
-    { value: 'pending', label: t('orders:status.pending', { defaultValue: 'Pending' }) },
-    { value: 'estimated', label: t('orders:status.estimated', { defaultValue: 'Quote Ready' }) },
-    { value: 'approved', label: t('orders:status.approved', { defaultValue: 'Approved' }) },
-    { value: 'denied', label: t('orders:status.denied', { defaultValue: 'Denied' }) },
-    { value: 'assigned', label: t('orders:status.assigned', { defaultValue: 'Assigned' }) },
-    { value: 'picking_up', label: t('orders:status.picking_up', { defaultValue: 'Picking Up' }) },
-    { value: 'in_transit', label: t('orders:status.in_transit', { defaultValue: 'In Transit' }) },
-    { value: 'completed', label: t('orders:status.completed', { defaultValue: 'Completed' }) },
+    { value: 'all', label: t('statuses:all', { defaultValue: 'All Statuses' }) },
+    { value: 'pending', label: t('statuses:pending', { defaultValue: 'Pending' }) },
+    {
+      value: 'estimated',
+      label: t('statuses:estimated', { Model: quoteModel, defaultValue: 'Quote Ready' }),
+    },
+    { value: 'approved', label: t('statuses:approved', { defaultValue: 'Approved' }) },
+    { value: 'denied', label: t('statuses:denied', { defaultValue: 'Denied' }) },
+    {
+      value: 'assigned',
+      label: t('statuses:assigned', { Model: driverModel, defaultValue: 'Driver Assigned' }),
+    },
+    { value: 'picking_up', label: t('statuses:picking_up', { defaultValue: 'Picking Up' }) },
+    { value: 'in_transit', label: t('statuses:in_transit', { defaultValue: 'In Transit' }) },
+    { value: 'completed', label: t('statuses:completed', { defaultValue: 'Completed' }) },
     {
       value: 'delivery_failed',
-      label: t('orders:status.delivery_failed', { defaultValue: 'Failed' }),
+      label: t('statuses:delivery_failed', { defaultValue: 'Failed' }),
     },
-    { value: 'canceled', label: t('orders:status.canceled', { defaultValue: 'Canceled' }) },
+    { value: 'canceled', label: t('statuses:canceled', { defaultValue: 'Canceled' }) },
   ];
 
   return (

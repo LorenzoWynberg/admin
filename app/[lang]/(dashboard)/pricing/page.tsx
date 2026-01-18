@@ -145,21 +145,21 @@ export default function PricingPage() {
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue
-                  placeholder={t('filter_by_status', { defaultValue: 'Filter by status' })}
+                  placeholder={t('common:filter_by_status', { defaultValue: 'Filter by status' })}
                 />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
-                  {t('all_statuses', { defaultValue: 'All statuses' })}
+                  {t('statuses:all', { defaultValue: 'All statuses' })}
                 </SelectItem>
                 <SelectItem value={Enums.PricingRuleStatus.DRAFT}>
-                  {t('status_draft', { defaultValue: 'Draft' })}
+                  {t('statuses:draft', { defaultValue: 'Draft' })}
                 </SelectItem>
                 <SelectItem value={Enums.PricingRuleStatus.ACTIVE}>
-                  {t('status_active', { defaultValue: 'Active' })}
+                  {t('statuses:active', { defaultValue: 'Active' })}
                 </SelectItem>
                 <SelectItem value={Enums.PricingRuleStatus.ARCHIVED}>
-                  {t('status_archived', { defaultValue: 'Archived' })}
+                  {t('statuses:archived', { defaultValue: 'Archived' })}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -211,15 +211,15 @@ export default function PricingPage() {
                     <TableCell>
                       {rule.status === Enums.PricingRuleStatus.ACTIVE ? (
                         <Badge variant="default" className="bg-green-600">
-                          {t('status_active', { defaultValue: 'Active' })}
+                          {t('statuses:active', { defaultValue: 'Active' })}
                         </Badge>
                       ) : rule.status === Enums.PricingRuleStatus.DRAFT ? (
                         <Badge variant="outline">
-                          {t('status_draft', { defaultValue: 'Draft' })}
+                          {t('statuses:draft', { defaultValue: 'Draft' })}
                         </Badge>
                       ) : (
                         <Badge variant="secondary">
-                          {t('status_archived', { defaultValue: 'Archived' })}
+                          {t('statuses:archived', { defaultValue: 'Archived' })}
                         </Badge>
                       )}
                     </TableCell>

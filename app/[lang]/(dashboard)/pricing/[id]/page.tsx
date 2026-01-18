@@ -130,13 +130,13 @@ export default function PricingRuleDetailPage() {
               <span>v{rule.version}</span>
               {rule.status === Enums.PricingRuleStatus.ACTIVE ? (
                 <Badge variant="default" className="bg-green-600">
-                  {t('status_active', { defaultValue: 'Active' })}
+                  {t('statuses:active', { defaultValue: 'Active' })}
                 </Badge>
               ) : rule.status === Enums.PricingRuleStatus.DRAFT ? (
-                <Badge variant="outline">{t('status_draft', { defaultValue: 'Draft' })}</Badge>
+                <Badge variant="outline">{t('statuses:draft', { defaultValue: 'Draft' })}</Badge>
               ) : (
                 <Badge variant="secondary">
-                  {t('status_archived', { defaultValue: 'Archived' })}
+                  {t('statuses:archived', { defaultValue: 'Archived' })}
                 </Badge>
               )}
             </div>

@@ -27,11 +27,19 @@ interface OrderStatusBadgeProps {
   status: OrderStatus;
 }
 
+// Status-specific model interpolations for order context
+const statusModels: Partial<Record<OrderStatus, string>> = {
+  estimated: 'quote',
+  assigned: 'driver',
+};
+
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
   const { t } = useTranslation();
 
   const variant = statusVariants[status] || 'outline';
-  const label = t(`orders:status.${status}`, { defaultValue: status });
+  const modelKey = statusModels[status];
+  const Model = modelKey ? t(`models:${modelKey}`, { defaultValue: modelKey }) : undefined;
+  const label = t(`statuses:${status}`, { Model, defaultValue: status });
 
   return <Badge variant={variant}>{label}</Badge>;
 }

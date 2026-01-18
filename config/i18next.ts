@@ -22,6 +22,7 @@ const namespaces = [
   'passwords',
   'quotes',
   'resource',
+  'statuses',
   'users',
   'validation',
 ] as const;

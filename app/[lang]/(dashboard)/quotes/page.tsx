@@ -71,13 +71,13 @@ export default function QuotesPage() {
   }
 
   const statusOptions = [
-    { value: 'all', label: t('quotes:status.all', { defaultValue: 'All Statuses' }) },
-    { value: 'draft', label: t('quotes:status.draft', { defaultValue: 'Draft' }) },
-    { value: 'sent', label: t('quotes:status.sent', { defaultValue: 'Sent' }) },
-    { value: 'accepted', label: t('quotes:status.accepted', { defaultValue: 'Accepted' }) },
-    { value: 'rejected', label: t('quotes:status.rejected', { defaultValue: 'Rejected' }) },
-    { value: 'expired', label: t('quotes:status.expired', { defaultValue: 'Expired' }) },
-    { value: 'finalized', label: t('quotes:status.finalized', { defaultValue: 'Finalized' }) },
+    { value: 'all', label: t('statuses:all', { defaultValue: 'All Statuses' }) },
+    { value: 'draft', label: t('statuses:draft', { defaultValue: 'Draft' }) },
+    { value: 'sent', label: t('statuses:sent', { defaultValue: 'Sent' }) },
+    { value: 'accepted', label: t('statuses:accepted', { defaultValue: 'Accepted' }) },
+    { value: 'rejected', label: t('statuses:rejected', { defaultValue: 'Rejected' }) },
+    { value: 'expired', label: t('statuses:expired', { defaultValue: 'Expired' }) },
+    { value: 'finalized', label: t('statuses:finalized', { defaultValue: 'Finalized' }) },
   ];
 
   return (

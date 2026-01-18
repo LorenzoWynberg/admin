@@ -22,7 +22,7 @@ export function QuoteStatusBadge({ status }: QuoteStatusBadgeProps) {
   const { t } = useTranslation();
 
   const variant = statusVariants[status] || 'outline';
-  const label = t(`quotes:status.${status}`, { defaultValue: status });
+  const label = t(`statuses:${status}`, { defaultValue: status });
 
   return <Badge variant={variant}>{label}</Badge>;
 }
