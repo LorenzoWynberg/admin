@@ -4,7 +4,7 @@ import { PricingService } from '@/services/pricingService';
 interface UsePricingRuleListParams {
   page?: number;
   perPage?: number;
-  currency?: string;
+  status?: App.Enums.PricingRuleStatus;
   enabled?: boolean;
 }
 

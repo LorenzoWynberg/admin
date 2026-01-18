@@ -10,18 +10,19 @@ type SuccessBasic = Api.Response.SuccessBasic;
 interface ListParams {
   page?: number;
   perPage?: number;
-  currency?: string;
+  status?: App.Enums.PricingRuleStatus;
 }
 
 interface CalculateParams {
-  currency: string;
   distanceKm: number;
 }
 
 interface CalculateResult {
+  pricingRuleId: number;
   baseFare: number;
   distanceFee: number;
   subtotal: number;
+  taxRate: number;
   tax: number;
   total: number;
 }
@@ -30,7 +31,7 @@ function buildQueryString(params: ListParams): string {
   const query = new URLSearchParams();
   if (params.page) query.set('page', String(params.page));
   if (params.perPage) query.set('per_page', String(params.perPage));
-  if (params.currency) query.set('currency', params.currency);
+  if (params.status) query.set('status', params.status);
   return query.toString();
 }
 
@@ -102,13 +103,14 @@ export const PricingService = {
   },
 
   /**
-   * Calculate fare for a given distance and currency
+   * Calculate fare for a given distance using the active pricing rule
    */
   async calculate(params: CalculateParams): Promise<CalculateResult> {
-    const response = await api.post<Single<CalculateResult>>('/pricing-rules/calculate', {
-      currency: params.currency,
-      distance_km: params.distanceKm,
-    });
+    const query = new URLSearchParams();
+    query.set('distance_km', String(params.distanceKm));
+    const response = await api.get<Single<CalculateResult>>(
+      `/pricing-rules/calculate?${query.toString()}`
+    );
     return response.item;
   },
 };

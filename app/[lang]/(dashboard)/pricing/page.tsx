@@ -46,6 +46,7 @@ import {
 
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Enums } from '@/data/app-enums';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -54,9 +55,9 @@ import { usePricingRuleList, useActivatePricingRule, useDeletePricingRule } from
 
 type PricingRuleData = App.Data.Pricing.PricingRuleData;
 
-function formatCurrency(amount?: number, currencyCode?: string): string {
+function formatCurrency(amount?: number): string {
   if (amount === undefined) return '-';
-  return `${currencyCode || ''} ${amount.toFixed(2)}`.trim();
+  return amount.toFixed(2);
 }
 
 function formatPercent(rate?: number): string {
@@ -68,7 +69,7 @@ export default function PricingPage() {
   const { t, ready } = useTranslation('pricing');
   const router = useRouter();
   const [page, setPage] = useState(1);
-  const [currency, setCurrency] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [activateDialogOpen, setActivateDialogOpen] = useState(false);
   const [selectedRule, setSelectedRule] = useState<PricingRuleData | null>(null);
@@ -76,7 +77,7 @@ export default function PricingPage() {
   const { data, isLoading, error } = usePricingRuleList({
     page,
     perPage: 15,
-    currency: currency === 'all' ? undefined : currency,
+    status: statusFilter === 'all' ? undefined : (statusFilter as App.Enums.PricingRuleStatus),
   });
 
   const activateMutation = useActivatePricingRule();
@@ -129,19 +130,30 @@ export default function PricingPage() {
         <CardContent>
           <div className="flex flex-wrap gap-4">
             <Select
-              value={currency}
+              value={statusFilter}
               onValueChange={(value) => {
-                setCurrency(value);
+                setStatusFilter(value);
                 setPage(1);
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t('filter_by_currency')} />
+                <SelectValue
+                  placeholder={t('filter_by_status', { defaultValue: 'Filter by status' })}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('all_currencies')}</SelectItem>
-                <SelectItem value="CRC">CRC - Colon</SelectItem>
-                <SelectItem value="USD">USD - Dollar</SelectItem>
+                <SelectItem value="all">
+                  {t('all_statuses', { defaultValue: 'All statuses' })}
+                </SelectItem>
+                <SelectItem value={Enums.PricingRuleStatus.DRAFT}>
+                  {t('status_draft', { defaultValue: 'Draft' })}
+                </SelectItem>
+                <SelectItem value={Enums.PricingRuleStatus.ACTIVE}>
+                  {t('status_active', { defaultValue: 'Active' })}
+                </SelectItem>
+                <SelectItem value={Enums.PricingRuleStatus.ARCHIVED}>
+                  {t('status_archived', { defaultValue: 'Archived' })}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -167,7 +179,6 @@ export default function PricingPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('column_name')}</TableHead>
-                  <TableHead>{t('column_currency')}</TableHead>
                   <TableHead>{t('column_base_fare')}</TableHead>
                   <TableHead>{t('column_tax_rate')}</TableHead>
                   <TableHead>{t('column_version')}</TableHead>
@@ -184,18 +195,23 @@ export default function PricingPage() {
                     onClick={() => router.push(`/pricing/${rule.id}`)}
                   >
                     <TableCell className="font-medium">{rule.name}</TableCell>
-                    <TableCell>{rule.currencyCode}</TableCell>
-                    <TableCell>{formatCurrency(rule.baseFare, rule.currencyCode)}</TableCell>
+                    <TableCell>{formatCurrency(rule.baseFare)}</TableCell>
                     <TableCell>{formatPercent(rule.taxRate)}</TableCell>
                     <TableCell>v{rule.version}</TableCell>
                     <TableCell>{rule.tiers?.length || 0}</TableCell>
                     <TableCell>
-                      {rule.isActive ? (
+                      {rule.status === Enums.PricingRuleStatus.ACTIVE ? (
                         <Badge variant="default" className="bg-green-600">
-                          {t('status_active')}
+                          {t('status_active', { defaultValue: 'Active' })}
+                        </Badge>
+                      ) : rule.status === Enums.PricingRuleStatus.DRAFT ? (
+                        <Badge variant="outline">
+                          {t('status_draft', { defaultValue: 'Draft' })}
                         </Badge>
                       ) : (
-                        <Badge variant="secondary">{t('status_inactive')}</Badge>
+                        <Badge variant="secondary">
+                          {t('status_archived', { defaultValue: 'Archived' })}
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
@@ -206,17 +222,21 @@ export default function PricingPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => router.push(`/pricing/${rule.id}/edit`)}>
-                            <Pencil className="mr-2 h-4 w-4" />
-                            {t('edit')}
-                          </DropdownMenuItem>
+                          {rule.status === Enums.PricingRuleStatus.DRAFT && (
+                            <DropdownMenuItem
+                              onClick={() => router.push(`/pricing/${rule.id}/edit`)}
+                            >
+                              <Pencil className="mr-2 h-4 w-4" />
+                              {t('edit')}
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
                             onClick={() => router.push(`/pricing/${rule.id}/duplicate`)}
                           >
                             <Copy className="mr-2 h-4 w-4" />
                             {t('duplicate')}
                           </DropdownMenuItem>
-                          {!rule.isActive && (
+                          {rule.status === Enums.PricingRuleStatus.DRAFT && (
                             <DropdownMenuItem
                               onClick={() => {
                                 setSelectedRule(rule);
@@ -227,17 +247,21 @@ export default function PricingPage() {
                               {t('activate')}
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => {
-                              setSelectedRule(rule);
-                              setDeleteDialogOpen(true);
-                            }}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            {t('delete')}
-                          </DropdownMenuItem>
+                          {rule.status === Enums.PricingRuleStatus.DRAFT && (
+                            <>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() => {
+                                  setSelectedRule(rule);
+                                  setDeleteDialogOpen(true);
+                                }}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                {t('delete')}
+                              </DropdownMenuItem>
+                            </>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

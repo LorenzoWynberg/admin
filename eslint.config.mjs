@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     // Node.js scripts (CommonJS)
     'scripts/**',
+    // Generated files
+    'types/generated.d.ts',
+    'coverage/**',
   ]),
 ]);
 

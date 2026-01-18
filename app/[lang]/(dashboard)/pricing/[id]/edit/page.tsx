@@ -142,9 +142,7 @@ export default function EditPricingRulePage() {
         </Button>
         <div>
           <h1 className="text-3xl font-bold">{t('edit_title')}</h1>
-          <p className="text-muted-foreground">
-            {rule.name} - {rule.currencyCode}
-          </p>
+          <p className="text-muted-foreground">{rule.name}</p>
         </div>
       </div>
 

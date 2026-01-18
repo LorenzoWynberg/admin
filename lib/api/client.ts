@@ -1,3 +1,5 @@
+import { useAuthStore } from '@/stores/useAuthStore';
+
 import { ApiError, parseErrorResponse } from './error';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.mandados.test:60';
@@ -70,6 +72,11 @@ async function handleResponse<T>(response: Response): Promise<T> {
   const isJson = contentType?.includes('application/json');
 
   if (!response.ok) {
+    // Clear auth state on 401 Unauthorized
+    if (response.status === 401) {
+      useAuthStore.getState().logout();
+    }
+
     let errorData: unknown = null;
     if (isJson) {
       try {

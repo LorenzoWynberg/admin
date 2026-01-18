@@ -19,13 +19,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { applyApiErrorsToForm } from '@/utils/form';
@@ -39,7 +32,6 @@ const tierSchema = z.object({
 });
 
 const formSchema = z.object({
-  currencyCode: z.string().min(1),
   name: z.string().min(1).max(255),
   baseFare: z.number().min(0),
   taxRate: z.number().min(0).max(1),
@@ -58,7 +50,6 @@ export default function CreatePricingRulePage() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      currencyCode: 'CRC',
       name: '',
       baseFare: 0,
       taxRate: 0,
@@ -76,7 +67,6 @@ export default function CreatePricingRulePage() {
   const onSubmit = async (values: FormValues) => {
     try {
       await createMutation.mutateAsync({
-        currencyCode: values.currencyCode,
         name: values.name,
         baseFare: values.baseFare,
         taxRate: values.taxRate,
@@ -93,7 +83,6 @@ export default function CreatePricingRulePage() {
       router.push('/pricing');
     } catch (error) {
       applyApiErrorsToForm(error, form.setError, {
-        currency_code: 'currencyCode',
         base_fare: 'baseFare',
         tax_rate: 'taxRate',
       });
@@ -122,43 +111,19 @@ export default function CreatePricingRulePage() {
               <CardTitle>{t('common:basic_info', { defaultValue: 'Basic Information' })}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('name')}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t('name_placeholder')} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="currencyCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('currency')}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t('select_currency')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="CRC">CRC - Colon</SelectItem>
-                          <SelectItem value="USD">USD - Dollar</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('name')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t('name_placeholder')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField

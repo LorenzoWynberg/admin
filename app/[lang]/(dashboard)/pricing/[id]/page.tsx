@@ -6,7 +6,6 @@ import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import {
   usePricingRule,
   useActivatePricingRule,
-  useDeactivatePricingRule,
   useDeletePricingRule,
   useDuplicatePricingRule,
 } from '@/hooks/pricing';
@@ -31,12 +30,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Pencil, Trash2, Copy, Power, PowerOff, DollarSign } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2, Copy, Power, DollarSign } from 'lucide-react';
 import { useState } from 'react';
+import { Enums } from '@/data/app-enums';
 
-function formatCurrency(amount?: number, currencyCode?: string): string {
+function formatCurrency(amount?: number): string {
   if (amount === undefined) return '-';
-  return `${currencyCode || ''} ${amount.toFixed(2)}`.trim();
+  return amount.toFixed(2);
 }
 
 function formatPercent(rate?: number): string {
@@ -70,17 +70,12 @@ export default function PricingRuleDetailPage() {
 
   const { data: rule, isLoading, error } = usePricingRule({ id: ruleId });
   const activateMutation = useActivatePricingRule();
-  const deactivateMutation = useDeactivatePricingRule();
   const deleteMutation = useDeletePricingRule();
   const duplicateMutation = useDuplicatePricingRule();
 
   const handleActivate = () => {
     activateMutation.mutate(ruleId);
     setActivateDialogOpen(false);
-  };
-
-  const handleDeactivate = () => {
-    deactivateMutation.mutate(ruleId);
   };
 
   const handleDelete = () => {
@@ -131,15 +126,17 @@ export default function PricingRuleDetailPage() {
           <div>
             <h1 className="text-3xl font-bold">{rule.name}</h1>
             <div className="text-muted-foreground flex items-center gap-2">
-              <span>
-                {rule.currencyCode} - v{rule.version}
-              </span>
-              {rule.isActive ? (
+              <span>v{rule.version}</span>
+              {rule.status === Enums.PricingRuleStatus.ACTIVE ? (
                 <Badge variant="default" className="bg-green-600">
-                  {t('status_active')}
+                  {t('status_active', { defaultValue: 'Active' })}
                 </Badge>
+              ) : rule.status === Enums.PricingRuleStatus.DRAFT ? (
+                <Badge variant="outline">{t('status_draft', { defaultValue: 'Draft' })}</Badge>
               ) : (
-                <Badge variant="secondary">{t('status_inactive')}</Badge>
+                <Badge variant="secondary">
+                  {t('status_archived', { defaultValue: 'Archived' })}
+                </Badge>
               )}
             </div>
           </div>
@@ -153,33 +150,26 @@ export default function PricingRuleDetailPage() {
             <Copy className="mr-2 h-4 w-4" />
             {t('duplicate')}
           </Button>
-          {rule.isActive ? (
-            <Button
-              variant="outline"
-              onClick={handleDeactivate}
-              disabled={deactivateMutation.isPending}
-            >
-              <PowerOff className="mr-2 h-4 w-4" />
-              {t('deactivate')}
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              onClick={() => setActivateDialogOpen(true)}
-              disabled={activateMutation.isPending}
-            >
-              <Power className="mr-2 h-4 w-4" />
-              {t('activate')}
-            </Button>
+          {rule.status === Enums.PricingRuleStatus.DRAFT && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => setActivateDialogOpen(true)}
+                disabled={activateMutation.isPending}
+              >
+                <Power className="mr-2 h-4 w-4" />
+                {t('activate')}
+              </Button>
+              <Button onClick={() => router.push(`/pricing/${ruleId}/edit`)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                {t('edit')}
+              </Button>
+              <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                {t('delete')}
+              </Button>
+            </>
           )}
-          <Button onClick={() => router.push(`/pricing/${ruleId}/edit`)}>
-            <Pencil className="mr-2 h-4 w-4" />
-            {t('edit')}
-          </Button>
-          <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
-            <Trash2 className="mr-2 h-4 w-4" />
-            {t('delete')}
-          </Button>
         </div>
       </div>
 
@@ -194,14 +184,8 @@ export default function PricingRuleDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('column_currency')}</span>
-              <span className="font-medium">{rule.currencyCode}</span>
-            </div>
-            <div className="flex justify-between">
               <span className="text-muted-foreground">{t('column_base_fare')}</span>
-              <span className="font-medium">
-                {formatCurrency(rule.baseFare, rule.currencyCode)}
-              </span>
+              <span className="font-medium">{formatCurrency(rule.baseFare)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('column_tax_rate')}</span>
@@ -255,13 +239,9 @@ export default function PricingRuleDetailPage() {
                     <TableRow key={tier.id || index}>
                       <TableCell>{tier.minKm} km</TableCell>
                       <TableCell>{tier.maxKm ? `${tier.maxKm} km` : t('no_max')}</TableCell>
+                      <TableCell>{tier.flatFee ? formatCurrency(tier.flatFee) : '-'}</TableCell>
                       <TableCell>
-                        {tier.flatFee ? formatCurrency(tier.flatFee, rule.currencyCode) : '-'}
-                      </TableCell>
-                      <TableCell>
-                        {tier.perKmRate
-                          ? formatCurrency(tier.perKmRate, rule.currencyCode) + '/km'
-                          : '-'}
+                        {tier.perKmRate ? formatCurrency(tier.perKmRate) + '/km' : '-'}
                       </TableCell>
                     </TableRow>
                   ))}

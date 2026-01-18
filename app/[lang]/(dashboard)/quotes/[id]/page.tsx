@@ -27,10 +27,9 @@ function formatDate(dateString?: string | null): string {
   }
 }
 
-function formatCurrency(amount?: number | null, currency?: string | null): string {
+function formatCurrency(amount?: number | null): string {
   if (amount == null) return '-';
-  const code = currency || 'USD';
-  return `${code} ${amount.toFixed(2)}`;
+  return amount.toFixed(2);
 }
 
 export default function QuoteDetailPage() {
@@ -206,9 +205,7 @@ export default function QuoteDetailPage() {
               <span className="text-muted-foreground">
                 {t('quotes:detail.base_fare', { defaultValue: 'Base Fare' })}
               </span>
-              <span className="font-medium">
-                {formatCurrency(quote.baseFare, quote.currencyCode)}
-              </span>
+              <span className="font-medium">{formatCurrency(quote.baseFare)}</span>
             </div>
             {quote.distanceKm != null && (
               <div className="flex justify-between">
@@ -223,9 +220,7 @@ export default function QuoteDetailPage() {
                 <span className="text-muted-foreground">
                   {t('quotes:detail.distance_fee', { defaultValue: 'Distance Fee' })}
                 </span>
-                <span className="font-medium">
-                  {formatCurrency(quote.distanceFee, quote.currencyCode)}
-                </span>
+                <span className="font-medium">{formatCurrency(quote.distanceFee)}</span>
               </div>
             )}
             {quote.timeFee != null && quote.timeFee > 0 && (
@@ -233,9 +228,7 @@ export default function QuoteDetailPage() {
                 <span className="text-muted-foreground">
                   {t('quotes:detail.time_fee', { defaultValue: 'Time Fee' })}
                 </span>
-                <span className="font-medium">
-                  {formatCurrency(quote.timeFee, quote.currencyCode)}
-                </span>
+                <span className="font-medium">{formatCurrency(quote.timeFee)}</span>
               </div>
             )}
             {quote.surcharge != null && quote.surcharge > 0 && (
@@ -243,9 +236,7 @@ export default function QuoteDetailPage() {
                 <span className="text-muted-foreground">
                   {t('quotes:detail.surcharge', { defaultValue: 'Surcharge' })}
                 </span>
-                <span className="font-medium">
-                  {formatCurrency(quote.surcharge, quote.currencyCode)}
-                </span>
+                <span className="font-medium">{formatCurrency(quote.surcharge)}</span>
               </div>
             )}
             {quote.discountRate != null && quote.discountRate > 0 && (
@@ -261,15 +252,13 @@ export default function QuoteDetailPage() {
                 <span className="text-muted-foreground">
                   {t('quotes:detail.tax', { defaultValue: 'Tax' })} ({quote.taxRate}%)
                 </span>
-                <span className="font-medium">
-                  {formatCurrency(quote.taxTotal, quote.currencyCode)}
-                </span>
+                <span className="font-medium">{formatCurrency(quote.taxTotal)}</span>
               </div>
             )}
             <div className="border-t pt-3">
               <div className="flex justify-between text-lg font-bold">
                 <span>{t('common:total', { defaultValue: 'Total' })}</span>
-                <span>{formatCurrency(quote.total, quote.currencyCode)}</span>
+                <span>{formatCurrency(quote.total)}</span>
               </div>
             </div>
           </CardContent>

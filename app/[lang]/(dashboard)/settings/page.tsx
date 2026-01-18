@@ -1,19 +1,20 @@
 'use client';
 
-import { useTranslation } from 'react-i18next';
-import { useParams, useRouter, usePathname } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
+  SelectContent,
   SelectValue,
+  SelectItem,
+  Select,
 } from '@/components/ui/select';
-import { Globe } from 'lucide-react';
+import { Globe, Coins, ChevronRight } from 'lucide-react';
+
+import { Label } from '@/components/ui/label';
+import { useTranslation } from 'react-i18next';
 import { Lang } from '@/services/langService';
 import type { LangCode } from '@/stores/useLangStore';
+import { useParams, useRouter, usePathname } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const languageCodes = ['en', 'es', 'fr'] as const;
 
@@ -80,6 +81,28 @@ export default function SettingsPage() {
             </Select>
           </div>
         </CardContent>
+      </Card>
+
+      <Card
+        className="hover:bg-muted/50 cursor-pointer transition-colors"
+        onClick={() => router.push(`/${currentLang}/settings/currencies`)}
+      >
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Coins className="h-5 w-5" />
+              <CardTitle>
+                {t('common:currency_settings', { defaultValue: 'Currency Settings' })}
+              </CardTitle>
+            </div>
+            <ChevronRight className="text-muted-foreground h-5 w-5" />
+          </div>
+          <CardDescription>
+            {t('common:currency_settings_description', {
+              defaultValue: 'Manage currencies and exchange rates',
+            })}
+          </CardDescription>
+        </CardHeader>
       </Card>
     </div>
   );

@@ -152,7 +152,6 @@ export default function OrderDetailPage() {
           {canCreateQuote && (
             <CreateQuoteDialog
               orderId={orderId}
-              defaultCurrency={order.currencyCode || 'CRC'}
               orderDistanceKm={order.distanceKm}
               orderEstimatedMinutes={order.estimatedMinutes}
             />
@@ -409,7 +408,6 @@ export default function OrderDetailPage() {
                 {canCreateQuote && (
                   <CreateQuoteDialog
                     orderId={orderId}
-                    defaultCurrency={order.currencyCode || 'CRC'}
                     orderDistanceKm={order.distanceKm}
                     orderEstimatedMinutes={order.estimatedMinutes}
                   />

@@ -44,10 +44,9 @@ function formatDate(dateString?: string | null): string {
   }
 }
 
-function formatCurrency(amount?: number | null, currency?: string | null): string {
+function formatCurrency(amount?: number | null): string {
   if (amount == null) return '-';
-  const code = currency || 'USD';
-  return `${code} ${amount.toFixed(2)}`;
+  return amount.toFixed(2);
 }
 
 export default function QuotesPage() {
@@ -198,7 +197,7 @@ export default function QuotesPage() {
                     <TableCell>
                       <QuoteStatusBadge status={quote.status as QuoteStatus} />
                     </TableCell>
-                    <TableCell>{formatCurrency(quote.total, quote.currencyCode)}</TableCell>
+                    <TableCell>{formatCurrency(quote.total)}</TableCell>
                     <TableCell>{formatDate(quote.validUntil)}</TableCell>
                     <TableCell>{formatDate(quote.createdAt)}</TableCell>
                   </TableRow>

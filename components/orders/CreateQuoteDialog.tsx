@@ -15,25 +15,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { FileText, Send } from 'lucide-react';
 
 interface CreateQuoteDialogProps {
   orderId: number;
-  defaultCurrency?: string;
   orderDistanceKm?: number | null;
   orderEstimatedMinutes?: number | null;
 }
 
 export function CreateQuoteDialog({
   orderId,
-  defaultCurrency = 'CRC',
   orderDistanceKm,
   orderEstimatedMinutes,
 }: CreateQuoteDialogProps) {
@@ -42,9 +33,7 @@ export function CreateQuoteDialog({
   const sendQuote = useSendQuote();
 
   const [formData, setFormData] = useState({
-    currencyCode: defaultCurrency,
     distanceKm: orderDistanceKm?.toString() || '',
-    distanceFee: '',
     timeFee: '',
     surcharge: '',
     discountRate: '',
@@ -64,11 +53,14 @@ export function CreateQuoteDialog({
     const defaultDelivery = new Date(now.getTime() + 4 * 60 * 60 * 1000).toISOString();
     const defaultValid = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
 
+    const distanceKm = formData.distanceKm ? parseFloat(formData.distanceKm) : 0;
+    if (distanceKm <= 0) {
+      return; // Distance is required
+    }
+
     const data = {
       orderId,
-      currencyCode: formData.currencyCode,
-      distanceKm: formData.distanceKm ? parseFloat(formData.distanceKm) : null,
-      distanceFee: formData.distanceFee ? parseFloat(formData.distanceFee) : null,
+      distanceKm,
       timeFee: formData.timeFee ? parseFloat(formData.timeFee) : null,
       surcharge: formData.surcharge ? parseFloat(formData.surcharge) : null,
       discountRate: formData.discountRate ? parseFloat(formData.discountRate) : null,
@@ -111,23 +103,7 @@ export function CreateQuoteDialog({
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="currencyCode">Currency</Label>
-            <Select
-              value={formData.currencyCode}
-              onValueChange={(v) => handleChange('currencyCode', v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="CRC">CRC (Colones)</SelectItem>
-                <SelectItem value="USD">USD (Dollars)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="distanceKm">Distance (km)</Label>
+            <Label htmlFor="distanceKm">Distance (km) *</Label>
             <Input
               id="distanceKm"
               type="number"
@@ -141,22 +117,14 @@ export function CreateQuoteDialog({
                 Estimated driving time: {orderEstimatedMinutes} min
               </p>
             )}
+            <p className="text-muted-foreground text-xs">
+              Distance fee will be calculated from the active pricing rule
+            </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="distanceFee">Distance Fee ({formData.currencyCode})</Label>
-              <Input
-                id="distanceFee"
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                value={formData.distanceFee}
-                onChange={(e) => handleChange('distanceFee', e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="timeFee">Time Fee ({formData.currencyCode})</Label>
+              <Label htmlFor="timeFee">Time Fee (optional)</Label>
               <Input
                 id="timeFee"
                 type="number"
@@ -167,7 +135,7 @@ export function CreateQuoteDialog({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="surcharge">Surcharge ({formData.currencyCode})</Label>
+              <Label htmlFor="surcharge">Surcharge (optional)</Label>
               <Input
                 id="surcharge"
                 type="number"
