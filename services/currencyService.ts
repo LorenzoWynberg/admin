@@ -25,9 +25,7 @@ export const CurrencyService = {
    * Update currency settings
    */
   async update(code: string, data: UpdateCurrencyData): Promise<CurrencyData> {
-    const response = await api.patch<Single<CurrencyData>>(`/currencies/${code}`, {
-      body: data,
-    });
+    const response = await api.patch<Single<CurrencyData>>(`/currencies/${code}`, data);
     return response.item;
   },
 
