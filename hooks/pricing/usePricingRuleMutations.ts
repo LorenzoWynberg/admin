@@ -3,25 +3,25 @@ import { PricingService } from '@/services/pricingService';
 import { toast } from 'sonner';
 import { isApiError } from '@/lib/api/error';
 import { useTranslation } from 'react-i18next';
+import { crudErrorMessage, crudSuccessMessage } from '@/utils/lang';
 
 type StorePricingRuleData = App.Data.Pricing.StorePricingRuleData;
 type UpdatePricingRuleData = App.Data.Pricing.UpdatePricingRuleData;
 
 export function useCreatePricingRule() {
   const queryClient = useQueryClient();
-  const { t } = useTranslation('pricing');
 
   return useMutation({
     mutationFn: (data: StorePricingRuleData) => PricingService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pricing-rules'] });
-      toast.success(t('resource:created', { resource: t('title') }));
+      toast.success(crudSuccessMessage('created', 'pricing_rule'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error(t('failed_to_load'));
+        toast.error(crudErrorMessage('creating', 'pricing_rule'));
       }
     },
   });
@@ -29,20 +29,19 @@ export function useCreatePricingRule() {
 
 export function useUpdatePricingRule() {
   const queryClient = useQueryClient();
-  const { t } = useTranslation('pricing');
 
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: UpdatePricingRuleData }) =>
       PricingService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pricing-rules'] });
-      toast.success(t('resource:updated', { resource: t('title') }));
+      toast.success(crudSuccessMessage('updated', 'pricing_rule'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error(t('failed_to_load'));
+        toast.error(crudErrorMessage('updating', 'pricing_rule'));
       }
     },
   });
@@ -50,19 +49,18 @@ export function useUpdatePricingRule() {
 
 export function useDeletePricingRule() {
   const queryClient = useQueryClient();
-  const { t } = useTranslation('pricing');
 
   return useMutation({
     mutationFn: (id: number) => PricingService.destroy(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pricing-rules'] });
-      toast.success(data.message || t('resource:deleted', { resource: t('title') }));
+      toast.success(data.message || crudSuccessMessage('deleted', 'pricing_rule'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error(t('failed_to_load'));
+        toast.error(crudErrorMessage('deleting', 'pricing_rule'));
       }
     },
   });
@@ -82,7 +80,7 @@ export function useActivatePricingRule() {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error(t('failed_to_load'));
+        toast.error(crudErrorMessage('updating', 'pricing_rule'));
       }
     },
   });
@@ -102,7 +100,7 @@ export function useClonePricingRule() {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error(t('failed_to_load'));
+        toast.error(crudErrorMessage('creating', 'pricing_rule'));
       }
     },
   });

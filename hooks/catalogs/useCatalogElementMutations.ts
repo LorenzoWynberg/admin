@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CatalogService } from '@/services/catalogService';
 import { toast } from 'sonner';
 import { isApiError } from '@/lib/api/error';
-import { useTranslation } from 'react-i18next';
+import { crudErrorMessage, crudSuccessMessage } from '@/utils/lang';
 
 type StoreCatalogElementData = App.Data.CatalogElement.StoreCatalogElementData;
 type UpdateCatalogElementData = App.Data.CatalogElement.UpdateCatalogElementData;
@@ -28,22 +28,19 @@ interface DeleteElementParams {
 
 export function useCreateCatalogElement() {
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ catalogId, data }: CreateElementParams) =>
       CatalogService.createElement(catalogId, data),
     onSuccess: (_, { catalogCode }) => {
       queryClient.invalidateQueries({ queryKey: ['catalogs', 'elements', catalogCode] });
-      toast.success(t('catalogs:element_created', { defaultValue: 'Element created' }));
+      toast.success(crudSuccessMessage('created', 'element'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error(
-          t('catalogs:element_create_failed', { defaultValue: 'Failed to create element' })
-        );
+        toast.error(crudErrorMessage('creating', 'element'));
       }
     },
   });
@@ -51,22 +48,19 @@ export function useCreateCatalogElement() {
 
 export function useUpdateCatalogElement() {
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ catalogId, elementId, data }: UpdateElementParams) =>
       CatalogService.updateElement(catalogId, elementId, data),
     onSuccess: (_, { catalogCode }) => {
       queryClient.invalidateQueries({ queryKey: ['catalogs', 'elements', catalogCode] });
-      toast.success(t('catalogs:element_updated', { defaultValue: 'Element updated' }));
+      toast.success(crudSuccessMessage('updated', 'element'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error(
-          t('catalogs:element_update_failed', { defaultValue: 'Failed to update element' })
-        );
+        toast.error(crudErrorMessage('updating', 'element'));
       }
     },
   });
@@ -74,22 +68,19 @@ export function useUpdateCatalogElement() {
 
 export function useDeleteCatalogElement() {
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: ({ catalogId, elementId }: DeleteElementParams) =>
       CatalogService.deleteElement(catalogId, elementId),
     onSuccess: (_, { catalogCode }) => {
       queryClient.invalidateQueries({ queryKey: ['catalogs', 'elements', catalogCode] });
-      toast.success(t('catalogs:element_deleted', { defaultValue: 'Element deleted' }));
+      toast.success(crudSuccessMessage('deleted', 'element'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error(
-          t('catalogs:element_delete_failed', { defaultValue: 'Failed to delete element' })
-        );
+        toast.error(crudErrorMessage('deleting', 'element'));
       }
     },
   });

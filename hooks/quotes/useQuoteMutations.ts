@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QuoteService } from '@/services/quoteService';
 import { toast } from 'sonner';
 import { isApiError } from '@/lib/api/error';
+import { crudErrorMessage, crudSuccessMessage } from '@/utils/lang';
 
 type StoreQuoteData = App.Data.Quote.StoreQuoteData;
 
@@ -13,13 +14,13 @@ export function useCreateQuote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Quote created');
+      toast.success(crudSuccessMessage('created', 'quote'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error('Failed to create quote');
+        toast.error(crudErrorMessage('creating', 'quote'));
       }
     },
   });
@@ -34,13 +35,13 @@ export function useUpdateQuote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Quote updated');
+      toast.success(crudSuccessMessage('updated', 'quote'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error('Failed to update quote');
+        toast.error(crudErrorMessage('updating', 'quote'));
       }
     },
   });
@@ -54,13 +55,13 @@ export function useSendQuote() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success(data.message || 'Quote sent to customer');
+      toast.success(data.message || crudSuccessMessage('sent', 'quote'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error('Failed to send quote');
+        toast.error(crudErrorMessage('sending', 'quote'));
       }
     },
   });
@@ -74,13 +75,13 @@ export function useDeleteQuote() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success(data.message || 'Quote deleted');
+      toast.success(data.message || crudSuccessMessage('deleted', 'quote'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error('Failed to delete quote');
+        toast.error(crudErrorMessage('deleting', 'quote'));
       }
     },
   });
