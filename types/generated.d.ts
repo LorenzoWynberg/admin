@@ -537,6 +537,9 @@ declare namespace App.Enums {
         Restored = "restored",
         ForceDeleted = "force_deleted",
         Synced = "synced",
+        Approved = "approved",
+        Denied = "denied",
+        Sent = "sent",
     }
     export enum ErrorAction {
         Retrieving = "retrieving",
@@ -547,6 +550,9 @@ declare namespace App.Enums {
         Restoring = "restoring",
         ForceDeleting = "force_deleting",
         Syncing = "syncing",
+        Approving = "approving",
+        Denying = "denying",
+        Sending = "sending",
     }
     export enum HttpStatus {
         OK = 200,

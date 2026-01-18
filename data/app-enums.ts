@@ -55,6 +55,9 @@ export const Enums = {
     Restored: "restored",
     ForceDeleted: "force_deleted",
     Synced: "synced",
+    Approved: "approved",
+    Denied: "denied",
+    Sent: "sent",
   },
   ErrorAction: {
     Retrieving: "retrieving",
@@ -65,6 +68,9 @@ export const Enums = {
     Restoring: "restoring",
     ForceDeleting: "force_deleting",
     Syncing: "syncing",
+    Approving: "approving",
+    Denying: "denying",
+    Sending: "sending",
   },
   HttpStatus: {
     OK: 200,
