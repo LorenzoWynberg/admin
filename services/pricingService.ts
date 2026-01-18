@@ -85,18 +85,10 @@ export const PricingService = {
   },
 
   /**
-   * Deactivate a pricing rule
+   * Clone a pricing rule to create a new draft
    */
-  async deactivate(id: number): Promise<PricingRuleData> {
-    const response = await api.post<Single<PricingRuleData>>(`/pricing-rules/${id}/deactivate`);
-    return response.item;
-  },
-
-  /**
-   * Duplicate a pricing rule
-   */
-  async duplicate(id: number, name?: string): Promise<PricingRuleData> {
-    const response = await api.post<Single<PricingRuleData>>(`/pricing-rules/${id}/duplicate`, {
+  async clone(id: number, name?: string): Promise<PricingRuleData> {
+    const response = await api.post<Single<PricingRuleData>>(`/pricing-rules/${id}/clone`, {
       name,
     });
     return response.item;

@@ -88,35 +88,15 @@ export function useActivatePricingRule() {
   });
 }
 
-export function useDeactivatePricingRule() {
+export function useClonePricingRule() {
   const queryClient = useQueryClient();
   const { t } = useTranslation('pricing');
 
   return useMutation({
-    mutationFn: (id: number) => PricingService.deactivate(id),
+    mutationFn: ({ id, name }: { id: number; name?: string }) => PricingService.clone(id, name),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pricing-rules'] });
-      toast.success(t('deactivated'));
-    },
-    onError: (error) => {
-      if (isApiError(error)) {
-        toast.error(error.message);
-      } else {
-        toast.error(t('failed_to_load'));
-      }
-    },
-  });
-}
-
-export function useDuplicatePricingRule() {
-  const queryClient = useQueryClient();
-  const { t } = useTranslation('pricing');
-
-  return useMutation({
-    mutationFn: ({ id, name }: { id: number; name?: string }) => PricingService.duplicate(id, name),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pricing-rules'] });
-      toast.success(t('duplicated'));
+      toast.success(t('cloned'));
     },
     onError: (error) => {
       if (isApiError(error)) {

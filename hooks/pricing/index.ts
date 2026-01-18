@@ -5,6 +5,5 @@ export {
   useUpdatePricingRule,
   useDeletePricingRule,
   useActivatePricingRule,
-  useDeactivatePricingRule,
-  useDuplicatePricingRule,
+  useClonePricingRule,
 } from './usePricingRuleMutations';

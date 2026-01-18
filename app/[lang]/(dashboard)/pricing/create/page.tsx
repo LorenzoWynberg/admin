@@ -11,6 +11,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Form,
   FormControl,
   FormDescription,
@@ -22,6 +29,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { applyApiErrorsToForm } from '@/utils/form';
+import { Enums } from '@/data/app-enums';
 
 const tierSchema = z.object({
   minKm: z.number().min(0),
@@ -35,6 +43,10 @@ const formSchema = z.object({
   name: z.string().min(1).max(255),
   baseFare: z.number().min(0),
   taxRate: z.number().min(0).max(1),
+  calculationMode: z.enum([
+    Enums.PricingCalculationMode.DISCRETE,
+    Enums.PricingCalculationMode.CUMULATIVE,
+  ]),
   notes: z.string().nullable(),
   activate: z.boolean(),
   tiers: z.array(tierSchema),
@@ -53,6 +65,7 @@ export default function CreatePricingRulePage() {
       name: '',
       baseFare: 0,
       taxRate: 0,
+      calculationMode: Enums.PricingCalculationMode.DISCRETE,
       notes: null,
       activate: false,
       tiers: [{ minKm: 0, maxKm: null, flatFee: null, perKmRate: null, order: 0 }],
@@ -70,6 +83,7 @@ export default function CreatePricingRulePage() {
         name: values.name,
         baseFare: values.baseFare,
         taxRate: values.taxRate,
+        calculationMode: values.calculationMode as App.Enums.PricingCalculationMode,
         notes: values.notes,
         activate: values.activate,
         tiers: values.tiers.map((tier, index) => ({
@@ -85,6 +99,7 @@ export default function CreatePricingRulePage() {
       applyApiErrorsToForm(error, form.setError, {
         base_fare: 'baseFare',
         tax_rate: 'taxRate',
+        calculation_mode: 'calculationMode',
       });
     }
   };
@@ -164,6 +179,40 @@ export default function CreatePricingRulePage() {
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="calculationMode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {t('calculation_mode', { defaultValue: 'Calculation Mode' })}
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={Enums.PricingCalculationMode.DISCRETE}>
+                          {t('calculation_mode_discrete', { defaultValue: 'Discrete' })}
+                        </SelectItem>
+                        <SelectItem value={Enums.PricingCalculationMode.CUMULATIVE}>
+                          {t('calculation_mode_cumulative', { defaultValue: 'Cumulative' })}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      {t('calculation_mode_help', {
+                        defaultValue:
+                          'Discrete: one tier applies. Cumulative: fees stack through tiers.',
+                      })}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}

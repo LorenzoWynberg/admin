@@ -51,7 +51,12 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { usePricingRuleList, useActivatePricingRule, useDeletePricingRule } from '@/hooks/pricing';
+import {
+  usePricingRuleList,
+  useActivatePricingRule,
+  useDeletePricingRule,
+  useClonePricingRule,
+} from '@/hooks/pricing';
 
 type PricingRuleData = App.Data.Pricing.PricingRuleData;
 
@@ -82,6 +87,7 @@ export default function PricingPage() {
 
   const activateMutation = useActivatePricingRule();
   const deleteMutation = useDeletePricingRule();
+  const cloneMutation = useClonePricingRule();
 
   const rules = data?.items || [];
   const meta = data?.meta;
@@ -227,14 +233,15 @@ export default function PricingPage() {
                               onClick={() => router.push(`/pricing/${rule.id}/edit`)}
                             >
                               <Pencil className="mr-2 h-4 w-4" />
-                              {t('edit')}
+                              {t('common:edit')}
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
-                            onClick={() => router.push(`/pricing/${rule.id}/duplicate`)}
+                            onClick={() => cloneMutation.mutate({ id: rule.id! })}
+                            disabled={cloneMutation.isPending}
                           >
                             <Copy className="mr-2 h-4 w-4" />
-                            {t('duplicate')}
+                            {t('common:clone')}
                           </DropdownMenuItem>
                           {rule.status === Enums.PricingRuleStatus.DRAFT && (
                             <DropdownMenuItem
@@ -244,7 +251,7 @@ export default function PricingPage() {
                               }}
                             >
                               <Power className="mr-2 h-4 w-4" />
-                              {t('activate')}
+                              {t('common:activate')}
                             </DropdownMenuItem>
                           )}
                           {rule.status === Enums.PricingRuleStatus.DRAFT && (
@@ -258,7 +265,7 @@ export default function PricingPage() {
                                 }}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                {t('delete')}
+                                {t('common:delete')}
                               </DropdownMenuItem>
                             </>
                           )}
@@ -311,12 +318,12 @@ export default function PricingPage() {
       <AlertDialog open={activateDialogOpen} onOpenChange={setActivateDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('activate')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('common:activate')}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_activate')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleActivate}>{t('activate')}</AlertDialogAction>
+            <AlertDialogAction onClick={handleActivate}>{t('common:activate')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -325,7 +332,7 @@ export default function PricingPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('delete')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('common:delete')}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_delete')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -334,7 +341,7 @@ export default function PricingPage() {
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              {t('delete')}
+              {t('common:delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -7,7 +7,7 @@ import {
   usePricingRule,
   useActivatePricingRule,
   useDeletePricingRule,
-  useDuplicatePricingRule,
+  useClonePricingRule,
 } from '@/hooks/pricing';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -71,7 +71,7 @@ export default function PricingRuleDetailPage() {
   const { data: rule, isLoading, error } = usePricingRule({ id: ruleId });
   const activateMutation = useActivatePricingRule();
   const deleteMutation = useDeletePricingRule();
-  const duplicateMutation = useDuplicatePricingRule();
+  const cloneMutation = useClonePricingRule();
 
   const handleActivate = () => {
     activateMutation.mutate(ruleId);
@@ -85,8 +85,8 @@ export default function PricingRuleDetailPage() {
     setDeleteDialogOpen(false);
   };
 
-  const handleDuplicate = () => {
-    duplicateMutation.mutate(
+  const handleClone = () => {
+    cloneMutation.mutate(
       { id: ruleId },
       {
         onSuccess: (newRule) => {
@@ -142,13 +142,9 @@ export default function PricingRuleDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={handleDuplicate}
-            disabled={duplicateMutation.isPending}
-          >
+          <Button variant="outline" onClick={handleClone} disabled={cloneMutation.isPending}>
             <Copy className="mr-2 h-4 w-4" />
-            {t('duplicate')}
+            {t('common:clone')}
           </Button>
           {rule.status === Enums.PricingRuleStatus.DRAFT && (
             <>
@@ -158,15 +154,15 @@ export default function PricingRuleDetailPage() {
                 disabled={activateMutation.isPending}
               >
                 <Power className="mr-2 h-4 w-4" />
-                {t('activate')}
+                {t('common:activate')}
               </Button>
               <Button onClick={() => router.push(`/pricing/${ruleId}/edit`)}>
                 <Pencil className="mr-2 h-4 w-4" />
-                {t('edit')}
+                {t('common:edit')}
               </Button>
               <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
                 <Trash2 className="mr-2 h-4 w-4" />
-                {t('delete')}
+                {t('common:delete')}
               </Button>
             </>
           )}
@@ -260,12 +256,12 @@ export default function PricingRuleDetailPage() {
       <AlertDialog open={activateDialogOpen} onOpenChange={setActivateDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('activate')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('common:activate')}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_activate')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleActivate}>{t('activate')}</AlertDialogAction>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleActivate}>{t('common:activate')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -274,16 +270,16 @@ export default function PricingRuleDetailPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('delete')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('common:delete')}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_delete')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              {t('delete')}
+              {t('common:delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
