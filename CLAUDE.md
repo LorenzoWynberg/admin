@@ -56,7 +56,7 @@ npm run check      # Run format:check + lint + typecheck
 
 To sync types from backend:
 ```bash
-cp ../api/types/generated.d.ts types/generated.d.ts
+cp ../api/resources/types/generated.d.ts types/generated.d.ts
 npm run gen:enums
 ```
 
