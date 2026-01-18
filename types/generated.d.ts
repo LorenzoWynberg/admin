@@ -523,6 +523,9 @@ declare namespace App.Enums {
     TO_ADDRESS = 'toAddress',
     DESCRIPTION = 'description',
     CURRENCY = 'currency',
+    TIMESTAMPS = 'timestamps',
+    STATUS = 'status',
+    CODE = 'code',
   }
   export enum CrudAction {
     Retrieved = 'retrieved',
@@ -533,6 +536,7 @@ declare namespace App.Enums {
     Unchanged = 'unchanged',
     Restored = 'restored',
     ForceDeleted = 'force_deleted',
+    Synced = 'synced',
   }
   export enum ErrorAction {
     Retrieving = 'retrieving',
@@ -542,6 +546,7 @@ declare namespace App.Enums {
     Deleting = 'deleting',
     Restoring = 'restoring',
     ForceDeleting = 'force_deleting',
+    Syncing = 'syncing',
   }
   export enum HttpStatus {
     OK = 200,

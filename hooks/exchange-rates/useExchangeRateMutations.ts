@@ -3,6 +3,7 @@ import { ExchangeRateService } from '@/services/exchangeRateService';
 import { toast } from 'sonner';
 import { isApiError } from '@/lib/api/error';
 import { useTranslation } from 'react-i18next';
+import { crudErrorMessage, crudSuccessMessage } from '@/utils/lang';
 
 export function useSyncExchangeRates() {
   const queryClient = useQueryClient();
@@ -23,22 +24,14 @@ export function useSyncExchangeRates() {
           })
         );
       } else {
-        toast.success(
-          t('common:rates_synced', {
-            defaultValue: 'Exchange rates synced successfully',
-          })
-        );
+        toast.success(crudSuccessMessage('synced', 'exchange_rate', 2));
       }
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error(
-          t('common:rates_sync_failed', {
-            defaultValue: 'Failed to sync exchange rates',
-          })
-        );
+        toast.error(crudErrorMessage('syncing', 'exchange_rate', 2));
       }
     },
   });

@@ -41,6 +41,9 @@ export const Enums = {
     TO_ADDRESS: 'toAddress',
     DESCRIPTION: 'description',
     CURRENCY: 'currency',
+    TIMESTAMPS: 'timestamps',
+    STATUS: 'status',
+    CODE: 'code',
   },
   CrudAction: {
     Retrieved: 'retrieved',
@@ -51,6 +54,7 @@ export const Enums = {
     Unchanged: 'unchanged',
     Restored: 'restored',
     ForceDeleted: 'force_deleted',
+    Synced: 'synced',
   },
   ErrorAction: {
     Retrieving: 'retrieving',
@@ -60,6 +64,7 @@ export const Enums = {
     Deleting: 'deleting',
     Restoring: 'restoring',
     ForceDeleting: 'force_deleting',
+    Syncing: 'syncing',
   },
   HttpStatus: {
     OK: 200,
