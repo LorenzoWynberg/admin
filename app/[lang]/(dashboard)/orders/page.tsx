@@ -82,13 +82,13 @@ export default function OrdersPage() {
     { value: 'pending', label: t('statuses:pending', { defaultValue: 'Pending' }) },
     {
       value: 'estimated',
-      label: t('statuses:estimated', { Model: quoteModel, defaultValue: 'Quote Ready' }),
+      label: t('statuses:model.estimated', { Model: quoteModel, defaultValue: 'Quote Ready' }),
     },
     { value: 'approved', label: t('statuses:approved', { defaultValue: 'Approved' }) },
     { value: 'denied', label: t('statuses:denied', { defaultValue: 'Denied' }) },
     {
       value: 'assigned',
-      label: t('statuses:assigned', { Model: driverModel, defaultValue: 'Driver Assigned' }),
+      label: t('statuses:model.assigned', { Model: driverModel, defaultValue: 'Driver Assigned' }),
     },
     { value: 'picking_up', label: t('statuses:picking_up', { defaultValue: 'Picking Up' }) },
     { value: 'in_transit', label: t('statuses:in_transit', { defaultValue: 'In Transit' }) },

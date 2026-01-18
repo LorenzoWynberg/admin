@@ -38,8 +38,15 @@ export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
 
   const variant = statusVariants[status] || 'outline';
   const modelKey = statusModels[status];
-  const Model = modelKey ? t(`models:${modelKey}`, { defaultValue: modelKey }) : undefined;
-  const label = t(`statuses:${status}`, { Model, defaultValue: status });
+
+  // Use model.* version for statuses that need entity context, flat version otherwise
+  let label: string;
+  if (modelKey) {
+    const Model = t(`models:${modelKey}`, { defaultValue: modelKey });
+    label = t(`statuses:model.${status}`, { Model, defaultValue: status });
+  } else {
+    label = t(`statuses:${status}`, { defaultValue: status });
+  }
 
   return <Badge variant={variant}>{label}</Badge>;
 }
