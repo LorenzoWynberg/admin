@@ -1,6 +1,6 @@
 'use client';
 
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -107,15 +107,11 @@ export default function BusinessDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t('common:name', { defaultValue: 'Name' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('name')}</span>
               <span className="font-medium">{business.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t('common:type', { defaultValue: 'Type' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('type')}</span>
               <span className="font-medium">{business.typeName || '-'}</span>
             </div>
             <div className="flex items-center justify-between">
@@ -144,15 +140,11 @@ export default function BusinessDetailPage() {
             {business.user ? (
               <>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    {t('common:name', { defaultValue: 'Name' })}
-                  </span>
+                  <span className="text-muted-foreground">{validationAttribute('name')}</span>
                   <span className="font-medium">{business.user.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    {t('common:email', { defaultValue: 'Email' })}
-                  </span>
+                  <span className="text-muted-foreground">{validationAttribute('email')}</span>
                   <span className="font-medium">{business.user.email || '-'}</span>
                 </div>
                 <Button
@@ -187,7 +179,7 @@ export default function BusinessDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              {t('businesses:detail.timestamps', { defaultValue: 'Timestamps' })}
+              {validationAttribute('timestamps', true)}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

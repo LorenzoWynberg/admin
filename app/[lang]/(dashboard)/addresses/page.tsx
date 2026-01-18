@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useAddressList } from '@/hooks/addresses';
@@ -117,7 +117,7 @@ export default function AddressesPage() {
                   <TableHead>{t('addresses:label', { defaultValue: 'Label' })}</TableHead>
                   <TableHead>{t('models:address_one', { defaultValue: 'Address' })}</TableHead>
                   <TableHead>{t('addresses:city', { defaultValue: 'City' })}</TableHead>
-                  <TableHead>{t('common:type', { defaultValue: 'Type' })}</TableHead>
+                  <TableHead>{validationAttribute('type')}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>

@@ -236,13 +236,15 @@ export default function PricingPage() {
                               {t('common:edit')}
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem
-                            onClick={() => cloneMutation.mutate({ id: rule.id! })}
-                            disabled={cloneMutation.isPending}
-                          >
-                            <Copy className="mr-2 h-4 w-4" />
-                            {t('common:clone')}
-                          </DropdownMenuItem>
+                          {rule.status !== Enums.PricingRuleStatus.DRAFT && (
+                            <DropdownMenuItem
+                              onClick={() => cloneMutation.mutate({ id: rule.id! })}
+                              disabled={cloneMutation.isPending}
+                            >
+                              <Copy className="mr-2 h-4 w-4" />
+                              {t('common:clone')}
+                            </DropdownMenuItem>
+                          )}
                           {rule.status === Enums.PricingRuleStatus.DRAFT && (
                             <DropdownMenuItem
                               onClick={() => {

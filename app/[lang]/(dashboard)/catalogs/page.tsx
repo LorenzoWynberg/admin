@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
@@ -107,7 +107,7 @@ export default function CatalogsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('catalogs:code', { defaultValue: 'Code' })}</TableHead>
-                  <TableHead>{t('common:name', { defaultValue: 'Name' })}</TableHead>
+                  <TableHead>{validationAttribute('name')}</TableHead>
                   <TableHead>{t('catalogs:elements', { defaultValue: 'Elements' })}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>

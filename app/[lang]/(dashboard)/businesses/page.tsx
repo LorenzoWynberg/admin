@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -107,8 +107,8 @@ export default function BusinessesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('common:name', { defaultValue: 'Name' })}</TableHead>
-                  <TableHead>{t('common:type', { defaultValue: 'Type' })}</TableHead>
+                  <TableHead>{validationAttribute('name')}</TableHead>
+                  <TableHead>{validationAttribute('type')}</TableHead>
                   <TableHead>{t('businesses:owner', { defaultValue: 'Owner' })}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>

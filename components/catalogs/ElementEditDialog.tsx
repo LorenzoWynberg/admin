@@ -30,6 +30,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useUpdateCatalogElement } from '@/hooks/catalogs';
 import { applyApiErrorsToForm } from '@/utils/form';
+import { validationAttribute } from '@/utils/lang';
 
 type CatalogElementData = App.Data.CatalogElement.CatalogElementData;
 type PartialLangData = App.Data.Shared.PartialLangData;
@@ -167,11 +168,11 @@ export function ElementEditDialog({
               name={`name.${selectedLang}`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('common:name', { defaultValue: 'Name' })}</FormLabel>
+                  <FormLabel>{validationAttribute('name')}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder={`${t('common:name', { defaultValue: 'Name' })} (${languageLabels[selectedLang]})`}
+                      placeholder={`${validationAttribute('name')} (${languageLabels[selectedLang]})`}
                     />
                   </FormControl>
                   <FormMessage />

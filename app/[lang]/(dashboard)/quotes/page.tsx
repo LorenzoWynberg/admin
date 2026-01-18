@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useQuoteList } from '@/hooks/quotes';
 import { useRouter } from 'next/navigation';
@@ -159,10 +159,10 @@ export default function QuotesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('common:id', { defaultValue: 'ID' })}</TableHead>
+                  <TableHead>{validationAttribute('id')}</TableHead>
                   <TableHead>{t('models:order_one', { defaultValue: 'Order' })}</TableHead>
                   <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
-                  <TableHead>{t('common:total', { defaultValue: 'Total' })}</TableHead>
+                  <TableHead>{validationAttribute('total')}</TableHead>
                   <TableHead>{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>

@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useOrderList } from '@/hooks/orders';
 import { useRouter } from 'next/navigation';
@@ -170,7 +170,7 @@ export default function OrdersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('common:id', { defaultValue: 'ID' })}</TableHead>
+                  <TableHead>{validationAttribute('id')}</TableHead>
                   <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
                   <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>

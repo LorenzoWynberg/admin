@@ -1,6 +1,6 @@
 'use client';
 
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -125,9 +125,7 @@ export default function UserDetailPage() {
                 <p className="font-medium">
                   {user.email || t('users:detail.not_provided', { defaultValue: 'Not provided' })}
                 </p>
-                <p className="text-muted-foreground text-sm">
-                  {t('common:email', { defaultValue: 'Email' })}
-                </p>
+                <p className="text-muted-foreground text-sm">{validationAttribute('email')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -136,9 +134,7 @@ export default function UserDetailPage() {
                 <p className="font-medium">
                   {user.phone || t('users:detail.not_provided', { defaultValue: 'Not provided' })}
                 </p>
-                <p className="text-muted-foreground text-sm">
-                  {t('common:phone', { defaultValue: 'Phone' })}
-                </p>
+                <p className="text-muted-foreground text-sm">{validationAttribute('phone')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -244,7 +240,7 @@ export default function UserDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              {t('users:detail.timestamps', { defaultValue: 'Timestamps' })}
+              {validationAttribute('timestamps', true)}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

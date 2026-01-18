@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { useUserList } from '@/hooks/users';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
@@ -169,9 +169,9 @@ export default function UsersPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('models:user_one', { defaultValue: 'User' })}</TableHead>
-                  <TableHead>{t('common:email', { defaultValue: 'Email' })}</TableHead>
-                  <TableHead>{t('common:role', { defaultValue: 'Role' })}</TableHead>
-                  <TableHead>{t('common:phone', { defaultValue: 'Phone' })}</TableHead>
+                  <TableHead>{validationAttribute('email')}</TableHead>
+                  <TableHead>{validationAttribute('role')}</TableHead>
+                  <TableHead>{validationAttribute('phone')}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>

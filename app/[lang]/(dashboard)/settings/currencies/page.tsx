@@ -34,6 +34,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { validationAttribute } from '@/utils/lang';
 import { useCurrencyList, useUpdateCurrency } from '@/hooks/currencies';
 import { useSyncExchangeRates } from '@/hooks/exchange-rates';
 
@@ -193,7 +194,7 @@ export default function CurrencySettingsPage() {
             </div>
           ) : error ? (
             <div className="text-destructive py-12 text-center">
-              {t('common:failed_to_load', { defaultValue: 'Failed to load' })}
+              {t('resource:failed_to_load', { defaultValue: 'Failed to load' })}
             </div>
           ) : currencies.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
@@ -205,7 +206,7 @@ export default function CurrencySettingsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('common:code', { defaultValue: 'Code' })}</TableHead>
-                  <TableHead>{t('common:name', { defaultValue: 'Name' })}</TableHead>
+                  <TableHead>{validationAttribute('name')}</TableHead>
                   <TableHead>{t('common:symbol', { defaultValue: 'Symbol' })}</TableHead>
                   <TableHead>
                     {t('common:exchange_rate', { defaultValue: 'Exchange Rate' })}

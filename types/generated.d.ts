@@ -488,12 +488,16 @@ declare namespace App.Enums {
     Snapshot = 'snapshot',
   }
   export enum Attributes {
+    ID = 'id',
     NAME = 'name',
+    EMAIL = 'email',
     PHONE = 'phone',
+    TYPE = 'type',
+    ROLE = 'role',
+    TOTAL = 'total',
     AVATAR = 'avatar',
     SEX_ID = 'sexId',
     LANG_CODE = 'langCode',
-    EMAIL = 'email',
     PASSWORD = 'password',
     NEW_PASSWORD = 'newPassword',
     CURRENT_PASSWORD = 'currentPassword',

@@ -1,6 +1,6 @@
 'use client';
 
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -257,7 +257,7 @@ export default function QuoteDetailPage() {
             )}
             <div className="border-t pt-3">
               <div className="flex justify-between text-lg font-bold">
-                <span>{t('common:total', { defaultValue: 'Total' })}</span>
+                <span>{validationAttribute('total')}</span>
                 <span>{formatCurrency(quote.total)}</span>
               </div>
             </div>
@@ -297,7 +297,7 @@ export default function QuoteDetailPage() {
         {/* Timestamps */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('quotes:detail.timestamps', { defaultValue: 'Timestamps' })}</CardTitle>
+            <CardTitle>{validationAttribute('timestamps', true)}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">

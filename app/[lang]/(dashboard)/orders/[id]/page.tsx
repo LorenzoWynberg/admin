@@ -25,6 +25,7 @@ import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { validationAttribute } from '@/utils/lang';
 import { useOrder, useApproveOrder, useDenyOrder, useDeleteOrder } from '@/hooks/orders';
 
 type OrderStatus = App.Enums.OrderStatus;
@@ -204,9 +205,7 @@ export default function OrderDetailPage() {
                   {order.fromPhone ||
                     t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
                 </p>
-                <p className="text-muted-foreground text-sm">
-                  {t('common:phone', { defaultValue: 'Phone' })}
-                </p>
+                <p className="text-muted-foreground text-sm">{validationAttribute('phone')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -249,9 +248,7 @@ export default function OrderDetailPage() {
                   {order.toPhone ||
                     t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
                 </p>
-                <p className="text-muted-foreground text-sm">
-                  {t('common:phone', { defaultValue: 'Phone' })}
-                </p>
+                <p className="text-muted-foreground text-sm">{validationAttribute('phone')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -386,7 +383,7 @@ export default function OrderDetailPage() {
                 )}
                 <div className="border-t pt-2">
                   <div className="flex justify-between text-lg font-bold">
-                    <span>{t('common:total', { defaultValue: 'Total' })}</span>
+                    <span>{validationAttribute('total')}</span>
                     <span>
                       {order.currencyCode} {order.currentQuote.total?.toFixed(2) || '0.00'}
                     </span>
@@ -441,9 +438,7 @@ export default function OrderDetailPage() {
                   <p className="font-medium">
                     {order.driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}
                   </p>
-                  <p className="text-muted-foreground text-sm">
-                    {t('common:name', { defaultValue: 'Name' })}
-                  </p>
+                  <p className="text-muted-foreground text-sm">{validationAttribute('name')}</p>
                 </div>
               </div>
               {order.driver.licensePlateNumber && (

@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { isApiError } from '@/lib/api/error';
 import { useLoginMutation } from '@/hooks/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { validationAttribute } from '@/utils/lang';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -77,9 +78,7 @@ export default function LoginPage() {
         } else if (error instanceof Error) {
           toast.error(error.message);
         } else {
-          toast.error(
-            t('common:unexpected_error', { defaultValue: 'An unexpected error occurred' })
-          );
+          toast.error(t('errors:unexpected', { defaultValue: 'An unexpected error occurred' }));
         }
       },
     });
@@ -101,7 +100,7 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">{t('common:email', { defaultValue: 'Email' })}</Label>
+              <Label htmlFor="email">{validationAttribute('email')}</Label>
               <Input
                 id="email"
                 type="email"

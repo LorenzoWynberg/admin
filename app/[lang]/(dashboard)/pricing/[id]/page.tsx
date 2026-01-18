@@ -90,7 +90,7 @@ export default function PricingRuleDetailPage() {
       { id: ruleId },
       {
         onSuccess: (newRule) => {
-          router.push(`/pricing/${newRule.id}`);
+          router.replace(`/pricing/${newRule.id}`);
         },
       }
     );
@@ -142,10 +142,12 @@ export default function PricingRuleDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleClone} disabled={cloneMutation.isPending}>
-            <Copy className="mr-2 h-4 w-4" />
-            {t('common:clone')}
-          </Button>
+          {rule.status !== Enums.PricingRuleStatus.DRAFT && (
+            <Button variant="outline" onClick={handleClone} disabled={cloneMutation.isPending}>
+              <Copy className="mr-2 h-4 w-4" />
+              {t('common:clone')}
+            </Button>
+          )}
           {rule.status === Enums.PricingRuleStatus.DRAFT && (
             <>
               <Button

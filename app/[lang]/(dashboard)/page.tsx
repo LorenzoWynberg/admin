@@ -105,7 +105,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm">
-                {t('common:click_to_manage', {
+                {t('resource:click_to_manage', {
                   resource: stat.name,
                   defaultValue: `Click to manage ${stat.name}`,
                 })}

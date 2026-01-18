@@ -17,7 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ArrowLeft, Database, List, Calendar, Pencil } from 'lucide-react';
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { ElementEditDialog } from '@/components/catalogs/ElementEditDialog';
 
 type CatalogElementData = App.Data.CatalogElement.CatalogElementData;
@@ -110,9 +110,7 @@ export default function CatalogDetailPage() {
               <Badge variant="outline">{catalog.code}</Badge>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t('common:name', { defaultValue: 'Name' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('name')}</span>
               <span className="font-medium">{catalog.name}</span>
             </div>
             {catalog.description && (
@@ -130,7 +128,7 @@ export default function CatalogDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              {t('catalogs:detail.timestamps', { defaultValue: 'Timestamps' })}
+              {validationAttribute('timestamps', true)}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -173,7 +171,7 @@ export default function CatalogDetailPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('catalogs:code', { defaultValue: 'Code' })}</TableHead>
-                  <TableHead>{t('common:name', { defaultValue: 'Name' })}</TableHead>
+                  <TableHead>{validationAttribute('name')}</TableHead>
                   <TableHead>{t('catalogs:detail.order', { defaultValue: 'Order' })}</TableHead>
                   <TableHead className="w-20">
                     {t('common:actions', { defaultValue: 'Actions' })}

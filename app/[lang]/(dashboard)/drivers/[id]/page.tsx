@@ -1,6 +1,6 @@
 'use client';
 
-import { capitalize } from '@/utils/lang';
+import { capitalize, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -121,21 +121,15 @@ export default function DriverDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t('common:name', { defaultValue: 'Name' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('name')}</span>
               <span className="font-medium">{driver.user?.name || '-'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t('common:email', { defaultValue: 'Email' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('email')}</span>
               <span className="font-medium">{driver.user?.email || '-'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t('common:phone', { defaultValue: 'Phone' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('phone')}</span>
               <span className="font-medium">{driver.user?.phone || '-'}</span>
             </div>
             {driver.userId && (
@@ -201,7 +195,7 @@ export default function DriverDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              {t('drivers:detail.timestamps', { defaultValue: 'Timestamps' })}
+              {validationAttribute('timestamps', true)}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
