@@ -51,3 +51,37 @@ export const crudErrorMessage = (
   const key = `error.${action}`;
   return resourceMessage(key, resourceKey, count, extra);
 };
+
+/**
+ * Get translated status label with optional model interpolation.
+ * @param status - The status key (e.g., 'pending', 'estimated')
+ * @param modelKey - Optional model key for interpolation (e.g., 'quote', 'driver')
+ * @returns Translated status label
+ */
+export const statusLabel = (status: string | undefined, modelKey?: string): string => {
+  if (!status) return i18next.t('statuses:unknown', { defaultValue: 'Unknown' });
+
+  if (modelKey) {
+    const Model = i18next.t(`models:${modelKey}`, { defaultValue: modelKey });
+    return i18next.t(`statuses:model.${status}`, { Model, defaultValue: status });
+  }
+
+  return i18next.t(`statuses:${status}`, { defaultValue: status });
+};
+
+// Status-specific model keys for order context
+const orderStatusModels: Record<string, string> = {
+  estimated: 'quote',
+  assigned: 'driver',
+};
+
+/**
+ * Get translated order status label with appropriate model interpolation.
+ * Handles estimated → "Quote Ready", assigned → "Driver Assigned" automatically.
+ * @param status - The order status
+ * @returns Translated status label
+ */
+export const orderStatusLabel = (status: string | undefined): string => {
+  const modelKey = status ? orderStatusModels[status] : undefined;
+  return statusLabel(status, modelKey);
+};

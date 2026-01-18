@@ -1,7 +1,7 @@
 'use client';
 
-import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
+import { orderStatusLabel } from '@/utils/lang';
 
 type OrderStatus = App.Enums.OrderStatus;
 
@@ -27,26 +27,8 @@ interface OrderStatusBadgeProps {
   status: OrderStatus;
 }
 
-// Status-specific model interpolations for order context
-const statusModels: Partial<Record<OrderStatus, string>> = {
-  estimated: 'quote',
-  assigned: 'driver',
-};
-
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
-  const { t } = useTranslation();
-
   const variant = statusVariants[status] || 'outline';
-  const modelKey = statusModels[status];
 
-  // Use model.* version for statuses that need entity context, flat version otherwise
-  let label: string;
-  if (modelKey) {
-    const Model = t(`models:${modelKey}`, { defaultValue: modelKey });
-    label = t(`statuses:model.${status}`, { Model, defaultValue: status });
-  } else {
-    label = t(`statuses:${status}`, { defaultValue: status });
-  }
-
-  return <Badge variant={variant}>{label}</Badge>;
+  return <Badge variant={variant}>{orderStatusLabel(status)}</Badge>;
 }
