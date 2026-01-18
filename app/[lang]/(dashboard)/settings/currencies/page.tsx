@@ -34,7 +34,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { validationAttribute } from '@/utils/lang';
+import { resourceMessage, validationAttribute } from '@/utils/lang';
 import { useCurrencyList, useUpdateCurrency } from '@/hooks/currencies';
 import { useSyncExchangeRates } from '@/hooks/exchange-rates';
 
@@ -194,7 +194,7 @@ export default function CurrencySettingsPage() {
             </div>
           ) : error ? (
             <div className="text-destructive py-12 text-center">
-              {t('resource:failed_to_load', { defaultValue: 'Failed to load' })}
+              {resourceMessage('failed_to_load', 'currency', 2)}
             </div>
           ) : currencies.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">

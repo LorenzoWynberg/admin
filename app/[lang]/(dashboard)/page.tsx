@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, FileText, Users, Truck, Building2, MapPin } from 'lucide-react';
-import { capitalize } from '@/utils/lang';
+import { capitalize, resourceMessage } from '@/utils/lang';
 
 const navItems = [
   {
@@ -105,10 +105,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm">
-                {t('resource:click_to_manage', {
-                  resource: stat.name,
-                  defaultValue: `Click to manage ${stat.name}`,
-                })}
+                {resourceMessage('click_to_manage', stat.modelKey, 2)}
               </p>
             </CardContent>
           </Card>
