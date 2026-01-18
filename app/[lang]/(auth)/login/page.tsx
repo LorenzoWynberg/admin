@@ -1,19 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Auth } from '@/services/authService';
-import { isApiError } from '@/lib/api/error';
-import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useSearchParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { isApiError } from '@/lib/api/error';
+import { useLoginMutation } from '@/hooks/auth';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from 'sonner';
 
 type LoginFormData = {
   email: string;
@@ -26,7 +25,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 
-  const [isLoading, setIsLoading] = useState(false);
+  const loginMutation = useLoginMutation();
 
   const loginSchema = z.object({
     email: z
@@ -54,37 +53,36 @@ export default function LoginPage() {
     return null;
   }
 
-  const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
-
-    try {
-      await Auth.login(data);
-      toast.success(t('auth:welcome_back', { defaultValue: 'Welcome back!' }));
-      router.push(callbackUrl);
-      router.refresh();
-    } catch (error) {
-      if (isApiError(error)) {
-        // Handle field-level errors
-        if (error.errors) {
-          Object.entries(error.errors).forEach(([field, messages]) => {
-            const formField = field as keyof LoginFormData;
-            if (formField === 'email' || formField === 'password') {
-              setError(formField, {
-                type: 'server',
-                message: Array.isArray(messages) ? messages[0] : messages,
-              });
-            }
-          });
+  const onSubmit = (data: LoginFormData) => {
+    loginMutation.mutate(data, {
+      onSuccess: () => {
+        toast.success(t('auth:welcome_back', { defaultValue: 'Welcome back!' }));
+        router.push(callbackUrl);
+        router.refresh();
+      },
+      onError: (error) => {
+        if (isApiError(error)) {
+          if (error.errors) {
+            Object.entries(error.errors).forEach(([field, messages]) => {
+              const formField = field as keyof LoginFormData;
+              if (formField === 'email' || formField === 'password') {
+                setError(formField, {
+                  type: 'server',
+                  message: Array.isArray(messages) ? messages[0] : messages,
+                });
+              }
+            });
+          }
+          toast.error(error.message);
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error(
+            t('common:unexpected_error', { defaultValue: 'An unexpected error occurred' })
+          );
         }
-        toast.error(error.message);
-      } else if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error(t('common:unexpected_error', { defaultValue: 'An unexpected error occurred' }));
-      }
-    } finally {
-      setIsLoading(false);
-    }
+      },
+    });
   };
 
   return (
@@ -109,7 +107,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="admin@example.com"
                 autoComplete="email"
-                disabled={isLoading}
+                disabled={loginMutation.isPending}
                 {...register('email')}
               />
               {errors.email && <p className="text-destructive text-sm">{errors.email.message}</p>}
@@ -122,7 +120,7 @@ export default function LoginPage() {
                 type="password"
                 placeholder={t('auth:enter_password', { defaultValue: 'Enter your password' })}
                 autoComplete="current-password"
-                disabled={isLoading}
+                disabled={loginMutation.isPending}
                 {...register('password')}
               />
               {errors.password && (
@@ -130,8 +128,8 @@ export default function LoginPage() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading
+            <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+              {loginMutation.isPending
                 ? t('auth:signing_in', { defaultValue: 'Signing in...' })
                 : t('auth:sign_in', { defaultValue: 'Sign in' })}
             </Button>
