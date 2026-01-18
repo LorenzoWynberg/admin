@@ -203,7 +203,9 @@ export default function OrderDetailPage() {
                   {order.fromPhone ||
                     t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
                 </p>
-                <p className="text-muted-foreground text-sm">{validationAttribute('phone')}</p>
+                <p className="text-muted-foreground text-sm">
+                  {validationAttribute('phone', true)}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -246,7 +248,9 @@ export default function OrderDetailPage() {
                   {order.toPhone ||
                     t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
                 </p>
-                <p className="text-muted-foreground text-sm">{validationAttribute('phone')}</p>
+                <p className="text-muted-foreground text-sm">
+                  {validationAttribute('phone', true)}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -273,7 +277,7 @@ export default function OrderDetailPage() {
             {order.description && (
               <div>
                 <p className="text-muted-foreground text-sm">
-                  {validationAttribute('description')}
+                  {validationAttribute('description', true)}
                 </p>
                 <p className="font-medium">{order.description}</p>
               </div>
@@ -286,7 +290,7 @@ export default function OrderDetailPage() {
                     <div>
                       <p className="font-medium">{order.distanceKm} km</p>
                       <p className="text-muted-foreground text-sm">
-                        {validationAttribute('distance')}
+                        {validationAttribute('distance', true)}
                       </p>
                     </div>
                   </div>
@@ -342,7 +346,9 @@ export default function OrderDetailPage() {
             {order.currentQuote ? (
               <>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">{validationAttribute('baseFare')}</span>
+                  <span className="text-muted-foreground">
+                    {validationAttribute('baseFare', true)}
+                  </span>
                   <span className="font-medium">
                     {order.currencyCode} {order.currentQuote.baseFare?.toFixed(2) || '0.00'}
                   </span>
@@ -350,7 +356,7 @@ export default function OrderDetailPage() {
                 {order.currentQuote.distanceFee && order.currentQuote.distanceFee > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      {validationAttribute('distanceFee')}
+                      {validationAttribute('distanceFee', true)}
                     </span>
                     <span className="font-medium">
                       {order.currencyCode} {order.currentQuote.distanceFee.toFixed(2)}
@@ -359,7 +365,9 @@ export default function OrderDetailPage() {
                 )}
                 {order.currentQuote.timeFee && order.currentQuote.timeFee > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{validationAttribute('timeFee')}</span>
+                    <span className="text-muted-foreground">
+                      {validationAttribute('timeFee', true)}
+                    </span>
                     <span className="font-medium">
                       {order.currencyCode} {order.currentQuote.timeFee.toFixed(2)}
                     </span>
@@ -368,7 +376,7 @@ export default function OrderDetailPage() {
                 {order.currentQuote.surcharge && order.currentQuote.surcharge > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      {validationAttribute('surcharge')}
+                      {validationAttribute('surcharge', true)}
                     </span>
                     <span className="font-medium">
                       {order.currencyCode} {order.currentQuote.surcharge.toFixed(2)}
@@ -377,7 +385,7 @@ export default function OrderDetailPage() {
                 )}
                 <div className="border-t pt-2">
                   <div className="flex justify-between text-lg font-bold">
-                    <span>{validationAttribute('total')}</span>
+                    <span>{validationAttribute('total', true)}</span>
                     <span>
                       {order.currencyCode} {order.currentQuote.total?.toFixed(2) || '0.00'}
                     </span>
@@ -432,13 +440,15 @@ export default function OrderDetailPage() {
                   <p className="font-medium">
                     {order.driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}
                   </p>
-                  <p className="text-muted-foreground text-sm">{validationAttribute('name')}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {validationAttribute('name', true)}
+                  </p>
                 </div>
               </div>
               {order.driver.licensePlateNumber && (
                 <div>
                   <p className="text-muted-foreground text-sm">
-                    {validationAttribute('licensePlate')}
+                    {validationAttribute('licensePlate', true)}
                   </p>
                   <p className="font-medium">{order.driver.licensePlateNumber}</p>
                 </div>

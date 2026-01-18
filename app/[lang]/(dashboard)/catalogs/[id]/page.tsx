@@ -102,17 +102,17 @@ export default function CatalogDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('code')}</span>
+              <span className="text-muted-foreground">{validationAttribute('code', true)}</span>
               <Badge variant="outline">{catalog.code}</Badge>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('name')}</span>
+              <span className="text-muted-foreground">{validationAttribute('name', true)}</span>
               <span className="font-medium">{catalog.name}</span>
             </div>
             {catalog.description && (
               <div>
                 <p className="text-muted-foreground text-sm">
-                  {validationAttribute('description')}
+                  {validationAttribute('description', true)}
                 </p>
                 <p className="mt-1">{catalog.description}</p>
               </div>
@@ -166,9 +166,9 @@ export default function CatalogDetailPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{validationAttribute('code')}</TableHead>
-                  <TableHead>{validationAttribute('name')}</TableHead>
-                  <TableHead>{validationAttribute('order')}</TableHead>
+                  <TableHead>{validationAttribute('code', true)}</TableHead>
+                  <TableHead>{validationAttribute('name', true)}</TableHead>
+                  <TableHead>{validationAttribute('order', true)}</TableHead>
                   <TableHead className="w-20">
                     {t('common:actions', { defaultValue: 'Actions' })}
                   </TableHead>

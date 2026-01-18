@@ -106,9 +106,9 @@ export default function CatalogsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{validationAttribute('code')}</TableHead>
-                  <TableHead>{validationAttribute('name')}</TableHead>
-                  <TableHead>{validationAttribute('elements')}</TableHead>
+                  <TableHead>{validationAttribute('code', true)}</TableHead>
+                  <TableHead>{validationAttribute('name', true)}</TableHead>
+                  <TableHead>{validationAttribute('elements', true)}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>

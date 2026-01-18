@@ -119,15 +119,15 @@ export default function DriverDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('name')}</span>
+              <span className="text-muted-foreground">{validationAttribute('name', true)}</span>
               <span className="font-medium">{driver.user?.name || '-'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('email')}</span>
+              <span className="text-muted-foreground">{validationAttribute('email', true)}</span>
               <span className="font-medium">{driver.user?.email || '-'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('phone')}</span>
+              <span className="text-muted-foreground">{validationAttribute('phone', true)}</span>
               <span className="font-medium">{driver.user?.phone || '-'}</span>
             </div>
             {driver.userId && (
@@ -151,11 +151,15 @@ export default function DriverDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('licenseNumber')}</span>
+              <span className="text-muted-foreground">
+                {validationAttribute('licenseNumber', true)}
+              </span>
               <span className="font-medium">{driver.licenseNumber || '-'}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{validationAttribute('expirationDate')}</span>
+              <span className="text-muted-foreground">
+                {validationAttribute('expirationDate', true)}
+              </span>
               <div className="flex items-center gap-2">
                 <span className="font-medium">{formatDate(driver.licenseExpirationDate)}</span>
                 {expired && (
@@ -177,7 +181,9 @@ export default function DriverDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('licensePlate')}</span>
+              <span className="text-muted-foreground">
+                {validationAttribute('licensePlate', true)}
+              </span>
               <span className="font-medium">{driver.licensePlateNumber || '-'}</span>
             </div>
           </CardContent>

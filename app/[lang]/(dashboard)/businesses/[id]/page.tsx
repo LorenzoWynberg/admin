@@ -105,11 +105,11 @@ export default function BusinessDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('name')}</span>
+              <span className="text-muted-foreground">{validationAttribute('name', true)}</span>
               <span className="font-medium">{business.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('type')}</span>
+              <span className="text-muted-foreground">{validationAttribute('type', true)}</span>
               <span className="font-medium">{business.typeName || '-'}</span>
             </div>
             <div className="flex items-center justify-between">
@@ -131,18 +131,20 @@ export default function BusinessDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              {validationAttribute('owner')}
+              {validationAttribute('owner', true)}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {business.user ? (
               <>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">{validationAttribute('name')}</span>
+                  <span className="text-muted-foreground">{validationAttribute('name', true)}</span>
                   <span className="font-medium">{business.user.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">{validationAttribute('email')}</span>
+                  <span className="text-muted-foreground">
+                    {validationAttribute('email', true)}
+                  </span>
                   <span className="font-medium">{business.user.email || '-'}</span>
                 </div>
                 <Button

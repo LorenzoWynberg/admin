@@ -138,7 +138,7 @@ export default function QuoteDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('version')}</span>
+              <span className="text-muted-foreground">{validationAttribute('version', true)}</span>
               <span className="font-medium">{quote.version || 1}</span>
             </div>
             {quote.orderId && (
@@ -179,7 +179,9 @@ export default function QuoteDetailPage() {
             )}
             {quote.notes && (
               <div className="border-t pt-4">
-                <p className="text-muted-foreground text-sm">{validationAttribute('notes')}</p>
+                <p className="text-muted-foreground text-sm">
+                  {validationAttribute('notes', true)}
+                </p>
                 <p className="mt-1">{quote.notes}</p>
               </div>
             )}
@@ -196,50 +198,60 @@ export default function QuoteDetailPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('baseFare')}</span>
+              <span className="text-muted-foreground">{validationAttribute('baseFare', true)}</span>
               <span className="font-medium">{formatCurrency(quote.baseFare)}</span>
             </div>
             {quote.distanceKm != null && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{validationAttribute('distance')}</span>
+                <span className="text-muted-foreground">
+                  {validationAttribute('distance', true)}
+                </span>
                 <span className="font-medium">{quote.distanceKm.toFixed(1)} km</span>
               </div>
             )}
             {quote.distanceFee != null && quote.distanceFee > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{validationAttribute('distanceFee')}</span>
+                <span className="text-muted-foreground">
+                  {validationAttribute('distanceFee', true)}
+                </span>
                 <span className="font-medium">{formatCurrency(quote.distanceFee)}</span>
               </div>
             )}
             {quote.timeFee != null && quote.timeFee > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{validationAttribute('timeFee')}</span>
+                <span className="text-muted-foreground">
+                  {validationAttribute('timeFee', true)}
+                </span>
                 <span className="font-medium">{formatCurrency(quote.timeFee)}</span>
               </div>
             )}
             {quote.surcharge != null && quote.surcharge > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{validationAttribute('surcharge')}</span>
+                <span className="text-muted-foreground">
+                  {validationAttribute('surcharge', true)}
+                </span>
                 <span className="font-medium">{formatCurrency(quote.surcharge)}</span>
               </div>
             )}
             {quote.discountRate != null && quote.discountRate > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{validationAttribute('discount')}</span>
+                <span className="text-muted-foreground">
+                  {validationAttribute('discount', true)}
+                </span>
                 <span className="font-medium text-green-600">-{quote.discountRate}%</span>
               </div>
             )}
             {quote.taxRate != null && quote.taxRate > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  {validationAttribute('tax')} ({quote.taxRate}%)
+                  {validationAttribute('tax', true)} ({quote.taxRate}%)
                 </span>
                 <span className="font-medium">{formatCurrency(quote.taxTotal)}</span>
               </div>
             )}
             <div className="border-t pt-3">
               <div className="flex justify-between text-lg font-bold">
-                <span>{validationAttribute('total')}</span>
+                <span>{validationAttribute('total', true)}</span>
                 <span>{formatCurrency(quote.total)}</span>
               </div>
             </div>

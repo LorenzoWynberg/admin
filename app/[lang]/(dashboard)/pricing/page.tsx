@@ -187,12 +187,12 @@ export default function PricingPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{validationAttribute('name')}</TableHead>
-                  <TableHead>{validationAttribute('baseFare')}</TableHead>
-                  <TableHead>{validationAttribute('taxRate')}</TableHead>
-                  <TableHead>{validationAttribute('version')}</TableHead>
-                  <TableHead>{validationAttribute('tiers')}</TableHead>
-                  <TableHead>{validationAttribute('status')}</TableHead>
+                  <TableHead>{validationAttribute('name', true)}</TableHead>
+                  <TableHead>{validationAttribute('baseFare', true)}</TableHead>
+                  <TableHead>{validationAttribute('taxRate', true)}</TableHead>
+                  <TableHead>{validationAttribute('version', true)}</TableHead>
+                  <TableHead>{validationAttribute('tiers', true)}</TableHead>
+                  <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead className="w-[50px]">{t('common:actions')}</TableHead>
                 </TableRow>
               </TableHeader>

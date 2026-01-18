@@ -2,7 +2,7 @@ import i18next from '@/config/i18next';
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-export const validationAttribute = (key: string, toUpper = false) => {
+export const validationAttribute = (key: string, toUpper = true) => {
   const translation = i18next.t(`validation:attributes.${key}`);
   return toUpper ? capitalize(translation) : translation;
 };
@@ -13,7 +13,7 @@ export const validationMessage = (
   extra?: Record<string, unknown>
 ) =>
   i18next.t(`validation:${key}`, {
-    ...(attributeKey ? { attribute: validationAttribute(attributeKey) } : {}),
+    ...(attributeKey ? { attribute: validationAttribute(attributeKey, false) } : {}),
     ...(extra ?? {}),
   });
 

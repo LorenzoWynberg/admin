@@ -112,10 +112,10 @@ export default function AddressesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{validationAttribute('label')}</TableHead>
+                  <TableHead>{validationAttribute('label', true)}</TableHead>
                   <TableHead>{t('models:address_one', { defaultValue: 'Address' })}</TableHead>
-                  <TableHead>{validationAttribute('city')}</TableHead>
-                  <TableHead>{validationAttribute('type')}</TableHead>
+                  <TableHead>{validationAttribute('city', true)}</TableHead>
+                  <TableHead>{validationAttribute('type', true)}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>

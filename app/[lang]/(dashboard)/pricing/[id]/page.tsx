@@ -183,15 +183,15 @@ export default function PricingRuleDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('baseFare')}</span>
+              <span className="text-muted-foreground">{validationAttribute('baseFare', true)}</span>
               <span className="font-medium">{formatCurrency(rule.baseFare)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('taxRate')}</span>
+              <span className="text-muted-foreground">{validationAttribute('taxRate', true)}</span>
               <span className="font-medium">{formatPercent(rule.taxRate)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('version')}</span>
+              <span className="text-muted-foreground">{validationAttribute('version', true)}</span>
               <span className="font-medium">v{rule.version}</span>
             </div>
             {rule.effectiveFrom && (
@@ -201,16 +201,22 @@ export default function PricingRuleDetailPage() {
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('createdAt')}</span>
+              <span className="text-muted-foreground">
+                {validationAttribute('createdAt', true)}
+              </span>
               <span className="font-medium">{formatDate(rule.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('updatedAt')}</span>
+              <span className="text-muted-foreground">
+                {validationAttribute('updatedAt', true)}
+              </span>
               <span className="font-medium">{formatDate(rule.updatedAt)}</span>
             </div>
             {rule.notes && (
               <div className="border-t pt-4">
-                <p className="text-muted-foreground text-sm">{validationAttribute('notes')}</p>
+                <p className="text-muted-foreground text-sm">
+                  {validationAttribute('notes', true)}
+                </p>
                 <p className="mt-1">{rule.notes}</p>
               </div>
             )}
@@ -220,17 +226,17 @@ export default function PricingRuleDetailPage() {
         {/* Tiers */}
         <Card>
           <CardHeader>
-            <CardTitle>{validationAttribute('tiers')}</CardTitle>
+            <CardTitle>{validationAttribute('tiers', true)}</CardTitle>
           </CardHeader>
           <CardContent>
             {rule.tiers && rule.tiers.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{validationAttribute('minKm')}</TableHead>
-                    <TableHead>{validationAttribute('maxKm')}</TableHead>
-                    <TableHead>{validationAttribute('flatFee')}</TableHead>
-                    <TableHead>{validationAttribute('perKmRate')}</TableHead>
+                    <TableHead>{validationAttribute('minKm', true)}</TableHead>
+                    <TableHead>{validationAttribute('maxKm', true)}</TableHead>
+                    <TableHead>{validationAttribute('flatFee', true)}</TableHead>
+                    <TableHead>{validationAttribute('perKmRate', true)}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

@@ -132,7 +132,7 @@ export default function CreatePricingRulePage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{validationAttribute('name')}</FormLabel>
+                    <FormLabel>{validationAttribute('name', true)}</FormLabel>
                     <FormControl>
                       <Input placeholder={t('name_placeholder')} {...field} />
                     </FormControl>
@@ -147,7 +147,7 @@ export default function CreatePricingRulePage() {
                   name="baseFare"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{validationAttribute('baseFare')}</FormLabel>
+                      <FormLabel>{validationAttribute('baseFare', true)}</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" min="0" {...field} />
                       </FormControl>
@@ -162,7 +162,7 @@ export default function CreatePricingRulePage() {
                   name="taxRate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{validationAttribute('taxRate')} (%)</FormLabel>
+                      <FormLabel>{validationAttribute('taxRate', true)} (%)</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -220,7 +220,7 @@ export default function CreatePricingRulePage() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{validationAttribute('notes')}</FormLabel>
+                    <FormLabel>{validationAttribute('notes', true)}</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder={t('notes_placeholder')}
@@ -255,7 +255,7 @@ export default function CreatePricingRulePage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>{validationAttribute('tiers')}</CardTitle>
+                <CardTitle>{validationAttribute('tiers', true)}</CardTitle>
                 <p className="text-muted-foreground text-sm">{t('tiers_help')}</p>
               </div>
               <Button
@@ -284,7 +284,7 @@ export default function CreatePricingRulePage() {
                     name={`tiers.${index}.minKm`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>{validationAttribute('minKm')}</FormLabel>
+                        <FormLabel>{validationAttribute('minKm', true)}</FormLabel>
                         <FormControl>
                           <Input type="number" step="0.1" min="0" {...field} />
                         </FormControl>
@@ -298,7 +298,7 @@ export default function CreatePricingRulePage() {
                     name={`tiers.${index}.maxKm`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>{validationAttribute('maxKm')}</FormLabel>
+                        <FormLabel>{validationAttribute('maxKm', true)}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -322,7 +322,7 @@ export default function CreatePricingRulePage() {
                     name={`tiers.${index}.flatFee`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>{validationAttribute('flatFee')}</FormLabel>
+                        <FormLabel>{validationAttribute('flatFee', true)}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -345,7 +345,7 @@ export default function CreatePricingRulePage() {
                     name={`tiers.${index}.perKmRate`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>{validationAttribute('perKmRate')}</FormLabel>
+                        <FormLabel>{validationAttribute('perKmRate', true)}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"

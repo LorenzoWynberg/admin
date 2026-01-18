@@ -123,7 +123,9 @@ export default function UserDetailPage() {
                 <p className="font-medium">
                   {user.email || t('users:detail.not_provided', { defaultValue: 'Not provided' })}
                 </p>
-                <p className="text-muted-foreground text-sm">{validationAttribute('email')}</p>
+                <p className="text-muted-foreground text-sm">
+                  {validationAttribute('email', true)}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -132,7 +134,9 @@ export default function UserDetailPage() {
                 <p className="font-medium">
                   {user.phone || t('users:detail.not_provided', { defaultValue: 'Not provided' })}
                 </p>
-                <p className="text-muted-foreground text-sm">{validationAttribute('phone')}</p>
+                <p className="text-muted-foreground text-sm">
+                  {validationAttribute('phone', true)}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -156,7 +160,7 @@ export default function UserDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('sex')}</span>
+              <span className="text-muted-foreground">{validationAttribute('sex', true)}</span>
               <span className="font-medium">{user.sexName || '-'}</span>
             </div>
             <div className="flex justify-between">

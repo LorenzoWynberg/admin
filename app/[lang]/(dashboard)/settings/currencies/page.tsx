@@ -206,7 +206,7 @@ export default function CurrencySettingsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{validationAttribute('code', true)}</TableHead>
-                  <TableHead>{validationAttribute('name')}</TableHead>
+                  <TableHead>{validationAttribute('name', true)}</TableHead>
                   <TableHead>{t('common:symbol', { defaultValue: 'Symbol' })}</TableHead>
                   <TableHead>
                     {t('common:exchange_rate', { defaultValue: 'Exchange Rate' })}

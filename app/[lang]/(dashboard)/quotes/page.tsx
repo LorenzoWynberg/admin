@@ -159,10 +159,10 @@ export default function QuotesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{validationAttribute('id')}</TableHead>
+                  <TableHead>{validationAttribute('id', true)}</TableHead>
                   <TableHead>{t('models:order_one', { defaultValue: 'Order' })}</TableHead>
                   <TableHead>{validationAttribute('status', true)}</TableHead>
-                  <TableHead>{validationAttribute('total')}</TableHead>
+                  <TableHead>{validationAttribute('total', true)}</TableHead>
                   <TableHead>{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>

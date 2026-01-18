@@ -170,7 +170,7 @@ export default function OrdersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{validationAttribute('id')}</TableHead>
+                  <TableHead>{validationAttribute('id', true)}</TableHead>
                   <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>

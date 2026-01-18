@@ -168,11 +168,11 @@ export function ElementEditDialog({
               name={`name.${selectedLang}`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{validationAttribute('name')}</FormLabel>
+                  <FormLabel>{validationAttribute('name', true)}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder={`${validationAttribute('name')} (${languageLabels[selectedLang]})`}
+                      placeholder={`${validationAttribute('name', true)} (${languageLabels[selectedLang]})`}
                     />
                   </FormControl>
                   <FormMessage />

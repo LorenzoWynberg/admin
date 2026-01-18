@@ -169,9 +169,9 @@ export default function UsersPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('models:user_one', { defaultValue: 'User' })}</TableHead>
-                  <TableHead>{validationAttribute('email')}</TableHead>
-                  <TableHead>{validationAttribute('role')}</TableHead>
-                  <TableHead>{validationAttribute('phone')}</TableHead>
+                  <TableHead>{validationAttribute('email', true)}</TableHead>
+                  <TableHead>{validationAttribute('role', true)}</TableHead>
+                  <TableHead>{validationAttribute('phone', true)}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>

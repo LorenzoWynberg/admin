@@ -117,9 +117,9 @@ export default function DriversPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('models:driver_one', { defaultValue: 'Driver' })}</TableHead>
-                  <TableHead>{validationAttribute('licenseNumber')}</TableHead>
-                  <TableHead>{validationAttribute('licensePlate')}</TableHead>
-                  <TableHead>{validationAttribute('licenseExpires')}</TableHead>
+                  <TableHead>{validationAttribute('licenseNumber', true)}</TableHead>
+                  <TableHead>{validationAttribute('licensePlate', true)}</TableHead>
+                  <TableHead>{validationAttribute('licenseExpires', true)}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>
