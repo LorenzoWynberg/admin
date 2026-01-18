@@ -33,7 +33,7 @@ export const DriverService = {
   },
 
   async update(id: number, data: UpdateDriverData): Promise<DriverData> {
-    const response = await api.patch<Single<DriverData>>(`/drivers/${id}`, { body: data });
+    const response = await api.patch<Single<DriverData>>(`/drivers/${id}`, data);
     return response.item;
   },
 

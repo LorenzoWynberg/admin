@@ -33,7 +33,7 @@ export const BusinessService = {
   },
 
   async update(id: number, data: UpdateBusinessData): Promise<BusinessData> {
-    const response = await api.patch<Single<BusinessData>>(`/businesses/${id}`, { body: data });
+    const response = await api.patch<Single<BusinessData>>(`/businesses/${id}`, data);
     return response.item;
   },
 

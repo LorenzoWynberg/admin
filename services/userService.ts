@@ -45,7 +45,7 @@ export const UserService = {
    * Create a new user
    */
   async create(data: StoreUserData): Promise<UserData> {
-    const response = await api.post<Single<UserData>>('/users', { body: data });
+    const response = await api.post<Single<UserData>>('/users', data);
     return response.item;
   },
 
@@ -53,7 +53,7 @@ export const UserService = {
    * Update a user
    */
   async update(id: number, data: UpdateUserData): Promise<UserData> {
-    const response = await api.patch<Single<UserData>>(`/users/${id}`, { body: data });
+    const response = await api.patch<Single<UserData>>(`/users/${id}`, data);
     return response.item;
   },
 

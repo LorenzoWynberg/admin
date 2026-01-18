@@ -46,7 +46,7 @@ export const QuoteService = {
    * Create a new quote for an order
    */
   async create(data: StoreQuoteData): Promise<QuoteData> {
-    const response = await api.post<Single<QuoteData>>('/quotes', { body: data });
+    const response = await api.post<Single<QuoteData>>('/quotes', data);
     return response.item;
   },
 
@@ -54,7 +54,7 @@ export const QuoteService = {
    * Update a quote (only draft quotes can be updated)
    */
   async update(id: number, data: Partial<StoreQuoteData>): Promise<QuoteData> {
-    const response = await api.patch<Single<QuoteData>>(`/quotes/${id}`, { body: data });
+    const response = await api.patch<Single<QuoteData>>(`/quotes/${id}`, data);
     return response.item;
   },
 

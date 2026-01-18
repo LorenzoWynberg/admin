@@ -28,12 +28,4 @@ export const CurrencyService = {
     const response = await api.patch<Single<CurrencyData>>(`/currencies/${code}`, data);
     return response.item;
   },
-
-  /**
-   * Set a currency as the base currency
-   */
-  async setBase(code: string): Promise<CurrencyData> {
-    const response = await api.post<Single<CurrencyData>>(`/currencies/${code}/set-base`);
-    return response.item;
-  },
 };

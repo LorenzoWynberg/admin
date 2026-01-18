@@ -45,6 +45,6 @@ export const ExchangeRateService = {
    * Manually trigger exchange rate sync
    */
   async sync(params: SyncParams = {}): Promise<SyncResult> {
-    return api.post<SyncResult>('/exchange-rates/sync', { body: params });
+    return api.post<SyncResult>('/exchange-rates/sync', params);
   },
 };

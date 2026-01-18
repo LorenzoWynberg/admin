@@ -26,23 +26,3 @@ export function useUpdateCurrency() {
     },
   });
 }
-
-export function useSetBaseCurrency() {
-  const queryClient = useQueryClient();
-  const { t } = useTranslation();
-
-  return useMutation({
-    mutationFn: (code: string) => CurrencyService.setBase(code),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currencies'] });
-      toast.success(t('common:base_currency_updated', { defaultValue: 'Base currency updated' }));
-    },
-    onError: (error) => {
-      if (isApiError(error)) {
-        toast.error(error.message);
-      } else {
-        toast.error(t('common:error'));
-      }
-    },
-  });
-}

@@ -1,16 +1,6 @@
 'use client';
 
 import {
-  AlertDialogDescription,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogCancel,
-  AlertDialogAction,
-  AlertDialogTitle,
-  AlertDialog,
-} from '@/components/ui/alert-dialog';
-import {
   SelectTrigger,
   SelectContent,
   SelectValue,
@@ -44,7 +34,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useCurrencyList, useUpdateCurrency, useSetBaseCurrency } from '@/hooks/currencies';
+import { useCurrencyList, useUpdateCurrency } from '@/hooks/currencies';
 import { useSyncExchangeRates } from '@/hooks/exchange-rates';
 
 type CurrencyData = App.Data.Currency.CurrencyData;
@@ -68,7 +58,6 @@ export default function CurrencySettingsPage() {
   const router = useRouter();
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [baseDialogOpen, setBaseDialogOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyData | null>(null);
   const [editForm, setEditForm] = useState({
     roundingMode: 'nearest',
@@ -77,7 +66,6 @@ export default function CurrencySettingsPage() {
 
   const { data, isLoading, error } = useCurrencyList();
   const updateMutation = useUpdateCurrency();
-  const setBaseMutation = useSetBaseCurrency();
   const syncMutation = useSyncExchangeRates();
 
   const currencies = data?.items || [];
@@ -121,16 +109,6 @@ export default function CurrencySettingsPage() {
         },
       }
     );
-  };
-
-  const handleSetBase = () => {
-    if (!selectedCurrency?.code) return;
-    setBaseMutation.mutate(selectedCurrency.code, {
-      onSuccess: () => {
-        setBaseDialogOpen(false);
-        setSelectedCurrency(null);
-      },
-    });
   };
 
   return (
@@ -306,27 +284,13 @@ export default function CurrencySettingsPage() {
                       />
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleOpenEditDialog(currency)}
-                        >
-                          {t('common:edit', { defaultValue: 'Edit' })}
-                        </Button>
-                        {!currency.isBase && currency.isEnabled && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedCurrency(currency);
-                              setBaseDialogOpen(true);
-                            }}
-                          >
-                            {t('common:set_base', { defaultValue: 'Set Base' })}
-                          </Button>
-                        )}
-                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenEditDialog(currency)}
+                      >
+                        {t('common:edit', { defaultValue: 'Edit' })}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -410,30 +374,6 @@ export default function CurrencySettingsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Set Base Currency Dialog */}
-      <AlertDialog open={baseDialogOpen} onOpenChange={setBaseDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t('common:change_base_currency', { defaultValue: 'Change Base Currency' })}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('common:change_base_currency_warning', {
-                defaultValue:
-                  'Changing the base currency is a significant operation. All pricing rules will need to be reconfigured. Are you sure you want to set {currency} as the new base currency?',
-                currency: selectedCurrency?.code,
-              })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSetBase} disabled={setBaseMutation.isPending}>
-              {t('common:confirm', { defaultValue: 'Confirm' })}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
