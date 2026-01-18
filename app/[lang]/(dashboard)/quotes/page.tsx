@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useQuoteList } from '@/hooks/quotes';
+import { useCurrencyList } from '@/hooks/currencies';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -44,9 +45,10 @@ function formatDate(dateString?: string | null): string {
   }
 }
 
-function formatCurrency(amount?: number | null): string {
+function formatCurrency(amount?: number | null, currencyCode?: string): string {
   if (amount == null) return '-';
-  return amount.toFixed(2);
+  const formatted = amount.toFixed(2);
+  return currencyCode ? `${currencyCode} ${formatted}` : formatted;
 }
 
 export default function QuotesPage() {
@@ -62,9 +64,12 @@ export default function QuotesPage() {
     status: status === 'all' ? undefined : status,
     search: search || undefined,
   });
+  const { data: currencies } = useCurrencyList();
 
   const quotes = data?.items || [];
   const meta = data?.meta;
+  const baseCurrency = currencies?.items?.find((c) => c.isBase);
+  const currencyCode = baseCurrency?.code || 'CRC';
 
   if (!ready) {
     return null;
@@ -160,7 +165,9 @@ export default function QuotesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{validationAttribute('id', true)}</TableHead>
-                  <TableHead>{t('models:order_one', { defaultValue: 'Order' })}</TableHead>
+                  <TableHead>
+                    {capitalize(t('models:order_one', { defaultValue: 'Order' }))}
+                  </TableHead>
                   <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{validationAttribute('total', true)}</TableHead>
                   <TableHead>{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</TableHead>
@@ -197,7 +204,7 @@ export default function QuotesPage() {
                     <TableCell>
                       <QuoteStatusBadge status={quote.status as QuoteStatus} />
                     </TableCell>
-                    <TableCell>{formatCurrency(quote.total)}</TableCell>
+                    <TableCell>{formatCurrency(quote.total, currencyCode)}</TableCell>
                     <TableCell>{formatDate(quote.validUntil)}</TableCell>
                     <TableCell>{formatDate(quote.createdAt)}</TableCell>
                   </TableRow>

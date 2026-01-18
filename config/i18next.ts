@@ -54,7 +54,15 @@ export async function ensureI18nInitialized(pathname?: string) {
       ns: Array.from(namespaces),
       defaultNS: 'common',
       preload: [lng],
-      interpolation: { escapeValue: false },
+      interpolation: {
+        escapeValue: false,
+        format: (value, format) => {
+          if (format === 'capitalize' && typeof value === 'string') {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+          }
+          return value;
+        },
+      },
       detection: {
         order: ['path', 'cookie', 'navigator'],
         lookupFromPathIndex: 0,

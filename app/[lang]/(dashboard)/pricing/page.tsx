@@ -188,7 +188,7 @@ export default function PricingPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{validationAttribute('name', true)}</TableHead>
-                  <TableHead>{validationAttribute('baseFare', true)}</TableHead>
+                  <TableHead>{validationAttribute('serviceFee', true)}</TableHead>
                   <TableHead>{validationAttribute('taxRate', true)}</TableHead>
                   <TableHead>{validationAttribute('version', true)}</TableHead>
                   <TableHead>{validationAttribute('tiers', true)}</TableHead>
@@ -204,7 +204,7 @@ export default function PricingPage() {
                     onClick={() => router.push(`/pricing/${rule.id}`)}
                   >
                     <TableCell className="font-medium">{rule.name}</TableCell>
-                    <TableCell>{formatCurrency(rule.baseFare)}</TableCell>
+                    <TableCell>{formatCurrency(rule.serviceFee)}</TableCell>
                     <TableCell>{formatPercent(rule.taxRate)}</TableCell>
                     <TableCell>v{rule.version}</TableCell>
                     <TableCell>{rule.tiers?.length || 0}</TableCell>

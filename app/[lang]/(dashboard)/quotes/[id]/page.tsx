@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { useQuote, useSendQuote, useDeleteQuote } from '@/hooks/quotes';
+import { useCurrencyList } from '@/hooks/currencies';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, FileText, DollarSign, Calendar, Send, Trash2, Package } from 'lucide-react';
 
@@ -27,9 +28,10 @@ function formatDate(dateString?: string | null): string {
   }
 }
 
-function formatCurrency(amount?: number | null): string {
+function formatCurrency(amount?: number | null, currencyCode?: string): string {
   if (amount == null) return '-';
-  return amount.toFixed(2);
+  const formatted = amount.toFixed(2);
+  return currencyCode ? `${currencyCode} ${formatted}` : formatted;
 }
 
 export default function QuoteDetailPage() {
@@ -39,6 +41,7 @@ export default function QuoteDetailPage() {
   const quoteId = Number(params.id);
 
   const { data: quote, isLoading, error } = useQuote(quoteId);
+  const { data: currencies } = useCurrencyList();
   const sendQuote = useSendQuote();
   const deleteQuote = useDeleteQuote();
 
@@ -90,6 +93,8 @@ export default function QuoteDetailPage() {
   const isDraft = quote.status === 'draft';
   const canSend = isDraft;
   const canDelete = isDraft;
+  const baseCurrency = currencies?.items?.find((c) => c.isBase);
+  const currencyCode = baseCurrency?.code || 'CRC';
 
   return (
     <div className="space-y-6">
@@ -144,7 +149,7 @@ export default function QuoteDetailPage() {
             {quote.orderId && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  {t('models:order_one', { defaultValue: 'Order' })}
+                  {capitalize(t('models:order_one', { defaultValue: 'Order' }))}
                 </span>
                 <Button
                   variant="link"
@@ -199,7 +204,7 @@ export default function QuoteDetailPage() {
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">{validationAttribute('baseFare', true)}</span>
-              <span className="font-medium">{formatCurrency(quote.baseFare)}</span>
+              <span className="font-medium">{formatCurrency(quote.baseFare, currencyCode)}</span>
             </div>
             {quote.distanceKm != null && (
               <div className="flex justify-between">
@@ -214,7 +219,9 @@ export default function QuoteDetailPage() {
                 <span className="text-muted-foreground">
                   {validationAttribute('distanceFee', true)}
                 </span>
-                <span className="font-medium">{formatCurrency(quote.distanceFee)}</span>
+                <span className="font-medium">
+                  {formatCurrency(quote.distanceFee, currencyCode)}
+                </span>
               </div>
             )}
             {quote.timeFee != null && quote.timeFee > 0 && (
@@ -222,7 +229,7 @@ export default function QuoteDetailPage() {
                 <span className="text-muted-foreground">
                   {validationAttribute('timeFee', true)}
                 </span>
-                <span className="font-medium">{formatCurrency(quote.timeFee)}</span>
+                <span className="font-medium">{formatCurrency(quote.timeFee, currencyCode)}</span>
               </div>
             )}
             {quote.surcharge != null && quote.surcharge > 0 && (
@@ -230,7 +237,7 @@ export default function QuoteDetailPage() {
                 <span className="text-muted-foreground">
                   {validationAttribute('surcharge', true)}
                 </span>
-                <span className="font-medium">{formatCurrency(quote.surcharge)}</span>
+                <span className="font-medium">{formatCurrency(quote.surcharge, currencyCode)}</span>
               </div>
             )}
             {quote.discountRate != null && quote.discountRate > 0 && (
@@ -246,13 +253,13 @@ export default function QuoteDetailPage() {
                 <span className="text-muted-foreground">
                   {validationAttribute('tax', true)} ({quote.taxRate}%)
                 </span>
-                <span className="font-medium">{formatCurrency(quote.taxTotal)}</span>
+                <span className="font-medium">{formatCurrency(quote.taxTotal, currencyCode)}</span>
               </div>
             )}
             <div className="border-t pt-3">
               <div className="flex justify-between text-lg font-bold">
                 <span>{validationAttribute('total', true)}</span>
-                <span>{formatCurrency(quote.total)}</span>
+                <span>{formatCurrency(quote.total, currencyCode)}</span>
               </div>
             </div>
           </CardContent>
@@ -267,6 +274,17 @@ export default function QuoteDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {quote.order?.fulfilledBefore && (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {t('quotes:detail.fulfilled_before', { defaultValue: 'Requested By' })}
+                  </span>
+                  <span className="font-medium">{formatDate(quote.order.fulfilledBefore)}</span>
+                </div>
+                <div className="border-t" />
+              </>
+            )}
             <div className="flex justify-between">
               <span className="text-muted-foreground">
                 {t('quotes:detail.pickup_proposed', { defaultValue: 'Pickup Proposed' })}
@@ -279,6 +297,7 @@ export default function QuoteDetailPage() {
               </span>
               <span className="font-medium">{formatDate(quote.deliveryProposedFor)}</span>
             </div>
+            <div className="border-t" />
             <div className="flex justify-between">
               <span className="text-muted-foreground">
                 {t('quotes:valid_until', { defaultValue: 'Valid Until' })}

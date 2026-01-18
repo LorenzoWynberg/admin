@@ -183,8 +183,10 @@ export default function PricingRuleDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('baseFare', true)}</span>
-              <span className="font-medium">{formatCurrency(rule.baseFare)}</span>
+              <span className="text-muted-foreground">
+                {validationAttribute('serviceFee', true)}
+              </span>
+              <span className="font-medium">{formatCurrency(rule.serviceFee)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">{validationAttribute('taxRate', true)}</span>

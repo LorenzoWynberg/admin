@@ -18,8 +18,7 @@ interface CalculateParams {
 }
 
 interface CalculateResult {
-  pricingRuleId: number;
-  baseFare: number;
+  serviceFee: number;
   distanceFee: number;
   subtotal: number;
   taxRate: number;
@@ -100,9 +99,7 @@ export const PricingService = {
   async calculate(params: CalculateParams): Promise<CalculateResult> {
     const query = new URLSearchParams();
     query.set('distance_km', String(params.distanceKm));
-    const response = await api.get<Single<CalculateResult>>(
-      `/pricing-rules/calculate?${query.toString()}`
-    );
-    return response.item;
+    // API returns data at root level (not wrapped in item)
+    return api.get<CalculateResult>(`/pricing-rules/calculate?${query.toString()}`);
   },
 };

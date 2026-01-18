@@ -113,7 +113,9 @@ export default function AddressesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{validationAttribute('label', true)}</TableHead>
-                  <TableHead>{t('models:address_one', { defaultValue: 'Address' })}</TableHead>
+                  <TableHead>
+                    {capitalize(t('models:address_one', { defaultValue: 'Address' }))}
+                  </TableHead>
                   <TableHead>{validationAttribute('city', true)}</TableHead>
                   <TableHead>{validationAttribute('type', true)}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
@@ -135,7 +137,9 @@ export default function AddressesPage() {
                     </TableCell>
                     <TableCell>{address.city?.name || '-'}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{address.type}</Badge>
+                      <Badge variant="outline">
+                        {t(`addresses:type.${address.type}`, { defaultValue: address.type })}
+                      </Badge>
                     </TableCell>
                     <TableCell>{formatDate(address.createdAt)}</TableCell>
                   </TableRow>

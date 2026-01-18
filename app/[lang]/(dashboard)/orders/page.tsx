@@ -74,22 +74,13 @@ export default function OrdersPage() {
     return null;
   }
 
-  const quoteModel = t('models:quote', { defaultValue: 'Quote' });
-  const driverModel = t('models:driver', { defaultValue: 'Driver' });
-
   const statusOptions = [
     { value: 'all', label: t('statuses:all', { defaultValue: 'All Statuses' }) },
     { value: 'pending', label: t('statuses:pending', { defaultValue: 'Pending' }) },
-    {
-      value: 'estimated',
-      label: t('statuses:model.estimated', { Model: quoteModel, defaultValue: 'Quote Ready' }),
-    },
+    { value: 'estimated', label: t('statuses:estimated', { defaultValue: 'Estimate Sent' }) },
     { value: 'approved', label: t('statuses:approved', { defaultValue: 'Approved' }) },
     { value: 'denied', label: t('statuses:denied', { defaultValue: 'Denied' }) },
-    {
-      value: 'assigned',
-      label: t('statuses:model.assigned', { Model: driverModel, defaultValue: 'Driver Assigned' }),
-    },
+    { value: 'assigned', label: t('statuses:assigned', { defaultValue: 'Driver Assigned' }) },
     { value: 'picking_up', label: t('statuses:picking_up', { defaultValue: 'Picking Up' }) },
     { value: 'in_transit', label: t('statuses:in_transit', { defaultValue: 'In Transit' }) },
     { value: 'completed', label: t('statuses:completed', { defaultValue: 'Completed' }) },
@@ -183,7 +174,9 @@ export default function OrdersPage() {
                   <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
-                  <TableHead>{t('models:quote_one', { defaultValue: 'Quote' })}</TableHead>
+                  <TableHead>
+                    {capitalize(t('models:quote_one', { defaultValue: 'Quote' }))}
+                  </TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>

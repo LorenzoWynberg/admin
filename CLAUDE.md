@@ -1,3 +1,5 @@
+> **IMPORTANT: Read `docs/strict-rules.md` first.** It contains critical rules that must always be followed.
+
 # Mandados Admin
 
 Next.js 16 admin dashboard with TypeScript, Zustand, React Query, React Hook Form, shadcn/ui.
@@ -12,7 +14,7 @@ npm run typecheck  # 2. Fix type errors
 npm run format     # 3. Format (LAST step)
 ```
 
-Then push immediately. See `../api/docs/strict-rules.md` for all rules.
+Then push immediately. See `docs/strict-rules.md` for all rules.
 
 ---
 
@@ -24,6 +26,22 @@ npm run build      # Production build
 npm run gen:enums  # Regenerate runtime enums from types/generated.d.ts
 npm run check      # Run format:check + lint + typecheck
 ```
+
+---
+
+## Testing
+
+```bash
+npm test              # Run tests
+npm test -- --coverage  # Run tests with coverage report
+```
+
+Tests use Vitest. Test files are in `__tests__/` folders next to source files:
+
+- `lib/api/__tests__/` - API error handling
+- `utils/__tests__/` - Utility functions (form, format, http, lang)
+
+Coverage target: 100% on all tested utility files.
 
 ---
 
@@ -55,12 +73,14 @@ npm run check      # Run format:check + lint + typecheck
 **Never edit `types/generated.d.ts`** - it's auto-generated from backend DTOs.
 
 To sync types from backend:
+
 ```bash
 cp ../api/resources/types/generated.d.ts types/generated.d.ts
 npm run gen:enums
 ```
 
 Runtime enums (for comparisons):
+
 ```typescript
 import { Enums } from '@/data/app-enums';
 if (order.status === Enums.OrderStatus.PENDING) { ... }
@@ -80,5 +100,5 @@ if (order.status === Enums.OrderStatus.PENDING) { ... }
 
 - `docs/architecture.md` - Detailed services, hooks, patterns, API reference
 - `docs/pricing-rules-plan.md` - Pricing system implementation plan
-- `../api/docs/strict-rules.md` - Critical rules
-- `../api/docs/jj-guide.md` - Version control reference
+- `docs/strict-rules.md` - Critical rules
+- `docs/jj-guide.md` - Version control reference

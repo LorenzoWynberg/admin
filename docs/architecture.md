@@ -86,11 +86,11 @@ useLangStore(): {
 import { Auth } from '@/services/authService';
 
 Auth.login({ email, password }); // POST /auth/token → sets token + user
-Auth.logout();                   // DELETE /auth/token → clears state
-Auth.refresh();                  // GET /auth/token/user → refreshes user
-Auth.check();                    // Returns boolean
-Auth.user();                     // Returns UserData | null
-Auth.token();                    // Returns string | null
+Auth.logout(); // DELETE /auth/token → clears state
+Auth.refresh(); // GET /auth/token/user → refreshes user
+Auth.check(); // Returns boolean
+Auth.user(); // Returns UserData | null
+Auth.token(); // Returns string | null
 ```
 
 ### Order Service
@@ -99,10 +99,10 @@ Auth.token();                    // Returns string | null
 import { OrderService } from '@/services/orderService';
 
 OrderService.list({ page, perPage, status, search }); // GET /orders
-OrderService.getById(id);                              // GET /orders/{id}
-OrderService.approve(id);                              // POST /orders/{id}/approve
-OrderService.deny(id);                                 // POST /orders/{id}/deny
-OrderService.destroy(id);                              // DELETE /orders/{id}
+OrderService.getById(id); // GET /orders/{id}
+OrderService.approve(id); // POST /orders/{id}/approve
+OrderService.deny(id); // POST /orders/{id}/deny
+OrderService.destroy(id); // DELETE /orders/{id}
 ```
 
 ### Quote Service
@@ -111,10 +111,10 @@ OrderService.destroy(id);                              // DELETE /orders/{id}
 import { QuoteService } from '@/services/quoteService';
 
 QuoteService.list({ page, perPage, orderId }); // GET /quotes
-QuoteService.getById(id);                       // GET /quotes/{id}
-QuoteService.create(payload);                   // POST /quotes
-QuoteService.update(id, payload);               // PATCH /quotes/{id}
-QuoteService.destroy(id);                       // DELETE /quotes/{id}
+QuoteService.getById(id); // GET /quotes/{id}
+QuoteService.create(payload); // POST /quotes
+QuoteService.update(id, payload); // PATCH /quotes/{id}
+QuoteService.destroy(id); // DELETE /quotes/{id}
 ```
 
 ### User Service
@@ -123,9 +123,9 @@ QuoteService.destroy(id);                       // DELETE /quotes/{id}
 import { UserService } from '@/services/userService';
 
 UserService.list({ page, perPage, role, search }); // GET /users
-UserService.getById(id);                            // GET /users/{id}
-UserService.update(id, payload);                    // PATCH /users/{id}
-UserService.destroy(id);                            // DELETE /users/{id}
+UserService.getById(id); // GET /users/{id}
+UserService.update(id, payload); // PATCH /users/{id}
+UserService.destroy(id); // DELETE /users/{id}
 ```
 
 ### Other Services
@@ -190,10 +190,10 @@ try {
   await api.post('/orders', data);
 } catch (err) {
   if (isApiError(err)) {
-    err.status;   // HTTP status code
-    err.message;  // Error message
-    err.errors;   // Field validation errors: { field: ['error1', 'error2'] }
-    err.details;  // Additional details
+    err.status; // HTTP status code
+    err.message; // Error message
+    err.errors; // Field validation errors: { field: ['error1', 'error2'] }
+    err.details; // Additional details
   }
 }
 ```
@@ -234,13 +234,7 @@ Each resource has its own hooks directory with:
 ### Orders
 
 ```typescript
-import {
-  useOrderList,
-  useOrder,
-  useApproveOrder,
-  useDenyOrder,
-  useDeleteOrder,
-} from '@/hooks/orders';
+import { useOrderList, useOrder, useDeleteOrder } from '@/hooks/orders';
 
 // List with filters
 const { data, isLoading, error } = useOrderList({
@@ -254,24 +248,42 @@ const { data, isLoading, error } = useOrderList({
 const { data: order, isLoading } = useOrder({ id: 123 });
 
 // Mutations
-const approveOrder = useApproveOrder();
-approveOrder.mutate(orderId);
+const deleteOrder = useDeleteOrder();
+deleteOrder.mutate(orderId);
 ```
 
 ### Other Hooks
 
 ```typescript
 // Quotes
-import { useQuoteList, useQuote, useCreateQuote, useUpdateQuote, useDeleteQuote } from '@/hooks/quotes';
+import {
+  useQuoteList,
+  useQuote,
+  useCreateQuote,
+  useUpdateQuote,
+  useDeleteQuote,
+} from '@/hooks/quotes';
 
 // Users
 import { useUserList, useUser, useUpdateUser, useDeleteUser } from '@/hooks/users';
 
 // Drivers
-import { useDriverList, useDriver, useApproveDriver, useUpdateDriver, useDeleteDriver } from '@/hooks/drivers';
+import {
+  useDriverList,
+  useDriver,
+  useApproveDriver,
+  useUpdateDriver,
+  useDeleteDriver,
+} from '@/hooks/drivers';
 
 // Businesses
-import { useBusinessList, useBusiness, useCreateBusiness, useUpdateBusiness, useDeleteBusiness } from '@/hooks/businesses';
+import {
+  useBusinessList,
+  useBusiness,
+  useCreateBusiness,
+  useUpdateBusiness,
+  useDeleteBusiness,
+} from '@/hooks/businesses';
 ```
 
 ---
@@ -320,11 +332,25 @@ import {
   orderStatusLabel,
 } from '@/utils/lang';
 
-validationMessage('required', 'email');     // "The email field is required"
-resourceMessage('created', 'order');        // "Order created"
-crudSuccessMessage('created', 'order');     // "Order created successfully"
-crudErrorMessage('delete', 'order');        // "Failed to delete order"
-orderStatusLabel('estimated');              // "Quote Ready"
+validationMessage('required', 'email'); // "The email field is required"
+resourceMessage('created', 'order'); // "Order created"
+crudSuccessMessage('created', 'order'); // "Order created successfully"
+crudErrorMessage('delete', 'order'); // "Failed to delete order"
+orderStatusLabel('estimated'); // "Quote Ready"
+```
+
+### Format Helpers
+
+```typescript
+import { formatCurrency, applyRounding } from '@/utils/format';
+
+formatCurrency(100, '$'); // "$100.00"
+formatCurrency(100, '₡', 0); // "₡100"
+
+applyRounding(10.3, 'nearest', 1); // 10
+applyRounding(10.3, 'up', 1); // 11
+applyRounding(10.3, 'down', 1); // 10
+applyRounding(12, 'nearest', 5); // 10
 ```
 
 ---
@@ -378,6 +404,7 @@ function MyForm() {
 Translations are managed in the backend at `api/lang/` (PHP files). This app fetches them at runtime from `/locales/{lng}/{ns}.json`.
 
 To add or modify translations:
+
 1. Edit PHP files in `../api/lang/en/*.php` or `../api/lang/es/*.php`
 2. Run `langs` command from the API directory
 3. No manual sync needed - translations are fetched at runtime

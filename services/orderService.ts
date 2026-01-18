@@ -40,20 +40,6 @@ export const OrderService = {
   },
 
   /**
-   * Approve an order (after quote is sent)
-   */
-  async approve(id: number): Promise<SuccessBasic> {
-    return api.post<SuccessBasic>(`/orders/${id}/approve`);
-  },
-
-  /**
-   * Deny an order
-   */
-  async deny(id: number): Promise<SuccessBasic> {
-    return api.post<SuccessBasic>(`/orders/${id}/deny`);
-  },
-
-  /**
    * Delete an order (admin only)
    */
   async destroy(id: number): Promise<SuccessBasic> {

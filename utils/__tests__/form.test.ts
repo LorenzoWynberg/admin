@@ -87,6 +87,63 @@ describe('form utils', () => {
 
       expect(toast.error).toHaveBeenCalledWith('Error', { description: 'Something went wrong' });
     });
+
+    it('handles single string error (not array)', () => {
+      const setError = vi.fn();
+      const error = new ApiError('Validation failed', 422, {
+        errors: {
+          name: 'Name is required' as unknown as string[],
+        },
+      });
+
+      applyApiErrorsToForm(error, setError);
+
+      expect(setError).toHaveBeenCalledWith('name', {
+        type: 'server',
+        message: 'Name is required',
+      });
+    });
+
+    it('handles empty/falsy error values with default message', () => {
+      const setError = vi.fn();
+      const error = new ApiError('Validation failed', 422, {
+        errors: {
+          email: [] as string[],
+          name: null as unknown as string[],
+        },
+      });
+
+      applyApiErrorsToForm(error, setError);
+
+      expect(setError).toHaveBeenCalledWith('email', {
+        type: 'server',
+        message: 'This field is invalid',
+      });
+      expect(setError).toHaveBeenCalledWith('name', {
+        type: 'server',
+        message: 'This field is invalid',
+      });
+    });
+
+    it('uses default toast title when message is empty', async () => {
+      const { toast } = await import('sonner');
+      const setError = vi.fn();
+      const error = new ApiError('', 500);
+
+      applyApiErrorsToForm(error, setError);
+
+      expect(toast.error).toHaveBeenCalledWith('An error occurred', { description: undefined });
+    });
+
+    it('handles undefined status gracefully', async () => {
+      const { toast } = await import('sonner');
+      const setError = vi.fn();
+      const error = new ApiError('Error', undefined as unknown as number);
+
+      applyApiErrorsToForm(error, setError);
+
+      expect(toast.error).toHaveBeenCalled();
+    });
   });
 
   describe('getFieldError', () => {

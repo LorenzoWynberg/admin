@@ -123,7 +123,7 @@ export default function CatalogsPage() {
                       <Badge variant="outline">{catalog.code}</Badge>
                     </TableCell>
                     <TableCell className="font-medium">{catalog.name}</TableCell>
-                    <TableCell>{catalog.elements?.length || 0}</TableCell>
+                    <TableCell>{catalog.elementsCount ?? 0}</TableCell>
                     <TableCell>{formatDate(catalog.createdAt)}</TableCell>
                   </TableRow>
                 ))}

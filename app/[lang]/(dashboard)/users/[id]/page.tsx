@@ -9,7 +9,7 @@ import { useUser, useDeleteUser } from '@/hooks/users';
 import { RoleBadge } from '@/components/users/RoleBadge';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, User, Mail, Phone, Calendar, Globe, Building2, Trash2 } from 'lucide-react';
 
 type Role = App.Enums.Role;
@@ -188,6 +188,11 @@ export default function UserDetailPage() {
             <CardTitle>
               {t('users:detail.account_type', { defaultValue: 'Account Type' })}
             </CardTitle>
+            <CardDescription>
+              {t('users:detail.account_type_description', {
+                defaultValue: 'Roles and permissions assigned to this user',
+              })}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">

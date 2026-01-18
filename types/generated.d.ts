@@ -133,6 +133,7 @@ declare namespace App.Data.Catalog {
     updatedAt?: string;
     deletedAt?: string | null;
     elements?: Array<App.Data.CatalogElement.CatalogElementData>;
+    elementsCount?: number;
   };
   export type StoreCatalogData = {
     code: string;
@@ -319,7 +320,7 @@ declare namespace App.Data.Pricing {
   export type PricingRuleData = {
     id?: number;
     name?: string;
-    baseFare?: number;
+    serviceFee?: number;
     taxRate?: number;
     version?: number;
     status?: App.Enums.PricingRuleStatus;
@@ -344,7 +345,7 @@ declare namespace App.Data.Pricing {
   };
   export type StorePricingRuleData = {
     name: string;
-    baseFare: number;
+    serviceFee: number;
     taxRate: number;
     calculationMode: App.Enums.PricingCalculationMode;
     notes: string | null;
@@ -360,7 +361,7 @@ declare namespace App.Data.Pricing {
   };
   export type UpdatePricingRuleData = {
     name?: string;
-    baseFare?: number;
+    serviceFee?: number;
     taxRate?: number;
     calculationMode?: App.Enums.PricingCalculationMode;
     notes?: string | null;
@@ -399,7 +400,7 @@ declare namespace App.Data.Quote {
     orderId: number;
     pickupProposedFor: string;
     deliveryProposedFor: string;
-    validUntil: string;
+    validUntil?: string;
     distanceKm: number;
     timeFee: number | null;
     surcharge: number | null;

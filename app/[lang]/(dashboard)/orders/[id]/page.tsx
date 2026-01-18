@@ -1,12 +1,10 @@
 'use client';
 
 import {
-  CheckCircle,
   DollarSign,
   Building2,
   ArrowLeft,
   Calendar,
-  XCircle,
   Package,
   Trash2,
   MapPin,
@@ -25,8 +23,8 @@ import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { resourceMessage, validationAttribute } from '@/utils/lang';
-import { useOrder, useApproveOrder, useDenyOrder, useDeleteOrder } from '@/hooks/orders';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { useOrder, useDeleteOrder } from '@/hooks/orders';
 
 type OrderStatus = App.Enums.OrderStatus;
 
@@ -52,8 +50,6 @@ export default function OrderDetailPage() {
   const orderId = Number(params.id);
 
   const { data: order, isLoading, error } = useOrder({ id: orderId });
-  const approveOrder = useApproveOrder();
-  const denyOrder = useDenyOrder();
   const deleteOrder = useDeleteOrder();
 
   const formatAddress = (address?: App.Data.Address.AddressData | null): string => {
@@ -65,30 +61,6 @@ export default function OrderDetailPage() {
     if (address.city?.name) parts.push(address.city.name);
     if (address.state?.name) parts.push(address.state.name);
     return parts.join(', ') || notSpecified;
-  };
-
-  const handleApprove = () => {
-    if (
-      confirm(
-        t('orders:detail.confirm_approve', {
-          defaultValue: 'Are you sure you want to approve this order?',
-        })
-      )
-    ) {
-      approveOrder.mutate(orderId);
-    }
-  };
-
-  const handleDeny = () => {
-    if (
-      confirm(
-        t('orders:detail.confirm_deny', {
-          defaultValue: 'Are you sure you want to deny this order?',
-        })
-      )
-    ) {
-      denyOrder.mutate(orderId);
-    }
   };
 
   const handleDelete = () => {
@@ -124,7 +96,6 @@ export default function OrderDetailPage() {
     );
   }
 
-  const canApproveOrDeny = order.status === 'estimated';
   const canCreateQuote = order.status === 'pending' && !order.currentQuote;
 
   return (
@@ -153,19 +124,9 @@ export default function OrderDetailPage() {
               orderId={orderId}
               orderDistanceKm={order.distanceKm}
               orderEstimatedMinutes={order.estimatedMinutes}
+              customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
+              customerDesiredDelivery={order.fulfilledBefore}
             />
-          )}
-          {canApproveOrDeny && (
-            <>
-              <Button variant="outline" onClick={handleDeny} disabled={denyOrder.isPending}>
-                <XCircle className="mr-2 h-4 w-4" />
-                {t('orders:detail.deny_action', { defaultValue: 'Deny' })}
-              </Button>
-              <Button onClick={handleApprove} disabled={approveOrder.isPending}>
-                <CheckCircle className="mr-2 h-4 w-4" />
-                {t('orders:detail.approve_action', { defaultValue: 'Approve' })}
-              </Button>
-            </>
           )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
             <Trash2 className="mr-2 h-4 w-4" />
@@ -347,13 +308,13 @@ export default function OrderDetailPage() {
               <>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
-                    {validationAttribute('baseFare', true)}
+                    {validationAttribute('serviceFee', true)}
                   </span>
                   <span className="font-medium">
                     {order.currencyCode} {order.currentQuote.baseFare?.toFixed(2) || '0.00'}
                   </span>
                 </div>
-                {order.currentQuote.distanceFee && order.currentQuote.distanceFee > 0 && (
+                {order.currentQuote.distanceFee != null && order.currentQuote.distanceFee > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
                       {validationAttribute('distanceFee', true)}
@@ -363,7 +324,7 @@ export default function OrderDetailPage() {
                     </span>
                   </div>
                 )}
-                {order.currentQuote.timeFee && order.currentQuote.timeFee > 0 && (
+                {order.currentQuote.timeFee != null && order.currentQuote.timeFee > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
                       {validationAttribute('timeFee', true)}
@@ -373,7 +334,7 @@ export default function OrderDetailPage() {
                     </span>
                   </div>
                 )}
-                {order.currentQuote.surcharge && order.currentQuote.surcharge > 0 && (
+                {order.currentQuote.surcharge != null && order.currentQuote.surcharge > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
                       {validationAttribute('surcharge', true)}
@@ -409,6 +370,8 @@ export default function OrderDetailPage() {
                     orderId={orderId}
                     orderDistanceKm={order.distanceKm}
                     orderEstimatedMinutes={order.estimatedMinutes}
+                    customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
+                    customerDesiredDelivery={order.fulfilledBefore}
                   />
                 )}
               </div>
@@ -418,9 +381,76 @@ export default function OrderDetailPage() {
                 {t('orders:detail.payment_status', { defaultValue: 'Payment Status' })}
               </span>
               <Badge variant={order.paymentStatus === 'paid' ? 'default' : 'secondary'}>
-                {order.paymentStatus || t('orders:detail.unpaid', { defaultValue: 'Unpaid' })}
+                {t(`statuses:${order.paymentStatus || 'unpaid'}`, {
+                  defaultValue: capitalize(order.paymentStatus || 'unpaid'),
+                })}
               </Badge>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Trip Schedule */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              {t('orders:detail.trip_schedule', { defaultValue: 'Trip Schedule' })}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {order.fulfilledBefore && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {t('orders:detail.deliver_by', { defaultValue: 'Deliver By' })}
+                </span>
+                <span className="font-medium">{formatDate(order.fulfilledBefore)}</span>
+              </div>
+            )}
+            {order.pickupScheduledFor && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {t('orders:detail.pickup_scheduled', { defaultValue: 'Pickup Scheduled' })}
+                </span>
+                <span className="font-medium">{formatDate(order.pickupScheduledFor)}</span>
+              </div>
+            )}
+            {order.deliveryScheduledFor && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {t('orders:detail.delivery_scheduled', { defaultValue: 'Delivery Scheduled' })}
+                </span>
+                <span className="font-medium">{formatDate(order.deliveryScheduledFor)}</span>
+              </div>
+            )}
+            {order.pickupCompletedAt && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {t('orders:detail.pickup_completed', { defaultValue: 'Pickup Completed' })}
+                </span>
+                <span className="font-medium text-green-600">
+                  {formatDate(order.pickupCompletedAt)}
+                </span>
+              </div>
+            )}
+            {order.deliveryCompletedAt && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {t('orders:detail.delivery_completed', { defaultValue: 'Delivery Completed' })}
+                </span>
+                <span className="font-medium text-green-600">
+                  {formatDate(order.deliveryCompletedAt)}
+                </span>
+              </div>
+            )}
+            {!order.fulfilledBefore &&
+              !order.pickupScheduledFor &&
+              !order.deliveryScheduledFor &&
+              !order.pickupCompletedAt &&
+              !order.deliveryCompletedAt && (
+                <p className="text-muted-foreground text-center">
+                  {t('orders:detail.no_schedule', { defaultValue: 'No schedule set' })}
+                </p>
+              )}
           </CardContent>
         </Card>
 

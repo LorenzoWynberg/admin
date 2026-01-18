@@ -43,7 +43,7 @@ const tierSchema = z.object({
 
 const formSchema = z.object({
   name: z.string().min(1).max(255),
-  baseFare: z.number().min(0),
+  serviceFee: z.number().min(0),
   taxRate: z.number().min(0).max(1),
   calculationMode: z.enum([
     Enums.PricingCalculationMode.DISCRETE,
@@ -68,7 +68,7 @@ export default function EditPricingRulePage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      baseFare: 0,
+      serviceFee: 0,
       taxRate: 0,
       calculationMode: Enums.PricingCalculationMode.DISCRETE,
       notes: null,
@@ -86,7 +86,7 @@ export default function EditPricingRulePage() {
     if (rule) {
       form.reset({
         name: rule.name || '',
-        baseFare: rule.baseFare || 0,
+        serviceFee: rule.serviceFee || 0,
         taxRate: rule.taxRate || 0,
         calculationMode: rule.calculationMode || Enums.PricingCalculationMode.DISCRETE,
         notes: rule.notes || null,
@@ -108,7 +108,7 @@ export default function EditPricingRulePage() {
         id: ruleId,
         data: {
           name: values.name,
-          baseFare: values.baseFare,
+          serviceFee: values.serviceFee,
           taxRate: values.taxRate,
           calculationMode: values.calculationMode as App.Enums.PricingCalculationMode,
           notes: values.notes,
@@ -124,7 +124,7 @@ export default function EditPricingRulePage() {
       router.push(`/pricing/${ruleId}`);
     } catch (error) {
       applyApiErrorsToForm(error, form.setError, {
-        base_fare: 'baseFare',
+        service_fee: 'serviceFee',
         tax_rate: 'taxRate',
         calculation_mode: 'calculationMode',
       });
@@ -188,14 +188,14 @@ export default function EditPricingRulePage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField
                   control={form.control}
-                  name="baseFare"
+                  name="serviceFee"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{validationAttribute('baseFare', true)}</FormLabel>
+                      <FormLabel>{validationAttribute('serviceFee', true)}</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" min="0" {...field} />
                       </FormControl>
-                      <FormDescription>{t('base_fare_help')}</FormDescription>
+                      <FormDescription>{t('service_fee_help')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
