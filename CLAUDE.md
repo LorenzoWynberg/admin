@@ -12,7 +12,7 @@ npm run typecheck  # 2. Fix type errors
 npm run format     # 3. Format (LAST step)
 ```
 
-Then push immediately. See `../docs/strict-rules.md` for all rules.
+Then push immediately. See `../api/docs/strict-rules.md` for all rules.
 
 ---
 
@@ -80,5 +80,5 @@ if (order.status === Enums.OrderStatus.PENDING) { ... }
 
 - `docs/architecture.md` - Detailed services, hooks, patterns, API reference
 - `docs/pricing-rules-plan.md` - Pricing system implementation plan
-- `../docs/strict-rules.md` - Critical rules
-- `../docs/jj-guide.md` - Version control reference
+- `../api/docs/strict-rules.md` - Critical rules
+- `../api/docs/jj-guide.md` - Version control reference
