@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useAddressList } from '@/hooks/addresses';
@@ -97,9 +97,7 @@ export default function AddressesPage() {
             </div>
           ) : error ? (
             <div className="text-destructive py-12 text-center">
-              {t('addresses:failed_to_load', {
-                defaultValue: 'Failed to load addresses',
-              })}
+              {resourceMessage('failed_to_load', 'address', 2)}
             </div>
           ) : addresses.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
@@ -114,9 +112,9 @@ export default function AddressesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('addresses:label', { defaultValue: 'Label' })}</TableHead>
+                  <TableHead>{validationAttribute('label')}</TableHead>
                   <TableHead>{t('models:address_one', { defaultValue: 'Address' })}</TableHead>
-                  <TableHead>{t('addresses:city', { defaultValue: 'City' })}</TableHead>
+                  <TableHead>{validationAttribute('city')}</TableHead>
                   <TableHead>{validationAttribute('type')}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>

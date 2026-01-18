@@ -30,6 +30,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { applyApiErrorsToForm } from '@/utils/form';
+import { resourceMessage, validationAttribute } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
 
 const tierSchema = z.object({
@@ -141,7 +142,7 @@ export default function EditPricingRulePage() {
   if (error || !rule) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">{t('failed_to_load')}</p>
+        <p className="text-destructive">{resourceMessage('failed_to_load', 'pricing_rule')}</p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
           {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
@@ -175,7 +176,7 @@ export default function EditPricingRulePage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('name')}</FormLabel>
+                    <FormLabel>{validationAttribute('name')}</FormLabel>
                     <FormControl>
                       <Input placeholder={t('name_placeholder')} {...field} />
                     </FormControl>
@@ -190,7 +191,7 @@ export default function EditPricingRulePage() {
                   name="baseFare"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('base_fare')}</FormLabel>
+                      <FormLabel>{validationAttribute('baseFare')}</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" min="0" {...field} />
                       </FormControl>
@@ -205,7 +206,7 @@ export default function EditPricingRulePage() {
                   name="taxRate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('tax_rate')} (%)</FormLabel>
+                      <FormLabel>{validationAttribute('taxRate')} (%)</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -263,7 +264,7 @@ export default function EditPricingRulePage() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('notes')}</FormLabel>
+                    <FormLabel>{validationAttribute('notes')}</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder={t('notes_placeholder')}
@@ -282,7 +283,7 @@ export default function EditPricingRulePage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>{t('tiers')}</CardTitle>
+                <CardTitle>{validationAttribute('tiers')}</CardTitle>
                 <p className="text-muted-foreground text-sm">{t('tiers_help')}</p>
               </div>
               <Button
@@ -311,7 +312,7 @@ export default function EditPricingRulePage() {
                     name={`tiers.${index}.minKm`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>{t('min_km')}</FormLabel>
+                        <FormLabel>{validationAttribute('minKm')}</FormLabel>
                         <FormControl>
                           <Input type="number" step="0.1" min="0" {...field} />
                         </FormControl>
@@ -325,7 +326,7 @@ export default function EditPricingRulePage() {
                     name={`tiers.${index}.maxKm`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>{t('max_km')}</FormLabel>
+                        <FormLabel>{validationAttribute('maxKm')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -349,7 +350,7 @@ export default function EditPricingRulePage() {
                     name={`tiers.${index}.flatFee`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>{t('flat_fee')}</FormLabel>
+                        <FormLabel>{validationAttribute('flatFee')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -372,7 +373,7 @@ export default function EditPricingRulePage() {
                     name={`tiers.${index}.perKmRate`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>{t('per_km_rate')}</FormLabel>
+                        <FormLabel>{validationAttribute('perKmRate')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"

@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { capitalize, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { useUserList } from '@/hooks/users';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
@@ -157,7 +157,7 @@ export default function UsersPage() {
             </div>
           ) : error ? (
             <div className="text-destructive py-12 text-center">
-              {t('users:failed_to_load', { defaultValue: 'Failed to load users' })}
+              {resourceMessage('failed_to_load', 'user', 2)}
             </div>
           ) : users.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">

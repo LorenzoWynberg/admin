@@ -25,7 +25,7 @@ import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { validationAttribute } from '@/utils/lang';
+import { resourceMessage, validationAttribute } from '@/utils/lang';
 import { useOrder, useApproveOrder, useDenyOrder, useDeleteOrder } from '@/hooks/orders';
 
 type OrderStatus = App.Enums.OrderStatus;
@@ -116,9 +116,7 @@ export default function OrderDetailPage() {
   if (error || !order) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">
-          {t('orders:failed_to_load', { defaultValue: 'Failed to load order' })}
-        </p>
+        <p className="text-destructive">{resourceMessage('failed_to_load', 'order')}</p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
           {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
@@ -275,7 +273,7 @@ export default function OrderDetailPage() {
             {order.description && (
               <div>
                 <p className="text-muted-foreground text-sm">
-                  {t('orders:detail.description', { defaultValue: 'Description' })}
+                  {validationAttribute('description')}
                 </p>
                 <p className="font-medium">{order.description}</p>
               </div>
@@ -288,7 +286,7 @@ export default function OrderDetailPage() {
                     <div>
                       <p className="font-medium">{order.distanceKm} km</p>
                       <p className="text-muted-foreground text-sm">
-                        {t('orders:detail.distance', { defaultValue: 'Distance' })}
+                        {validationAttribute('distance')}
                       </p>
                     </div>
                   </div>
@@ -344,9 +342,7 @@ export default function OrderDetailPage() {
             {order.currentQuote ? (
               <>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    {t('orders:detail.base_fare', { defaultValue: 'Base Fare' })}
-                  </span>
+                  <span className="text-muted-foreground">{validationAttribute('baseFare')}</span>
                   <span className="font-medium">
                     {order.currencyCode} {order.currentQuote.baseFare?.toFixed(2) || '0.00'}
                   </span>
@@ -354,7 +350,7 @@ export default function OrderDetailPage() {
                 {order.currentQuote.distanceFee && order.currentQuote.distanceFee > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      {t('orders:detail.distance_fee', { defaultValue: 'Distance Fee' })}
+                      {validationAttribute('distanceFee')}
                     </span>
                     <span className="font-medium">
                       {order.currencyCode} {order.currentQuote.distanceFee.toFixed(2)}
@@ -363,9 +359,7 @@ export default function OrderDetailPage() {
                 )}
                 {order.currentQuote.timeFee && order.currentQuote.timeFee > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      {t('orders:detail.time_fee', { defaultValue: 'Time Fee' })}
-                    </span>
+                    <span className="text-muted-foreground">{validationAttribute('timeFee')}</span>
                     <span className="font-medium">
                       {order.currencyCode} {order.currentQuote.timeFee.toFixed(2)}
                     </span>
@@ -374,7 +368,7 @@ export default function OrderDetailPage() {
                 {order.currentQuote.surcharge && order.currentQuote.surcharge > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      {t('orders:detail.surcharge', { defaultValue: 'Surcharge' })}
+                      {validationAttribute('surcharge')}
                     </span>
                     <span className="font-medium">
                       {order.currencyCode} {order.currentQuote.surcharge.toFixed(2)}
@@ -444,7 +438,7 @@ export default function OrderDetailPage() {
               {order.driver.licensePlateNumber && (
                 <div>
                   <p className="text-muted-foreground text-sm">
-                    {t('drivers:license_plate', { defaultValue: 'License Plate' })}
+                    {validationAttribute('licensePlate')}
                   </p>
                   <p className="font-medium">{order.driver.licensePlateNumber}</p>
                 </div>

@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { capitalize, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useQuoteList } from '@/hooks/quotes';
 import { useRouter } from 'next/navigation';
@@ -148,7 +148,7 @@ export default function QuotesPage() {
             </div>
           ) : error ? (
             <div className="text-destructive py-12 text-center">
-              {t('quotes:failed_to_load', { defaultValue: 'Failed to load quotes' })}
+              {resourceMessage('failed_to_load', 'quote', 2)}
             </div>
           ) : quotes.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">

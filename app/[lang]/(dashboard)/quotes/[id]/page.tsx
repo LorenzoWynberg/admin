@@ -1,6 +1,6 @@
 'use client';
 
-import { capitalize, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -79,9 +79,7 @@ export default function QuoteDetailPage() {
   if (error || !quote) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">
-          {t('quotes:failed_to_load', { defaultValue: 'Failed to load quote' })}
-        </p>
+        <p className="text-destructive">{resourceMessage('failed_to_load', 'quote')}</p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
           {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
@@ -140,9 +138,7 @@ export default function QuoteDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t('quotes:detail.version', { defaultValue: 'Version' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('version')}</span>
               <span className="font-medium">{quote.version || 1}</span>
             </div>
             {quote.orderId && (
@@ -183,9 +179,7 @@ export default function QuoteDetailPage() {
             )}
             {quote.notes && (
               <div className="border-t pt-4">
-                <p className="text-muted-foreground text-sm">
-                  {t('quotes:detail.notes', { defaultValue: 'Notes' })}
-                </p>
+                <p className="text-muted-foreground text-sm">{validationAttribute('notes')}</p>
                 <p className="mt-1">{quote.notes}</p>
               </div>
             )}
@@ -202,55 +196,43 @@ export default function QuoteDetailPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t('quotes:detail.base_fare', { defaultValue: 'Base Fare' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('baseFare')}</span>
               <span className="font-medium">{formatCurrency(quote.baseFare)}</span>
             </div>
             {quote.distanceKm != null && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('quotes:detail.distance', { defaultValue: 'Distance' })}
-                </span>
+                <span className="text-muted-foreground">{validationAttribute('distance')}</span>
                 <span className="font-medium">{quote.distanceKm.toFixed(1)} km</span>
               </div>
             )}
             {quote.distanceFee != null && quote.distanceFee > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('quotes:detail.distance_fee', { defaultValue: 'Distance Fee' })}
-                </span>
+                <span className="text-muted-foreground">{validationAttribute('distanceFee')}</span>
                 <span className="font-medium">{formatCurrency(quote.distanceFee)}</span>
               </div>
             )}
             {quote.timeFee != null && quote.timeFee > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('quotes:detail.time_fee', { defaultValue: 'Time Fee' })}
-                </span>
+                <span className="text-muted-foreground">{validationAttribute('timeFee')}</span>
                 <span className="font-medium">{formatCurrency(quote.timeFee)}</span>
               </div>
             )}
             {quote.surcharge != null && quote.surcharge > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('quotes:detail.surcharge', { defaultValue: 'Surcharge' })}
-                </span>
+                <span className="text-muted-foreground">{validationAttribute('surcharge')}</span>
                 <span className="font-medium">{formatCurrency(quote.surcharge)}</span>
               </div>
             )}
             {quote.discountRate != null && quote.discountRate > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('quotes:detail.discount', { defaultValue: 'Discount' })}
-                </span>
+                <span className="text-muted-foreground">{validationAttribute('discount')}</span>
                 <span className="font-medium text-green-600">-{quote.discountRate}%</span>
               </div>
             )}
             {quote.taxRate != null && quote.taxRate > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  {t('quotes:detail.tax', { defaultValue: 'Tax' })} ({quote.taxRate}%)
+                  {validationAttribute('tax')} ({quote.taxRate}%)
                 </span>
                 <span className="font-medium">{formatCurrency(quote.taxTotal)}</span>
               </div>

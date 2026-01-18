@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
@@ -95,7 +95,7 @@ export default function CatalogsPage() {
             </div>
           ) : error ? (
             <div className="text-destructive py-12 text-center">
-              {t('catalogs:failed_to_load', { defaultValue: 'Failed to load catalogs' })}
+              {resourceMessage('failed_to_load', 'catalog', 2)}
             </div>
           ) : catalogs.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
@@ -106,9 +106,9 @@ export default function CatalogsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('catalogs:code', { defaultValue: 'Code' })}</TableHead>
+                  <TableHead>{validationAttribute('code')}</TableHead>
                   <TableHead>{validationAttribute('name')}</TableHead>
-                  <TableHead>{t('catalogs:elements', { defaultValue: 'Elements' })}</TableHead>
+                  <TableHead>{validationAttribute('elements')}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>

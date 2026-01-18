@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -96,7 +96,7 @@ export default function BusinessesPage() {
             </div>
           ) : error ? (
             <div className="text-destructive py-12 text-center">
-              {t('businesses:failed_to_load', { defaultValue: 'Failed to load businesses' })}
+              {resourceMessage('failed_to_load', 'business', 2)}
             </div>
           ) : businesses.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
@@ -109,7 +109,7 @@ export default function BusinessesPage() {
                 <TableRow>
                   <TableHead>{validationAttribute('name')}</TableHead>
                   <TableHead>{validationAttribute('type')}</TableHead>
-                  <TableHead>{t('businesses:owner', { defaultValue: 'Owner' })}</TableHead>
+                  <TableHead>{validationAttribute('owner')}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>

@@ -1,6 +1,6 @@
 'use client';
 
-import { capitalize, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -73,9 +73,7 @@ export default function DriverDetailPage() {
   if (error || !driver) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">
-          {t('drivers:failed_to_load', { defaultValue: 'Failed to load driver' })}
-        </p>
+        <p className="text-destructive">{resourceMessage('failed_to_load', 'driver')}</p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
           {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
@@ -153,15 +151,11 @@ export default function DriverDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t('drivers:license_number', { defaultValue: 'License Number' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('licenseNumber')}</span>
               <span className="font-medium">{driver.licenseNumber || '-'}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">
-                {t('drivers:detail.expiration_date', { defaultValue: 'Expiration Date' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('expirationDate')}</span>
               <div className="flex items-center gap-2">
                 <span className="font-medium">{formatDate(driver.licenseExpirationDate)}</span>
                 {expired && (
@@ -183,9 +177,7 @@ export default function DriverDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t('drivers:license_plate', { defaultValue: 'License Plate' })}
-              </span>
+              <span className="text-muted-foreground">{validationAttribute('licensePlate')}</span>
               <span className="font-medium">{driver.licensePlateNumber || '-'}</span>
             </div>
           </CardContent>

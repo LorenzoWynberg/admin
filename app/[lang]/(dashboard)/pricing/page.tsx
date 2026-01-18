@@ -51,6 +51,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { resourceMessage, validationAttribute } from '@/utils/lang';
 import {
   usePricingRuleList,
   useActivatePricingRule,
@@ -174,7 +175,9 @@ export default function PricingPage() {
               <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
             </div>
           ) : error ? (
-            <div className="text-destructive py-12 text-center">{t('failed_to_load')}</div>
+            <div className="text-destructive py-12 text-center">
+              {resourceMessage('failed_to_load', 'pricing_rule', 2)}
+            </div>
           ) : rules.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <DollarSign className="mb-4 h-12 w-12" />
@@ -184,13 +187,13 @@ export default function PricingPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('column_name')}</TableHead>
-                  <TableHead>{t('column_base_fare')}</TableHead>
-                  <TableHead>{t('column_tax_rate')}</TableHead>
-                  <TableHead>{t('column_version')}</TableHead>
-                  <TableHead>{t('column_tiers')}</TableHead>
-                  <TableHead>{t('column_status')}</TableHead>
-                  <TableHead className="w-[50px]">{t('column_actions')}</TableHead>
+                  <TableHead>{validationAttribute('name')}</TableHead>
+                  <TableHead>{validationAttribute('baseFare')}</TableHead>
+                  <TableHead>{validationAttribute('taxRate')}</TableHead>
+                  <TableHead>{validationAttribute('version')}</TableHead>
+                  <TableHead>{validationAttribute('tiers')}</TableHead>
+                  <TableHead>{validationAttribute('status')}</TableHead>
+                  <TableHead className="w-[50px]">{t('common:actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

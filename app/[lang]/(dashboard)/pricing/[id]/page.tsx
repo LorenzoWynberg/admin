@@ -33,6 +33,7 @@ import {
 import { ArrowLeft, Pencil, Trash2, Copy, Power, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { Enums } from '@/data/app-enums';
+import { resourceMessage, validationAttribute } from '@/utils/lang';
 
 function formatCurrency(amount?: number): string {
   if (amount === undefined) return '-';
@@ -107,7 +108,7 @@ export default function PricingRuleDetailPage() {
   if (error || !rule) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">{t('failed_to_load')}</p>
+        <p className="text-destructive">{resourceMessage('failed_to_load', 'pricing_rule')}</p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
           {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
@@ -182,15 +183,15 @@ export default function PricingRuleDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('column_base_fare')}</span>
+              <span className="text-muted-foreground">{validationAttribute('baseFare')}</span>
               <span className="font-medium">{formatCurrency(rule.baseFare)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('column_tax_rate')}</span>
+              <span className="text-muted-foreground">{validationAttribute('taxRate')}</span>
               <span className="font-medium">{formatPercent(rule.taxRate)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('column_version')}</span>
+              <span className="text-muted-foreground">{validationAttribute('version')}</span>
               <span className="font-medium">v{rule.version}</span>
             </div>
             {rule.effectiveFrom && (
@@ -200,16 +201,16 @@ export default function PricingRuleDetailPage() {
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('created_at')}</span>
+              <span className="text-muted-foreground">{validationAttribute('createdAt')}</span>
               <span className="font-medium">{formatDate(rule.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('updated_at')}</span>
+              <span className="text-muted-foreground">{validationAttribute('updatedAt')}</span>
               <span className="font-medium">{formatDate(rule.updatedAt)}</span>
             </div>
             {rule.notes && (
               <div className="border-t pt-4">
-                <p className="text-muted-foreground text-sm">{t('notes')}</p>
+                <p className="text-muted-foreground text-sm">{validationAttribute('notes')}</p>
                 <p className="mt-1">{rule.notes}</p>
               </div>
             )}
@@ -219,17 +220,17 @@ export default function PricingRuleDetailPage() {
         {/* Tiers */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('tiers')}</CardTitle>
+            <CardTitle>{validationAttribute('tiers')}</CardTitle>
           </CardHeader>
           <CardContent>
             {rule.tiers && rule.tiers.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t('min_km')}</TableHead>
-                    <TableHead>{t('max_km')}</TableHead>
-                    <TableHead>{t('flat_fee')}</TableHead>
-                    <TableHead>{t('per_km_rate')}</TableHead>
+                    <TableHead>{validationAttribute('minKm')}</TableHead>
+                    <TableHead>{validationAttribute('maxKm')}</TableHead>
+                    <TableHead>{validationAttribute('flatFee')}</TableHead>
+                    <TableHead>{validationAttribute('perKmRate')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

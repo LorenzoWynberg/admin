@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useDriverList } from '@/hooks/drivers';
 import { useRouter } from 'next/navigation';
@@ -105,7 +105,7 @@ export default function DriversPage() {
             </div>
           ) : error ? (
             <div className="text-destructive py-12 text-center">
-              {t('drivers:failed_to_load', { defaultValue: 'Failed to load drivers' })}
+              {resourceMessage('failed_to_load', 'driver', 2)}
             </div>
           ) : drivers.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
@@ -117,15 +117,9 @@ export default function DriversPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('models:driver_one', { defaultValue: 'Driver' })}</TableHead>
-                  <TableHead>
-                    {t('drivers:license_number', { defaultValue: 'License Number' })}
-                  </TableHead>
-                  <TableHead>
-                    {t('drivers:license_plate', { defaultValue: 'License Plate' })}
-                  </TableHead>
-                  <TableHead>
-                    {t('drivers:license_expires', { defaultValue: 'License Expires' })}
-                  </TableHead>
+                  <TableHead>{validationAttribute('licenseNumber')}</TableHead>
+                  <TableHead>{validationAttribute('licensePlate')}</TableHead>
+                  <TableHead>{validationAttribute('licenseExpires')}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
                 </TableRow>
               </TableHeader>

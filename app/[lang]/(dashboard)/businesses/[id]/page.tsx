@@ -1,6 +1,6 @@
 'use client';
 
-import { capitalize, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -67,9 +67,7 @@ export default function BusinessDetailPage() {
   if (error || !business) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">
-          {t('businesses:failed_to_load', { defaultValue: 'Failed to load business' })}
-        </p>
+        <p className="text-destructive">{resourceMessage('failed_to_load', 'business')}</p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
           {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
@@ -133,7 +131,7 @@ export default function BusinessDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              {t('businesses:owner', { defaultValue: 'Owner' })}
+              {validationAttribute('owner')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
