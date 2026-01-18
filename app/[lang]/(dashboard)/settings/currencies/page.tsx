@@ -205,7 +205,7 @@ export default function CurrencySettingsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('common:code', { defaultValue: 'Code' })}</TableHead>
+                  <TableHead>{validationAttribute('code', true)}</TableHead>
                   <TableHead>{validationAttribute('name')}</TableHead>
                   <TableHead>{t('common:symbol', { defaultValue: 'Symbol' })}</TableHead>
                   <TableHead>
@@ -213,7 +213,7 @@ export default function CurrencySettingsPage() {
                   </TableHead>
                   <TableHead>{t('common:rate_date', { defaultValue: 'Rate Date' })}</TableHead>
                   <TableHead>{t('common:rounding', { defaultValue: 'Rounding' })}</TableHead>
-                  <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
+                  <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{t('common:enabled', { defaultValue: 'Enabled' })}</TableHead>
                   <TableHead className="w-[100px]">
                     {t('common:actions', { defaultValue: 'Actions' })}

@@ -171,7 +171,7 @@ export default function OrdersPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{validationAttribute('id')}</TableHead>
-                  <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
+                  <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
                   <TableHead>{t('models:quote_one', { defaultValue: 'Quote' })}</TableHead>

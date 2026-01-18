@@ -161,7 +161,7 @@ export default function QuotesPage() {
                 <TableRow>
                   <TableHead>{validationAttribute('id')}</TableHead>
                   <TableHead>{t('models:order_one', { defaultValue: 'Order' })}</TableHead>
-                  <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
+                  <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{validationAttribute('total')}</TableHead>
                   <TableHead>{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</TableHead>
                   <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
