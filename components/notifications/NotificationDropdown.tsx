@@ -15,7 +15,7 @@ interface NotificationDropdownProps {
 export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
   const { t } = useTranslation();
   const router = useLocalizedRouter();
-  const { data, isLoading } = useNotifications({ perPage: 20, unreadOnly: true });
+  const { data, isLoading, isFetching } = useNotifications({ perPage: 20, unreadOnly: true });
   const { markAsRead, markAllAsRead } = useNotificationMutations();
 
   const notifications = data?.items ?? [];
@@ -33,9 +33,14 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between border-b p-4">
-        <h4 className="font-semibold">
-          {t('common:notifications', { defaultValue: 'Notifications' })}
-        </h4>
+        <div className="flex items-center gap-2">
+          <h4 className="font-semibold">
+            {t('common:notifications', { defaultValue: 'Notifications' })}
+          </h4>
+          {isFetching && !isLoading && (
+            <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+          )}
+        </div>
         {hasUnread && (
           <Button
             variant="ghost"
