@@ -214,6 +214,7 @@ export default function NotificationsPage() {
               <Input
                 type="date"
                 value={fromDate}
+                max={toDate || undefined}
                 onChange={(e) => {
                   setFromDate(e.target.value);
                   setPage(1);
@@ -226,6 +227,7 @@ export default function NotificationsPage() {
               <Input
                 type="date"
                 value={toDate}
+                min={fromDate || undefined}
                 onChange={(e) => {
                   setToDate(e.target.value);
                   setPage(1);
