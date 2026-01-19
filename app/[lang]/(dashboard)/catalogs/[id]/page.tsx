@@ -45,7 +45,7 @@ export default function CatalogDetailPage() {
   const [selectedElement, setSelectedElement] = useState<CatalogElementData | null>(null);
 
   const { data: catalog, isLoading, error } = useCatalog(catalogId);
-  const { data: elementsData } = useCatalogElements(catalog?.code || '', {
+  const { data: elementsData, isLoading: elementsLoading } = useCatalogElements(catalog?.code || '', {
     enabled: !!catalog?.code,
   });
 
@@ -155,7 +155,11 @@ export default function CatalogDetailPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {elements.length === 0 ? (
+          {elementsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="border-primary h-6 w-6 animate-spin rounded-full border-4 border-t-transparent" />
+            </div>
+          ) : elements.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <List className="mb-4 h-12 w-12" />
               <p>
