@@ -4,6 +4,7 @@ import { NotificationService } from '@/services/notificationService';
 interface UseNotificationsParams {
   unreadOnly?: boolean;
   perPage?: number;
+  page?: number;
   enabled?: boolean;
 }
 

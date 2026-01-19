@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useNotifications, useNotificationMutations } from '@/hooks/notifications';
 import { NotificationItem } from './NotificationItem';
 
@@ -13,6 +14,7 @@ interface NotificationDropdownProps {
 
 export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
   const { t } = useTranslation();
+  const router = useLocalizedRouter();
   const { data, isLoading } = useNotifications({ perPage: 20 });
   const { markAsRead, markAllAsRead } = useNotificationMutations();
 
@@ -66,6 +68,20 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
           ))
         )}
       </ScrollArea>
+
+      <div className="border-t p-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full"
+          onClick={() => {
+            router.push('/notifications');
+            onClose();
+          }}
+        >
+          {t('common:viewAll', { defaultValue: 'View all notifications' })}
+        </Button>
+      </div>
     </div>
   );
 }
