@@ -15,7 +15,7 @@ interface NotificationDropdownProps {
 export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
   const { t } = useTranslation();
   const router = useLocalizedRouter();
-  const { data, isLoading } = useNotifications({ perPage: 20 });
+  const { data, isLoading } = useNotifications({ perPage: 20, unreadOnly: true });
   const { markAsRead, markAllAsRead } = useNotificationMutations();
 
   const notifications = data?.items ?? [];
