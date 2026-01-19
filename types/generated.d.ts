@@ -1,6 +1,16 @@
+declare namespace App.Data {
+  export type NotificationData = {
+    id: string;
+    type: string;
+    data: Array<any>;
+    readAt: string | null;
+    createdAt: string | null;
+  };
+}
 declare namespace App.Data.Address {
   export type AddressData = {
     id: number;
+    publicId: string;
     ownerId: number | null;
     ownerType: string | null;
     type: App.Enums.AddressType;
@@ -98,6 +108,7 @@ declare namespace App.Data.Address {
 declare namespace App.Data.Business {
   export type BusinessData = {
     id: number;
+    publicId: string;
     name: string;
     typeName?: string;
     usersCanApproveOwnOrders?: boolean;
@@ -207,6 +218,7 @@ declare namespace App.Data.Currency {
 declare namespace App.Data.Driver {
   export type DriverData = {
     id?: number;
+    publicId?: string;
     userId?: number;
     licenseNumber?: string;
     licensePlateNumber?: string;
@@ -265,6 +277,7 @@ declare namespace App.Data.Location {
 declare namespace App.Data.Order {
   export type OrderData = {
     id?: number;
+    publicId?: string;
     userId?: number;
     businessId?: number | null;
     driverId?: number | null;
@@ -371,6 +384,7 @@ declare namespace App.Data.Pricing {
 declare namespace App.Data.Quote {
   export type QuoteData = {
     id?: number;
+    publicId?: string;
     orderId?: number;
     pricingRuleId?: number | null;
     version?: number;
@@ -458,6 +472,7 @@ declare namespace App.Data.User {
   };
   export type UserData = {
     id: number;
+    publicId: string;
     role: App.Enums.Role;
     name: string;
     email?: string;
@@ -466,7 +481,7 @@ declare namespace App.Data.User {
     langCode: string;
     preferredCurrency?: string | null;
     businessId?: number | null;
-    sexName?: string;
+    sexId?: number | null;
     isAdmin: boolean;
     isBusinessAccount: boolean;
     isBusinessOwner: boolean;

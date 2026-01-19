@@ -47,7 +47,7 @@ export default function OrderDetailPage() {
   const params = useParams();
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
-  const orderId = Number(params.id);
+  const orderId = params.id as string;
 
   const { data: order, isLoading, error } = useOrder({ id: orderId });
   const deleteOrder = useDeleteOrder();
@@ -109,7 +109,10 @@ export default function OrderDetailPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold">
-                {t('orders:order_id', { id: order.id, defaultValue: `Order #${order.id}` })}
+                {t('orders:order_id', {
+                  id: order.publicId,
+                  defaultValue: `Order ${order.publicId}`,
+                })}
               </h1>
               <OrderStatusBadge status={order.status as OrderStatus} />
             </div>
@@ -119,9 +122,9 @@ export default function OrderDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          {canCreateQuote && (
+          {canCreateQuote && order.id && (
             <CreateQuoteDialog
-              orderId={orderId}
+              orderId={order.id}
               orderDistanceKm={order.distanceKm}
               orderEstimatedMinutes={order.estimatedMinutes}
               customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
@@ -365,9 +368,9 @@ export default function OrderDetailPage() {
                 <p className="text-muted-foreground mb-4">
                   {t('orders:detail.no_quote', { defaultValue: 'No quote available' })}
                 </p>
-                {canCreateQuote && (
+                {canCreateQuote && order.id && (
                   <CreateQuoteDialog
-                    orderId={orderId}
+                    orderId={order.id}
                     orderDistanceKm={order.distanceKm}
                     orderEstimatedMinutes={order.estimatedMinutes}
                     customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}

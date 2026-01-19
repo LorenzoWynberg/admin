@@ -8,7 +8,7 @@ export function useDeleteOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => OrderService.destroy(id),
+    mutationFn: (id: string) => OrderService.destroy(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       toast.success(data.message || crudSuccessMessage('deleted', 'order'));

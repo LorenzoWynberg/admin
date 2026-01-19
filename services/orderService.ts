@@ -32,9 +32,9 @@ export const OrderService = {
   },
 
   /**
-   * Get a single order by ID
+   * Get a single order by publicId
    */
-  async getById(id: number): Promise<OrderData> {
+  async getById(id: string): Promise<OrderData> {
     const response = await api.get<Single<OrderData>>(`/orders/${id}`);
     return response.item;
   },
@@ -42,7 +42,7 @@ export const OrderService = {
   /**
    * Delete an order (admin only)
    */
-  async destroy(id: number): Promise<SuccessBasic> {
+  async destroy(id: string): Promise<SuccessBasic> {
     return api.destroy<SuccessBasic>(`/orders/${id}`);
   },
 };

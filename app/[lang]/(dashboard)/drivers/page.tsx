@@ -128,7 +128,7 @@ export default function DriversPage() {
                   <TableRow
                     key={driver.id}
                     className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => router.push(`/drivers/${driver.id}`)}
+                    onClick={() => router.push(`/drivers/${driver.publicId}`)}
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">

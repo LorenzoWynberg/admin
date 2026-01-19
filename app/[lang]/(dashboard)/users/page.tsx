@@ -182,7 +182,7 @@ export default function UsersPage() {
                   <TableRow
                     key={user.id}
                     className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => router.push(`/users/${user.id}`)}
+                    onClick={() => router.push(`/users/${user.publicId}`)}
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">

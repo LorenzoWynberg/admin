@@ -35,9 +35,9 @@ export const QuoteService = {
   },
 
   /**
-   * Get a single quote by ID
+   * Get a single quote by publicId
    */
-  async getById(id: number): Promise<QuoteData> {
+  async getById(id: string): Promise<QuoteData> {
     const response = await api.get<Single<QuoteData>>(`/quotes/${id}`);
     return response.item;
   },
@@ -53,7 +53,7 @@ export const QuoteService = {
   /**
    * Update a quote (only draft quotes can be updated)
    */
-  async update(id: number, data: Partial<StoreQuoteData>): Promise<QuoteData> {
+  async update(id: string, data: Partial<StoreQuoteData>): Promise<QuoteData> {
     const response = await api.patch<Single<QuoteData>>(`/quotes/${id}`, data);
     return response.item;
   },
@@ -61,14 +61,14 @@ export const QuoteService = {
   /**
    * Send a quote to the customer
    */
-  async send(id: number): Promise<SuccessBasic> {
+  async send(id: string): Promise<SuccessBasic> {
     return api.post<SuccessBasic>(`/quotes/${id}/send`);
   },
 
   /**
    * Delete a quote (draft quotes only)
    */
-  async destroy(id: number): Promise<SuccessBasic> {
+  async destroy(id: string): Promise<SuccessBasic> {
     return api.destroy<SuccessBasic>(`/quotes/${id}`);
   },
 };

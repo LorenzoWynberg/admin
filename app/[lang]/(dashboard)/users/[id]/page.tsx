@@ -8,9 +8,24 @@ import { useTranslation } from 'react-i18next';
 import { useUser, useDeleteUser } from '@/hooks/users';
 import { RoleBadge } from '@/components/users/RoleBadge';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
+import { useCatalogElement } from '@/hooks/catalogs/useCatalogStore';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, User, Mail, Phone, Calendar, Globe, Building2, Trash2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  Globe,
+  Building2,
+  Trash2,
+  Shield,
+  Car,
+  UserCircle,
+  Store,
+  Users,
+} from 'lucide-react';
 
 type Role = App.Enums.Role;
 
@@ -41,10 +56,11 @@ export default function UserDetailPage() {
   const params = useParams();
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
-  const userId = Number(params.id);
+  const userId = params.id as string;
 
   const { data: user, isLoading, error } = useUser(userId);
   const deleteUser = useDeleteUser();
+  const sexElement = useCatalogElement(user?.sexId);
 
   const handleDelete = () => {
     if (
@@ -97,7 +113,7 @@ export default function UserDetailPage() {
               <RoleBadge role={user.role as Role} />
             </div>
             <p className="text-muted-foreground">
-              {capitalize(t('models:user_one', { defaultValue: 'User' }))} #{user.id}
+              {capitalize(t('models:user_one', { defaultValue: 'User' }))} {user.publicId}
             </p>
           </div>
         </div>
@@ -161,7 +177,7 @@ export default function UserDetailPage() {
           <CardContent className="space-y-4">
             <div className="flex justify-between">
               <span className="text-muted-foreground">{validationAttribute('sex', true)}</span>
-              <span className="font-medium">{user.sexName || '-'}</span>
+              <span className="font-medium">{sexElement?.name || '-'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">
@@ -182,40 +198,59 @@ export default function UserDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Role Flags */}
+        {/* Account Type */}
         <Card>
-          <CardHeader>
-            <CardTitle>
-              {t('users:detail.account_type', { defaultValue: 'Account Type' })}
-            </CardTitle>
-            <CardDescription>
-              {t('users:detail.account_type_description', {
-                defaultValue: 'Roles and permissions assigned to this user',
-              })}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {user.isAdmin && (
-                <Badge variant="destructive">
+          <CardContent className="flex items-center gap-4 pt-6">
+            {user.isAdmin && (
+              <>
+                <div className="bg-destructive/10 flex h-12 w-12 items-center justify-center rounded-xl">
+                  <Shield className="text-destructive h-6 w-6" />
+                </div>
+                <p className="text-lg font-semibold">
                   {t('users:role.admin', { defaultValue: 'Admin' })}
-                </Badge>
-              )}
-              {user.isDriver && <Badge>{t('users:role.driver', { defaultValue: 'Driver' })}</Badge>}
-              {user.isClient && (
-                <Badge variant="outline">
+                </p>
+              </>
+            )}
+            {user.isDriver && (
+              <>
+                <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-xl">
+                  <Car className="text-primary h-6 w-6" />
+                </div>
+                <p className="text-lg font-semibold">
+                  {t('users:role.driver', { defaultValue: 'Driver' })}
+                </p>
+              </>
+            )}
+            {user.isClient && (
+              <>
+                <div className="bg-muted flex h-12 w-12 items-center justify-center rounded-xl">
+                  <UserCircle className="text-foreground h-6 w-6" />
+                </div>
+                <p className="text-lg font-semibold">
                   {t('users:role.client', { defaultValue: 'Client' })}
-                </Badge>
-              )}
-              {user.isBusinessOwner && (
-                <Badge>{t('users:role.business_owner', { defaultValue: 'Business Owner' })}</Badge>
-              )}
-              {user.isBusinessUser && (
-                <Badge variant="secondary">
+                </p>
+              </>
+            )}
+            {user.isBusinessOwner && (
+              <>
+                <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-xl">
+                  <Store className="text-primary h-6 w-6" />
+                </div>
+                <p className="text-lg font-semibold">
+                  {t('users:role.business_owner', { defaultValue: 'Business Owner' })}
+                </p>
+              </>
+            )}
+            {user.isBusinessUser && (
+              <>
+                <div className="bg-secondary flex h-12 w-12 items-center justify-center rounded-xl">
+                  <Users className="text-secondary-foreground h-6 w-6" />
+                </div>
+                <p className="text-lg font-semibold">
                   {t('users:role.business_user', { defaultValue: 'Business User' })}
-                </Badge>
-              )}
-            </div>
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -232,7 +267,7 @@ export default function UserDetailPage() {
               <Button
                 variant="link"
                 className="h-auto p-0"
-                onClick={() => router.push(`/businesses/${user.business?.id}`)}
+                onClick={() => router.push(`/businesses/${user.business?.publicId}`)}
               >
                 {user.business.name}
               </Button>

@@ -27,17 +27,17 @@ export const BusinessService = {
     return api.get<Paginated<BusinessData>>(url);
   },
 
-  async getById(id: number): Promise<BusinessData> {
+  async getById(id: string): Promise<BusinessData> {
     const response = await api.get<Single<BusinessData>>(`/businesses/${id}`);
     return response.item;
   },
 
-  async update(id: number, data: UpdateBusinessData): Promise<BusinessData> {
+  async update(id: string, data: UpdateBusinessData): Promise<BusinessData> {
     const response = await api.patch<Single<BusinessData>>(`/businesses/${id}`, data);
     return response.item;
   },
 
-  async destroy(id: number): Promise<SuccessBasic> {
+  async destroy(id: string): Promise<SuccessBasic> {
     return api.destroy<SuccessBasic>(`/businesses/${id}`);
   },
 };

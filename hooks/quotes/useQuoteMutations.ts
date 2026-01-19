@@ -30,7 +30,7 @@ export function useUpdateQuote() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<StoreQuoteData> }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<StoreQuoteData> }) =>
       QuoteService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
@@ -51,7 +51,7 @@ export function useSendQuote() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => QuoteService.send(id),
+    mutationFn: (id: string) => QuoteService.send(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
@@ -71,7 +71,7 @@ export function useDeleteQuote() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => QuoteService.destroy(id),
+    mutationFn: (id: string) => QuoteService.destroy(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });

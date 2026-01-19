@@ -27,7 +27,7 @@ export default function BusinessDetailPage() {
   const params = useParams();
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
-  const businessId = Number(params.id);
+  const businessId = params.id as string;
 
   const { data: business, isLoading, error } = useBusiness(businessId);
   const deleteBusiness = useDeleteBusiness();
@@ -85,7 +85,8 @@ export default function BusinessDetailPage() {
           <div>
             <h1 className="text-3xl font-bold">{business.name}</h1>
             <p className="text-muted-foreground">
-              {capitalize(t('models:business_one', { defaultValue: 'Business' }))} #{business.id}
+              {capitalize(t('models:business_one', { defaultValue: 'Business' }))}{' '}
+              {business.publicId}
             </p>
           </div>
         </div>
@@ -150,7 +151,7 @@ export default function BusinessDetailPage() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => router.push(`/users/${business.user?.id}`)}
+                  onClick={() => router.push(`/users/${business.user?.publicId}`)}
                 >
                   {t('drivers:detail.view_user_profile', { defaultValue: 'View User Profile' })}
                 </Button>

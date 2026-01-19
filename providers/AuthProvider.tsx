@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Auth } from '@/services/authService';
+import { useLoadCatalogs } from '@/hooks/catalogs';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -11,6 +12,9 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const token = useAuthStore((state) => state.token);
   const hydrated = useAuthStore((state) => state.hydrated);
+
+  // Load catalogs when authenticated
+  useLoadCatalogs();
 
   useEffect(() => {
     // Only refresh if we have a token and store is hydrated

@@ -165,8 +165,8 @@ export function CreateQuoteDialog({
 
     createQuote.mutate(data, {
       onSuccess: (quote) => {
-        if (andSend && quote.id) {
-          sendQuote.mutate(quote.id, {
+        if (andSend && quote.publicId) {
+          sendQuote.mutate(quote.publicId, {
             onSuccess: () => setOpen(false),
           });
         } else {

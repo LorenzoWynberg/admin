@@ -10,7 +10,7 @@ export function useUpdateUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateUserData }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateUserData }) =>
       UserService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -30,7 +30,7 @@ export function useDeleteUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => UserService.destroy(id),
+    mutationFn: (id: string) => UserService.destroy(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success(data.message || crudSuccessMessage('deleted', 'user'));

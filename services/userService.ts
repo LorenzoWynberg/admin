@@ -34,9 +34,9 @@ export const UserService = {
   },
 
   /**
-   * Get a single user by ID
+   * Get a single user by publicId
    */
-  async getById(id: number): Promise<UserData> {
+  async getById(id: string): Promise<UserData> {
     const response = await api.get<Single<UserData>>(`/users/${id}`);
     return response.item;
   },
@@ -52,7 +52,7 @@ export const UserService = {
   /**
    * Update a user
    */
-  async update(id: number, data: UpdateUserData): Promise<UserData> {
+  async update(id: string, data: UpdateUserData): Promise<UserData> {
     const response = await api.patch<Single<UserData>>(`/users/${id}`, data);
     return response.item;
   },
@@ -60,7 +60,7 @@ export const UserService = {
   /**
    * Delete a user
    */
-  async destroy(id: number): Promise<SuccessBasic> {
+  async destroy(id: string): Promise<SuccessBasic> {
     return api.destroy<SuccessBasic>(`/users/${id}`);
   },
 };

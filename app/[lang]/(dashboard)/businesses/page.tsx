@@ -118,7 +118,7 @@ export default function BusinessesPage() {
                   <TableRow
                     key={business.id}
                     className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => router.push(`/businesses/${business.id}`)}
+                    onClick={() => router.push(`/businesses/${business.publicId}`)}
                   >
                     <TableCell className="font-medium">{business.name}</TableCell>
                     <TableCell>{business.typeName || '-'}</TableCell>

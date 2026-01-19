@@ -27,17 +27,17 @@ export const DriverService = {
     return api.get<Paginated<DriverData>>(url);
   },
 
-  async getById(id: number): Promise<DriverData> {
+  async getById(id: string): Promise<DriverData> {
     const response = await api.get<Single<DriverData>>(`/drivers/${id}`);
     return response.item;
   },
 
-  async update(id: number, data: UpdateDriverData): Promise<DriverData> {
+  async update(id: string, data: UpdateDriverData): Promise<DriverData> {
     const response = await api.patch<Single<DriverData>>(`/drivers/${id}`, data);
     return response.item;
   },
 
-  async destroy(id: number): Promise<SuccessBasic> {
+  async destroy(id: string): Promise<SuccessBasic> {
     return api.destroy<SuccessBasic>(`/drivers/${id}`);
   },
 };

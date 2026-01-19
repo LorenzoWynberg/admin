@@ -10,7 +10,7 @@ export function useUpdateDriver() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateDriverData }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateDriverData }) =>
       DriverService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['drivers'] });
@@ -30,7 +30,7 @@ export function useDeleteDriver() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => DriverService.destroy(id),
+    mutationFn: (id: string) => DriverService.destroy(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['drivers'] });
       toast.success(data.message || crudSuccessMessage('deleted', 'driver'));

@@ -38,7 +38,7 @@ export default function QuoteDetailPage() {
   const params = useParams();
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
-  const quoteId = Number(params.id);
+  const quoteId = params.id as string;
 
   const { data: quote, isLoading, error } = useQuote(quoteId);
   const { data: currencies } = useCurrencyList();
@@ -107,7 +107,7 @@ export default function QuoteDetailPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold">
-                {capitalize(t('models:quote_one', { defaultValue: 'Quote' }))} #{quote.id}
+                {capitalize(t('models:quote_one', { defaultValue: 'Quote' }))} {quote.publicId}
               </h1>
               <QuoteStatusBadge status={quote.status as QuoteStatus} />
             </div>
@@ -154,12 +154,12 @@ export default function QuoteDetailPage() {
                 <Button
                   variant="link"
                   className="h-auto p-0"
-                  onClick={() => router.push(`/orders/${quote.orderId}`)}
+                  onClick={() => router.push(`/orders/${quote.order?.publicId}`)}
                 >
                   <Package className="mr-1 h-4 w-4" />
                   {t('orders:order_id', {
-                    id: quote.orderId,
-                    defaultValue: `Order #${quote.orderId}`,
+                    id: quote.order?.publicId,
+                    defaultValue: `Order ${quote.order?.publicId}`,
                   })}
                 </Button>
               </div>

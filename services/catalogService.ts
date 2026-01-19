@@ -22,6 +22,11 @@ function buildQueryString(params: ListParams): string {
 }
 
 export const CatalogService = {
+  async all(): Promise<CatalogData[]> {
+    const response = await api.get<Api.Response.Multiple<CatalogData>>('/catalogs/all');
+    return response.items;
+  },
+
   async list(params: ListParams = {}): Promise<Paginated<CatalogData>> {
     const query = buildQueryString(params);
     const url = `/catalogs${query ? `?${query}` : ''}`;

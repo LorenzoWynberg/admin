@@ -179,22 +179,22 @@ export default function QuotesPage() {
                   <TableRow
                     key={quote.id}
                     className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => router.push(`/quotes/${quote.id}`)}
+                    onClick={() => router.push(`/quotes/${quote.publicId}`)}
                   >
-                    <TableCell className="font-medium">#{quote.id}</TableCell>
+                    <TableCell className="font-medium">{quote.publicId}</TableCell>
                     <TableCell>
-                      {quote.orderId ? (
+                      {quote.order?.publicId ? (
                         <Button
                           variant="link"
                           className="h-auto p-0"
                           onClick={(e) => {
                             e.stopPropagation();
-                            router.push(`/orders/${quote.orderId}`);
+                            router.push(`/orders/${quote.order?.publicId}`);
                           }}
                         >
                           {t('orders:order_id', {
-                            id: quote.orderId,
-                            defaultValue: `Order #${quote.orderId}`,
+                            id: quote.order?.publicId,
+                            defaultValue: `Order ${quote.order?.publicId}`,
                           })}
                         </Button>
                       ) : (

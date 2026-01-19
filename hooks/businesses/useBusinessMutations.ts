@@ -10,7 +10,7 @@ export function useUpdateBusiness() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateBusinessData }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateBusinessData }) =>
       BusinessService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['businesses'] });
@@ -30,7 +30,7 @@ export function useDeleteBusiness() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => BusinessService.destroy(id),
+    mutationFn: (id: string) => BusinessService.destroy(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['businesses'] });
       toast.success(data.message || crudSuccessMessage('deleted', 'business'));

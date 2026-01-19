@@ -185,9 +185,9 @@ export default function OrdersPage() {
                   <TableRow
                     key={order.id}
                     className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => router.push(`/orders/${order.id}`)}
+                    onClick={() => router.push(`/orders/${order.publicId}`)}
                   >
-                    <TableCell className="font-medium">#{order.id}</TableCell>
+                    <TableCell className="font-medium">{order.publicId}</TableCell>
                     <TableCell>
                       <OrderStatusBadge status={order.status as OrderStatus} />
                     </TableCell>

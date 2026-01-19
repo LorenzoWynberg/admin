@@ -43,7 +43,7 @@ export default function DriverDetailPage() {
   const params = useParams();
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
-  const driverId = Number(params.id);
+  const driverId = params.id as string;
 
   const { data: driver, isLoading, error } = useDriver(driverId);
   const deleteDriver = useDeleteDriver();
@@ -99,7 +99,7 @@ export default function DriverDetailPage() {
               {driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}
             </h1>
             <p className="text-muted-foreground">
-              {capitalize(t('models:driver_one', { defaultValue: 'Driver' }))} #{driver.id}
+              {capitalize(t('models:driver_one', { defaultValue: 'Driver' }))} {driver.publicId}
             </p>
           </div>
         </div>
@@ -130,11 +130,11 @@ export default function DriverDetailPage() {
               <span className="text-muted-foreground">{validationAttribute('phone', true)}</span>
               <span className="font-medium">{driver.user?.phone || '-'}</span>
             </div>
-            {driver.userId && (
+            {driver.user?.publicId && (
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => router.push(`/users/${driver.userId}`)}
+                onClick={() => router.push(`/users/${driver.user?.publicId}`)}
               >
                 {t('drivers:detail.view_user_profile', { defaultValue: 'View User Profile' })}
               </Button>
