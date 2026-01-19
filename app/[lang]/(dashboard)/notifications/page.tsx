@@ -15,6 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  useNotifications,
+  useNotificationMutations,
+  useNotificationHelpers,
+  getNotificationUrl,
+  getNotificationData,
+} from '@/hooks/notifications';
 
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
@@ -22,10 +29,11 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { capitalize } from '@/utils/lang';
+import { getDateLocale } from '@/utils/format';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
-import { useNotifications, useNotificationMutations } from '@/hooks/notifications';
 import {
   Bell,
   BookOpen,
@@ -40,59 +48,26 @@ import {
 
 type NotificationData = App.Data.NotificationData;
 
-const MODEL_OPTIONS = [
-  { value: 'catalog', label: 'Catalog' },
-  { value: 'catalog_element', label: 'Catalog Element' },
-];
-
-const ACTION_OPTIONS = [
-  { value: 'created', label: 'Created' },
-  { value: 'updated', label: 'Updated' },
-  { value: 'deleted', label: 'Deleted' },
-  { value: 'restored', label: 'Restored' },
-];
-
-function getNotificationData(notification: NotificationData) {
-  const data = Array.isArray(notification.data) ? notification.data[0] : notification.data;
-  return data as {
-    action?: string;
-    model?: string;
-    model_id?: number | null;
-    model_name?: string | null;
-    catalog_id?: number | null;
-    title?: string;
-    message?: string;
-  };
-}
-
-function getNotificationUrl(data: ReturnType<typeof getNotificationData>): string | null {
-  if (!data.model) return null;
-
-  switch (data.model) {
-    case 'catalog':
-      return data.model_id ? `/catalogs/${data.model_id}` : null;
-    case 'catalog_element':
-      return data.catalog_id ? `/catalogs/${data.catalog_id}` : null;
-    default:
-      return null;
-  }
-}
-
 function NotificationIcon({ model }: { model: string }) {
   switch (model) {
     case 'catalog':
-    case 'catalog_element':
+    case 'element':
       return <BookOpen className="text-muted-foreground h-5 w-5" />;
-    default:
+    case 'order':
       return <Package className="text-muted-foreground h-5 w-5" />;
+    default:
+      return <Bell className="text-muted-foreground h-5 w-5" />;
   }
 }
 
 export default function NotificationsPage() {
-  const { t, ready } = useTranslation();
+  const { t, ready, i18n } = useTranslation('notifications');
+  const { getTitle, getMessage, getModelLabel, getActionLabel } = useNotificationHelpers();
   const router = useLocalizedRouter();
+  const dateLocale = getDateLocale(i18n.language);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState<string>('');
+  const [status, setStatus] = useState<string>('');
   const [model, setModel] = useState<string>('');
   const [action, setAction] = useState<string>('');
   const [fromDate, setFromDate] = useState<string>('');
@@ -100,8 +75,9 @@ export default function NotificationsPage() {
 
   const { data, isLoading, error } = useNotifications({
     page,
-    perPage: 20,
+    perPage: 10,
     search: search || undefined,
+    status: (status as 'read' | 'unread') || undefined,
     model: model || undefined,
     action: action || undefined,
     fromDate: fromDate || undefined,
@@ -112,7 +88,7 @@ export default function NotificationsPage() {
   const notifications = data?.items || [];
   const meta = data?.meta;
   const hasUnread = (data?.extra?.unread_count ?? 0) > 0;
-  const hasFilters = search || model || action || fromDate || toDate;
+  const hasFilters = search || status || model || action || fromDate || toDate;
 
   const handleRowClick = (notification: NotificationData) => {
     if (!notification.readAt) {
@@ -127,6 +103,7 @@ export default function NotificationsPage() {
 
   const clearFilters = () => {
     setSearch('');
+    setStatus('');
     setModel('');
     setAction('');
     setFromDate('');
@@ -143,7 +120,7 @@ export default function NotificationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {t('common:notifications', { defaultValue: 'Notifications' })}
+            {capitalize(t('models:notification_other', { defaultValue: 'Notifications' }))}
           </h1>
           <p className="text-muted-foreground">
             {t('notifications:page_description', {
@@ -171,7 +148,7 @@ export default function NotificationsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="relative max-w-md">
+          <div className="relative">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder={t('notifications:filter.search_placeholder', {
@@ -186,13 +163,43 @@ export default function NotificationsPage() {
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label>{t('notifications:filter.status', { defaultValue: 'Status' })}</Label>
+              <Select
+                value={status || 'all'}
+                onValueChange={(value) => {
+                  setStatus(value === 'all' ? '' : value);
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={t('notifications:filter.all_statuses', {
+                      defaultValue: 'All statuses',
+                    })}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {t('notifications:filter.all_statuses', { defaultValue: 'All statuses' })}
+                  </SelectItem>
+                  <SelectItem value="unread">
+                    {t('statuses:unread', { defaultValue: 'Unread' })}
+                  </SelectItem>
+                  <SelectItem value="read">
+                    {t('statuses:read', { defaultValue: 'Read' })}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-2">
               <Label>{t('notifications:filter.model', { defaultValue: 'Type' })}</Label>
               <Select
-                value={model}
+                value={model || 'all'}
                 onValueChange={(value) => {
-                  setModel(value);
+                  setModel(value === 'all' ? '' : value);
                   setPage(1);
                 }}
               >
@@ -202,11 +209,12 @@ export default function NotificationsPage() {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  {MODEL_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="all">
+                    {t('notifications:filter.all_types', { defaultValue: 'All types' })}
+                  </SelectItem>
+                  <SelectItem value="catalog">{capitalize(getModelLabel('catalog'))}</SelectItem>
+                  <SelectItem value="element">{capitalize(getModelLabel('element'))}</SelectItem>
+                  <SelectItem value="order">{capitalize(getModelLabel('order'))}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -214,9 +222,9 @@ export default function NotificationsPage() {
             <div className="space-y-2">
               <Label>{t('notifications:filter.action', { defaultValue: 'Action' })}</Label>
               <Select
-                value={action}
+                value={action || 'all'}
                 onValueChange={(value) => {
-                  setAction(value);
+                  setAction(value === 'all' ? '' : value);
                   setPage(1);
                 }}
               >
@@ -228,39 +236,73 @@ export default function NotificationsPage() {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  {ACTION_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="all">
+                    {t('notifications:filter.all_actions', { defaultValue: 'All actions' })}
+                  </SelectItem>
+                  <SelectItem value="created">{capitalize(getActionLabel('created'))}</SelectItem>
+                  <SelectItem value="updated">{capitalize(getActionLabel('updated'))}</SelectItem>
+                  <SelectItem value="deleted">{capitalize(getActionLabel('deleted'))}</SelectItem>
+                  <SelectItem value="restored">{capitalize(getActionLabel('restored'))}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label>{t('notifications:filter.from_date', { defaultValue: 'From date' })}</Label>
-              <Input
-                type="date"
-                value={fromDate}
-                max={toDate || undefined}
-                onChange={(e) => {
-                  setFromDate(e.target.value);
-                  setPage(1);
-                }}
-              />
+              <div className="relative">
+                <Input
+                  type="date"
+                  value={fromDate}
+                  max={toDate || undefined}
+                  onChange={(e) => {
+                    setFromDate(e.target.value);
+                    setPage(1);
+                  }}
+                  className={fromDate ? 'pr-8' : ''}
+                />
+                {fromDate && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFromDate('');
+                      setPage(1);
+                    }}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
               <Label>{t('notifications:filter.to_date', { defaultValue: 'To date' })}</Label>
-              <Input
-                type="date"
-                value={toDate}
-                min={fromDate || undefined}
-                onChange={(e) => {
-                  setToDate(e.target.value);
-                  setPage(1);
-                }}
-              />
+              <div className="relative">
+                <Input
+                  type="date"
+                  value={toDate}
+                  min={fromDate || undefined}
+                  onChange={(e) => {
+                    setToDate(e.target.value);
+                    setPage(1);
+                  }}
+                  className={toDate ? 'pr-8' : ''}
+                />
+                {toDate && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setToDate('');
+                      setPage(1);
+                    }}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -294,7 +336,7 @@ export default function NotificationsPage() {
                 <TableRow>
                   <TableHead className="w-12"></TableHead>
                   <TableHead>
-                    {t('common:notification', { defaultValue: 'Notification' })}
+                    {capitalize(t('models:notification_one', { defaultValue: 'Notification' }))}
                   </TableHead>
                   <TableHead className="w-32">
                     {t('common:status', { defaultValue: 'Status' })}
@@ -321,21 +363,22 @@ export default function NotificationsPage() {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-medium">{notifData.title ?? 'Notification'}</p>
-                          <p className="text-muted-foreground text-sm">{notifData.message ?? ''}</p>
+                          <p className="font-medium">{getTitle(notifData)}</p>
+                          <p className="text-muted-foreground text-sm">{getMessage(notifData)}</p>
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant={isUnread ? 'default' : 'secondary'}>
                           {isUnread
-                            ? t('common:unread', { defaultValue: 'Unread' })
-                            : t('common:read', { defaultValue: 'Read' })}
+                            ? t('statuses:unread', { defaultValue: 'Unread' })
+                            : t('statuses:read', { defaultValue: 'Read' })}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {notification.createdAt
                           ? formatDistanceToNow(new Date(notification.createdAt), {
                               addSuffix: true,
+                              locale: dateLocale,
                             })
                           : '-'}
                       </TableCell>

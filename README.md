@@ -35,6 +35,7 @@ app/admin/
 │       ├── businesses/   # Business management
 │       ├── catalogs/     # Catalog management
 │       ├── pricing/      # Pricing rules
+│       ├── notifications/# Notification history
 │       └── settings/     # Admin settings
 ├── components/
 │   ├── ui/               # shadcn/ui components
@@ -54,6 +55,13 @@ app/admin/
 - **Store + Service dual layer**: Zustand for reactive state, Services for API calls
 - **React Query** for server state with automatic cache invalidation
 - **Hydration guards**: Wait for `hydrated: true` before rendering
+- **Real-time updates**: WebSocket via Laravel Reverb + EchoProvider
+
+### Real-time Features
+
+- **Catalog broadcasts**: Live updates when catalogs/elements change
+- **Notifications**: Toast alerts + bell icon with unread badge
+- **Notification page**: Full history with filters (text, type, action, date range)
 
 ## Commands
 

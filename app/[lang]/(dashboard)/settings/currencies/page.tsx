@@ -47,7 +47,9 @@ function formatRate(rate?: number | null): string {
 
 function formatDate(dateStr?: string | null): string {
   if (!dateStr) return '-';
-  return new Date(dateStr).toLocaleDateString(undefined, {
+  // Append T00:00:00 to parse as local time, not UTC
+  const localDate = dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`;
+  return new Date(localDate).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

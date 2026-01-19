@@ -51,7 +51,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { resourceMessage, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import {
   usePricingRuleList,
   useActivatePricingRule,
@@ -236,7 +236,7 @@ export default function PricingPage() {
                               onClick={() => router.push(`/pricing/${rule.id}/edit`)}
                             >
                               <Pencil className="mr-2 h-4 w-4" />
-                              {t('common:edit')}
+                              {capitalize(t('common:edit'))}
                             </DropdownMenuItem>
                           )}
                           {rule.status !== Enums.PricingRuleStatus.DRAFT && (
@@ -245,7 +245,7 @@ export default function PricingPage() {
                               disabled={cloneMutation.isPending}
                             >
                               <Copy className="mr-2 h-4 w-4" />
-                              {t('common:clone')}
+                              {capitalize(t('common:clone'))}
                             </DropdownMenuItem>
                           )}
                           {rule.status === Enums.PricingRuleStatus.DRAFT && (
@@ -256,7 +256,7 @@ export default function PricingPage() {
                               }}
                             >
                               <Power className="mr-2 h-4 w-4" />
-                              {t('common:activate')}
+                              {capitalize(t('common:activate'))}
                             </DropdownMenuItem>
                           )}
                           {rule.status === Enums.PricingRuleStatus.DRAFT && (
@@ -270,7 +270,7 @@ export default function PricingPage() {
                                 }}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                {t('common:delete')}
+                                {capitalize(t('common:delete'))}
                               </DropdownMenuItem>
                             </>
                           )}

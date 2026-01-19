@@ -3,6 +3,7 @@ import { NotificationService } from '@/services/notificationService';
 
 interface UseNotificationsParams {
   unreadOnly?: boolean;
+  status?: 'read' | 'unread';
   perPage?: number;
   page?: number;
   search?: string;

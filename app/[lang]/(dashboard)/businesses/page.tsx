@@ -110,7 +110,9 @@ export default function BusinessesPage() {
                   <TableHead>{validationAttribute('name', true)}</TableHead>
                   <TableHead>{validationAttribute('type', true)}</TableHead>
                   <TableHead>{validationAttribute('owner', true)}</TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>
+                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

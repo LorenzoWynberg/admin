@@ -117,7 +117,8 @@ export default function OrderDetailPage() {
               <OrderStatusBadge status={order.status as OrderStatus} />
             </div>
             <p className="text-muted-foreground">
-              {t('common:created', { defaultValue: 'Created' })} {formatDate(order.createdAt)}
+              {capitalize(t('common:created', { defaultValue: 'Created' }))}{' '}
+              {formatDate(order.createdAt)}
             </p>
           </div>
         </div>
@@ -133,7 +134,7 @@ export default function OrderDetailPage() {
           )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
             <Trash2 className="mr-2 h-4 w-4" />
-            {t('common:delete', { defaultValue: 'Delete' })}
+            {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
           </Button>
         </div>
       </div>
@@ -358,7 +359,7 @@ export default function OrderDetailPage() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => router.push(`/quotes/${order.currentQuote?.id}`)}
+                  onClick={() => router.push(`/quotes/${order.currentQuote?.publicId}`)}
                 >
                   {t('orders:detail.view_quote', { defaultValue: 'View Quote Details' })}
                 </Button>

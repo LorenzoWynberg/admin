@@ -120,7 +120,9 @@ export default function DriversPage() {
                   <TableHead>{validationAttribute('licenseNumber', true)}</TableHead>
                   <TableHead>{validationAttribute('licensePlate', true)}</TableHead>
                   <TableHead>{validationAttribute('licenseExpires', true)}</TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>
+                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

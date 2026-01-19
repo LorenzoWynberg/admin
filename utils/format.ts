@@ -1,3 +1,20 @@
+import { es, fr, enUS } from 'date-fns/locale';
+import type { Locale } from 'date-fns';
+
+/**
+ * Get date-fns locale from language code.
+ */
+export function getDateLocale(lang: string): Locale {
+  switch (lang) {
+    case 'es':
+      return es;
+    case 'fr':
+      return fr;
+    default:
+      return enUS;
+  }
+}
+
 /**
  * Format a number as currency with symbol and precision.
  */

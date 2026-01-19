@@ -118,7 +118,9 @@ export default function AddressesPage() {
                   </TableHead>
                   <TableHead>{validationAttribute('city', true)}</TableHead>
                   <TableHead>{validationAttribute('type', true)}</TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>
+                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

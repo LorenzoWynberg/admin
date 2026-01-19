@@ -5,6 +5,7 @@ type Paginated<T> = Api.Response.Paginated<T>;
 
 interface ListParams {
   unreadOnly?: boolean;
+  status?: 'read' | 'unread';
   perPage?: number;
   page?: number;
   search?: string;
@@ -24,6 +25,7 @@ export const NotificationService = {
   async list(params: ListParams = {}): Promise<NotificationsResponse> {
     const query = new URLSearchParams();
     if (params.unreadOnly) query.set('unread_only', 'true');
+    if (params.status) query.set('status', params.status);
     if (params.perPage) query.set('per_page', String(params.perPage));
     if (params.page) query.set('page', String(params.page));
     if (params.search) query.set('search', params.search);
