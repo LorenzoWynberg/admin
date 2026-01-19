@@ -26,7 +26,17 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useNotifications, useNotificationMutations } from '@/hooks/notifications';
-import { Bell, BookOpen, ChevronLeft, ChevronRight, Package, Check, Filter, X } from 'lucide-react';
+import {
+  Bell,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  Package,
+  Check,
+  Filter,
+  Search,
+  X,
+} from 'lucide-react';
 
 type NotificationData = App.Data.NotificationData;
 
@@ -82,6 +92,7 @@ export default function NotificationsPage() {
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState<string>('');
   const [model, setModel] = useState<string>('');
   const [action, setAction] = useState<string>('');
   const [fromDate, setFromDate] = useState<string>('');
@@ -90,6 +101,7 @@ export default function NotificationsPage() {
   const { data, isLoading, error } = useNotifications({
     page,
     perPage: 20,
+    search: search || undefined,
     model: model || undefined,
     action: action || undefined,
     fromDate: fromDate || undefined,
@@ -100,7 +112,7 @@ export default function NotificationsPage() {
   const notifications = data?.items || [];
   const meta = data?.meta;
   const hasUnread = (data?.extra?.unread_count ?? 0) > 0;
-  const hasFilters = model || action || fromDate || toDate;
+  const hasFilters = search || model || action || fromDate || toDate;
 
   const handleRowClick = (notification: NotificationData) => {
     if (!notification.readAt) {
@@ -114,6 +126,7 @@ export default function NotificationsPage() {
   };
 
   const clearFilters = () => {
+    setSearch('');
     setModel('');
     setAction('');
     setFromDate('');
@@ -157,7 +170,22 @@ export default function NotificationsPage() {
             {t('common:filters', { defaultValue: 'Filters' })}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="relative max-w-md">
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder={t('notifications:filter.search_placeholder', {
+                defaultValue: 'Search notifications...',
+              })}
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              className="pl-9"
+            />
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <Label>{t('notifications:filter.model', { defaultValue: 'Type' })}</Label>

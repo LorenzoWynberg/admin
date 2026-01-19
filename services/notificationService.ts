@@ -7,6 +7,7 @@ interface ListParams {
   unreadOnly?: boolean;
   perPage?: number;
   page?: number;
+  search?: string;
   model?: string;
   action?: string;
   fromDate?: string;
@@ -25,6 +26,7 @@ export const NotificationService = {
     if (params.unreadOnly) query.set('unread_only', 'true');
     if (params.perPage) query.set('per_page', String(params.perPage));
     if (params.page) query.set('page', String(params.page));
+    if (params.search) query.set('search', params.search);
     if (params.model) query.set('model', params.model);
     if (params.action) query.set('action', params.action);
     if (params.fromDate) query.set('from_date', params.fromDate);
