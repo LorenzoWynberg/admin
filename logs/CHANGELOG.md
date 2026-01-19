@@ -6,6 +6,50 @@ Format: Each entry includes the date, affected component(s), and a brief descrip
 
 ---
 
+## 2026-01-19
+
+### Admin + API
+
+- **feat: real-time catalog broadcasts**
+  - WebSocket broadcasting for catalog updates using Laravel Reverb
+  - Echo provider with `useSyncExternalStore` for React Strict Mode compatibility
+  - Catalog store with reactive hooks for real-time updates
+
+- **feat: notification system**
+  - Database-persisted notifications (Laravel's built-in)
+  - Real-time toast notifications via WebSocket
+  - Bell icon with unread badge in header
+  - Dropdown showing unread notifications
+  - Click to mark as read and navigate to resource
+  - `/notifications` page with full history and filters:
+    - Text search (title, message, model_name)
+    - Type filter (Catalog, Catalog Element)
+    - Action filter (Created, Updated, Deleted, Restored)
+    - Date range filter with validation
+  - Dismissible toasts with close button
+
+### Files Created (Admin)
+
+- `lib/echo.ts` - Echo configuration
+- `providers/EchoProvider.tsx` - WebSocket provider
+- `stores/useCatalogStore.ts` - Catalog state management
+- `hooks/catalogs/useCatalogBroadcast.ts` - Catalog broadcast listener
+- `services/notificationService.ts` - Notification API calls
+- `hooks/notifications/*` - Notification hooks
+- `components/notifications/*` - Bell, dropdown, item components
+- `app/[lang]/(dashboard)/notifications/page.tsx` - Notifications page
+
+### Files Created (API)
+
+- `app/Events/CatalogsUpdated.php` - Broadcast event
+- `app/Notifications/CatalogUpdatedNotification.php` - Notification class
+- `app/Http/Controllers/NotificationController.php` - API endpoints
+- `app/Data/NotificationData.php` - DTO
+- `routes/channels.php` - Channel authorization
+- `config/reverb.php`, `config/broadcasting.php` - Broadcasting config
+
+---
+
 ## 2026-01-14
 
 ### Admin
