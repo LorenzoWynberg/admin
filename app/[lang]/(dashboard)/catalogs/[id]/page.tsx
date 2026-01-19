@@ -45,9 +45,12 @@ export default function CatalogDetailPage() {
   const [selectedElement, setSelectedElement] = useState<CatalogElementData | null>(null);
 
   const { data: catalog, isLoading, error } = useCatalog(catalogId);
-  const { data: elementsData, isLoading: elementsLoading } = useCatalogElements(catalog?.code || '', {
-    enabled: !!catalog?.code,
-  });
+  const { data: elementsData, isLoading: elementsLoading } = useCatalogElements(
+    catalog?.code || '',
+    {
+      enabled: !!catalog?.code,
+    }
+  );
 
   const handleEditElement = (element: CatalogElementData) => {
     setSelectedElement(element);

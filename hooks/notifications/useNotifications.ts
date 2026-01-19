@@ -5,6 +5,10 @@ interface UseNotificationsParams {
   unreadOnly?: boolean;
   perPage?: number;
   page?: number;
+  model?: string;
+  action?: string;
+  fromDate?: string;
+  toDate?: string;
   enabled?: boolean;
 }
 

@@ -7,6 +7,10 @@ interface ListParams {
   unreadOnly?: boolean;
   perPage?: number;
   page?: number;
+  model?: string;
+  action?: string;
+  fromDate?: string;
+  toDate?: string;
 }
 
 interface NotificationsResponse extends Paginated<NotificationData> {
@@ -21,6 +25,10 @@ export const NotificationService = {
     if (params.unreadOnly) query.set('unread_only', 'true');
     if (params.perPage) query.set('per_page', String(params.perPage));
     if (params.page) query.set('page', String(params.page));
+    if (params.model) query.set('model', params.model);
+    if (params.action) query.set('action', params.action);
+    if (params.fromDate) query.set('from_date', params.fromDate);
+    if (params.toDate) query.set('to_date', params.toDate);
 
     const queryString = query.toString();
     const url = `/notifications${queryString ? `?${queryString}` : ''}`;

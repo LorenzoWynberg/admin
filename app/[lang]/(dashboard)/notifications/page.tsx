@@ -8,18 +8,39 @@ import {
   TableRow,
   Table,
 } from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useNotifications, useNotificationMutations } from '@/hooks/notifications';
-import { Bell, BookOpen, ChevronLeft, ChevronRight, Package, Check } from 'lucide-react';
+import { Bell, BookOpen, ChevronLeft, ChevronRight, Package, Check, Filter, X } from 'lucide-react';
 
 type NotificationData = App.Data.NotificationData;
+
+const MODEL_OPTIONS = [
+  { value: 'catalog', label: 'Catalog' },
+  { value: 'catalog_element', label: 'Catalog Element' },
+];
+
+const ACTION_OPTIONS = [
+  { value: 'created', label: 'Created' },
+  { value: 'updated', label: 'Updated' },
+  { value: 'deleted', label: 'Deleted' },
+  { value: 'restored', label: 'Restored' },
+];
 
 function getNotificationData(notification: NotificationData) {
   const data = Array.isArray(notification.data) ? notification.data[0] : notification.data;
@@ -61,13 +82,25 @@ export default function NotificationsPage() {
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
   const [page, setPage] = useState(1);
+  const [model, setModel] = useState<string>('');
+  const [action, setAction] = useState<string>('');
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
 
-  const { data, isLoading, error } = useNotifications({ page, perPage: 20 });
+  const { data, isLoading, error } = useNotifications({
+    page,
+    perPage: 20,
+    model: model || undefined,
+    action: action || undefined,
+    fromDate: fromDate || undefined,
+    toDate: toDate || undefined,
+  });
   const { markAsRead, markAllAsRead } = useNotificationMutations();
 
   const notifications = data?.items || [];
   const meta = data?.meta;
   const hasUnread = (data?.extra?.unread_count ?? 0) > 0;
+  const hasFilters = model || action || fromDate || toDate;
 
   const handleRowClick = (notification: NotificationData) => {
     if (!notification.readAt) {
@@ -78,6 +111,14 @@ export default function NotificationsPage() {
     if (url) {
       router.push(url);
     }
+  };
+
+  const clearFilters = () => {
+    setModel('');
+    setAction('');
+    setFromDate('');
+    setToDate('');
+    setPage(1);
   };
 
   if (!ready) {
@@ -108,6 +149,99 @@ export default function NotificationsPage() {
           </Button>
         )}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Filter className="h-5 w-5" />
+            {t('common:filters', { defaultValue: 'Filters' })}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="space-y-2">
+              <Label>{t('notifications:filter.model', { defaultValue: 'Type' })}</Label>
+              <Select
+                value={model}
+                onValueChange={(value) => {
+                  setModel(value);
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={t('notifications:filter.all_types', { defaultValue: 'All types' })}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {MODEL_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('notifications:filter.action', { defaultValue: 'Action' })}</Label>
+              <Select
+                value={action}
+                onValueChange={(value) => {
+                  setAction(value);
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={t('notifications:filter.all_actions', {
+                      defaultValue: 'All actions',
+                    })}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {ACTION_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('notifications:filter.from_date', { defaultValue: 'From date' })}</Label>
+              <Input
+                type="date"
+                value={fromDate}
+                onChange={(e) => {
+                  setFromDate(e.target.value);
+                  setPage(1);
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('notifications:filter.to_date', { defaultValue: 'To date' })}</Label>
+              <Input
+                type="date"
+                value={toDate}
+                onChange={(e) => {
+                  setToDate(e.target.value);
+                  setPage(1);
+                }}
+              />
+            </div>
+          </div>
+
+          {hasFilters && (
+            <Button variant="ghost" size="sm" className="mt-4" onClick={clearFilters}>
+              <X className="mr-2 h-4 w-4" />
+              {t('common:clearFilters', { defaultValue: 'Clear filters' })}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardContent className="p-0">
