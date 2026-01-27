@@ -68,6 +68,48 @@ Coverage target: 100% on all tested utility files.
 
 ---
 
+## i18n (Translations)
+
+Translations come from the API via [laravel-to-i18next](https://github.com/LorenzoWynberg/laravel-to-i18next).
+
+### Placeholder Capitalization
+
+Laravel placeholders are auto-converted:
+
+- `:foo` → `{{foo}}` (as-is)
+- `:Foo` → `{{foo, capitalize}}` (first letter uppercase)
+- `:FOO` → `{{foo, uppercase}}` (all uppercase)
+
+**Frontend passes lowercase keys** - i18next applies formatting automatically:
+
+```typescript
+t('resource:success.was_actioned', { resource: 'my catalog', action: 'created' });
+// With `:Resource` in Laravel → outputs "My catalog was created"
+```
+
+### Key Namespaces
+
+| Namespace    | Purpose                                            |
+| ------------ | -------------------------------------------------- |
+| `models`     | Model names: `t('models:catalog', { count: 2 })`   |
+| `common`     | UI labels: `created`, `updated`, `save`            |
+| `resource`   | CRUD messages: `success.created`, `error.deleting` |
+| `statuses`   | Status labels: `pending`, `read`, `unread`         |
+| `validation` | Form validation messages                           |
+
+### Helpers (`utils/lang.ts`)
+
+```typescript
+import { capitalize, modelLabel, actionLabel, statusLabel } from '@/utils/lang';
+
+modelLabel('catalog'); // "catalog" (from models:catalog)
+actionLabel('created'); // "created" (from common:created)
+statusLabel('pending'); // "pending" (from statuses:pending)
+capitalize(modelLabel('catalog')); // "Catalog"
+```
+
+---
+
 ## Types
 
 **Never edit `types/generated.d.ts`** - it's auto-generated from backend DTOs.
@@ -101,4 +143,3 @@ if (order.status === Enums.OrderStatus.PENDING) { ... }
 - `docs/architecture.md` - Detailed services, hooks, patterns, API reference
 - `docs/pricing-rules-plan.md` - Pricing system implementation plan
 - `docs/strict-rules.md` - Critical rules
-- `docs/jj-guide.md` - Version control reference
