@@ -143,4 +143,3 @@ if (order.status === Enums.OrderStatus.PENDING) { ... }
 - `docs/architecture.md` - Detailed services, hooks, patterns, API reference
 - `docs/pricing-rules-plan.md` - Pricing system implementation plan
 - `docs/strict-rules.md` - Critical rules
-- `docs/jj-guide.md` - Version control reference
