@@ -96,7 +96,9 @@ export default function OrderDetailPage() {
     );
   }
 
-  const canCreateQuote = order.status === 'pending' && !order.currentQuote;
+  // Can create quote for: pending (no quote yet), or denied (re-quote after rejection)
+  const canCreateQuote =
+    (order.status === 'pending' && !order.currentQuote) || order.status === 'denied';
 
   return (
     <div className="space-y-6">

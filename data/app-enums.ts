@@ -70,6 +70,8 @@ export const Enums = {
     TIME_FEE: 'timeFee',
     SURCHARGE: 'surcharge',
     DISCOUNT: 'discount',
+    PICKUP: 'pickup',
+    DELIVERY: 'delivery',
   },
   CrudAction: {
     Retrieved: 'retrieved',
@@ -138,6 +140,7 @@ export const Enums = {
     PricingRule: 'pricing_rule',
     PricingTier: 'pricing_tier',
     ExchangeRate: 'exchange_rate',
+    Notification: 'notification',
   },
   OrderStatus: {
     PENDING: 'pending',
