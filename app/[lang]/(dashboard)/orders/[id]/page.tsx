@@ -103,28 +103,26 @@ export default function OrderDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">
-                {t('orders:order_id', {
-                  id: order.publicId,
-                  defaultValue: `Order ${order.publicId}`,
-                })}
-              </h1>
-              <OrderStatusBadge status={order.status as OrderStatus} />
-            </div>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl font-bold sm:text-3xl">
+              {t('orders:order_id', {
+                id: order.publicId,
+                defaultValue: `Order ${order.publicId}`,
+              })}
+            </h1>
+            <p className="text-muted-foreground text-sm">
               {capitalize(t('common:created', { defaultValue: 'Created' }))}{' '}
               {formatDate(order.createdAt)}
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3">
+          <OrderStatusBadge status={order.status as OrderStatus} />
           {canCreateQuote && order.id && (
             <CreateQuoteDialog
               orderId={order.id}
