@@ -174,7 +174,9 @@ export default function UsersPage() {
                   <TableHead>{validationAttribute('email', true)}</TableHead>
                   <TableHead>{validationAttribute('role', true)}</TableHead>
                   <TableHead>{validationAttribute('phone', true)}</TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>
+                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

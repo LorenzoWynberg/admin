@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useLangStore } from '@/stores/useLangStore';
 
 import { ApiError, parseErrorResponse } from './error';
 
@@ -29,6 +30,13 @@ function getToken(): string | null {
 }
 
 /**
+ * Get current language from store
+ */
+function getLang(): string {
+  return useLangStore.getState().lang ?? 'en';
+}
+
+/**
  * Build request options with auth headers
  */
 function buildRequestOptions(
@@ -37,9 +45,11 @@ function buildRequestOptions(
   options: FetchOptions = {}
 ): RequestInit {
   const token = getToken();
+  const lang = getLang();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
+    'Accept-Language': lang,
     ...options.headers,
   };
 

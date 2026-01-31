@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useState, useEffect, useMemo } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useCatalog, useCatalogElements } from '@/hooks/catalogs';
@@ -37,6 +37,7 @@ function formatDate(dateString?: string | null): string {
 
 export default function CatalogDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
   const catalogId = Number(params.id);
@@ -45,9 +46,29 @@ export default function CatalogDetailPage() {
   const [selectedElement, setSelectedElement] = useState<CatalogElementData | null>(null);
 
   const { data: catalog, isLoading, error } = useCatalog(catalogId);
-  const { data: elementsData } = useCatalogElements(catalog?.code || '', {
-    enabled: !!catalog?.code,
-  });
+  const { data: elementsData, isLoading: elementsLoading } = useCatalogElements(
+    catalog?.code || '',
+    {
+      enabled: !!catalog?.code,
+    }
+  );
+
+  const elements = useMemo(() => elementsData?.items || [], [elementsData?.items]);
+
+  // Open element modal if ?element= param is present
+  useEffect(() => {
+    const elementId = searchParams.get('element');
+    if (elementId && elements.length > 0) {
+      const element = elements.find((e) => e.id === Number(elementId));
+      if (element) {
+        queueMicrotask(() => {
+          setSelectedElement(element);
+          setEditDialogOpen(true);
+        });
+        router.replace(`/catalogs/${catalogId}`);
+      }
+    }
+  }, [searchParams, elements, catalogId, router]);
 
   const handleEditElement = (element: CatalogElementData) => {
     setSelectedElement(element);
@@ -72,8 +93,6 @@ export default function CatalogDetailPage() {
       </div>
     );
   }
-
-  const elements = elementsData?.items || [];
 
   return (
     <div className="space-y-6">
@@ -130,13 +149,13 @@ export default function CatalogDetailPage() {
           <CardContent className="space-y-4">
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {t('common:created', { defaultValue: 'Created' })}
+                {capitalize(t('common:created', { defaultValue: 'Created' }))}
               </span>
               <span className="font-medium">{formatDate(catalog.createdAt)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {t('common:updated', { defaultValue: 'Updated' })}
+                {capitalize(t('common:updated', { defaultValue: 'Updated' }))}
               </span>
               <span className="font-medium">{formatDate(catalog.updatedAt)}</span>
             </div>
@@ -155,7 +174,11 @@ export default function CatalogDetailPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {elements.length === 0 ? (
+          {elementsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="border-primary h-6 w-6 animate-spin rounded-full border-4 border-t-transparent" />
+            </div>
+          ) : elements.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <List className="mb-4 h-12 w-12" />
               <p>

@@ -17,6 +17,7 @@ const namespaces = [
   'http',
   'languages',
   'models',
+  'notifications',
   'orders',
   'pagination',
   'passwords',

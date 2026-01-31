@@ -1,18 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useEcho } from '@/providers/EchoProvider';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useNotificationHelpers, type NotifData } from './useNotificationHelpers';
 
 interface BroadcastNotification {
   id: string;
   type: string;
   action: string;
   model: string;
-  model_id: number | null;
-  model_name: string | null;
-  title: string;
-  message: string;
+  modelId: number | null;
+  modelName: string | null;
+  catalogId?: number | null;
 }
 
 /**
@@ -23,6 +23,13 @@ export function useNotificationBroadcast() {
   const echo = useEcho();
   const token = useAuthStore((state) => state.token);
   const queryClient = useQueryClient();
+  const { getTitle, getMessage } = useNotificationHelpers();
+
+  // Use refs to avoid re-subscribing when helpers change
+  const helpersRef = useRef({ getTitle, getMessage });
+  useEffect(() => {
+    helpersRef.current = { getTitle, getMessage };
+  });
 
   useEffect(() => {
     if (!echo || !token) return;
@@ -30,9 +37,17 @@ export function useNotificationBroadcast() {
     const channel = echo.private('notifications');
 
     channel.notification((notification: BroadcastNotification) => {
+      const data: NotifData = {
+        action: notification.action,
+        model: notification.model,
+        modelId: notification.modelId,
+        modelName: notification.modelName,
+        catalogId: notification.catalogId,
+      };
+
       // Show toast notification
-      toast(notification.title, {
-        description: notification.message,
+      toast(helpersRef.current.getTitle(data), {
+        description: helpersRef.current.getMessage(data),
       });
 
       // Refresh notifications list

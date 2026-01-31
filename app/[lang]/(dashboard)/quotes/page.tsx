@@ -171,7 +171,9 @@ export default function QuotesPage() {
                   <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{validationAttribute('total', true)}</TableHead>
                   <TableHead>{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>
+                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

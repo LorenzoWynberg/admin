@@ -112,7 +112,8 @@ export default function QuoteDetailPage() {
               <QuoteStatusBadge status={quote.status as QuoteStatus} />
             </div>
             <p className="text-muted-foreground">
-              {t('common:created', { defaultValue: 'Created' })} {formatDate(quote.createdAt)}
+              {capitalize(t('common:created', { defaultValue: 'Created' }))}{' '}
+              {formatDate(quote.createdAt)}
             </p>
           </div>
         </div>
@@ -126,7 +127,7 @@ export default function QuoteDetailPage() {
           {canDelete && (
             <Button variant="destructive" onClick={handleDelete} disabled={deleteQuote.isPending}>
               <Trash2 className="mr-2 h-4 w-4" />
-              {t('common:delete', { defaultValue: 'Delete' })}
+              {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
             </Button>
           )}
         </div>
@@ -315,13 +316,13 @@ export default function QuoteDetailPage() {
           <CardContent className="space-y-4">
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {t('common:created', { defaultValue: 'Created' })}
+                {capitalize(t('common:created', { defaultValue: 'Created' }))}
               </span>
               <span className="font-medium">{formatDate(quote.createdAt)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {t('common:updated', { defaultValue: 'Updated' })}
+                {capitalize(t('common:updated', { defaultValue: 'Updated' }))}
               </span>
               <span className="font-medium">{formatDate(quote.updatedAt)}</span>
             </div>

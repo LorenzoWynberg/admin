@@ -16,6 +16,7 @@ app/admin/
 │   │   ├── businesses/   # Business management
 │   │   ├── catalogs/     # Catalog management
 │   │   ├── pricing/      # Pricing rules
+│   │   ├── notifications/# Notification history
 │   │   └── settings/     # Admin settings
 │   └── layout.tsx        # Root layout with providers
 ├── components/
@@ -74,7 +75,111 @@ useLangStore(): {
   hydrated: boolean
   setLang(), getVersion(), setVersions()
 }
+
+// Catalog store - stores/useCatalogStore.ts
+useCatalogStore(): {
+  catalogs: Map<number, CatalogData>
+  set(), get(), reset()
+}
+
+// Reactive hooks
+useCatalog(id): CatalogData | undefined
+useCatalogByCode(code): CatalogData | undefined
+useCatalogElement(catalogId, elementId): CatalogElementData | undefined
 ```
+
+---
+
+## Real-time Broadcasts
+
+### Echo Configuration
+
+WebSocket connection to Laravel Reverb for real-time updates.
+
+```typescript
+// lib/echo.ts - Echo instance with auth
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+// Configured for Laravel Reverb with Sanctum auth
+```
+
+### EchoProvider
+
+React context provider managing Echo lifecycle with `useSyncExternalStore` for React Strict Mode compatibility.
+
+```typescript
+// providers/EchoProvider.tsx
+<EchoProvider>
+  {/* App - Echo connected, broadcasts subscribed */}
+</EchoProvider>
+```
+
+**Key fix**: React Strict Mode double-invokes effects, which disconnected Echo between invocations. Fixed by managing Echo outside React's render cycle with `useSyncExternalStore`.
+
+### Broadcast Hooks
+
+```typescript
+// hooks/catalogs/useCatalogBroadcast.ts
+// Listens to public 'catalogs' channel, invalidates queries on changes
+
+// hooks/notifications/useNotificationBroadcast.ts
+// Listens to private 'notifications.{userId}' channel
+// Shows toast + invalidates notification queries
+```
+
+---
+
+## Notification Helpers
+
+Shared utilities for notification display and navigation in `hooks/notifications/useNotificationHelpers.ts`.
+
+### Exports
+
+```typescript
+import {
+  useNotificationHelpers, // Hook with translation helpers
+  getNotificationUrl, // Get navigation URL for a notification
+  getNotificationData, // Extract data from notification object
+  notificationRoutes, // Route config per model type
+  type NotifData, // Notification data interface
+} from '@/hooks/notifications';
+
+import { buildUrl } from '@/utils/http'; // Build URL with query params
+```
+
+### Route Config
+
+Each model type defines its own URL builder. Add new models here:
+
+```typescript
+const notificationRoutes: Record<string, (data: NotifData) => string | null> = {
+  catalog: (data) => (data.model_id ? `/catalogs/${data.model_id}` : null),
+  element: (data) =>
+    data.catalog_id ? buildUrl(`/catalogs/${data.catalog_id}`, { element: data.model_id }) : null,
+};
+```
+
+### Translation Helpers
+
+```typescript
+const { getTitle, getMessage, getModelLabel, getActionLabel } = useNotificationHelpers();
+
+// Title: uses resource:success.was_actioned template
+getTitle(data); // "Catalog was updated" (via {{resource, capitalize}} was {{action}})
+
+// Message: uses resource:success.was_actioned template
+getMessage(data); // "My Catalog was created"
+
+// Labels: from respective namespaces
+getModelLabel('catalog'); // from models:catalog
+getActionLabel('created'); // from common:created
+```
+
+### Deep Linking
+
+Clicking an element notification navigates to `/catalogs/2?element=4`.
+The catalog page reads the `element` param and auto-opens the edit modal.
 
 ---
 
@@ -126,6 +231,17 @@ UserService.list({ page, perPage, role, search }); // GET /users
 UserService.getById(id); // GET /users/{id}
 UserService.update(id, payload); // PATCH /users/{id}
 UserService.destroy(id); // DELETE /users/{id}
+```
+
+### Notification Service
+
+```typescript
+import { NotificationService } from '@/services/notificationService';
+
+NotificationService.list({ page, perPage, unreadOnly, search, model, action, from, to }); // GET /notifications
+NotificationService.markAsRead(id); // PATCH /notifications/{id}/read
+NotificationService.markAllAsRead(); // PATCH /notifications/read-all
+NotificationService.destroy(id); // DELETE /notifications/{id}
 ```
 
 ### Other Services
@@ -284,6 +400,29 @@ import {
   useUpdateBusiness,
   useDeleteBusiness,
 } from '@/hooks/businesses';
+
+// Notifications
+import {
+  useNotifications,
+  useUnreadCount,
+  useMarkAsRead,
+  useMarkAllAsRead,
+} from '@/hooks/notifications';
+
+// Notifications with filters
+const { data, isLoading } = useNotifications({
+  page: 1,
+  perPage: 20,
+  unreadOnly: true, // Bell dropdown: only unread
+  search: 'catalog', // Text search across title, message, model_name
+  model: 'Catalog', // Filter by type
+  action: 'updated', // Filter by action
+  from: '2026-01-01', // Date range
+  to: '2026-01-19',
+});
+
+// Unread count (for bell badge)
+const { data: count } = useUnreadCount();
 ```
 
 ---

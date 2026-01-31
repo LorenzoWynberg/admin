@@ -105,7 +105,7 @@ export default function DriverDetailPage() {
         </div>
         <Button variant="destructive" onClick={handleDelete} disabled={deleteDriver.isPending}>
           <Trash2 className="mr-2 h-4 w-4" />
-          {t('common:delete', { defaultValue: 'Delete' })}
+          {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
         </Button>
       </div>
 
@@ -199,13 +199,13 @@ export default function DriverDetailPage() {
           <CardContent className="space-y-4">
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {t('common:created', { defaultValue: 'Created' })}
+                {capitalize(t('common:created', { defaultValue: 'Created' }))}
               </span>
               <span className="font-medium">{formatDate(driver.createdAt)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {t('common:updated', { defaultValue: 'Updated' })}
+                {capitalize(t('common:updated', { defaultValue: 'Updated' }))}
               </span>
               <span className="font-medium">{formatDate(driver.updatedAt)}</span>
             </div>

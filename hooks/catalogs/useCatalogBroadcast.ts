@@ -17,7 +17,7 @@ export function useCatalogBroadcast() {
 
     echo.channel('catalogs').listen('.catalogs.updated', () => {
       reset();
-      queryClient.refetchQueries({ queryKey: ['catalogs', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ['catalogs'] });
     });
   }, [echo, reset, queryClient]);
 }

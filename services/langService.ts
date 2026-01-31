@@ -2,6 +2,8 @@
 
 import { useLangStore, type LangCode } from '@/stores/useLangStore';
 import { ensureI18nInitialized, i18n } from '@/config/i18next';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { UserService } from '@/services/userService';
 
 function setLangCookie(lang: LangCode) {
   try {
@@ -21,6 +23,14 @@ export const Lang = {
     try {
       await i18n.changeLanguage(lang);
     } catch {}
+
+    // Sync language to backend for authenticated users
+    const user = useAuthStore.getState().user;
+    if (user?.publicId) {
+      try {
+        await UserService.update(user.publicId, { langCode: lang });
+      } catch {}
+    }
   },
 
   hydrated(): boolean {

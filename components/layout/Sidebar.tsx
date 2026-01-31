@@ -15,6 +15,7 @@ import {
   MapPin,
   Database,
   DollarSign,
+  Bell,
   Settings,
 } from 'lucide-react';
 
@@ -34,6 +35,7 @@ const navigation = [
     isModel: false,
     translationKey: 'pricing:title',
   },
+  { modelKey: 'notification', href: '/notifications', icon: Bell, isModel: true },
 ];
 
 export function Sidebar() {

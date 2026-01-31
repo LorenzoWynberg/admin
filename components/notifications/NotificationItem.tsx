@@ -2,7 +2,14 @@
 
 import { formatDistanceToNow } from 'date-fns';
 import { BookOpen, Package } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { getDateLocale } from '@/utils/format';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
+import {
+  useNotificationHelpers,
+  getNotificationUrl,
+  getNotificationData,
+} from '@/hooks/notifications';
 import { cn } from '@/lib/utils';
 
 type NotificationData = App.Data.NotificationData;
@@ -23,35 +30,11 @@ function NotificationIcon({ model }: { model: string }) {
   }
 }
 
-function getNotificationData(notification: NotificationData) {
-  // Handle both array and object data formats
-  const data = Array.isArray(notification.data) ? notification.data[0] : notification.data;
-  return data as {
-    action?: string;
-    model?: string;
-    model_id?: number | null;
-    model_name?: string | null;
-    catalog_id?: number | null;
-    title?: string;
-    message?: string;
-  };
-}
-
-function getNotificationUrl(data: ReturnType<typeof getNotificationData>): string | null {
-  if (!data.model) return null;
-
-  switch (data.model) {
-    case 'catalog':
-      return data.model_id ? `/catalogs/${data.model_id}` : null;
-    case 'catalog_element':
-      return data.catalog_id ? `/catalogs/${data.catalog_id}` : null;
-    default:
-      return null;
-  }
-}
-
 export function NotificationItem({ notification, onMarkRead, onNavigate }: NotificationItemProps) {
+  const { i18n } = useTranslation();
+  const { getTitle, getMessage } = useNotificationHelpers();
   const router = useLocalizedRouter();
+  const dateLocale = getDateLocale(i18n.language);
   const data = getNotificationData(notification);
   const isUnread = !notification.readAt;
   const url = getNotificationUrl(data);
@@ -75,11 +58,14 @@ export function NotificationItem({ notification, onMarkRead, onNavigate }: Notif
       <div className="flex items-start gap-3">
         <NotificationIcon model={data.model ?? 'default'} />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">{data.title ?? 'Notification'}</p>
-          <p className="text-muted-foreground truncate text-sm">{data.message ?? ''}</p>
+          <p className="text-sm font-medium">{getTitle(data)}</p>
+          <p className="text-muted-foreground truncate text-sm">{getMessage(data)}</p>
           {notification.createdAt && (
             <p className="text-muted-foreground mt-1 text-xs">
-              {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+              {formatDistanceToNow(new Date(notification.createdAt), {
+                addSuffix: true,
+                locale: dateLocale,
+              })}
             </p>
           )}
         </div>

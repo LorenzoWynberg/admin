@@ -177,7 +177,9 @@ export default function OrdersPage() {
                   <TableHead>
                     {capitalize(t('models:quote_one', { defaultValue: 'Quote' }))}
                   </TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>
+                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

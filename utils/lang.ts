@@ -73,3 +73,22 @@ export const statusLabel = (status: string | undefined): string => {
 export const orderStatusLabel = (status: string | undefined): string => {
   return statusLabel(status);
 };
+
+/**
+ * Get translated action label (e.g., 'created', 'updated', 'deleted').
+ * @param action - The action key
+ * @returns Translated action label
+ */
+export const actionLabel = (action: string): string => {
+  return i18next.t(`common:${action}`, { defaultValue: action });
+};
+
+/**
+ * Get translated model label (e.g., 'catalog', 'catalog_element').
+ * @param model - The model key
+ * @param count - For pluralization (1 = singular, >1 = plural)
+ * @returns Translated model label
+ */
+export const modelLabel = (model: string, count = 1): string => {
+  return i18next.t(`models:${model}`, { count, defaultValue: model });
+};

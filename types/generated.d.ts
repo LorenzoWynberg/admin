@@ -568,6 +568,8 @@ declare namespace App.Enums {
     TIME_FEE = 'timeFee',
     SURCHARGE = 'surcharge',
     DISCOUNT = 'discount',
+    PICKUP = 'pickup',
+    DELIVERY = 'delivery',
   }
   export enum CrudAction {
     Retrieved = 'retrieved',
@@ -636,6 +638,7 @@ declare namespace App.Enums {
     PricingRule = 'pricing_rule',
     PricingTier = 'pricing_tier',
     ExchangeRate = 'exchange_rate',
+    Notification = 'notification',
   }
   export enum OrderStatus {
     PENDING = 'pending',
