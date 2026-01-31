@@ -7,9 +7,9 @@ type NotificationData = App.Data.NotificationData;
 export interface NotifData {
   action?: string;
   model?: string;
-  model_id?: number | null;
-  model_name?: string | null;
-  catalog_id?: number | null;
+  modelId?: number | null;
+  modelName?: string | null;
+  catalogId?: number | null;
 }
 
 /**
@@ -17,13 +17,13 @@ export interface NotifData {
  * Add new models here to define their navigation behavior.
  */
 export const notificationRoutes: Record<string, (data: NotifData) => string | null> = {
-  catalog: (data) => (data.model_id ? `/catalogs/${data.model_id}` : null),
+  catalog: (data) => (data.modelId ? `/catalogs/${data.modelId}` : null),
   element: (data) =>
-    data.catalog_id ? buildUrl(`/catalogs/${data.catalog_id}`, { element: data.model_id }) : null,
-  order: (data) => (data.model_name ? `/orders/${data.model_name}` : null),
-  user: (data) => (data.model_id ? `/users/${data.model_id}` : null),
-  business: (data) => (data.model_id ? `/businesses/${data.model_id}` : null),
-  driver: (data) => (data.model_id ? `/drivers/${data.model_id}` : null),
+    data.catalogId ? buildUrl(`/catalogs/${data.catalogId}`, { element: data.modelId }) : null,
+  order: (data) => (data.modelName ? `/orders/${data.modelName}` : null),
+  user: (data) => (data.modelId ? `/users/${data.modelId}` : null),
+  business: (data) => (data.modelId ? `/businesses/${data.modelId}` : null),
+  driver: (data) => (data.modelId ? `/drivers/${data.modelId}` : null),
 };
 
 /**
@@ -61,7 +61,7 @@ export function useNotificationHelpers() {
   // Message: 'Name was created' = resource:success.was_actioned with interpolation
   const getMessage = (data: NotifData): string => {
     const action = data.action || 'updated';
-    const resource = data.model_name || t('common:unknown', { defaultValue: 'Unknown' });
+    const resource = data.modelName || t('common:unknown', { defaultValue: 'Unknown' });
     const actionText = actionLabel(action).toLowerCase();
     return t('resource:success.was_actioned', {
       resource,

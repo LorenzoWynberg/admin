@@ -10,9 +10,9 @@ interface BroadcastNotification {
   type: string;
   action: string;
   model: string;
-  model_id: number | null;
-  model_name: string | null;
-  catalog_id?: number | null;
+  modelId: number | null;
+  modelName: string | null;
+  catalogId?: number | null;
 }
 
 /**
@@ -40,9 +40,9 @@ export function useNotificationBroadcast() {
       const data: NotifData = {
         action: notification.action,
         model: notification.model,
-        model_id: notification.model_id,
-        model_name: notification.model_name,
-        catalog_id: notification.catalog_id,
+        modelId: notification.modelId,
+        modelName: notification.modelName,
+        catalogId: notification.catalogId,
       };
 
       // Show toast notification
