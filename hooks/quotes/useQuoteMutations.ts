@@ -14,7 +14,6 @@ export function useCreateQuote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success(crudSuccessMessage('created', 'quote'));
     },
     onError: (error) => {
       if (isApiError(error)) {
