@@ -329,6 +329,63 @@ declare namespace App.Data.Order {
     isContactless: boolean;
   };
 }
+declare namespace App.Data.Payment {
+  export type InitiatePaymentData = {
+    orderPublicId: string;
+    paymentMethodPublicId: string | null;
+    amount: number | null;
+    returnUrl: string | null;
+  };
+  export type PaymentData = {
+    id?: number;
+    publicId?: string;
+    orderId?: number;
+    paymentMethodId?: number | null;
+    provider?: App.Enums.PaymentProvider;
+    method?: App.Enums.PaymentMethodType | null;
+    status?: App.Enums.TransactionStatus;
+    amount?: number;
+    currencyCode?: string;
+    fxRate?: number | null;
+    providerChargeId?: string | null;
+    receiptUrl?: string | null;
+    paidAt?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  export type PaymentMethodData = {
+    id?: number;
+    publicId?: string;
+    userId?: number;
+    businessId?: number | null;
+    provider?: App.Enums.PaymentProvider;
+    methodType?: App.Enums.PaymentMethodType;
+    brand?: string | null;
+    last4?: string | null;
+    expMonth?: number | null;
+    expYear?: number | null;
+    isDefault?: boolean;
+    active?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  export type RefundData = {
+    id?: number;
+    publicId?: string;
+    paymentId?: number;
+    orderId?: number | null;
+    amount?: number;
+    currencyCode?: string;
+    reason?: string | null;
+    refundedAt?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  export type StoreRefundData = {
+    amount: number;
+    reason: string | null;
+  };
+}
 declare namespace App.Data.Pricing {
   export type PricingRuleData = {
     id?: number;
