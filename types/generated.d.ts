@@ -639,6 +639,9 @@ declare namespace App.Enums {
     PricingTier = 'pricing_tier',
     ExchangeRate = 'exchange_rate',
     Notification = 'notification',
+    Payment = 'payment',
+    PaymentMethod = 'payment_method',
+    Refund = 'refund',
   }
   export enum OrderStatus {
     PENDING = 'pending',
@@ -656,6 +659,16 @@ declare namespace App.Enums {
     DELIVERY_FAILED = 'delivery_failed',
     RETURNED_TO_SENDER = 'returned_to_sender',
     CANCELED = 'canceled',
+  }
+  export enum PaymentMethodType {
+    Card = 'card',
+    SinpeMobile = 'sinpe_mobile',
+    ApplePay = 'apple_pay',
+    Cash = 'cash',
+  }
+  export enum PaymentProvider {
+    Tilopay = 'tilopay',
+    Cash = 'cash',
   }
   export enum PaymentStatus {
     UNPAID = 'unpaid',
@@ -694,5 +707,11 @@ declare namespace App.Enums {
     CLIENT = 'client',
     DRIVER = 'driver',
     ADMIN = 'admin',
+  }
+  export enum TransactionStatus {
+    Pending = 'pending',
+    Authorized = 'authorized',
+    Succeeded = 'succeeded',
+    Failed = 'failed',
   }
 }
