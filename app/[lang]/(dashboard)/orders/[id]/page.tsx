@@ -22,9 +22,11 @@ import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
+import { PaymentSection } from '@/components/payments/PaymentSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { useOrder, useDeleteOrder } from '@/hooks/orders';
+import { useCurrencyList } from '@/hooks/currencies';
 
 type OrderStatus = App.Enums.OrderStatus;
 
@@ -51,6 +53,14 @@ export default function OrderDetailPage() {
 
   const { data: order, isLoading, error } = useOrder({ id: orderId });
   const deleteOrder = useDeleteOrder();
+  const { data: currencyData } = useCurrencyList();
+
+  // Get currency symbol for the order's currency
+  const currencies = currencyData?.items || [];
+  const orderCurrency = order?.currencyCode
+    ? currencies.find((c) => c.code === order.currencyCode)
+    : null;
+  const currencySymbol = orderCurrency?.symbol || order?.currencyCode || '$';
 
   const formatAddress = (address?: App.Data.Address.AddressData | null): string => {
     const notSpecified = t('orders:detail.not_specified', { defaultValue: 'Not specified' });
@@ -392,6 +402,9 @@ export default function OrderDetailPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Payments Section */}
+        {order.id && <PaymentSection orderId={order.id} currencySymbol={currencySymbol} />}
 
         {/* Trip Schedule */}
         <Card>
