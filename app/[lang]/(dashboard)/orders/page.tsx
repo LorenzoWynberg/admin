@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PaymentStatusBadge } from '@/components/orders/PaymentStatusBadge';
 import { ChevronLeft, ChevronRight, Search, Package } from 'lucide-react';
 
 type OrderStatus = App.Enums.OrderStatus;
@@ -172,6 +173,9 @@ export default function OrdersPage() {
                 <TableRow>
                   <TableHead>{validationAttribute('id', true)}</TableHead>
                   <TableHead>{validationAttribute('status', true)}</TableHead>
+                  <TableHead>
+                    {t('orders:detail.payment_status', { defaultValue: 'Payment' })}
+                  </TableHead>
                   <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
                   <TableHead>
@@ -192,6 +196,9 @@ export default function OrdersPage() {
                     <TableCell className="font-medium">{order.publicId}</TableCell>
                     <TableCell>
                       <OrderStatusBadge status={order.status as OrderStatus} />
+                    </TableCell>
+                    <TableCell>
+                      <PaymentStatusBadge status={order.paymentStatus} />
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">
                       {formatAddress(order.fromAddress)}
