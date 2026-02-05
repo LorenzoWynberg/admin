@@ -10,7 +10,13 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -18,19 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useBusinessList } from '@/hooks/businesses';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, Building2 } from 'lucide-react';
-
-function formatDate(dateString?: string): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
+import { formatDate } from '@/utils/format';
 
 export default function BusinessesPage() {
   const { t, ready } = useTranslation();
@@ -55,9 +49,7 @@ export default function BusinessesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
-            {capitalize(modelLabel('business', 2))}
-          </h1>
+          <h1 className="text-3xl font-bold">{capitalize(modelLabel('business', 2))}</h1>
           <p className="text-muted-foreground">
             {t('businesses:manage_description', { defaultValue: 'Manage business accounts' })}
           </p>
@@ -110,9 +102,7 @@ export default function BusinessesPage() {
                   <TableHead>{validationAttribute('name', true)}</TableHead>
                   <TableHead>{validationAttribute('type', true)}</TableHead>
                   <TableHead>{validationAttribute('owner', true)}</TableHead>
-                  <TableHead>
-                    {actionLabel('created')}
-                  </TableHead>
+                  <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

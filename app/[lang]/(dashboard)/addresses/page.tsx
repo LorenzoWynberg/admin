@@ -10,7 +10,13 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useAddressList } from '@/hooks/addresses';
@@ -18,19 +24,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, MapPin } from 'lucide-react';
-
-function formatDate(dateString?: string): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
+import { formatDate } from '@/utils/format';
 
 export default function AddressesPage() {
   const { t, ready } = useTranslation();
@@ -54,9 +48,7 @@ export default function AddressesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
-            {capitalize(modelLabel('address', 2))}
-          </h1>
+          <h1 className="text-3xl font-bold">{capitalize(modelLabel('address', 2))}</h1>
           <p className="text-muted-foreground">
             {t('addresses:manage_description', {
               defaultValue: 'View saved addresses',
@@ -113,14 +105,10 @@ export default function AddressesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{validationAttribute('label', true)}</TableHead>
-                  <TableHead>
-                    {capitalize(modelLabel('address'))}
-                  </TableHead>
+                  <TableHead>{capitalize(modelLabel('address'))}</TableHead>
                   <TableHead>{validationAttribute('city', true)}</TableHead>
                   <TableHead>{validationAttribute('type', true)}</TableHead>
-                  <TableHead>
-                    {actionLabel('created')}
-                  </TableHead>
+                  <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

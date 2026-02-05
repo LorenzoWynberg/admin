@@ -328,7 +328,9 @@ export default function PricingPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleActivate}>{actionLabel('activate')}</AlertDialogAction>
+            <AlertDialogAction onClick={handleActivate}>
+              {actionLabel('activate')}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

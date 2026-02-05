@@ -34,6 +34,7 @@ import { ArrowLeft, Pencil, Trash2, Copy, Power, DollarSign } from 'lucide-react
 import { useState } from 'react';
 import { Enums } from '@/data/app-enums';
 import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { formatDate } from '@/utils/format';
 
 function formatCurrency(amount?: number): string {
   if (amount === undefined) return '-';
@@ -43,21 +44,6 @@ function formatCurrency(amount?: number): string {
 function formatPercent(rate?: number): string {
   if (rate === undefined) return '-';
   return `${(rate * 100).toFixed(1)}%`;
-}
-
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  } catch {
-    return dateString;
-  }
 }
 
 export default function PricingRuleDetailPage() {
@@ -272,7 +258,9 @@ export default function PricingRuleDetailPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleActivate}>{actionLabel('activate')}</AlertDialogAction>
+            <AlertDialogAction onClick={handleActivate}>
+              {actionLabel('activate')}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -5,6 +5,7 @@ import {
   toDateTimeLocal,
   dateTimeLocalToISO,
   formatDateTime,
+  formatDate,
 } from '../format';
 
 describe('formatCurrency', () => {
@@ -166,5 +167,25 @@ describe('formatDateTime', () => {
 
   it('returns original string for invalid date', () => {
     expect(formatDateTime('not-a-date')).toBe('not-a-date');
+  });
+});
+
+describe('formatDate', () => {
+  it('formats ISO string for display', () => {
+    const result = formatDate('2026-01-18T14:30:00.000Z');
+    expect(result).toMatch(/Jan 18.*2026/);
+  });
+
+  it('returns fallback for null input', () => {
+    expect(formatDate(null)).toBe('-');
+    expect(formatDate(undefined)).toBe('-');
+  });
+
+  it('returns custom fallback when provided', () => {
+    expect(formatDate(null, 'N/A')).toBe('N/A');
+  });
+
+  it('returns original string for invalid date', () => {
+    expect(formatDate('not-a-date')).toBe('not-a-date');
   });
 });

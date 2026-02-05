@@ -35,6 +35,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { resourceMessage, validationAttribute } from '@/utils/lang';
+import { formatDate } from '@/utils/format';
 import { useCurrencyList, useUpdateCurrency } from '@/hooks/currencies';
 import { useSyncExchangeRates } from '@/hooks/exchange-rates';
 
@@ -43,17 +44,6 @@ type CurrencyData = App.Data.Currency.CurrencyData;
 function formatRate(rate?: number | null): string {
   if (rate === undefined || rate === null) return '-';
   return rate.toFixed(6);
-}
-
-function formatDate(dateStr?: string | null): string {
-  if (!dateStr) return '-';
-  // Append T00:00:00 to parse as local time, not UTC
-  const localDate = dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`;
-  return new Date(localDate).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
 }
 
 export default function CurrencySettingsPage() {

@@ -17,23 +17,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ArrowLeft, Database, List, Calendar, Pencil } from 'lucide-react';
-import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
 import { ElementEditDialog } from '@/components/catalogs/ElementEditDialog';
+import { formatDate } from '@/utils/format';
 
 type CatalogElementData = App.Data.CatalogElement.CatalogElementData;
-
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
 
 export default function CatalogDetailPage() {
   const params = useParams();
@@ -148,15 +142,11 @@ export default function CatalogDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {actionLabel('created')}
-              </span>
+              <span className="text-muted-foreground">{actionLabel('created')}</span>
               <span className="font-medium">{formatDate(catalog.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {actionLabel('updated')}
-              </span>
+              <span className="text-muted-foreground">{actionLabel('updated')}</span>
               <span className="font-medium">{formatDate(catalog.updatedAt)}</span>
             </div>
           </CardContent>

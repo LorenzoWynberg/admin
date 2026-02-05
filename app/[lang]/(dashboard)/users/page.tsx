@@ -17,7 +17,14 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
+import { formatDate } from '@/utils/format';
 import { useUserList } from '@/hooks/users';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
@@ -29,19 +36,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 
 type Role = App.Enums.Role;
-
-function formatDate(dateString?: string): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
 
 function getInitials(name?: string): string {
   if (!name) return '?';
@@ -94,9 +88,7 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
-            {capitalize(modelLabel('user', 2))}
-          </h1>
+          <h1 className="text-3xl font-bold">{capitalize(modelLabel('user', 2))}</h1>
           <p className="text-muted-foreground">
             {t('users:manage_description', { defaultValue: 'Manage user accounts' })}
           </p>
@@ -168,15 +160,11 @@ export default function UsersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>
-                    {capitalize(modelLabel('user'))}
-                  </TableHead>
+                  <TableHead>{capitalize(modelLabel('user'))}</TableHead>
                   <TableHead>{validationAttribute('email', true)}</TableHead>
                   <TableHead>{validationAttribute('role', true)}</TableHead>
                   <TableHead>{validationAttribute('phone', true)}</TableHead>
-                  <TableHead>
-                    {actionLabel('created')}
-                  </TableHead>
+                  <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
