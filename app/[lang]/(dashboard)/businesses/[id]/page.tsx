@@ -1,6 +1,12 @@
 'use client';
 
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -9,19 +15,7 @@ import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useBusiness, useDeleteBusiness } from '@/hooks/businesses';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Building2, User, MapPin, Calendar, Trash2 } from 'lucide-react';
-
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
+import { formatDate } from '@/utils/format';
 
 export default function BusinessDetailPage() {
   const params = useParams();
@@ -85,14 +79,13 @@ export default function BusinessDetailPage() {
           <div>
             <h1 className="text-3xl font-bold">{business.name}</h1>
             <p className="text-muted-foreground">
-              {capitalize(t('models:business_one', { defaultValue: 'Business' }))}{' '}
-              {business.publicId}
+              {capitalize(modelLabel('business'))} {business.publicId}
             </p>
           </div>
         </div>
         <Button variant="destructive" onClick={handleDelete} disabled={deleteBusiness.isPending}>
           <Trash2 className="mr-2 h-4 w-4" />
-          {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
+          {actionLabel('delete')}
         </Button>
       </div>
 
@@ -185,15 +178,11 @@ export default function BusinessDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {capitalize(t('common:created', { defaultValue: 'Created' }))}
-              </span>
+              <span className="text-muted-foreground">{actionLabel('created')}</span>
               <span className="font-medium">{formatDate(business.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {capitalize(t('common:updated', { defaultValue: 'Updated' }))}
-              </span>
+              <span className="text-muted-foreground">{actionLabel('updated')}</span>
               <span className="font-medium">{formatDate(business.updatedAt)}</span>
             </div>
           </CardContent>

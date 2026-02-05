@@ -24,26 +24,12 @@ import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { PaymentSection } from '@/components/payments/PaymentSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { formatDate } from '@/utils/format';
 import { useOrder, useDeleteOrder } from '@/hooks/orders';
 import { useCurrencyList } from '@/hooks/currencies';
 
 type OrderStatus = App.Enums.OrderStatus;
-
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  } catch {
-    return dateString;
-  }
-}
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -128,8 +114,7 @@ export default function OrderDetailPage() {
               })}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {capitalize(t('common:created', { defaultValue: 'Created' }))}{' '}
-              {formatDate(order.createdAt)}
+              {actionLabel('created')} {formatDate(order.createdAt)}
             </p>
           </div>
         </div>
@@ -146,7 +131,7 @@ export default function OrderDetailPage() {
           )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
             <Trash2 className="mr-2 h-4 w-4" />
-            {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
+            {actionLabel('delete')}
           </Button>
         </div>
       </div>

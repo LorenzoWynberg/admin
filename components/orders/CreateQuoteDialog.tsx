@@ -21,7 +21,13 @@ import { useCurrencyList } from '@/hooks/currencies';
 import { useCalculatePricing } from '@/hooks/pricing';
 import { useCreateQuote, useSendQuote } from '@/hooks/quotes';
 import { validationAttribute } from '@/utils/lang';
-import { formatCurrency, applyRounding, toDateTimeLocal, dateTimeLocalToISO } from '@/utils/format';
+import {
+  formatCurrency,
+  applyRounding,
+  toDateTimeLocal,
+  dateTimeLocalToISO,
+  formatDateTime,
+} from '@/utils/format';
 import { formatRateDisplay } from '@/utils/currency';
 
 interface CreateQuoteDialogProps {
@@ -434,15 +440,7 @@ export function CreateQuoteDialog({
                   {t('quotes:create.from_order_request', { defaultValue: 'From order request' })}
                 </p>
               </div>
-              <p className="text-lg font-semibold">
-                {new Date(customerDesiredDelivery).toLocaleString('en-US', {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: '2-digit',
-                })}
-              </p>
+              <p className="text-lg font-semibold">{formatDateTime(customerDesiredDelivery)}</p>
             </div>
           )}
 

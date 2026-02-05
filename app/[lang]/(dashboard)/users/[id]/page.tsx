@@ -1,6 +1,13 @@
 'use client';
 
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
+import { formatDate } from '@/utils/format';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -28,19 +35,6 @@ import {
 } from 'lucide-react';
 
 type Role = App.Enums.Role;
-
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
 
 function getInitials(name?: string): string {
   if (!name) return '?';
@@ -113,13 +107,13 @@ export default function UserDetailPage() {
               <RoleBadge role={user.role as Role} />
             </div>
             <p className="text-muted-foreground">
-              {capitalize(t('models:user_one', { defaultValue: 'User' }))} {user.publicId}
+              {capitalize(modelLabel('user'))} {user.publicId}
             </p>
           </div>
         </div>
         <Button variant="destructive" onClick={handleDelete} disabled={deleteUser.isPending}>
           <Trash2 className="mr-2 h-4 w-4" />
-          {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
+          {actionLabel('delete')}
         </Button>
       </div>
 
@@ -285,15 +279,11 @@ export default function UserDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {capitalize(t('common:created', { defaultValue: 'Created' }))}
-              </span>
+              <span className="text-muted-foreground">{actionLabel('created')}</span>
               <span className="font-medium">{formatDate(user.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {capitalize(t('common:updated', { defaultValue: 'Updated' }))}
-              </span>
+              <span className="text-muted-foreground">{actionLabel('updated')}</span>
               <span className="font-medium">{formatDate(user.updatedAt)}</span>
             </div>
           </CardContent>

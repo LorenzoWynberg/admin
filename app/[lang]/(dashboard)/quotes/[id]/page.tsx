@@ -1,6 +1,13 @@
 'use client';
 
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
+import { formatDate } from '@/utils/format';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -12,21 +19,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, FileText, DollarSign, Calendar, Send, Trash2, Package } from 'lucide-react';
 
 type QuoteStatus = App.Enums.QuoteStatus;
-
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  } catch {
-    return dateString;
-  }
-}
 
 function formatCurrency(amount?: number | null, currencyCode?: string): string {
   if (amount == null) return '-';
@@ -107,13 +99,12 @@ export default function QuoteDetailPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold">
-                {capitalize(t('models:quote_one', { defaultValue: 'Quote' }))} {quote.publicId}
+                {capitalize(modelLabel('quote'))} {quote.publicId}
               </h1>
               <QuoteStatusBadge status={quote.status as QuoteStatus} />
             </div>
             <p className="text-muted-foreground">
-              {capitalize(t('common:created', { defaultValue: 'Created' }))}{' '}
-              {formatDate(quote.createdAt)}
+              {actionLabel('created')} {formatDate(quote.createdAt)}
             </p>
           </div>
         </div>
@@ -127,7 +118,7 @@ export default function QuoteDetailPage() {
           {canDelete && (
             <Button variant="destructive" onClick={handleDelete} disabled={deleteQuote.isPending}>
               <Trash2 className="mr-2 h-4 w-4" />
-              {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
+              {actionLabel('delete')}
             </Button>
           )}
         </div>
@@ -149,9 +140,7 @@ export default function QuoteDetailPage() {
             </div>
             {quote.orderId && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {capitalize(t('models:order_one', { defaultValue: 'Order' }))}
-                </span>
+                <span className="text-muted-foreground">{capitalize(modelLabel('order'))}</span>
                 <Button
                   variant="link"
                   className="h-auto p-0"
@@ -315,15 +304,11 @@ export default function QuoteDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {capitalize(t('common:created', { defaultValue: 'Created' }))}
-              </span>
+              <span className="text-muted-foreground">{actionLabel('created')}</span>
               <span className="font-medium">{formatDate(quote.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {capitalize(t('common:updated', { defaultValue: 'Updated' }))}
-              </span>
+              <span className="text-muted-foreground">{actionLabel('updated')}</span>
               <span className="font-medium">{formatDate(quote.updatedAt)}</span>
             </div>
           </CardContent>

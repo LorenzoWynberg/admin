@@ -103,7 +103,7 @@ t('resource:success.was_actioned', { resource: 'my catalog', action: 'created' }
 import { capitalize, modelLabel, actionLabel, statusLabel } from '@/utils/lang';
 
 modelLabel('catalog'); // "catalog" (from models:catalog)
-actionLabel('created'); // "created" (from common:created)
+actionLabel('created'); // "Created" (auto-capitalized from common:created)
 statusLabel('pending'); // "pending" (from statuses:pending)
 capitalize(modelLabel('catalog')); // "Catalog"
 ```

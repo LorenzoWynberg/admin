@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderPayments } from '@/hooks/payments';
 import { RefundDialog } from './RefundDialog';
-import { formatCurrency } from '@/utils/format';
+import { formatDate, formatCurrency } from '@/utils/format';
 import { capitalize } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
 
@@ -49,21 +49,6 @@ function getPaymentMethodLabel(method?: string | null, brand?: string | null): s
       return 'Cash';
     default:
       return capitalize(method);
-  }
-}
-
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  } catch {
-    return dateString;
   }
 }
 

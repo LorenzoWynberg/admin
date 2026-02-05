@@ -17,7 +17,14 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
+import { formatDate } from '@/utils/format';
 import { Input } from '@/components/ui/input';
 import { useQuoteList } from '@/hooks/quotes';
 import { useCurrencyList } from '@/hooks/currencies';
@@ -30,21 +37,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, FileText, X } from 'lucide-react';
 
 type QuoteStatus = App.Enums.QuoteStatus;
-
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  } catch {
-    return dateString;
-  }
-}
 
 function formatCurrency(amount?: number | null, currencyCode?: string): string {
   if (amount == null) return '-';
@@ -95,9 +87,7 @@ export default function QuotesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
-            {capitalize(t('models:quote_other', { defaultValue: 'Quotes' }))}
-          </h1>
+          <h1 className="text-3xl font-bold">{capitalize(modelLabel('quote', 2))}</h1>
           <p className="text-muted-foreground">
             {t('quotes:manage_description', { defaultValue: 'Create and manage delivery quotes' })}
           </p>
@@ -228,15 +218,11 @@ export default function QuotesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{validationAttribute('id', true)}</TableHead>
-                  <TableHead>
-                    {capitalize(t('models:order_one', { defaultValue: 'Order' }))}
-                  </TableHead>
+                  <TableHead>{capitalize(modelLabel('order'))}</TableHead>
                   <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{validationAttribute('total', true)}</TableHead>
                   <TableHead>{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</TableHead>
-                  <TableHead>
-                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
-                  </TableHead>
+                  <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -10,7 +10,13 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useDriverList } from '@/hooks/drivers';
 import { useRouter } from 'next/navigation';
@@ -19,19 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, Truck } from 'lucide-react';
-
-function formatDate(dateString?: string): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
+import { formatDate } from '@/utils/format';
 
 function getInitials(name?: string): string {
   if (!name) return '?';
@@ -66,9 +60,7 @@ export default function DriversPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
-            {capitalize(t('models:driver_other', { defaultValue: 'Drivers' }))}
-          </h1>
+          <h1 className="text-3xl font-bold">{capitalize(modelLabel('driver', 2))}</h1>
           <p className="text-muted-foreground">
             {t('drivers:manage_description', { defaultValue: 'Manage driver accounts' })}
           </p>
@@ -120,9 +112,7 @@ export default function DriversPage() {
                   <TableHead>{validationAttribute('licenseNumber', true)}</TableHead>
                   <TableHead>{validationAttribute('licensePlate', true)}</TableHead>
                   <TableHead>{validationAttribute('licenseExpires', true)}</TableHead>
-                  <TableHead>
-                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
-                  </TableHead>
+                  <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

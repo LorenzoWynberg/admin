@@ -17,7 +17,14 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
+import { formatDate } from '@/utils/format';
 import { Input } from '@/components/ui/input';
 import { useOrderList } from '@/hooks/orders';
 import { useRouter } from 'next/navigation';
@@ -29,21 +36,6 @@ import { PaymentStatusBadge } from '@/components/orders/PaymentStatusBadge';
 import { ChevronLeft, ChevronRight, Search, Package } from 'lucide-react';
 
 type OrderStatus = App.Enums.OrderStatus;
-
-function formatDate(dateString?: string): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  } catch {
-    return dateString;
-  }
-}
 
 function formatAddress(address?: App.Data.Address.AddressData | null): string {
   if (!address) return '-';
@@ -97,9 +89,7 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
-            {capitalize(t('models:order_other', { defaultValue: 'Orders' }))}
-          </h1>
+          <h1 className="text-3xl font-bold">{capitalize(modelLabel('order', 2))}</h1>
           <p className="text-muted-foreground">
             {t('orders:manage_description', { defaultValue: 'Manage delivery orders and quotes' })}
           </p>
@@ -178,12 +168,8 @@ export default function OrdersPage() {
                   </TableHead>
                   <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
-                  <TableHead>
-                    {capitalize(t('models:quote_one', { defaultValue: 'Quote' }))}
-                  </TableHead>
-                  <TableHead>
-                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
-                  </TableHead>
+                  <TableHead>{capitalize(modelLabel('quote'))}</TableHead>
+                  <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -1,6 +1,12 @@
 'use client';
 
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -10,19 +16,7 @@ import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, User, CreditCard, Car, Calendar, Trash2 } from 'lucide-react';
-
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
+import { formatDate } from '@/utils/format';
 
 function getInitials(name?: string): string {
   if (!name) return '?';
@@ -99,13 +93,13 @@ export default function DriverDetailPage() {
               {driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}
             </h1>
             <p className="text-muted-foreground">
-              {capitalize(t('models:driver_one', { defaultValue: 'Driver' }))} {driver.publicId}
+              {capitalize(modelLabel('driver'))} {driver.publicId}
             </p>
           </div>
         </div>
         <Button variant="destructive" onClick={handleDelete} disabled={deleteDriver.isPending}>
           <Trash2 className="mr-2 h-4 w-4" />
-          {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
+          {actionLabel('delete')}
         </Button>
       </div>
 
@@ -198,15 +192,11 @@ export default function DriverDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {capitalize(t('common:created', { defaultValue: 'Created' }))}
-              </span>
+              <span className="text-muted-foreground">{actionLabel('created')}</span>
               <span className="font-medium">{formatDate(driver.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {capitalize(t('common:updated', { defaultValue: 'Updated' }))}
-              </span>
+              <span className="text-muted-foreground">{actionLabel('updated')}</span>
               <span className="font-medium">{formatDate(driver.updatedAt)}</span>
             </div>
           </CardContent>

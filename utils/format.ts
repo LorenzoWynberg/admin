@@ -1,5 +1,8 @@
 import { es, fr, enUS } from 'date-fns/locale';
 import type { Locale } from 'date-fns';
+import i18n from '@/config/i18next';
+
+const getLocale = (): string => i18n.language || 'en';
 
 /**
  * Get date-fns locale from language code.
@@ -72,7 +75,7 @@ export function formatDateTime(
   try {
     const date = new Date(isoString);
     if (isNaN(date.getTime())) return isoString;
-    return date.toLocaleString('en-US', {
+    return date.toLocaleString(getLocale(), {
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
@@ -80,5 +83,24 @@ export function formatDateTime(
     });
   } catch {
     return isoString;
+  }
+}
+
+/**
+ * Format an ISO date string for date-only display (locale-aware).
+ * e.g. "18 ene 2026" (es), "Jan 18, 2026" (en)
+ */
+export function formatDate(dateString: string | null | undefined, fallback: string = '-'): string {
+  if (!dateString) return fallback;
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    return date.toLocaleDateString(getLocale(), {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch {
+    return dateString;
   }
 }

@@ -33,7 +33,8 @@ import {
 import { ArrowLeft, Pencil, Trash2, Copy, Power, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { Enums } from '@/data/app-enums';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { formatDate } from '@/utils/format';
 
 function formatCurrency(amount?: number): string {
   if (amount === undefined) return '-';
@@ -43,21 +44,6 @@ function formatCurrency(amount?: number): string {
 function formatPercent(rate?: number): string {
   if (rate === undefined) return '-';
   return `${(rate * 100).toFixed(1)}%`;
-}
-
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  } catch {
-    return dateString;
-  }
 }
 
 export default function PricingRuleDetailPage() {
@@ -146,7 +132,7 @@ export default function PricingRuleDetailPage() {
           {rule.status !== Enums.PricingRuleStatus.DRAFT && (
             <Button variant="outline" onClick={handleClone} disabled={cloneMutation.isPending}>
               <Copy className="mr-2 h-4 w-4" />
-              {capitalize(t('common:clone'))}
+              {actionLabel('clone')}
             </Button>
           )}
           {rule.status === Enums.PricingRuleStatus.DRAFT && (
@@ -157,15 +143,15 @@ export default function PricingRuleDetailPage() {
                 disabled={activateMutation.isPending}
               >
                 <Power className="mr-2 h-4 w-4" />
-                {capitalize(t('common:activate'))}
+                {actionLabel('activate')}
               </Button>
               <Button onClick={() => router.push(`/pricing/${ruleId}/edit`)}>
                 <Pencil className="mr-2 h-4 w-4" />
-                {capitalize(t('common:edit'))}
+                {actionLabel('edit')}
               </Button>
               <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
                 <Trash2 className="mr-2 h-4 w-4" />
-                {capitalize(t('common:delete'))}
+                {actionLabel('delete')}
               </Button>
             </>
           )}
@@ -267,12 +253,14 @@ export default function PricingRuleDetailPage() {
       <AlertDialog open={activateDialogOpen} onOpenChange={setActivateDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{capitalize(t('common:activate'))}</AlertDialogTitle>
+            <AlertDialogTitle>{actionLabel('activate')}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_activate')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleActivate}>{capitalize(t('common:activate'))}</AlertDialogAction>
+            <AlertDialogAction onClick={handleActivate}>
+              {actionLabel('activate')}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -281,7 +269,7 @@ export default function PricingRuleDetailPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{capitalize(t('common:delete'))}</AlertDialogTitle>
+            <AlertDialogTitle>{actionLabel('delete')}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_delete')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -290,7 +278,7 @@ export default function PricingRuleDetailPage() {
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              {capitalize(t('common:delete'))}
+              {actionLabel('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
