@@ -323,12 +323,12 @@ export default function PricingPage() {
       <AlertDialog open={activateDialogOpen} onOpenChange={setActivateDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('common:activate')}</AlertDialogTitle>
+            <AlertDialogTitle>{capitalize(t('common:activate'))}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_activate')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleActivate}>{t('common:activate')}</AlertDialogAction>
+            <AlertDialogAction onClick={handleActivate}>{capitalize(t('common:activate'))}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -337,7 +337,7 @@ export default function PricingPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('common:delete')}</AlertDialogTitle>
+            <AlertDialogTitle>{capitalize(t('common:delete'))}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_delete')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -346,7 +346,7 @@ export default function PricingPage() {
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              {t('common:delete')}
+              {capitalize(t('common:delete'))}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

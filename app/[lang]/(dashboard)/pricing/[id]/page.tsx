@@ -33,7 +33,7 @@ import {
 import { ArrowLeft, Pencil, Trash2, Copy, Power, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { Enums } from '@/data/app-enums';
-import { resourceMessage, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 
 function formatCurrency(amount?: number): string {
   if (amount === undefined) return '-';
@@ -146,7 +146,7 @@ export default function PricingRuleDetailPage() {
           {rule.status !== Enums.PricingRuleStatus.DRAFT && (
             <Button variant="outline" onClick={handleClone} disabled={cloneMutation.isPending}>
               <Copy className="mr-2 h-4 w-4" />
-              {t('common:clone')}
+              {capitalize(t('common:clone'))}
             </Button>
           )}
           {rule.status === Enums.PricingRuleStatus.DRAFT && (
@@ -157,15 +157,15 @@ export default function PricingRuleDetailPage() {
                 disabled={activateMutation.isPending}
               >
                 <Power className="mr-2 h-4 w-4" />
-                {t('common:activate')}
+                {capitalize(t('common:activate'))}
               </Button>
               <Button onClick={() => router.push(`/pricing/${ruleId}/edit`)}>
                 <Pencil className="mr-2 h-4 w-4" />
-                {t('common:edit')}
+                {capitalize(t('common:edit'))}
               </Button>
               <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
                 <Trash2 className="mr-2 h-4 w-4" />
-                {t('common:delete')}
+                {capitalize(t('common:delete'))}
               </Button>
             </>
           )}
@@ -267,12 +267,12 @@ export default function PricingRuleDetailPage() {
       <AlertDialog open={activateDialogOpen} onOpenChange={setActivateDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('common:activate')}</AlertDialogTitle>
+            <AlertDialogTitle>{capitalize(t('common:activate'))}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_activate')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleActivate}>{t('common:activate')}</AlertDialogAction>
+            <AlertDialogAction onClick={handleActivate}>{capitalize(t('common:activate'))}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -281,7 +281,7 @@ export default function PricingRuleDetailPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('common:delete')}</AlertDialogTitle>
+            <AlertDialogTitle>{capitalize(t('common:delete'))}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_delete')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -290,7 +290,7 @@ export default function PricingRuleDetailPage() {
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              {t('common:delete')}
+              {capitalize(t('common:delete'))}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
