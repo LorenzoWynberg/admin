@@ -461,6 +461,7 @@ declare namespace App.Data.Quote {
     taxTotal?: number | null;
     total?: number | null;
     notes?: string | null;
+    rejectionReason?: string | null;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -725,6 +726,7 @@ declare namespace App.Enums {
   }
   export enum PaymentProvider {
     Tilopay = 'tilopay',
+    Onvo = 'onvo',
     Cash = 'cash',
   }
   export enum PaymentStatus {
