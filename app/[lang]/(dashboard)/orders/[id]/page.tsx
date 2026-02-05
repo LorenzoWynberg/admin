@@ -106,9 +106,11 @@ export default function OrderDetailPage() {
     );
   }
 
-  // Can create quote for: pending (no quote yet), or denied (re-quote after rejection)
+  const isQuoteExpired = order.currentQuote?.status === 'expired';
+  // Can create quote for: pending (no/expired quote), or denied (re-quote after rejection)
   const canCreateQuote =
-    (order.status === 'pending' && !order.currentQuote) || order.status === 'denied';
+    (order.status === 'pending' && (!order.currentQuote || isQuoteExpired)) ||
+    order.status === 'denied';
 
   return (
     <div className="space-y-6">
@@ -320,6 +322,26 @@ export default function OrderDetailPage() {
           <CardContent className="space-y-4">
             {order.currentQuote ? (
               <>
+                {isQuoteExpired && (
+                  <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950">
+                    <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                      {t('orders:detail.quote_expired', {
+                        defaultValue: 'This quote has expired. Please create a new quote.',
+                      })}
+                    </p>
+                    {canCreateQuote && order.id && (
+                      <div className="mt-2">
+                        <CreateQuoteDialog
+                          orderId={order.id}
+                          orderDistanceKm={order.distanceKm}
+                          orderEstimatedMinutes={order.estimatedMinutes}
+                          customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
+                          customerDesiredDelivery={order.fulfilledBefore}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
                     {validationAttribute('serviceFee', true)}
