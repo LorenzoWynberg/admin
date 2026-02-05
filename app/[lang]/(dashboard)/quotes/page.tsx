@@ -25,8 +25,9 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Search, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, FileText, X } from 'lucide-react';
 
 type QuoteStatus = App.Enums.QuoteStatus;
 
@@ -57,12 +58,16 @@ export default function QuotesPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
 
   const { data, isLoading, error } = useQuoteList({
     page,
     perPage: 15,
     status: status === 'all' ? undefined : status,
     search: search || undefined,
+    fromDate: fromDate || undefined,
+    toDate: toDate || undefined,
   });
   const { data: currencies } = useCurrencyList();
 
@@ -106,7 +111,7 @@ export default function QuotesPage() {
             {t('common:filters', { defaultValue: 'Filters' })}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-4">
             <div className="relative min-w-[200px] flex-1">
               <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
@@ -140,6 +145,64 @@ export default function QuotesPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>{t('common:from_date', { defaultValue: 'From date' })}</Label>
+              <div className="relative">
+                <Input
+                  type="date"
+                  value={fromDate}
+                  max={toDate || undefined}
+                  onChange={(e) => {
+                    setFromDate(e.target.value);
+                    setPage(1);
+                  }}
+                  className={fromDate ? 'pr-8' : ''}
+                />
+                {fromDate && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFromDate('');
+                      setPage(1);
+                    }}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('common:to_date', { defaultValue: 'To date' })}</Label>
+              <div className="relative">
+                <Input
+                  type="date"
+                  value={toDate}
+                  min={fromDate || undefined}
+                  onChange={(e) => {
+                    setToDate(e.target.value);
+                    setPage(1);
+                  }}
+                  className={toDate ? 'pr-8' : ''}
+                />
+                {toDate && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setToDate('');
+                      setPage(1);
+                    }}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

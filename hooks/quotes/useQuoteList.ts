@@ -7,6 +7,8 @@ interface UseQuoteListParams {
   status?: string;
   orderId?: number;
   search?: string;
+  fromDate?: string;
+  toDate?: string;
   enabled?: boolean;
 }
 
