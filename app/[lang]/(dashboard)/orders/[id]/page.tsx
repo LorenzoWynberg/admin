@@ -325,7 +325,7 @@ export default function OrderDetailPage() {
                 {isQuoteExpired && (
                   <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950">
                     <p className="text-sm font-medium text-red-600 dark:text-red-400">
-                      {t('orders:detail.quote_expired', {
+                      {t('orders:quote_expired_admin', {
                         defaultValue: 'This quote has expired. Please create a new quote.',
                       })}
                     </p>
