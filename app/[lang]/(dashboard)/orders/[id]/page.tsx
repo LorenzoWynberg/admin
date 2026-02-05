@@ -24,7 +24,7 @@ import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { PaymentSection } from '@/components/payments/PaymentSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { useOrder, useDeleteOrder } from '@/hooks/orders';
 import { useCurrencyList } from '@/hooks/currencies';
 
@@ -128,7 +128,7 @@ export default function OrderDetailPage() {
               })}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {capitalize(t('common:created', { defaultValue: 'Created' }))}{' '}
+              {actionLabel('created')}{' '}
               {formatDate(order.createdAt)}
             </p>
           </div>
@@ -146,7 +146,7 @@ export default function OrderDetailPage() {
           )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
             <Trash2 className="mr-2 h-4 w-4" />
-            {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
+            {actionLabel('delete')}
           </Button>
         </div>
       </div>

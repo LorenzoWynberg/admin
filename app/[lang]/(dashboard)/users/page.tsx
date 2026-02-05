@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { useUserList } from '@/hooks/users';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
@@ -95,7 +95,7 @@ export default function UsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {capitalize(t('models:user_other', { defaultValue: 'Users' }))}
+            {capitalize(modelLabel('user', 2))}
           </h1>
           <p className="text-muted-foreground">
             {t('users:manage_description', { defaultValue: 'Manage user accounts' })}
@@ -169,13 +169,13 @@ export default function UsersPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>
-                    {capitalize(t('models:user_one', { defaultValue: 'User' }))}
+                    {capitalize(modelLabel('user'))}
                   </TableHead>
                   <TableHead>{validationAttribute('email', true)}</TableHead>
                   <TableHead>{validationAttribute('role', true)}</TableHead>
                   <TableHead>{validationAttribute('phone', true)}</TableHead>
                   <TableHead>
-                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                    {actionLabel('created')}
                   </TableHead>
                 </TableRow>
               </TableHeader>

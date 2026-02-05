@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useOrderList } from '@/hooks/orders';
 import { useRouter } from 'next/navigation';
@@ -98,7 +98,7 @@ export default function OrdersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {capitalize(t('models:order_other', { defaultValue: 'Orders' }))}
+            {capitalize(modelLabel('order', 2))}
           </h1>
           <p className="text-muted-foreground">
             {t('orders:manage_description', { defaultValue: 'Manage delivery orders and quotes' })}
@@ -179,10 +179,10 @@ export default function OrdersPage() {
                   <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
                   <TableHead>
-                    {capitalize(t('models:quote_one', { defaultValue: 'Quote' }))}
+                    {capitalize(modelLabel('quote'))}
                   </TableHead>
                   <TableHead>
-                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                    {actionLabel('created')}
                   </TableHead>
                 </TableRow>
               </TableHeader>

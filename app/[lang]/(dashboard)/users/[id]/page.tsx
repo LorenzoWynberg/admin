@@ -1,6 +1,6 @@
 'use client';
 
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -113,13 +113,13 @@ export default function UserDetailPage() {
               <RoleBadge role={user.role as Role} />
             </div>
             <p className="text-muted-foreground">
-              {capitalize(t('models:user_one', { defaultValue: 'User' }))} {user.publicId}
+              {capitalize(modelLabel('user'))} {user.publicId}
             </p>
           </div>
         </div>
         <Button variant="destructive" onClick={handleDelete} disabled={deleteUser.isPending}>
           <Trash2 className="mr-2 h-4 w-4" />
-          {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
+          {actionLabel('delete')}
         </Button>
       </div>
 
@@ -286,13 +286,13 @@ export default function UserDetailPage() {
           <CardContent className="space-y-4">
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                {actionLabel('created')}
               </span>
               <span className="font-medium">{formatDate(user.createdAt)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {capitalize(t('common:updated', { defaultValue: 'Updated' }))}
+                {actionLabel('updated')}
               </span>
               <span className="font-medium">{formatDate(user.updatedAt)}</span>
             </div>

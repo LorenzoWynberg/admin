@@ -1,6 +1,6 @@
 'use client';
 
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -99,13 +99,13 @@ export default function DriverDetailPage() {
               {driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}
             </h1>
             <p className="text-muted-foreground">
-              {capitalize(t('models:driver_one', { defaultValue: 'Driver' }))} {driver.publicId}
+              {capitalize(modelLabel('driver'))} {driver.publicId}
             </p>
           </div>
         </div>
         <Button variant="destructive" onClick={handleDelete} disabled={deleteDriver.isPending}>
           <Trash2 className="mr-2 h-4 w-4" />
-          {capitalize(t('common:delete', { defaultValue: 'Delete' }))}
+          {actionLabel('delete')}
         </Button>
       </div>
 
@@ -199,13 +199,13 @@ export default function DriverDetailPage() {
           <CardContent className="space-y-4">
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                {actionLabel('created')}
               </span>
               <span className="font-medium">{formatDate(driver.createdAt)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {capitalize(t('common:updated', { defaultValue: 'Updated' }))}
+                {actionLabel('updated')}
               </span>
               <span className="font-medium">{formatDate(driver.updatedAt)}</span>
             </div>

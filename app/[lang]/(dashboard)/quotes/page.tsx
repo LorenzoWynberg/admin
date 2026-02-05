@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useQuoteList } from '@/hooks/quotes';
 import { useCurrencyList } from '@/hooks/currencies';
@@ -96,7 +96,7 @@ export default function QuotesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {capitalize(t('models:quote_other', { defaultValue: 'Quotes' }))}
+            {capitalize(modelLabel('quote', 2))}
           </h1>
           <p className="text-muted-foreground">
             {t('quotes:manage_description', { defaultValue: 'Create and manage delivery quotes' })}
@@ -229,13 +229,13 @@ export default function QuotesPage() {
                 <TableRow>
                   <TableHead>{validationAttribute('id', true)}</TableHead>
                   <TableHead>
-                    {capitalize(t('models:order_one', { defaultValue: 'Order' }))}
+                    {capitalize(modelLabel('order'))}
                   </TableHead>
                   <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{validationAttribute('total', true)}</TableHead>
                   <TableHead>{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</TableHead>
                   <TableHead>
-                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                    {actionLabel('created')}
                   </TableHead>
                 </TableRow>
               </TableHeader>

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useDriverList } from '@/hooks/drivers';
 import { useRouter } from 'next/navigation';
@@ -67,7 +67,7 @@ export default function DriversPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {capitalize(t('models:driver_other', { defaultValue: 'Drivers' }))}
+            {capitalize(modelLabel('driver', 2))}
           </h1>
           <p className="text-muted-foreground">
             {t('drivers:manage_description', { defaultValue: 'Manage driver accounts' })}
@@ -121,7 +121,7 @@ export default function DriversPage() {
                   <TableHead>{validationAttribute('licensePlate', true)}</TableHead>
                   <TableHead>{validationAttribute('licenseExpires', true)}</TableHead>
                   <TableHead>
-                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                    {actionLabel('created')}
                   </TableHead>
                 </TableRow>
               </TableHeader>

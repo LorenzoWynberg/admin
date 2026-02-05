@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
@@ -57,7 +57,7 @@ export default function CatalogsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {capitalize(t('models:catalog_other', { defaultValue: 'Catalogs' }))}
+            {capitalize(modelLabel('catalog', 2))}
           </h1>
           <p className="text-muted-foreground">
             {t('catalogs:manage_description', { defaultValue: 'Manage catalog data' })}
@@ -110,7 +110,7 @@ export default function CatalogsPage() {
                   <TableHead>{validationAttribute('name', true)}</TableHead>
                   <TableHead>{validationAttribute('elements', true)}</TableHead>
                   <TableHead>
-                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                    {actionLabel('created')}
                   </TableHead>
                 </TableRow>
               </TableHeader>

@@ -51,7 +51,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import {
   usePricingRuleList,
   useActivatePricingRule,
@@ -236,7 +236,7 @@ export default function PricingPage() {
                               onClick={() => router.push(`/pricing/${rule.id}/edit`)}
                             >
                               <Pencil className="mr-2 h-4 w-4" />
-                              {capitalize(t('common:edit'))}
+                              {actionLabel('edit')}
                             </DropdownMenuItem>
                           )}
                           {rule.status !== Enums.PricingRuleStatus.DRAFT && (
@@ -245,7 +245,7 @@ export default function PricingPage() {
                               disabled={cloneMutation.isPending}
                             >
                               <Copy className="mr-2 h-4 w-4" />
-                              {capitalize(t('common:clone'))}
+                              {actionLabel('clone')}
                             </DropdownMenuItem>
                           )}
                           {rule.status === Enums.PricingRuleStatus.DRAFT && (
@@ -256,7 +256,7 @@ export default function PricingPage() {
                               }}
                             >
                               <Power className="mr-2 h-4 w-4" />
-                              {capitalize(t('common:activate'))}
+                              {actionLabel('activate')}
                             </DropdownMenuItem>
                           )}
                           {rule.status === Enums.PricingRuleStatus.DRAFT && (
@@ -270,7 +270,7 @@ export default function PricingPage() {
                                 }}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                {capitalize(t('common:delete'))}
+                                {actionLabel('delete')}
                               </DropdownMenuItem>
                             </>
                           )}
@@ -323,12 +323,12 @@ export default function PricingPage() {
       <AlertDialog open={activateDialogOpen} onOpenChange={setActivateDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{capitalize(t('common:activate'))}</AlertDialogTitle>
+            <AlertDialogTitle>{actionLabel('activate')}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_activate')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleActivate}>{capitalize(t('common:activate'))}</AlertDialogAction>
+            <AlertDialogAction onClick={handleActivate}>{actionLabel('activate')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -337,7 +337,7 @@ export default function PricingPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{capitalize(t('common:delete'))}</AlertDialogTitle>
+            <AlertDialogTitle>{actionLabel('delete')}</AlertDialogTitle>
             <AlertDialogDescription>{t('confirm_delete')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -346,7 +346,7 @@ export default function PricingPage() {
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              {capitalize(t('common:delete'))}
+              {actionLabel('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

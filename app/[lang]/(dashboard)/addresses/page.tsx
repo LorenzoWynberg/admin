@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useAddressList } from '@/hooks/addresses';
@@ -55,7 +55,7 @@ export default function AddressesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {capitalize(t('models:address_other', { defaultValue: 'Addresses' }))}
+            {capitalize(modelLabel('address', 2))}
           </h1>
           <p className="text-muted-foreground">
             {t('addresses:manage_description', {
@@ -114,12 +114,12 @@ export default function AddressesPage() {
                 <TableRow>
                   <TableHead>{validationAttribute('label', true)}</TableHead>
                   <TableHead>
-                    {capitalize(t('models:address_one', { defaultValue: 'Address' }))}
+                    {capitalize(modelLabel('address'))}
                   </TableHead>
                   <TableHead>{validationAttribute('city', true)}</TableHead>
                   <TableHead>{validationAttribute('type', true)}</TableHead>
                   <TableHead>
-                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                    {actionLabel('created')}
                   </TableHead>
                 </TableRow>
               </TableHeader>

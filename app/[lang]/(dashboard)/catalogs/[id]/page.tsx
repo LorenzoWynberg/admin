@@ -17,7 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ArrowLeft, Database, List, Calendar, Pencil } from 'lucide-react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { ElementEditDialog } from '@/components/catalogs/ElementEditDialog';
 
 type CatalogElementData = App.Data.CatalogElement.CatalogElementData;
@@ -106,7 +106,7 @@ export default function CatalogDetailPage() {
             <Badge variant="outline">{catalog.code}</Badge>
           </div>
           <p className="text-muted-foreground">
-            {capitalize(t('models:catalog_one', { defaultValue: 'Catalog' }))} #{catalog.id}
+            {capitalize(modelLabel('catalog'))} #{catalog.id}
           </p>
         </div>
       </div>
@@ -149,13 +149,13 @@ export default function CatalogDetailPage() {
           <CardContent className="space-y-4">
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                {actionLabel('created')}
               </span>
               <span className="font-medium">{formatDate(catalog.createdAt)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {capitalize(t('common:updated', { defaultValue: 'Updated' }))}
+                {actionLabel('updated')}
               </span>
               <span className="font-medium">{formatDate(catalog.updatedAt)}</span>
             </div>

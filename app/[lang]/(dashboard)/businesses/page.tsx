@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import { capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -56,7 +56,7 @@ export default function BusinessesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {capitalize(t('models:business_other', { defaultValue: 'Businesses' }))}
+            {capitalize(modelLabel('business', 2))}
           </h1>
           <p className="text-muted-foreground">
             {t('businesses:manage_description', { defaultValue: 'Manage business accounts' })}
@@ -111,7 +111,7 @@ export default function BusinessesPage() {
                   <TableHead>{validationAttribute('type', true)}</TableHead>
                   <TableHead>{validationAttribute('owner', true)}</TableHead>
                   <TableHead>
-                    {capitalize(t('common:created', { defaultValue: 'Created' }))}
+                    {actionLabel('created')}
                   </TableHead>
                 </TableRow>
               </TableHeader>

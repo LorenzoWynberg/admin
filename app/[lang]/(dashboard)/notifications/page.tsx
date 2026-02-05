@@ -29,7 +29,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { capitalize } from '@/utils/lang';
+import { capitalize, modelLabel } from '@/utils/lang';
 import { getDateLocale } from '@/utils/format';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -120,7 +120,7 @@ export default function NotificationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            {capitalize(t('models:notification_other', { defaultValue: 'Notifications' }))}
+            {capitalize(modelLabel('notification', 2))}
           </h1>
           <p className="text-muted-foreground">
             {t('notifications:page_description', {
@@ -336,7 +336,7 @@ export default function NotificationsPage() {
                 <TableRow>
                   <TableHead className="w-12"></TableHead>
                   <TableHead>
-                    {capitalize(t('models:notification_one', { defaultValue: 'Notification' }))}
+                    {capitalize(modelLabel('notification'))}
                   </TableHead>
                   <TableHead className="w-32">
                     {t('common:status', { defaultValue: 'Status' })}

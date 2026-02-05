@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { capitalize } from '@/utils/lang';
+import { actionLabel, capitalize } from '@/utils/lang';
 import {
   LayoutDashboard,
   Package,
@@ -111,7 +111,7 @@ export function Sidebar() {
             )}
           >
             <Settings className="h-5 w-5" />
-            {ready ? capitalize(t('common:settings_other', { defaultValue: 'Settings' })) : ''}
+            {ready ? actionLabel('settings_other') : ''}
           </Link>
         </div>
       </div>
