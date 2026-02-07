@@ -5,6 +5,7 @@ import {
   Building2,
   ArrowLeft,
   Calendar,
+  MessageSquare,
   Package,
   Trash2,
   MapPin,
@@ -136,6 +137,23 @@ export default function OrderDetailPage() {
           </Button>
         </div>
       </div>
+
+      {/* Rejection Reason */}
+      {order.status === 'denied' && order.currentQuote?.rejectionReason && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950">
+          <div className="flex items-start gap-3">
+            <MessageSquare className="mt-0.5 h-5 w-5 text-amber-600 dark:text-amber-400" />
+            <div>
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                {t('orders:detail.rejection_reason', { defaultValue: 'Customer Feedback' })}
+              </p>
+              <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
+                {order.currentQuote.rejectionReason}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Pickup Details */}
