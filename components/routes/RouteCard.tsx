@@ -23,6 +23,7 @@ type RouteStopData = App.Data.Route.RouteStopData;
 interface RouteCardProps {
   route: RouteData;
   isSelected: boolean;
+  isAddingStop?: boolean;
   onSelect: () => void;
   onStopClick?: (stop: RouteStopData) => void;
   selectedStopId?: number | null;
@@ -32,6 +33,7 @@ interface RouteCardProps {
 export function RouteCard({
   route,
   isSelected,
+  isAddingStop,
   onSelect,
   onStopClick,
   selectedStopId,
@@ -71,10 +73,10 @@ export function RouteCard({
       <div className="mb-2 flex items-center justify-between">
         <button className="flex items-center gap-2 text-left" onClick={onSelect}>
           <Truck className="text-muted-foreground h-4 w-4" />
-          <span className="text-sm font-semibold">{route.name}</span>
+          <span className="text-sm font-semibold">{route.publicId}</span>
         </button>
         <div className="flex items-center gap-2">
-          <RouteStatusBadge status={route.status} />
+          {route.status && <RouteStatusBadge status={route.status} />}
           {onDelete && (
             <Button
               variant="ghost"
@@ -110,7 +112,7 @@ export function RouteCard({
 
       {/* Stops */}
       <div ref={setNodeRef} className="min-h-[40px] space-y-1.5">
-        {stops.length === 0 ? (
+        {stops.length === 0 && !isAddingStop ? (
           <p className="text-muted-foreground rounded-md border border-dashed py-4 text-center text-xs">
             {t('routes:empty_route', { defaultValue: 'No stops — drag orders here' })}
           </p>
@@ -126,6 +128,15 @@ export function RouteCard({
               />
             ))}
           </SortableContext>
+        )}
+        {isAddingStop && (
+          <div className="flex animate-pulse items-center gap-2 rounded-md border border-l-4 border-l-gray-300 bg-gray-50/50 p-2">
+            <div className="bg-muted h-4 w-4 rounded" />
+            <div className="flex-1 space-y-1.5">
+              <div className="bg-muted h-3 w-24 rounded" />
+              <div className="bg-muted h-3 w-32 rounded" />
+            </div>
+          </div>
         )}
       </div>
     </div>

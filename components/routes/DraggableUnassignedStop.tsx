@@ -1,63 +1,47 @@
 'use client';
 
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { useDraggable } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
-import { GripVertical, Package, MapPin, X, Info, Phone, Building2 } from 'lucide-react';
+import { Package, MapPin, Info, Phone, Building2 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { capitalize } from '@/utils/lang';
-import { Button } from '@/components/ui/button';
+import type { UnassignedStop } from '@/services/routeService';
 
-type RouteStopData = App.Data.Route.RouteStopData;
-
-interface SortableStopCardProps {
-  stop: RouteStopData;
-  onRemove?: () => void;
+interface DraggableUnassignedStopProps {
+  stop: UnassignedStop;
+  isSelected: boolean;
   onClick?: () => void;
-  isSelected?: boolean;
 }
 
-export function SortableStopCard({ stop, onRemove, onClick, isSelected }: SortableStopCardProps) {
+/** Presentational card — used both in the list and in DragOverlay */
+export function UnassignedStopContent({
+  stop,
+  isSelected = false,
+  isDragging = false,
+}: {
+  stop: UnassignedStop;
+  isSelected?: boolean;
+  isDragging?: boolean;
+}) {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: stop.id,
-  });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  const isPickup = stop.type === 'pickup';
+  const isPickup = stop.stopType === 'pickup';
   const colorClass = isPickup
     ? 'border-l-sky-500 bg-sky-50/50'
     : 'border-l-violet-500 bg-violet-50/50';
   const iconColor = isPickup ? 'text-sky-600' : 'text-violet-600';
-
-  const order = stop.order;
-  const address = isPickup ? order?.fromAddress : order?.toAddress;
-  const contactName = isPickup ? order?.fromName : order?.toName;
-  const contactPhone = isPickup ? order?.fromPhone : order?.toPhone;
-  const businessName = order?.business?.name;
+  const address = isPickup ? stop.order.fromAddress : stop.order.toAddress;
+  const contactName = isPickup ? stop.order.fromName : stop.order.toName;
+  const contactPhone = isPickup ? stop.order.fromPhone : stop.order.toPhone;
+  const businessName = stop.order.business?.name;
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      className={`flex items-center gap-2 rounded-md border border-l-4 p-2 ${colorClass} ${
-        isDragging ? 'opacity-50' : ''
-      } ${isSelected ? 'ring-primary ring-2' : ''}`}
-      onClick={onClick}
+      className={`rounded-md border border-l-4 p-2 transition-colors hover:shadow-sm ${colorClass} ${
+        isSelected ? 'ring-primary ring-2' : ''
+      } ${isDragging ? 'opacity-50' : ''}`}
     >
-      <button
-        className="text-muted-foreground hover:text-foreground shrink-0 cursor-grab active:cursor-grabbing"
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="h-4 w-4" />
-      </button>
-
-      <div className="flex min-w-0 flex-1 items-center gap-2">
+      <div className="flex items-center gap-2">
         {isPickup ? (
           <Package className={`h-4 w-4 shrink-0 ${iconColor}`} />
         ) : (
@@ -66,9 +50,9 @@ export function SortableStopCard({ stop, onRemove, onClick, isSelected }: Sortab
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1 text-xs font-medium">
             <span className={iconColor}>
-              {capitalize(t(`routes:stop_types.${stop.type}`, { defaultValue: stop.type }))}
+              {capitalize(t(`routes:stop_types.${stop.stopType}`, { defaultValue: stop.stopType }))}
             </span>
-            {order?.publicId && <span className="text-muted-foreground">#{order.publicId}</span>}
+            <span className="text-muted-foreground">#{stop.order.publicId}</span>
             {(contactPhone || businessName) && (
               <Popover>
                 <PopoverTrigger asChild>
@@ -102,22 +86,41 @@ export function SortableStopCard({ stop, onRemove, onClick, isSelected }: Sortab
           {address?.streetAddress && (
             <p className="text-muted-foreground truncate text-xs">{address.streetAddress}</p>
           )}
+          {stop.scheduledFor && (
+            <p className="text-muted-foreground text-xs">
+              {new Date(stop.scheduledFor).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </p>
+          )}
         </div>
       </div>
+    </div>
+  );
+}
 
-      {onRemove && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-muted-foreground hover:text-destructive h-6 w-6 shrink-0"
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-        >
-          <X className="h-3 w-3" />
-        </Button>
-      )}
+export function DraggableUnassignedStop({
+  stop,
+  isSelected,
+  onClick,
+}: DraggableUnassignedStopProps) {
+  const draggableId = `unassigned-${stop.order.id}-${stop.stopType}`;
+
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: draggableId,
+    data: { orderId: stop.order.id, stopType: stop.stopType },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className="cursor-grab touch-none active:cursor-grabbing"
+      onClick={onClick}
+    >
+      <UnassignedStopContent stop={stop} isSelected={isSelected} isDragging={isDragging} />
     </div>
   );
 }

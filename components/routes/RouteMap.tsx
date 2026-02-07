@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import { APIProvider, Map, useMap } from '@vis.gl/react-google-maps';
 import { StopMarker } from './StopMarker';
 import type { UnassignedStop } from '@/services/routeService';
@@ -67,6 +67,7 @@ function MapContent({
           type: stop.stopType as 'pickup' | 'dropoff',
           publicId: stop.order.publicId ?? '',
           isUnassigned: true,
+          label: (stop.order.publicId ?? '').replace(/^ORD-/i, '').slice(0, 3),
           isSelected: selectedUnassignedKey === key,
         };
       });
@@ -88,6 +89,19 @@ function MapContent({
     [map, onUnassignedClick]
   );
 
+  // Pan to selected stop when selection changes from sidebar
+  useEffect(() => {
+    if (!map) return;
+
+    if (selectedStopId) {
+      const marker = routeMarkers.find((m) => m.id === selectedStopId);
+      if (marker) map.panTo({ lat: marker.lat, lng: marker.lng });
+    } else if (selectedUnassignedKey) {
+      const marker = unassignedMarkers.find((m) => m.key === selectedUnassignedKey);
+      if (marker) map.panTo({ lat: marker.lat, lng: marker.lng });
+    }
+  }, [map, selectedStopId, selectedUnassignedKey, routeMarkers, unassignedMarkers]);
+
   return (
     <>
       {/* Unassigned markers (grey) */}
@@ -99,7 +113,7 @@ function MapContent({
           type={marker.type}
           isUnassigned
           isSelected={marker.isSelected}
-          label={marker.publicId}
+          label={marker.label}
           onClick={() => handleUnassignedClick(marker.key, marker.lat, marker.lng)}
         />
       ))}

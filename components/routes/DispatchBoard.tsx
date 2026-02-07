@@ -4,31 +4,69 @@ import { useState, useCallback, useMemo } from 'react';
 import { format } from 'date-fns';
 import {
   DndContext,
+  DragOverlay,
   DragEndEvent,
+  DragStartEvent,
   closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { useRouteList, useUnassignedStops, useReorderStops, useDeleteRoute } from '@/hooks/routes';
+import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import {
+  useRouteList,
+  useUnassignedStops,
+  useReorderStops,
+  useDeleteRoute,
+  useAddStop,
+} from '@/hooks/routes';
 import { DateNavigator } from './DateNavigator';
 import { CreateRouteDialog } from './CreateRouteDialog';
 import { UnassignedStopsList } from './UnassignedStopsList';
 import { RouteCard } from './RouteCard';
 import { AddOrderDialog } from './AddOrderDialog';
+import { UnassignedStopContent } from './DraggableUnassignedStop';
 import { RouteMap } from './RouteMap';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { UnassignedStop } from '@/services/routeService';
 
 type RouteData = App.Data.Route.RouteData;
 type RouteStopData = App.Data.Route.RouteStopData;
+type Paginated<T> = Api.Response.Paginated<T>;
+
+/** Validates that no dropoff comes before its pickup when both are in the same route. */
+function isValidStopOrder(stops: RouteStopData[]): boolean {
+  const indices = new Map<number, { pickup: number; dropoff: number }>();
+
+  for (let i = 0; i < stops.length; i++) {
+    const orderId = stops[i].orderId;
+    if (!orderId) continue;
+    const entry = indices.get(orderId) ?? { pickup: -1, dropoff: -1 };
+    if (stops[i].type === 'pickup') entry.pickup = i;
+    else if (stops[i].type === 'dropoff') entry.dropoff = i;
+    indices.set(orderId, entry);
+  }
+
+  // Only enforce when both pickup and dropoff are in this route
+  for (const { pickup, dropoff } of indices.values()) {
+    if (pickup !== -1 && dropoff !== -1 && dropoff < pickup) return false;
+  }
+
+  return true;
+}
 
 export function DispatchBoard() {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+
   const [date, setDate] = useState(new Date());
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedStopId, setSelectedStopId] = useState<number | null>(null);
   const [selectedUnassignedKey, setSelectedUnassignedKey] = useState<string | null>(null);
+  const [activeDragStop, setActiveDragStop] = useState<UnassignedStop | null>(null);
 
   const dateStr = format(date, 'yyyy-MM-dd');
 
@@ -42,9 +80,10 @@ export function DispatchBoard() {
 
   const reorderStops = useReorderStops();
   const deleteRoute = useDeleteRoute();
+  const addStop = useAddStop();
 
-  const routes = (routesData?.items ?? []) as RouteData[];
-  const unassigned = (unassignedStops ?? []) as UnassignedStop[];
+  const routes = useMemo(() => (routesData?.items ?? []) as RouteData[], [routesData?.items]);
+  const unassigned = useMemo(() => (unassignedStops ?? []) as UnassignedStop[], [unassignedStops]);
 
   const selectedRoute = routes.find((r) => r.publicId === selectedRouteId) ?? null;
   const selectedRouteStops = useMemo(
@@ -58,25 +97,144 @@ export function DispatchBoard() {
     })
   );
 
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const id = String(event.active.id);
+      if (id.startsWith('unassigned-')) {
+        const data = event.active.data.current as {
+          orderId: number;
+          stopType: 'pickup' | 'dropoff';
+        };
+        const stop = unassigned.find(
+          (s) => s.order.id === data.orderId && s.stopType === data.stopType
+        );
+        setActiveDragStop(stop ?? null);
+      }
+    },
+    [unassigned]
+  );
+
+  const handleDragCancel = useCallback(() => {
+    setActiveDragStop(null);
+  }, []);
+
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (!over || !selectedRouteId) return;
+      setActiveDragStop(null);
 
-      // Reordering within the same route
+      const { active, over } = event;
+      if (!over) return;
+
+      const activeId = String(active.id);
+      const overId = String(over.id);
+
+      // --- Cross-container: unassigned stop → route ---
+      if (activeId.startsWith('unassigned-')) {
+        const { orderId, stopType } = active.data.current as {
+          orderId: number;
+          stopType: 'pickup' | 'dropoff';
+        };
+
+        let targetRouteId: string | null = null;
+
+        if (overId.startsWith('route-')) {
+          // Dropped directly on a route card droppable
+          targetRouteId = overId.replace('route-', '');
+        } else {
+          // Dropped on a stop inside a route — find which route owns that stop
+          const numericId = Number(overId);
+          if (!Number.isNaN(numericId)) {
+            const ownerRoute = routes.find((r) =>
+              (r.stops ?? []).some((s: RouteStopData) => s.id === numericId)
+            );
+            targetRouteId = ownerRoute?.publicId ?? null;
+          }
+        }
+
+        if (targetRouteId) {
+          // Validate: dropoff needs its pickup completed or assigned to a route
+          if (stopType === 'dropoff') {
+            const order = unassigned.find(
+              (s) => s.order.id === orderId && s.stopType === 'dropoff'
+            )?.order;
+
+            const pickupCompleted = !!order?.pickupCompletedAt;
+            const pickupInARoute = routes.some((r) =>
+              (r.stops ?? []).some(
+                (s: RouteStopData) => s.orderId === orderId && s.type === 'pickup'
+              )
+            );
+
+            if (!pickupCompleted && !pickupInARoute) {
+              toast.error(
+                t('routes:errors.pickup_required_first', {
+                  defaultValue: 'A pickup stop must exist before adding a dropoff.',
+                })
+              );
+              return;
+            }
+          }
+
+          addStop.mutate({ routeId: targetRouteId, data: { orderId, type: stopType } });
+        }
+        return;
+      }
+
+      // --- Reordering within the selected route ---
+      if (!selectedRouteId) return;
+
       const stops = selectedRouteStops;
       const activeIndex = stops.findIndex((s) => s.id === active.id);
       const overIndex = stops.findIndex((s) => s.id === over.id);
 
       if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
         const newOrder = arrayMove(stops, activeIndex, overIndex);
-        reorderStops.mutate({
-          routeId: selectedRouteId,
-          stopIds: newOrder.map((s) => s.id),
+
+        // Validate: dropoff can't come before its pickup
+        if (!isValidStopOrder(newOrder)) {
+          toast.error(
+            t('routes:validation.pickup_before_dropoff', {
+              defaultValue: 'Pickup must come before dropoff for the same order',
+            })
+          );
+          return;
+        }
+
+        // Optimistic update — instantly reorder in cache
+        const routeListKey = ['routes', 'list', { date: dateStr, perPage: 50 }];
+        const previousRoutes = queryClient.getQueryData<Paginated<RouteData>>(routeListKey);
+
+        queryClient.setQueryData<Paginated<RouteData>>(routeListKey, (old) => {
+          if (!old?.items) return old;
+          return {
+            ...old,
+            items: (old.items as RouteData[]).map((route) =>
+              route.publicId === selectedRouteId ? { ...route, stops: newOrder } : route
+            ),
+          };
         });
+
+        reorderStops.mutate(
+          { routeId: selectedRouteId, stopIds: newOrder.map((s) => s.id) },
+          {
+            onError: () => {
+              queryClient.setQueryData(routeListKey, previousRoutes);
+            },
+          }
+        );
       }
     },
-    [selectedRouteId, selectedRouteStops, reorderStops]
+    [
+      selectedRouteId,
+      selectedRouteStops,
+      reorderStops,
+      addStop,
+      routes,
+      unassigned,
+      queryClient,
+      dateStr,
+      t,
+    ]
   );
 
   const handleStopClick = (stop: RouteStopData) => {
@@ -98,7 +256,13 @@ export function DispatchBoard() {
   };
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
+    >
       <div className="flex h-full flex-col">
         {/* Header */}
         <div className="flex items-center justify-between border-b px-4 py-3">
@@ -140,6 +304,9 @@ export function DispatchBoard() {
                       <RouteCard
                         route={route}
                         isSelected={selectedRouteId === route.publicId}
+                        isAddingStop={
+                          addStop.isPending && addStop.variables?.routeId === route.publicId
+                        }
                         onSelect={() =>
                           setSelectedRouteId(
                             selectedRouteId === route.publicId ? null : route.publicId!
@@ -151,11 +318,7 @@ export function DispatchBoard() {
                       />
                       {route.publicId && (
                         <div className="mt-1.5">
-                          <AddOrderDialog
-                            routeId={route.publicId}
-                            routeName={route.name}
-                            unassignedStops={unassigned}
-                          />
+                          <AddOrderDialog routeId={route.publicId} unassignedStops={unassigned} />
                         </div>
                       )}
                     </div>
@@ -184,6 +347,13 @@ export function DispatchBoard() {
           </div>
         </div>
       </div>
+      <DragOverlay dropAnimation={null}>
+        {activeDragStop && (
+          <div className="w-72">
+            <UnassignedStopContent stop={activeDragStop} />
+          </div>
+        )}
+      </DragOverlay>
     </DndContext>
   );
 }
