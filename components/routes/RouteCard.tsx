@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { useDriverList } from '@/hooks/drivers/useDriverList';
-import { useUpdateRoute, useRemoveStop } from '@/hooks/routes';
+import { useUpdateRoute, useRemoveStop, useOptimizeRoute } from '@/hooks/routes';
 import { Enums } from '@/data/app-enums';
 import { statusLabel } from '@/utils/lang';
 import { SortableStopCard } from './SortableStopCard';
@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Truck, Trash2 } from 'lucide-react';
+import { Truck, Trash2, Sparkles } from 'lucide-react';
 
 type RouteData = App.Data.Route.RouteData;
 type RouteStopData = App.Data.Route.RouteStopData;
@@ -68,12 +68,14 @@ export function RouteCard({
   const { t } = useTranslation();
   const updateRoute = useUpdateRoute();
   const removeStop = useRemoveStop();
+  const optimizeRoute = useOptimizeRoute();
   const { data: driversData } = useDriverList({ perPage: 100 });
   const drivers = driversData?.items ?? [];
 
   const stops = (route.stops ?? []) as RouteStopData[];
   const stopIds = stops.map((s) => s.id);
   const isClosed = CLOSED_ROUTE_STATUSES.has(route.status ?? '');
+  const canOptimize = !isClosed && stops.length >= 2;
 
   const { setNodeRef } = useDroppable({
     id: `route-${route.publicId}`,
@@ -160,6 +162,24 @@ export function RouteCard({
           </SelectContent>
         </Select>
       </div>
+
+      {/* Optimize */}
+      {canOptimize && (
+        <div className="mb-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full gap-1.5"
+            disabled={optimizeRoute.isPending}
+            onClick={() => route.publicId && optimizeRoute.mutate(route.publicId)}
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            {optimizeRoute.isPending
+              ? t('routes:optimizing', { defaultValue: 'Optimizing...' })
+              : t('routes:optimize_route', { defaultValue: 'Optimize Route' })}
+          </Button>
+        </div>
+      )}
 
       {/* Stops */}
       <div ref={setNodeRef} className="min-h-[40px] space-y-1.5">

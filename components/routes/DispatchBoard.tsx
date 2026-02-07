@@ -288,6 +288,8 @@ export function DispatchBoard() {
                   isLoading={unassignedLoading}
                   onStopClick={handleUnassignedClick}
                   selectedStopKey={selectedUnassignedKey}
+                  date={dateStr}
+                  routes={routes}
                 />
 
                 {/* Divider */}

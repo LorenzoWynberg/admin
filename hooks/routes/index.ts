@@ -8,4 +8,7 @@ export {
   useAddStop,
   useRemoveStop,
   useReorderStops,
+  useOptimizeRoute,
+  useBatchAddStops,
+  useCreateRouteWithStops,
 } from './useRouteMutations';

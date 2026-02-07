@@ -88,6 +88,29 @@ export const RouteService = {
     const response = await api.get<{ items: UnassignedStop[] }>(url);
     return response.items ?? [];
   },
+
+  async optimizeRoute(routeId: string): Promise<RouteData> {
+    const response = await api.post<Single<RouteData>>(`/routes/${routeId}/optimize`);
+    return response.item;
+  },
+
+  async batchAddStops(
+    routeId: string,
+    data: { stops: { orderId: number; type: 'pickup' | 'dropoff' }[]; optimize: boolean }
+  ): Promise<RouteData> {
+    const response = await api.post<Single<RouteData>>(`/routes/${routeId}/stops/batch`, data);
+    return response.item;
+  },
+
+  async createRouteWithStops(data: {
+    date: string;
+    driverId?: number | null;
+    stops: { orderId: number; type: 'pickup' | 'dropoff' }[];
+    optimize: boolean;
+  }): Promise<RouteData> {
+    const response = await api.post<Single<RouteData>>('/routes/create-with-stops', data);
+    return response.item;
+  },
 };
 
 export type { UnassignedStop };

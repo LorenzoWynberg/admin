@@ -134,3 +134,73 @@ export function useReorderStops() {
     },
   });
 }
+
+export function useOptimizeRoute() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (routeId: string) => RouteService.optimizeRoute(routeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['routes'] });
+      toast.success(crudSuccessMessage('updated', 'route'));
+    },
+    onError: (error) => {
+      if (isApiError(error)) {
+        toast.error(error.message);
+      } else {
+        toast.error(crudErrorMessage('updating', 'route'));
+      }
+    },
+  });
+}
+
+export function useBatchAddStops() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      routeId,
+      data,
+    }: {
+      routeId: string;
+      data: { stops: { orderId: number; type: 'pickup' | 'dropoff' }[]; optimize: boolean };
+    }) => RouteService.batchAddStops(routeId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['routes'] });
+      queryClient.invalidateQueries({ queryKey: ['unassignedStops'] });
+      toast.success(crudSuccessMessage('updated', 'route'));
+    },
+    onError: (error) => {
+      if (isApiError(error)) {
+        toast.error(error.message);
+      } else {
+        toast.error(crudErrorMessage('updating', 'route'));
+      }
+    },
+  });
+}
+
+export function useCreateRouteWithStops() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      date: string;
+      driverId?: number | null;
+      stops: { orderId: number; type: 'pickup' | 'dropoff' }[];
+      optimize: boolean;
+    }) => RouteService.createRouteWithStops(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['routes'] });
+      queryClient.invalidateQueries({ queryKey: ['unassignedStops'] });
+      toast.success(crudSuccessMessage('created', 'route'));
+    },
+    onError: (error) => {
+      if (isApiError(error)) {
+        toast.error(error.message);
+      } else {
+        toast.error(crudErrorMessage('creating', 'route'));
+      }
+    },
+  });
+}
