@@ -37,64 +37,65 @@ export function UnassignedStopContent({
 
   return (
     <div
-      className={`rounded-md border border-l-4 p-2 transition-colors hover:shadow-sm ${colorClass} ${
+      className={`rounded-md border border-l-4 px-2.5 py-2 transition-colors hover:shadow-sm ${colorClass} ${
         isSelected ? 'ring-primary ring-2' : ''
       } ${isDragging ? 'opacity-50' : ''}`}
     >
-      <div className="flex items-center gap-2">
+      {/* Header row: icon + type + order ID + info */}
+      <div className="flex items-center gap-1.5">
         {isPickup ? (
-          <Package className={`h-4 w-4 shrink-0 ${iconColor}`} />
+          <Package className={`h-3.5 w-3.5 shrink-0 ${iconColor}`} />
         ) : (
-          <MapPin className={`h-4 w-4 shrink-0 ${iconColor}`} />
+          <MapPin className={`h-3.5 w-3.5 shrink-0 ${iconColor}`} />
         )}
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1 text-xs font-medium">
-            <span className={iconColor}>
-              {capitalize(t(`routes:stop_types.${stop.stopType}`, { defaultValue: stop.stopType }))}
-            </span>
-            <span className="text-muted-foreground">#{stop.order.publicId}</span>
-            {(contactPhone || businessName) && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    className="text-muted-foreground hover:text-foreground ml-auto shrink-0"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Info className="h-3.5 w-3.5" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-56 space-y-2 p-3 text-xs" align="start">
-                  {businessName && (
-                    <div className="flex items-center gap-1.5">
-                      <Building2 className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
-                      <span>{businessName}</span>
-                    </div>
-                  )}
-                  {contactPhone && (
-                    <div className="flex items-center gap-1.5">
-                      <Phone className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
-                      <a href={`tel:${contactPhone}`} className="text-primary hover:underline">
-                        {contactPhone}
-                      </a>
-                    </div>
-                  )}
-                </PopoverContent>
-              </Popover>
-            )}
-          </div>
-          {contactName && <p className="truncate text-xs font-medium">{contactName}</p>}
-          {address?.streetAddress && (
-            <p className="text-muted-foreground truncate text-xs">{address.streetAddress}</p>
-          )}
-          {stop.scheduledFor && (
-            <p className="text-muted-foreground text-xs">
-              {new Date(stop.scheduledFor).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </p>
-          )}
-        </div>
+        <span className={`text-xs font-semibold ${iconColor}`}>
+          {capitalize(t(`routes:stop_types.${stop.stopType}`, { defaultValue: stop.stopType }))}
+        </span>
+        {(contactPhone || businessName) && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className="text-muted-foreground hover:text-foreground ml-auto shrink-0 p-0.5"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Info className="h-3.5 w-3.5" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 space-y-2 p-3 text-xs" align="start">
+              {businessName && (
+                <div className="flex items-center gap-1.5">
+                  <Building2 className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+                  <span>{businessName}</span>
+                </div>
+              )}
+              {contactPhone && (
+                <div className="flex items-center gap-1.5">
+                  <Phone className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+                  <a href={`tel:${contactPhone}`} className="text-primary hover:underline">
+                    {contactPhone}
+                  </a>
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
+        )}
+      </div>
+
+      {/* Detail rows */}
+      <div className="mt-0.5 pl-5 text-xs">
+        <p className="text-muted-foreground text-[11px]">#{stop.order.publicId}</p>
+        {contactName && <p className="truncate font-medium">{contactName}</p>}
+        {address?.streetAddress && (
+          <p className="text-muted-foreground truncate">{address.streetAddress}</p>
+        )}
+        {stop.scheduledFor && (
+          <p className="text-muted-foreground">
+            {new Date(stop.scheduledFor).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </p>
+        )}
       </div>
     </div>
   );

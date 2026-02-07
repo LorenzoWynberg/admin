@@ -273,60 +273,62 @@ export function DispatchBoard() {
         {/* Main content */}
         <div className="flex min-h-0 flex-1">
           {/* Left panel — sidebar with stops and routes */}
-          <ScrollArea className="w-80 shrink-0 border-r">
-            <div className="space-y-4 p-4">
-              {/* Unassigned stops */}
-              <UnassignedStopsList
-                stops={unassigned}
-                isLoading={unassignedLoading}
-                onStopClick={handleUnassignedClick}
-                selectedStopKey={selectedUnassignedKey}
-              />
+          <div className="w-80 shrink-0 overflow-hidden border-r">
+            <ScrollArea className="h-full">
+              <div className="space-y-4 p-4">
+                {/* Unassigned stops */}
+                <UnassignedStopsList
+                  stops={unassigned}
+                  isLoading={unassignedLoading}
+                  onStopClick={handleUnassignedClick}
+                  selectedStopKey={selectedUnassignedKey}
+                />
 
-              {/* Divider */}
-              <hr />
+                {/* Divider */}
+                <hr />
 
-              {/* Routes */}
-              {routesLoading ? (
-                <div className="space-y-3">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="bg-muted h-32 animate-pulse rounded-lg" />
-                  ))}
-                </div>
-              ) : routes.length === 0 ? (
-                <p className="text-muted-foreground py-4 text-center text-sm">
-                  No routes for this date
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {routes.map((route) => (
-                    <div key={route.publicId}>
-                      <RouteCard
-                        route={route}
-                        isSelected={selectedRouteId === route.publicId}
-                        isAddingStop={
-                          addStop.isPending && addStop.variables?.routeId === route.publicId
-                        }
-                        onSelect={() =>
-                          setSelectedRouteId(
-                            selectedRouteId === route.publicId ? null : route.publicId!
-                          )
-                        }
-                        onStopClick={handleStopClick}
-                        selectedStopId={selectedStopId}
-                        onDelete={() => handleDeleteRoute(route.publicId!)}
-                      />
-                      {route.publicId && (
-                        <div className="mt-1.5">
-                          <AddOrderDialog routeId={route.publicId} unassignedStops={unassigned} />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </ScrollArea>
+                {/* Routes */}
+                {routesLoading ? (
+                  <div className="space-y-3">
+                    {[1, 2].map((i) => (
+                      <div key={i} className="bg-muted h-32 animate-pulse rounded-lg" />
+                    ))}
+                  </div>
+                ) : routes.length === 0 ? (
+                  <p className="text-muted-foreground py-4 text-center text-sm">
+                    No routes for this date
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {routes.map((route) => (
+                      <div key={route.publicId}>
+                        <RouteCard
+                          route={route}
+                          isSelected={selectedRouteId === route.publicId}
+                          isAddingStop={
+                            addStop.isPending && addStop.variables?.routeId === route.publicId
+                          }
+                          onSelect={() =>
+                            setSelectedRouteId(
+                              selectedRouteId === route.publicId ? null : route.publicId!
+                            )
+                          }
+                          onStopClick={handleStopClick}
+                          selectedStopId={selectedStopId}
+                          onDelete={() => handleDeleteRoute(route.publicId!)}
+                        />
+                        {route.publicId && (
+                          <div className="mt-1.5">
+                            <AddOrderDialog routeId={route.publicId} unassignedStops={unassigned} />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+          </div>
 
           {/* Right panel — Map */}
           <div className="flex-1 p-2">
