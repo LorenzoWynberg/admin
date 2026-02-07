@@ -126,7 +126,8 @@ export default function OrderDetailPage() {
               orderDistanceKm={order.distanceKm}
               orderEstimatedMinutes={order.estimatedMinutes}
               customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
-              customerDesiredDelivery={order.fulfilledBefore}
+              customerDesiredDelivery={order.desiredDeliveryAt}
+              customerDesiredPickup={order.desiredPickupAt}
             />
           )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
@@ -282,13 +283,24 @@ export default function OrderDetailPage() {
                 </Badge>
               )}
             </div>
-            {order.fulfilledBefore && (
+            {order.desiredDeliveryAt && (
               <div className="flex items-start gap-3">
                 <Calendar className="text-muted-foreground mt-0.5 h-4 w-4" />
                 <div>
-                  <p className="font-medium">{formatDate(order.fulfilledBefore)}</p>
+                  <p className="font-medium">{formatDate(order.desiredDeliveryAt)}</p>
                   <p className="text-muted-foreground text-sm">
                     {t('orders:detail.deliver_by', { defaultValue: 'Deliver By' })}
+                  </p>
+                </div>
+              </div>
+            )}
+            {order.desiredPickupAt && (
+              <div className="flex items-start gap-3">
+                <Calendar className="text-muted-foreground mt-0.5 h-4 w-4" />
+                <div>
+                  <p className="font-medium">{formatDate(order.desiredPickupAt)}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {t('orders:create.desiredPickupAt', { defaultValue: 'Pick up by' })}
                   </p>
                 </div>
               </div>
@@ -321,7 +333,7 @@ export default function OrderDetailPage() {
                           orderDistanceKm={order.distanceKm}
                           orderEstimatedMinutes={order.estimatedMinutes}
                           customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
-                          customerDesiredDelivery={order.fulfilledBefore}
+                          customerDesiredDelivery={order.desiredDeliveryAt}
                         />
                       </div>
                     )}
@@ -392,7 +404,7 @@ export default function OrderDetailPage() {
                     orderDistanceKm={order.distanceKm}
                     orderEstimatedMinutes={order.estimatedMinutes}
                     customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
-                    customerDesiredDelivery={order.fulfilledBefore}
+                    customerDesiredDelivery={order.desiredDeliveryAt}
                   />
                 )}
               </div>
@@ -422,12 +434,20 @@ export default function OrderDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {order.fulfilledBefore && (
+            {order.desiredDeliveryAt && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   {t('orders:detail.deliver_by', { defaultValue: 'Deliver By' })}
                 </span>
-                <span className="font-medium">{formatDate(order.fulfilledBefore)}</span>
+                <span className="font-medium">{formatDate(order.desiredDeliveryAt)}</span>
+              </div>
+            )}
+            {order.desiredPickupAt && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {t('orders:create.desiredPickupAt', { defaultValue: 'Pick up by' })}
+                </span>
+                <span className="font-medium">{formatDate(order.desiredPickupAt)}</span>
               </div>
             )}
             {order.pickupScheduledFor && (
@@ -466,7 +486,8 @@ export default function OrderDetailPage() {
                 </span>
               </div>
             )}
-            {!order.fulfilledBefore &&
+            {!order.desiredDeliveryAt &&
+              !order.desiredPickupAt &&
               !order.pickupScheduledFor &&
               !order.deliveryScheduledFor &&
               !order.pickupCompletedAt &&

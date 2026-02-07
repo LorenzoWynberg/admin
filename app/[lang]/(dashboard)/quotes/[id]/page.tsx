@@ -264,13 +264,15 @@ export default function QuoteDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {quote.order?.fulfilledBefore && (
+            {quote.order?.desiredDeliveryAt && (
               <>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
-                    {t('quotes:detail.fulfilled_before', { defaultValue: 'Requested By' })}
+                    {t('quotes:detail.desired_delivery_at', {
+                      defaultValue: 'Requested Delivery By',
+                    })}
                   </span>
-                  <span className="font-medium">{formatDate(quote.order.fulfilledBefore)}</span>
+                  <span className="font-medium">{formatDate(quote.order.desiredDeliveryAt)}</span>
                 </div>
                 <div className="border-t" />
               </>

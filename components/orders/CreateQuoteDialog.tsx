@@ -36,6 +36,7 @@ interface CreateQuoteDialogProps {
   orderEstimatedMinutes?: number | null;
   customerCurrencyCode?: string | null;
   customerDesiredDelivery?: string | null;
+  customerDesiredPickup?: string | null;
 }
 
 export function CreateQuoteDialog({
@@ -44,6 +45,7 @@ export function CreateQuoteDialog({
   orderEstimatedMinutes,
   customerCurrencyCode,
   customerDesiredDelivery,
+  customerDesiredPickup,
 }: CreateQuoteDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -441,6 +443,23 @@ export function CreateQuoteDialog({
                 </p>
               </div>
               <p className="text-lg font-semibold">{formatDateTime(customerDesiredDelivery)}</p>
+            </div>
+          )}
+
+          {/* Customer Requested Pickup */}
+          {customerDesiredPickup && (
+            <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
+              <div>
+                <p className="text-muted-foreground text-sm font-medium">
+                  {t('quotes:create.customer_requested_pickup', {
+                    defaultValue: 'Customer Requested Pickup',
+                  })}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {t('quotes:create.from_order_request', { defaultValue: 'From order request' })}
+                </p>
+              </div>
+              <p className="text-lg font-semibold">{formatDateTime(customerDesiredPickup)}</p>
             </div>
           )}
 

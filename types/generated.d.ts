@@ -302,7 +302,8 @@ declare namespace App.Data.Order {
     deletedAt?: string | null;
     pickupScheduledFor?: string | null;
     deliveryScheduledFor?: string | null;
-    fulfilledBefore?: string | null;
+    desiredDeliveryAt?: string | null;
+    desiredPickupAt?: string | null;
     pickupCompletedAt?: string | null;
     deliveryCompletedAt?: string | null;
     paidAt?: string | null;
@@ -324,7 +325,8 @@ declare namespace App.Data.Order {
     toAddress: App.Data.Address.StoreSnapshotAddressData;
     currencyCode: string;
     description?: string;
-    fulfilledBefore: string | null;
+    desiredDeliveryAt: string | null;
+    desiredPickupAt: string | null;
     requiresPin: boolean;
     isContactless: boolean;
   };
