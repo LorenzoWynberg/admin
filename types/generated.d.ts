@@ -315,6 +315,7 @@ declare namespace App.Data.Order {
     currentQuote?: App.Data.Quote.QuoteData;
     fromAddress?: App.Data.Address.AddressData;
     toAddress?: App.Data.Address.AddressData;
+    quotes?: Array<App.Data.Quote.QuoteData>;
   };
   export type StoreOrderData = {
     fromName: string;

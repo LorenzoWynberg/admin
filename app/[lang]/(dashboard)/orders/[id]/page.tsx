@@ -1,10 +1,10 @@
 'use client';
 
 import {
-  DollarSign,
   Building2,
   ArrowLeft,
   Calendar,
+  FileText,
   MessageSquare,
   Package,
   Trash2,
@@ -23,12 +23,15 @@ import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
+import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { PaymentSection } from '@/components/payments/PaymentSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatCurrency } from '@/utils/format';
 import { useOrder, useDeleteOrder } from '@/hooks/orders';
 import { useCurrencyList } from '@/hooks/currencies';
+
+type QuoteStatus = App.Enums.QuoteStatus;
 
 type OrderStatus = App.Enums.OrderStatus;
 
@@ -98,6 +101,11 @@ export default function OrderDetailPage() {
   const canCreateQuote =
     (order.status === 'pending' && (!order.currentQuote || isQuoteExpired)) ||
     order.status === 'denied';
+
+  // Sort quotes newest first (highest version first)
+  const sortedQuotes = [...(order.quotes || [])].sort(
+    (a, b) => (b.version || 0) - (a.version || 0)
+  );
 
   return (
     <div className="space-y-6">
@@ -326,108 +334,82 @@ export default function OrderDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Quote & Payment */}
+        {/* Quote History */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5" />
-              {t('orders:detail.quote_payment', { defaultValue: 'Quote & Payment' })}
+              <FileText className="h-5 w-5" />
+              {t('orders:detail.quote_history', { defaultValue: 'Quote History' })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {order.currentQuote ? (
-              <>
-                {isQuoteExpired && (
-                  <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950">
-                    <p className="text-sm font-medium text-red-600 dark:text-red-400">
-                      {t('orders:quote_expired_admin', {
-                        defaultValue: 'This quote has expired. Please create a new quote.',
-                      })}
-                    </p>
-                    {canCreateQuote && order.id && (
-                      <div className="mt-2">
-                        <CreateQuoteDialog
-                          orderId={order.id}
-                          orderDistanceKm={order.distanceKm}
-                          orderEstimatedMinutes={order.estimatedMinutes}
-                          customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
-                          customerDesiredDelivery={order.desiredDeliveryAt}
-                          customerDesiredPickup={order.desiredPickupAt}
-                        />
+            {sortedQuotes.length > 0 ? (
+              <div className="space-y-3">
+                {sortedQuotes.map((quote) => {
+                  const isCurrent = quote.id === order.currentQuoteId;
+                  return (
+                    <div
+                      key={quote.publicId || quote.id}
+                      className={`rounded-lg border p-3 ${isCurrent ? 'border-primary bg-primary/5' : 'bg-muted/30'}`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-sm">{quote.publicId}</span>
+                            <QuoteStatusBadge status={quote.status as QuoteStatus} />
+                            {isCurrent && (
+                              <Badge variant="outline" className="text-xs">
+                                {t('orders:detail.current_quote', { defaultValue: 'Current' })}
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-muted-foreground text-xs">
+                            v{quote.version || 1} &middot; {formatDate(quote.createdAt)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-semibold">
+                            {formatCurrency(quote.total || 0, currencySymbol)}
+                          </p>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    {validationAttribute('serviceFee', true)}
-                  </span>
-                  <span className="font-medium">
-                    {order.currencyCode} {order.currentQuote.baseFare?.toFixed(2) || '0.00'}
-                  </span>
-                </div>
-                {order.currentQuote.distanceFee != null && order.currentQuote.distanceFee > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      {validationAttribute('distanceFee', true)}
-                    </span>
-                    <span className="font-medium">
-                      {order.currencyCode} {order.currentQuote.distanceFee.toFixed(2)}
-                    </span>
-                  </div>
-                )}
-                {order.currentQuote.timeFee != null && order.currentQuote.timeFee > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      {validationAttribute('timeFee', true)}
-                    </span>
-                    <span className="font-medium">
-                      {order.currencyCode} {order.currentQuote.timeFee.toFixed(2)}
-                    </span>
-                  </div>
-                )}
-                {order.currentQuote.surcharge != null && order.currentQuote.surcharge > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      {validationAttribute('surcharge', true)}
-                    </span>
-                    <span className="font-medium">
-                      {order.currencyCode} {order.currentQuote.surcharge.toFixed(2)}
-                    </span>
-                  </div>
-                )}
-                <div className="border-t pt-2">
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>{validationAttribute('total', true)}</span>
-                    <span>
-                      {order.currencyCode} {order.currentQuote.total?.toFixed(2) || '0.00'}
-                    </span>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => router.push(`/quotes/${order.currentQuote?.publicId}`)}
-                >
-                  {t('orders:detail.view_quote', { defaultValue: 'View Quote Details' })}
-                </Button>
-              </>
+                      {quote.rejectionReason && (
+                        <div className="mt-2 flex items-start gap-2 rounded border border-amber-200 bg-amber-50 p-2 dark:border-amber-900 dark:bg-amber-950">
+                          <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                          <p className="text-sm text-amber-700 dark:text-amber-400">
+                            {quote.rejectionReason}
+                          </p>
+                        </div>
+                      )}
+                      <div className="mt-2 flex justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => router.push(`/quotes/${quote.publicId}`)}
+                        >
+                          {t('orders:detail.view_quote', { defaultValue: 'View Quote Details' })}
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
               <div className="text-center">
                 <p className="text-muted-foreground mb-4">
                   {t('orders:detail.no_quote', { defaultValue: 'No quote available' })}
                 </p>
-                {canCreateQuote && order.id && (
-                  <CreateQuoteDialog
-                    orderId={order.id}
-                    orderDistanceKm={order.distanceKm}
-                    orderEstimatedMinutes={order.estimatedMinutes}
-                    customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
-                    customerDesiredDelivery={order.desiredDeliveryAt}
-                    customerDesiredPickup={order.desiredPickupAt}
-                  />
-                )}
               </div>
+            )}
+            {canCreateQuote && order.id && (
+              <CreateQuoteDialog
+                orderId={order.id}
+                orderDistanceKm={order.distanceKm}
+                orderEstimatedMinutes={order.estimatedMinutes}
+                customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
+                customerDesiredDelivery={order.desiredDeliveryAt}
+                customerDesiredPickup={order.desiredPickupAt}
+              />
             )}
             <div className="flex justify-between border-t pt-2">
               <span className="text-muted-foreground">
