@@ -334,6 +334,7 @@ export default function OrderDetailPage() {
                           orderEstimatedMinutes={order.estimatedMinutes}
                           customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
                           customerDesiredDelivery={order.desiredDeliveryAt}
+                          customerDesiredPickup={order.desiredPickupAt}
                         />
                       </div>
                     )}
@@ -405,6 +406,7 @@ export default function OrderDetailPage() {
                     orderEstimatedMinutes={order.estimatedMinutes}
                     customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
                     customerDesiredDelivery={order.desiredDeliveryAt}
+                    customerDesiredPickup={order.desiredPickupAt}
                   />
                 )}
               </div>

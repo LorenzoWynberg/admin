@@ -429,23 +429,6 @@ export function CreateQuoteDialog({
             />
           </div>
 
-          {/* Customer Requested Delivery */}
-          {customerDesiredDelivery && (
-            <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
-              <div>
-                <p className="text-muted-foreground text-sm font-medium">
-                  {t('quotes:create.customer_requested_delivery', {
-                    defaultValue: 'Customer Requested Delivery',
-                  })}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  {t('quotes:create.from_order_request', { defaultValue: 'From order request' })}
-                </p>
-              </div>
-              <p className="text-lg font-semibold">{formatDateTime(customerDesiredDelivery)}</p>
-            </div>
-          )}
-
           {/* Customer Requested Pickup */}
           {customerDesiredPickup && (
             <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
@@ -460,6 +443,23 @@ export function CreateQuoteDialog({
                 </p>
               </div>
               <p className="text-lg font-semibold">{formatDateTime(customerDesiredPickup)}</p>
+            </div>
+          )}
+
+          {/* Customer Requested Delivery */}
+          {customerDesiredDelivery && (
+            <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
+              <div>
+                <p className="text-muted-foreground text-sm font-medium">
+                  {t('quotes:create.customer_requested_delivery', {
+                    defaultValue: 'Customer Requested Delivery',
+                  })}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {t('quotes:create.from_order_request', { defaultValue: 'From order request' })}
+                </p>
+              </div>
+              <p className="text-lg font-semibold">{formatDateTime(customerDesiredDelivery)}</p>
             </div>
           )}
 
