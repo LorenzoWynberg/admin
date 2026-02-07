@@ -144,6 +144,8 @@ export const Enums = {
     Payment: 'payment',
     PaymentMethod: 'payment_method',
     Refund: 'refund',
+    Route: 'route',
+    RouteStop: 'route_stop',
   },
   OrderStatus: {
     PENDING: 'pending',
@@ -210,6 +212,23 @@ export const Enums = {
     CLIENT: 'client',
     DRIVER: 'driver',
     ADMIN: 'admin',
+  },
+  RouteStatus: {
+    DRAFT: 'draft',
+    SCHEDULED: 'scheduled',
+    IN_PROGRESS: 'in_progress',
+    COMPLETED: 'completed',
+    CANCELLED: 'cancelled',
+  },
+  RouteStopStatus: {
+    PENDING: 'pending',
+    ARRIVED: 'arrived',
+    COMPLETED: 'completed',
+    SKIPPED: 'skipped',
+  },
+  RouteStopType: {
+    PICKUP: 'pickup',
+    DROPOFF: 'dropoff',
   },
   TransactionStatus: {
     Pending: 'pending',

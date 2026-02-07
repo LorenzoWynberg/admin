@@ -482,6 +482,54 @@ declare namespace App.Data.Quote {
     notes?: string | null;
   };
 }
+declare namespace App.Data.Route {
+  export type AddStopData = {
+    orderId: number;
+    type: App.Enums.RouteStopType;
+  };
+  export type ReorderStopsData = {
+    stopIds: Array<any>;
+  };
+  export type RouteData = {
+    id?: number;
+    publicId?: string;
+    name: string;
+    driverId?: number | null;
+    date: string;
+    status: App.Enums.RouteStatus;
+    notes?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+    deletedAt?: string | null;
+    driver?: App.Data.Driver.DriverData | null;
+    stops?: Array<App.Data.Route.RouteStopData>;
+  };
+  export type RouteStopData = {
+    id: number;
+    routeId?: number;
+    orderId?: number;
+    type: App.Enums.RouteStopType;
+    sequence: number;
+    status: App.Enums.RouteStopStatus;
+    notes?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+    order?: App.Data.Order.OrderData;
+  };
+  export type StoreRouteData = {
+    name: string;
+    date: string;
+    driverId?: number | null;
+    notes?: string | null;
+  };
+  export type UpdateRouteData = {
+    name?: string;
+    date?: string;
+    driverId?: number | null;
+    notes?: string | null;
+    status?: string | null;
+  };
+}
 declare namespace App.Data.Shared {
   export type FullLangData = {
     en: string;
@@ -702,6 +750,8 @@ declare namespace App.Enums {
     Payment = 'payment',
     PaymentMethod = 'payment_method',
     Refund = 'refund',
+    Route = 'route',
+    RouteStop = 'route_stop',
   }
   export enum OrderStatus {
     PENDING = 'pending',
@@ -768,6 +818,23 @@ declare namespace App.Enums {
     CLIENT = 'client',
     DRIVER = 'driver',
     ADMIN = 'admin',
+  }
+  export enum RouteStatus {
+    DRAFT = 'draft',
+    SCHEDULED = 'scheduled',
+    IN_PROGRESS = 'in_progress',
+    COMPLETED = 'completed',
+    CANCELLED = 'cancelled',
+  }
+  export enum RouteStopStatus {
+    PENDING = 'pending',
+    ARRIVED = 'arrived',
+    COMPLETED = 'completed',
+    SKIPPED = 'skipped',
+  }
+  export enum RouteStopType {
+    PICKUP = 'pickup',
+    DROPOFF = 'dropoff',
   }
   export enum TransactionStatus {
     Pending = 'pending',
