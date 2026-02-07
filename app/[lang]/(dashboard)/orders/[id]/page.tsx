@@ -289,7 +289,7 @@ export default function OrderDetailPage() {
                 <div>
                   <p className="font-medium">{formatDate(order.desiredPickupAt)}</p>
                   <p className="text-muted-foreground text-sm">
-                    {t('orders:create.desiredPickupAt', { defaultValue: 'Pick up by' })}
+                    {t('orders:detail.pick_up_by', { defaultValue: 'Pick Up By' })}
                   </p>
                 </div>
               </div>
@@ -437,7 +437,7 @@ export default function OrderDetailPage() {
             {order.desiredPickupAt && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  {t('orders:create.desiredPickupAt', { defaultValue: 'Pick up by' })}
+                  {t('orders:detail.pick_up_by', { defaultValue: 'Pick Up By' })}
                 </span>
                 <span className="font-medium">{formatDate(order.desiredPickupAt)}</span>
               </div>
