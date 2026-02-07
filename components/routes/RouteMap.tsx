@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useCallback, useEffect } from 'react';
-import { APIProvider, Map, useMap } from '@vis.gl/react-google-maps';
+import { useMemo, useCallback, useEffect, useRef } from 'react';
+import { APIProvider, Map, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import { StopMarker } from './StopMarker';
 import type { UnassignedStop } from '@/services/routeService';
 
@@ -20,6 +20,77 @@ const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 
 // Costa Rica default center
 const DEFAULT_CENTER = { lat: 9.9281, lng: -84.0907 };
+
+/** Renders the driving route polyline between route stops. */
+function RouteDirections({ waypoints }: { waypoints: Array<{ lat: number; lng: number }> }) {
+  const map = useMap();
+  const routesLib = useMapsLibrary('routes');
+  const rendererRef = useRef<google.maps.DirectionsRenderer | null>(null);
+  const prevKeyRef = useRef('');
+
+  // Stable key to avoid re-requesting identical directions
+  const waypointKey = waypoints.map((w) => `${w.lat},${w.lng}`).join('|');
+
+  useEffect(() => {
+    if (!map || !routesLib) return;
+
+    // Create renderer once
+    if (!rendererRef.current) {
+      rendererRef.current = new routesLib.DirectionsRenderer({
+        map,
+        suppressMarkers: true,
+        polylineOptions: {
+          strokeColor: '#4285F4',
+          strokeWeight: 4,
+          strokeOpacity: 0.7,
+        },
+      });
+    }
+
+    // Clear if fewer than 2 waypoints
+    if (waypoints.length < 2) {
+      rendererRef.current.setDirections({ routes: [] } as unknown as google.maps.DirectionsResult);
+      prevKeyRef.current = '';
+      return;
+    }
+
+    // Skip if waypoints haven't changed
+    if (waypointKey === prevKeyRef.current) return;
+    prevKeyRef.current = waypointKey;
+
+    const service = new routesLib.DirectionsService();
+    const origin = waypoints[0];
+    const destination = waypoints[waypoints.length - 1];
+    const intermediates = waypoints.slice(1, -1).map((w) => ({
+      location: new google.maps.LatLng(w.lat, w.lng),
+      stopover: true,
+    }));
+
+    service.route(
+      {
+        origin: new google.maps.LatLng(origin.lat, origin.lng),
+        destination: new google.maps.LatLng(destination.lat, destination.lng),
+        waypoints: intermediates,
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK && result) {
+          rendererRef.current?.setDirections(result);
+        }
+      }
+    );
+  }, [map, routesLib, waypoints, waypointKey]);
+
+  // Cleanup renderer on unmount
+  useEffect(() => {
+    return () => {
+      rendererRef.current?.setMap(null);
+      rendererRef.current = null;
+    };
+  }, []);
+
+  return null;
+}
 
 function MapContent({
   routeStops,
@@ -50,6 +121,12 @@ function MapContent({
         };
       });
   }, [routeStops, selectedStopId]);
+
+  // Waypoints for the directions polyline (in stop sequence order)
+  const directionWaypoints = useMemo(
+    () => routeMarkers.map((m) => ({ lat: m.lat, lng: m.lng })),
+    [routeMarkers]
+  );
 
   const unassignedMarkers = useMemo(() => {
     return unassignedStops
@@ -104,6 +181,9 @@ function MapContent({
 
   return (
     <>
+      {/* Driving route polyline */}
+      <RouteDirections waypoints={directionWaypoints} />
+
       {/* Unassigned markers (grey) */}
       {unassignedMarkers.map((marker) => (
         <StopMarker

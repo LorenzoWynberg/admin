@@ -5,7 +5,8 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useDroppable } from '@dnd-kit/core';
 import { useDriverList } from '@/hooks/drivers/useDriverList';
 import { useUpdateRoute, useRemoveStop } from '@/hooks/routes';
-import { RouteStatusBadge } from './RouteStatusBadge';
+import { Enums } from '@/data/app-enums';
+import { statusLabel } from '@/utils/lang';
 import { SortableStopCard } from './SortableStopCard';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +20,31 @@ import { Truck, Trash2 } from 'lucide-react';
 
 type RouteData = App.Data.Route.RouteData;
 type RouteStopData = App.Data.Route.RouteStopData;
+
+/** Statuses the admin can manually set. In progress / completed are driver-driven. */
+const ADMIN_SETTABLE_STATUSES = [
+  Enums.RouteStatus.DRAFT,
+  Enums.RouteStatus.SCHEDULED,
+  Enums.RouteStatus.CANCELLED,
+];
+
+const statusStyles: Record<string, string> = {
+  draft: 'text-gray-700',
+  scheduled: 'text-blue-700',
+  in_progress: 'text-orange-700',
+  completed: 'text-green-700',
+  cancelled: 'text-red-700',
+};
+
+const LOCKED_STOP_STATUSES = new Set<string>([
+  Enums.RouteStopStatus.COMPLETED,
+  Enums.RouteStopStatus.SKIPPED,
+]);
+
+const CLOSED_ROUTE_STATUSES = new Set<string>([
+  Enums.RouteStatus.COMPLETED,
+  Enums.RouteStatus.CANCELLED,
+]);
 
 interface RouteCardProps {
   route: RouteData;
@@ -47,8 +73,12 @@ export function RouteCard({
 
   const stops = (route.stops ?? []) as RouteStopData[];
   const stopIds = stops.map((s) => s.id);
+  const isClosed = CLOSED_ROUTE_STATUSES.has(route.status ?? '');
 
-  const { setNodeRef } = useDroppable({ id: `route-${route.publicId}` });
+  const { setNodeRef } = useDroppable({
+    id: `route-${route.publicId}`,
+    disabled: isClosed,
+  });
 
   const handleDriverChange = (driverId: string) => {
     if (!route.publicId) return;
@@ -56,6 +86,11 @@ export function RouteCard({
       id: route.publicId,
       data: { driverId: driverId === 'none' ? null : Number(driverId) },
     });
+  };
+
+  const handleStatusChange = (status: string) => {
+    if (!route.publicId) return;
+    updateRoute.mutate({ id: route.publicId, data: { status } });
   };
 
   const handleRemoveStop = (stopId: number) => {
@@ -76,7 +111,23 @@ export function RouteCard({
           <span className="text-sm font-semibold">{route.publicId}</span>
         </button>
         <div className="flex items-center gap-2">
-          {route.status && <RouteStatusBadge status={route.status} />}
+          {route.status && (
+            <Select value={route.status} onValueChange={handleStatusChange}>
+              <SelectTrigger
+                size="sm"
+                className={`h-6 w-auto gap-1 border-0 px-2 text-xs font-medium shadow-none ${statusStyles[route.status] ?? ''}`}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ADMIN_SETTABLE_STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {statusLabel(s)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           {onDelete && (
             <Button
               variant="ghost"
@@ -118,15 +169,19 @@ export function RouteCard({
           </p>
         ) : (
           <SortableContext items={stopIds} strategy={verticalListSortingStrategy}>
-            {stops.map((stop) => (
-              <SortableStopCard
-                key={stop.id}
-                stop={stop}
-                isSelected={selectedStopId === stop.id}
-                onClick={() => onStopClick?.(stop)}
-                onRemove={() => handleRemoveStop(stop.id)}
-              />
-            ))}
+            {stops.map((stop) => {
+              const isLocked = LOCKED_STOP_STATUSES.has(stop.status ?? '');
+              return (
+                <SortableStopCard
+                  key={stop.id}
+                  stop={stop}
+                  isSelected={selectedStopId === stop.id}
+                  onClick={() => onStopClick?.(stop)}
+                  onRemove={isLocked ? undefined : () => handleRemoveStop(stop.id)}
+                  disabled={isLocked}
+                />
+              );
+            })}
           </SortableContext>
         )}
         {isAddingStop && (

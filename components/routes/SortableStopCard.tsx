@@ -3,7 +3,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
-import { GripVertical, Package, MapPin, X, Info, Phone, Building2 } from 'lucide-react';
+import { GripVertical, Lock, Package, MapPin, X, Info, Phone, Building2 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { capitalize } from '@/utils/lang';
 import { Button } from '@/components/ui/button';
@@ -15,12 +15,20 @@ interface SortableStopCardProps {
   onRemove?: () => void;
   onClick?: () => void;
   isSelected?: boolean;
+  disabled?: boolean;
 }
 
-export function SortableStopCard({ stop, onRemove, onClick, isSelected }: SortableStopCardProps) {
+export function SortableStopCard({
+  stop,
+  onRemove,
+  onClick,
+  isSelected,
+  disabled,
+}: SortableStopCardProps) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: stop.id,
+    disabled,
   });
 
   const style = {
@@ -46,18 +54,22 @@ export function SortableStopCard({ stop, onRemove, onClick, isSelected }: Sortab
       style={style}
       className={`rounded-md border border-l-4 px-2.5 py-2 ${colorClass} ${
         isDragging ? 'opacity-50' : ''
-      } ${isSelected ? 'ring-primary ring-2' : ''}`}
+      } ${isSelected ? 'ring-primary ring-2' : ''} ${disabled ? 'opacity-60' : ''}`}
       onClick={onClick}
     >
       {/* Header row: grip + type badge + order ID + info + remove */}
       <div className="flex items-center gap-1.5">
-        <button
-          className="text-muted-foreground hover:text-foreground shrink-0 cursor-grab active:cursor-grabbing"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="h-4 w-4" />
-        </button>
+        {disabled ? (
+          <Lock className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+        ) : (
+          <button
+            className="text-muted-foreground hover:text-foreground shrink-0 cursor-grab active:cursor-grabbing"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+        )}
         {isPickup ? (
           <Package className={`h-3.5 w-3.5 shrink-0 ${iconColor}`} />
         ) : (

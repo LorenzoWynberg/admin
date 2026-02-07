@@ -152,6 +152,12 @@ export function DispatchBoard() {
         }
 
         if (targetRouteId) {
+          // Validate: can't add stops to completed/cancelled routes
+          const targetRoute = routes.find((r) => r.publicId === targetRouteId);
+          if (targetRoute?.status === 'completed' || targetRoute?.status === 'cancelled') {
+            return;
+          }
+
           // Validate: dropoff needs its pickup completed or assigned to a route
           if (stopType === 'dropoff') {
             const order = unassigned.find(
