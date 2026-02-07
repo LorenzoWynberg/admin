@@ -24,6 +24,7 @@ import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
+import { QuoteDetailDialog } from '@/components/quotes/QuoteDetailDialog';
 import { PaymentSection } from '@/components/payments/PaymentSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
@@ -145,23 +146,6 @@ export default function OrderDetailPage() {
           </Button>
         </div>
       </div>
-
-      {/* Rejection Reason */}
-      {order.status === 'denied' && order.currentQuote?.rejectionReason && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950">
-          <div className="flex items-start gap-3">
-            <MessageSquare className="mt-0.5 h-5 w-5 text-amber-600 dark:text-amber-400" />
-            <div>
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-                {t('orders:detail.rejection_reason', { defaultValue: 'Customer Feedback' })}
-              </p>
-              <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
-                {order.currentQuote.rejectionReason}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Pickup Details */}
@@ -382,13 +366,18 @@ export default function OrderDetailPage() {
                         </div>
                       )}
                       <div className="mt-2 flex justify-end">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => router.push(`/quotes/${quote.publicId}`)}
-                        >
-                          {t('orders:detail.view_quote', { defaultValue: 'View Quote Details' })}
-                        </Button>
+                        <QuoteDetailDialog
+                          quote={quote}
+                          currencySymbol={currencySymbol}
+                          isCurrent={isCurrent}
+                          trigger={
+                            <Button variant="ghost" size="sm">
+                              {t('orders:detail.view_quote', {
+                                defaultValue: 'View Quote Details',
+                              })}
+                            </Button>
+                          }
+                        />
                       </div>
                     </div>
                   );
