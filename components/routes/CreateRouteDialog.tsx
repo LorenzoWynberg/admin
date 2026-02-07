@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form';
 import { useDriverList } from '@/hooks/drivers/useDriverList';
 import { useCreateRoute } from '@/hooks/routes';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -32,7 +31,6 @@ interface CreateRouteDialogProps {
 }
 
 interface FormValues {
-  name: string;
   driverId: string;
   notes: string;
 }
@@ -45,20 +43,13 @@ export function CreateRouteDialog({ date }: CreateRouteDialogProps) {
 
   const drivers = driversData?.items ?? [];
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<FormValues>({
-    defaultValues: { name: '', driverId: '', notes: '' },
+  const { register, handleSubmit, reset, setValue } = useForm<FormValues>({
+    defaultValues: { driverId: '', notes: '' },
   });
 
   const onSubmit = (values: FormValues) => {
     createRoute.mutate(
       {
-        name: values.name,
         date,
         driverId: values.driverId ? Number(values.driverId) : null,
         notes: values.notes || null,
@@ -88,19 +79,6 @@ export function CreateRouteDialog({ date }: CreateRouteDialogProps) {
           </DialogHeader>
 
           <div className="mt-4 space-y-4">
-            <div className="space-y-2">
-              <Label>{t('routes:fields.name', { defaultValue: 'Route Name' })}</Label>
-              <Input
-                {...register('name', { required: true })}
-                placeholder={t('routes:fields.name', { defaultValue: 'Route Name' })}
-              />
-              {errors.name && (
-                <p className="text-destructive text-xs">
-                  {t('validation:required', { defaultValue: 'This field is required.' })}
-                </p>
-              )}
-            </div>
-
             <div className="space-y-2">
               <Label>{t('routes:fields.driver', { defaultValue: 'Driver' })}</Label>
               <Select onValueChange={(v) => setValue('driverId', v)}>

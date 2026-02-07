@@ -39,7 +39,6 @@ export const RouteService = {
   },
 
   async create(data: {
-    name: string;
     date: string;
     driverId?: number | null;
     notes?: string | null;
@@ -51,7 +50,6 @@ export const RouteService = {
   async update(
     id: string,
     data: {
-      name?: string;
       date?: string;
       driverId?: number | null;
       notes?: string | null;

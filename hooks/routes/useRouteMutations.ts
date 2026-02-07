@@ -8,12 +8,8 @@ export function useCreateRoute() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: {
-      name: string;
-      date: string;
-      driverId?: number | null;
-      notes?: string | null;
-    }) => RouteService.create(data),
+    mutationFn: (data: { date: string; driverId?: number | null; notes?: string | null }) =>
+      RouteService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routes'] });
       toast.success(crudSuccessMessage('created', 'route'));
@@ -38,7 +34,6 @@ export function useUpdateRoute() {
     }: {
       id: string;
       data: {
-        name?: string;
         date?: string;
         driverId?: number | null;
         notes?: string | null;

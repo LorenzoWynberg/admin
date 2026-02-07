@@ -17,11 +17,10 @@ import type { UnassignedStop } from '@/services/routeService';
 
 interface AddOrderDialogProps {
   routeId: string;
-  routeName: string;
   unassignedStops: UnassignedStop[];
 }
 
-export function AddOrderDialog({ routeId, routeName, unassignedStops }: AddOrderDialogProps) {
+export function AddOrderDialog({ routeId, unassignedStops }: AddOrderDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const addStop = useAddStop();
@@ -54,7 +53,7 @@ export function AddOrderDialog({ routeId, routeName, unassignedStops }: AddOrder
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{t('routes:add_orders', { defaultValue: 'Add Orders' })}</DialogTitle>
-          <DialogDescription>{routeName}</DialogDescription>
+          <DialogDescription>{routeId}</DialogDescription>
         </DialogHeader>
 
         <div className="max-h-[400px] space-y-2 overflow-y-auto">
@@ -66,7 +65,7 @@ export function AddOrderDialog({ routeId, routeName, unassignedStops }: AddOrder
             unassignedStops.map((stop) => {
               const isPickup = stop.stopType === 'pickup';
               const key = `${stop.order.publicId}-${stop.stopType}`;
-              const iconColor = isPickup ? 'text-emerald-600' : 'text-red-600';
+              const iconColor = isPickup ? 'text-sky-600' : 'text-violet-600';
               const address = isPickup ? stop.order.fromAddress : stop.order.toAddress;
 
               return (

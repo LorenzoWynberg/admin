@@ -2,7 +2,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { useDroppable } from '@dnd-kit/core';
-import { Package, MapPin } from 'lucide-react';
+import { DraggableUnassignedStop } from './DraggableUnassignedStop';
 import type { UnassignedStop } from '@/services/routeService';
 
 interface UnassignedStopsListProps {
@@ -44,52 +44,14 @@ export function UnassignedStopsList({
       ) : (
         <div className="space-y-2">
           {stops.map((stop) => {
-            const isPickup = stop.stopType === 'pickup';
             const key = `${stop.order.publicId}-${stop.stopType}`;
-            const isSelected = selectedStopKey === key;
-            const colorClass = isPickup
-              ? 'border-l-emerald-500 bg-emerald-50/50'
-              : 'border-l-red-500 bg-red-50/50';
-            const iconColor = isPickup ? 'text-emerald-600' : 'text-red-600';
-            const address = isPickup ? stop.order.fromAddress : stop.order.toAddress;
-
             return (
-              <div
+              <DraggableUnassignedStop
                 key={key}
-                className={`cursor-pointer rounded-md border border-l-4 p-2 transition-colors hover:shadow-sm ${colorClass} ${
-                  isSelected ? 'ring-primary ring-2' : ''
-                }`}
+                stop={stop}
+                isSelected={selectedStopKey === key}
                 onClick={() => onStopClick?.(stop)}
-              >
-                <div className="flex items-center gap-2">
-                  {isPickup ? (
-                    <Package className={`h-4 w-4 shrink-0 ${iconColor}`} />
-                  ) : (
-                    <MapPin className={`h-4 w-4 shrink-0 ${iconColor}`} />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1 text-xs font-medium">
-                      <span className={iconColor}>
-                        {t(`routes:stop_types.${stop.stopType}`, { defaultValue: stop.stopType })}
-                      </span>
-                      <span className="text-muted-foreground">#{stop.order.publicId}</span>
-                    </div>
-                    {address?.streetAddress && (
-                      <p className="text-muted-foreground truncate text-xs">
-                        {address.streetAddress}
-                      </p>
-                    )}
-                    {stop.scheduledFor && (
-                      <p className="text-muted-foreground text-xs">
-                        {new Date(stop.scheduledFor).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
+              />
             );
           })}
         </div>

@@ -494,10 +494,9 @@ declare namespace App.Data.Route {
   export type RouteData = {
     id?: number;
     publicId?: string;
-    name: string;
     driverId?: number | null;
     date: string;
-    status: App.Enums.RouteStatus;
+    status?: App.Enums.RouteStatus;
     notes?: string | null;
     createdAt?: string;
     updatedAt?: string;
@@ -518,13 +517,11 @@ declare namespace App.Data.Route {
     order?: App.Data.Order.OrderData;
   };
   export type StoreRouteData = {
-    name: string;
     date: string;
     driverId?: number | null;
     notes?: string | null;
   };
   export type UpdateRouteData = {
-    name?: string;
     date?: string;
     driverId?: number | null;
     notes?: string | null;
