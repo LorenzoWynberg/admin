@@ -65,8 +65,9 @@ function updateEchoInstance(token: string | null) {
   echoStore.instance = createEcho(token);
   echoStore.token = token;
 
-  // Notify listeners
-  echoStore.listeners.forEach((listener) => listener());
+  // Snapshot listeners before notifying — prevents issues if Set is mutated during iteration
+  const current = [...echoStore.listeners];
+  current.forEach((listener) => listener());
 }
 
 export function EchoProvider({ children }: EchoProviderProps) {

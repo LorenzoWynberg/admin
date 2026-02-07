@@ -25,10 +25,10 @@ export function useNotificationBroadcast() {
   const queryClient = useQueryClient();
   const { getTitle, getMessage } = useNotificationHelpers();
 
-  // Use refs to avoid re-subscribing when helpers change
-  const helpersRef = useRef({ getTitle, getMessage });
+  // Use refs to avoid re-subscribing when helpers/queryClient change
+  const helpersRef = useRef({ getTitle, getMessage, queryClient });
   useEffect(() => {
-    helpersRef.current = { getTitle, getMessage };
+    helpersRef.current = { getTitle, getMessage, queryClient };
   });
 
   useEffect(() => {
@@ -51,11 +51,13 @@ export function useNotificationBroadcast() {
       });
 
       // Refresh notifications list
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      helpersRef.current.queryClient.invalidateQueries({
+        queryKey: ['notifications'],
+      });
     });
 
     return () => {
       echo.leaveChannel('private-notifications');
     };
-  }, [echo, token, queryClient]);
+  }, [echo, token]);
 }
