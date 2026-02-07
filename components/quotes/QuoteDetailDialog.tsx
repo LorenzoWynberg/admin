@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { QuoteStatusBadge } from './QuoteStatusBadge';
-import { formatDate, formatCurrency } from '@/utils/format';
+import { formatDate, formatDateTime, formatCurrency } from '@/utils/format';
 import { validationAttribute } from '@/utils/lang';
 import {
   Dialog,
@@ -130,7 +130,7 @@ export function QuoteDetailDialog({
                   <span className="text-muted-foreground">
                     {t('quotes:detail.pickup_proposed', { defaultValue: 'Pickup Proposed' })}
                   </span>
-                  <span>{formatDate(quote.pickupProposedFor)}</span>
+                  <span>{formatDateTime(quote.pickupProposedFor)}</span>
                 </div>
               )}
               {quote.deliveryProposedFor && (
@@ -138,7 +138,7 @@ export function QuoteDetailDialog({
                   <span className="text-muted-foreground">
                     {t('quotes:detail.delivery_proposed', { defaultValue: 'Delivery Proposed' })}
                   </span>
-                  <span>{formatDate(quote.deliveryProposedFor)}</span>
+                  <span>{formatDateTime(quote.deliveryProposedFor)}</span>
                 </div>
               )}
               {quote.validUntil && (
@@ -146,7 +146,7 @@ export function QuoteDetailDialog({
                   <span className="text-muted-foreground">
                     {t('quotes:valid_until', { defaultValue: 'Valid Until' })}
                   </span>
-                  <span>{formatDate(quote.validUntil)}</span>
+                  <span>{formatDateTime(quote.validUntil)}</span>
                 </div>
               )}
             </div>
