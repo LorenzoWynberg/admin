@@ -16,7 +16,7 @@ import {
   Select,
 } from '@/components/ui/select';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   actionLabel,
   capitalize,
@@ -33,7 +33,8 @@ import { useTranslation } from 'react-i18next';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PaymentStatusBadge } from '@/components/orders/PaymentStatusBadge';
-import { ChevronLeft, ChevronRight, Search, Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Package, X } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 type OrderStatus = App.Enums.OrderStatus;
 
@@ -52,12 +53,22 @@ export default function OrdersPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [pickupFrom, setPickupFrom] = useState('');
+  const [pickupTo, setPickupTo] = useState('');
+  const [deliveryFrom, setDeliveryFrom] = useState('');
+  const [deliveryTo, setDeliveryTo] = useState('');
+
+  const resetPage = useCallback(() => setPage(1), []);
 
   const { data, isLoading, error } = useOrderList({
     page,
     perPage: 15,
     status: status === 'all' ? undefined : status,
     search: search || undefined,
+    pickupFrom: pickupFrom || undefined,
+    pickupTo: pickupTo || undefined,
+    deliveryFrom: deliveryFrom || undefined,
+    deliveryTo: deliveryTo || undefined,
   });
 
   const orders = data?.items || [];
@@ -112,7 +123,7 @@ export default function OrdersPage() {
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
-                  setPage(1);
+                  resetPage();
                 }}
                 className="pl-9"
               />
@@ -121,7 +132,7 @@ export default function OrdersPage() {
               value={status}
               onValueChange={(value) => {
                 setStatus(value);
-                setPage(1);
+                resetPage();
               }}
             >
               <SelectTrigger className="w-[180px]">
@@ -137,6 +148,88 @@ export default function OrdersPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            <div className="grid gap-1">
+              <Label className="text-muted-foreground text-xs">
+                {t('orders:detail.pickup_scheduled', { defaultValue: 'Pickup Scheduled' })}
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={pickupFrom}
+                  onChange={(e) => {
+                    setPickupFrom(e.target.value);
+                    resetPage();
+                  }}
+                  className="w-[150px]"
+                />
+                <span className="text-muted-foreground text-sm">–</span>
+                <Input
+                  type="date"
+                  value={pickupTo}
+                  onChange={(e) => {
+                    setPickupTo(e.target.value);
+                    resetPage();
+                  }}
+                  className="w-[150px]"
+                />
+                {(pickupFrom || pickupTo) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => {
+                      setPickupFrom('');
+                      setPickupTo('');
+                      resetPage();
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div className="grid gap-1">
+              <Label className="text-muted-foreground text-xs">
+                {t('orders:detail.delivery_scheduled', { defaultValue: 'Delivery Scheduled' })}
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={deliveryFrom}
+                  onChange={(e) => {
+                    setDeliveryFrom(e.target.value);
+                    resetPage();
+                  }}
+                  className="w-[150px]"
+                />
+                <span className="text-muted-foreground text-sm">–</span>
+                <Input
+                  type="date"
+                  value={deliveryTo}
+                  onChange={(e) => {
+                    setDeliveryTo(e.target.value);
+                    resetPage();
+                  }}
+                  className="w-[150px]"
+                />
+                {(deliveryFrom || deliveryTo) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => {
+                      setDeliveryFrom('');
+                      setDeliveryTo('');
+                      resetPage();
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

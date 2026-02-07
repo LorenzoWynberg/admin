@@ -6,6 +6,10 @@ interface UseOrderListParams {
   perPage?: number;
   status?: string;
   search?: string;
+  pickupFrom?: string;
+  pickupTo?: string;
+  deliveryFrom?: string;
+  deliveryTo?: string;
   enabled?: boolean;
 }
 
