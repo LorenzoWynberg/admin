@@ -2,14 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 import { PaymentService } from '@/services/paymentService';
 
 interface UseOrderPaymentsParams {
-  orderId: number;
+  orderPublicId: string;
   enabled?: boolean;
 }
 
-export function useOrderPayments({ orderId, enabled = true }: UseOrderPaymentsParams) {
+export function useOrderPayments({ orderPublicId, enabled = true }: UseOrderPaymentsParams) {
   return useQuery({
-    queryKey: ['payments', 'order', orderId],
-    queryFn: () => PaymentService.getByOrderId(orderId),
-    enabled: enabled && !!orderId,
+    queryKey: ['payments', 'order', orderPublicId],
+    queryFn: () => PaymentService.getByOrderPublicId(orderPublicId),
+    enabled: enabled && !!orderPublicId,
   });
 }

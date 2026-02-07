@@ -41,9 +41,9 @@ export const PaymentService = {
   /**
    * Get payments for a specific order
    */
-  async getByOrderId(orderId: number): Promise<PaymentData[]> {
+  async getByOrderPublicId(orderPublicId: string): Promise<PaymentData[]> {
     const response = await api.get<Paginated<PaymentData>>(
-      `/payments?filter[order_id]=${orderId}&perPage=100`
+      `/payments?order=${orderPublicId}&perPage=100`
     );
     return response.items;
   },

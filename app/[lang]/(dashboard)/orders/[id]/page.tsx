@@ -425,7 +425,9 @@ export default function OrderDetailPage() {
         </Card>
 
         {/* Payments Section */}
-        {order.id && <PaymentSection orderId={order.id} currencySymbol={currencySymbol} />}
+        {order.publicId && (
+          <PaymentSection orderPublicId={order.publicId} currencySymbol={currencySymbol} />
+        )}
 
         {/* Trip Schedule */}
         <Card>
