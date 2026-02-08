@@ -225,6 +225,7 @@ declare namespace App.Data.Driver {
     licensePhotoFront?: string;
     licensePhotoBack?: string;
     licenseExpirationDate?: string;
+    active?: boolean;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -244,6 +245,7 @@ declare namespace App.Data.Driver {
     licensePhotoFront?: string;
     licensePhotoBack?: string;
     licenseExpirationDate?: string;
+    active?: boolean;
   };
 }
 declare namespace App.Data.ExchangeRate {
