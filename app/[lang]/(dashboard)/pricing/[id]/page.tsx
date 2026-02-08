@@ -33,7 +33,7 @@ import {
 import { ArrowLeft, Pencil, Trash2, Copy, Power, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { Enums } from '@/data/app-enums';
-import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { formatDate } from '@/utils/format';
 
 function formatCurrency(amount?: number): string {
