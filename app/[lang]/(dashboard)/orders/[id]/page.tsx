@@ -130,9 +130,10 @@ export default function OrderDetailPage() {
         </div>
         <div className="flex items-center gap-3">
           <OrderStatusBadge status={order.status as OrderStatus} />
-          {canCreateQuote && order.id && (
+          {canCreateQuote && order.id && order.publicId && (
             <CreateQuoteDialog
               orderId={order.id}
+              orderPublicId={order.publicId}
               orderDistanceKm={order.distanceKm}
               orderEstimatedMinutes={order.estimatedMinutes}
               customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
@@ -390,9 +391,10 @@ export default function OrderDetailPage() {
                 </p>
               </div>
             )}
-            {canCreateQuote && order.id && (
+            {canCreateQuote && order.id && order.publicId && (
               <CreateQuoteDialog
                 orderId={order.id}
+                orderPublicId={order.publicId}
                 orderDistanceKm={order.distanceKm}
                 orderEstimatedMinutes={order.estimatedMinutes}
                 customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}

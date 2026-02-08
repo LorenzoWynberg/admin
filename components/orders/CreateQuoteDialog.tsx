@@ -9,9 +9,11 @@ import {
   DialogTitle,
   Dialog,
 } from '@/components/ui/dialog';
-import { FileText, Send, Loader2 } from 'lucide-react';
+import { FileText, Send, Loader2, Pencil } from 'lucide-react';
 
+import { FeasibilityBadge } from './FeasibilityBadge';
 import { useMemo, useState } from 'react';
+import { useFeasibilityCheck } from '@/hooks/feasibility';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -32,6 +34,7 @@ import { formatRateDisplay } from '@/utils/currency';
 
 interface CreateQuoteDialogProps {
   orderId: number;
+  orderPublicId: string;
   orderDistanceKm?: number | null;
   orderEstimatedMinutes?: number | null;
   customerCurrencyCode?: string | null;
@@ -41,6 +44,7 @@ interface CreateQuoteDialogProps {
 
 export function CreateQuoteDialog({
   orderId,
+  orderPublicId,
   orderDistanceKm,
   orderEstimatedMinutes,
   customerCurrencyCode,
@@ -49,8 +53,15 @@ export function CreateQuoteDialog({
 }: CreateQuoteDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [editingTimes, setEditingTimes] = useState(false);
   const createQuote = useCreateQuote();
   const sendQuote = useSendQuote();
+
+  // Fetch feasibility when dialog is open
+  const { data: feasibility, isLoading: feasibilityLoading } = useFeasibilityCheck({
+    orderPublicId,
+    enabled: open,
+  });
 
   const getDefaultFormData = () => {
     const now = new Date();
@@ -70,10 +81,22 @@ export function CreateQuoteDialog({
 
   const [formData, setFormData] = useState(getDefaultFormData);
 
+  // Compute effective proposed times: feasibility suggestions override defaults when not editing
+  const effectivePickup =
+    !editingTimes && feasibility?.suggestedPickup
+      ? toDateTimeLocal(new Date(feasibility.suggestedPickup))
+      : formData.pickupProposedFor;
+
+  const effectiveDelivery =
+    !editingTimes && feasibility?.suggestedDelivery
+      ? toDateTimeLocal(new Date(feasibility.suggestedDelivery))
+      : formData.deliveryProposedFor;
+
   // Reset form with fresh defaults when dialog opens
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
       setFormData(getDefaultFormData());
+      setEditingTimes(false);
     }
     setOpen(isOpen);
   };
@@ -167,8 +190,8 @@ export function CreateQuoteDialog({
       surcharge: formData.surcharge ? parseFloat(formData.surcharge) : null,
       discountRate: formData.discountRate ? parseFloat(formData.discountRate) / 100 : null,
       notes: formData.notes || undefined,
-      pickupProposedFor: dateTimeLocalToISO(formData.pickupProposedFor),
-      deliveryProposedFor: dateTimeLocalToISO(formData.deliveryProposedFor),
+      pickupProposedFor: dateTimeLocalToISO(effectivePickup),
+      deliveryProposedFor: dateTimeLocalToISO(effectiveDelivery),
     };
 
     createQuote.mutate(data, {
@@ -209,6 +232,23 @@ export function CreateQuoteDialog({
               defaultValue: 'Enter distance to calculate pricing from the active pricing rule.',
             })}
           </DialogDescription>
+          {feasibilityLoading ? (
+            <div className="flex items-center gap-2 pt-2">
+              <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+              <span className="text-muted-foreground text-sm">
+                {t('quotes:feasibility.checking', {
+                  defaultValue: 'Checking driver availability...',
+                })}
+              </span>
+            </div>
+          ) : feasibility ? (
+            <div className="pt-2">
+              <FeasibilityBadge
+                level={feasibility.level}
+                candidateCount={feasibility.candidates?.length || 0}
+              />
+            </div>
+          ) : null}
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
@@ -463,37 +503,83 @@ export function CreateQuoteDialog({
             </div>
           )}
 
-          {/* Proposed Pickup/Delivery */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="pickupProposedFor">
-                {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })}
-              </Label>
-              <Input
-                id="pickupProposedFor"
-                type="datetime-local"
-                value={formData.pickupProposedFor}
-                onChange={(e) => handleChange('pickupProposedFor', e.target.value)}
-              />
-              <p className="text-muted-foreground text-xs">
-                {t('quotes:create.default_pickup_hint', { defaultValue: 'Default: +2 hours' })}
-              </p>
+          {/* Proposed Pickup/Delivery — smart display with edit */}
+          {editingTimes ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="pickupProposedFor">
+                  {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })}
+                </Label>
+                <Input
+                  id="pickupProposedFor"
+                  type="datetime-local"
+                  value={formData.pickupProposedFor}
+                  onChange={(e) => handleChange('pickupProposedFor', e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="deliveryProposedFor">
+                  {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}
+                </Label>
+                <Input
+                  id="deliveryProposedFor"
+                  type="datetime-local"
+                  value={formData.deliveryProposedFor}
+                  onChange={(e) => handleChange('deliveryProposedFor', e.target.value)}
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="deliveryProposedFor">
-                {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}
-              </Label>
-              <Input
-                id="deliveryProposedFor"
-                type="datetime-local"
-                value={formData.deliveryProposedFor}
-                onChange={(e) => handleChange('deliveryProposedFor', e.target.value)}
-              />
-              <p className="text-muted-foreground text-xs">
-                {t('quotes:create.default_delivery_hint', { defaultValue: 'Default: +4 hours' })}
-              </p>
+          ) : (
+            <div className="bg-muted/50 rounded-lg border p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">
+                  {t('quotes:create.proposed_times', { defaultValue: 'Proposed Times' })}
+                  {feasibility && !feasibility.outsourceRequired && (
+                    <span className="text-muted-foreground ml-2 text-xs font-normal">
+                      {t('quotes:feasibility.suggested', { defaultValue: '(suggested by system)' })}
+                    </span>
+                  )}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      pickupProposedFor: effectivePickup,
+                      deliveryProposedFor: effectiveDelivery,
+                    }));
+                    setEditingTimes(true);
+                  }}
+                >
+                  <Pencil className="mr-1 h-3 w-3" />
+                  {t('common:edit', { defaultValue: 'Edit' })}
+                </Button>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })}
+                  </p>
+                  <p className="text-sm font-semibold">
+                    {effectivePickup
+                      ? formatDateTime(new Date(effectivePickup).toISOString())
+                      : '—'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}
+                  </p>
+                  <p className="text-sm font-semibold">
+                    {effectiveDelivery
+                      ? formatDateTime(new Date(effectiveDelivery).toISOString())
+                      : '—'}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <DialogFooter className="flex gap-2">
