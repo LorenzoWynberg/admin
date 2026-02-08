@@ -260,6 +260,22 @@ declare namespace App.Data.ExchangeRate {
     updatedAt?: string;
   };
 }
+declare namespace App.Data.Feasibility {
+  export type DriverCandidate = {
+    driverId: number;
+    driverName: string;
+    extraDistanceKm: number;
+    suggestedPickup: string | null;
+    suggestedDelivery: string | null;
+  };
+  export type FeasibilityResult = {
+    level: App.Enums.FeasibilityLevel;
+    candidates: Array<App.Data.Feasibility.DriverCandidate>;
+    outsourceRequired: boolean;
+    suggestedPickup: string | null;
+    suggestedDelivery: string | null;
+  };
+}
 declare namespace App.Data.Location {
   export type LocationData = {
     id?: number;
@@ -292,6 +308,8 @@ declare namespace App.Data.Order {
     pin?: string | null;
     requiresPin?: boolean;
     isContactless?: boolean;
+    deliveryTier?: App.Enums.DeliveryTier;
+    timeSensitive?: boolean;
     description?: string | null;
     distanceKm?: number | null;
     estimatedMinutes?: number | null;
@@ -330,6 +348,8 @@ declare namespace App.Data.Order {
     desiredPickupAt: string | null;
     requiresPin: boolean;
     isContactless: boolean;
+    deliveryTier: App.Enums.DeliveryTier;
+    timeSensitive: boolean;
   };
 }
 declare namespace App.Data.Payment {
@@ -488,6 +508,16 @@ declare namespace App.Data.Route {
     orderId: number;
     type: App.Enums.RouteStopType;
   };
+  export type BatchAddStopsData = {
+    stops: Array<any>;
+    optimize: boolean;
+  };
+  export type CreateRouteWithStopsData = {
+    date: string;
+    driverId: number | null;
+    stops: Array<any>;
+    optimize: boolean;
+  };
   export type ReorderStopsData = {
     stopIds: Array<any>;
   };
@@ -511,6 +541,7 @@ declare namespace App.Data.Route {
     type: App.Enums.RouteStopType;
     sequence: number;
     status: App.Enums.RouteStopStatus;
+    scheduledFor?: string | null;
     notes?: string | null;
     createdAt?: string;
     updatedAt?: string;
@@ -674,6 +705,8 @@ declare namespace App.Enums {
     TIME_FEE = 'timeFee',
     SURCHARGE = 'surcharge',
     DISCOUNT = 'discount',
+    DELIVERY_TIER = 'deliveryTier',
+    TIME_SENSITIVE = 'timeSensitive',
     PICKUP = 'pickup',
     DELIVERY = 'delivery',
   }
@@ -691,6 +724,12 @@ declare namespace App.Enums {
     Denied = 'denied',
     Sent = 'sent',
   }
+  export enum DeliveryTier {
+    Expedited = 'expedited',
+    Regular = 'regular',
+    Cheapest = 'cheapest',
+    Custom = 'custom',
+  }
   export enum ErrorAction {
     Retrieving = 'retrieving',
     Creating = 'creating',
@@ -703,6 +742,11 @@ declare namespace App.Enums {
     Approving = 'approving',
     Denying = 'denying',
     Sending = 'sending',
+  }
+  export enum FeasibilityLevel {
+    Green = 'green',
+    Yellow = 'yellow',
+    Red = 'red',
   }
   export enum HttpStatus {
     OK = 200,
