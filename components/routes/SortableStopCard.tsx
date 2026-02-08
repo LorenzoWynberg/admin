@@ -3,7 +3,18 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
-import { GripVertical, Lock, Package, MapPin, X, Info, Phone, Building2 } from 'lucide-react';
+import {
+  GripVertical,
+  Lock,
+  Package,
+  MapPin,
+  X,
+  Info,
+  Phone,
+  Building2,
+  ArrowRightLeft,
+  AlertTriangle,
+} from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { capitalize } from '@/utils/lang';
 import { Button } from '@/components/ui/button';
@@ -13,6 +24,7 @@ type RouteStopData = App.Data.Route.RouteStopData;
 interface SortableStopCardProps {
   stop: RouteStopData;
   onRemove?: () => void;
+  onReassign?: () => void;
   onClick?: () => void;
   isSelected?: boolean;
   disabled?: boolean;
@@ -21,6 +33,7 @@ interface SortableStopCardProps {
 export function SortableStopCard({
   stop,
   onRemove,
+  onReassign,
   onClick,
   isSelected,
   disabled,
@@ -37,9 +50,12 @@ export function SortableStopCard({
   };
 
   const isPickup = stop.type === 'pickup';
-  const colorClass = isPickup
-    ? 'border-l-sky-500 bg-sky-50/50'
-    : 'border-l-violet-500 bg-violet-50/50';
+  const isDelayed = !!stop.delayFlaggedAt;
+  const colorClass = isDelayed
+    ? 'border-l-amber-500 bg-amber-50/50'
+    : isPickup
+      ? 'border-l-sky-500 bg-sky-50/50'
+      : 'border-l-violet-500 bg-violet-50/50';
   const iconColor = isPickup ? 'text-sky-600' : 'text-violet-600';
 
   const order = stop.order;
@@ -106,6 +122,39 @@ export function SortableStopCard({
                 )}
               </PopoverContent>
             </Popover>
+          )}
+          {isDelayed && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  className="p-0.5 text-amber-600 hover:text-amber-800"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-56 p-3 text-xs" align="start">
+                <p className="font-medium text-amber-700">
+                  {t('routes:delay.flagged', { defaultValue: 'Delay Flagged' })}
+                </p>
+                {stop.delayReason && (
+                  <p className="text-muted-foreground mt-1">{stop.delayReason}</p>
+                )}
+              </PopoverContent>
+            </Popover>
+          )}
+          {onReassign && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-foreground h-6 w-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                onReassign();
+              }}
+            >
+              <ArrowRightLeft className="h-3 w-3" />
+            </Button>
           )}
           {onRemove && (
             <Button

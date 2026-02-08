@@ -519,6 +519,15 @@ declare namespace App.Data.Route {
     stops: Array<any>;
     optimize: boolean;
   };
+  export type FlagDelayData = {
+    reason: string;
+  };
+  export type ReassignStopData = {
+    targetRouteId: number | null;
+    newDriverId: number | null;
+    date: string | null;
+    optimize: boolean;
+  };
   export type ReorderStopsData = {
     stopIds: Array<any>;
   };
@@ -543,6 +552,8 @@ declare namespace App.Data.Route {
     sequence: number;
     status: App.Enums.RouteStopStatus;
     scheduledFor?: string | null;
+    delayFlaggedAt?: string | null;
+    delayReason?: string | null;
     notes?: string | null;
     createdAt?: string;
     updatedAt?: string;
