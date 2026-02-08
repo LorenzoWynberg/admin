@@ -226,6 +226,7 @@ declare namespace App.Data.Driver {
     licensePhotoBack?: string;
     licenseExpirationDate?: string;
     active?: boolean;
+    isOutsourced?: boolean;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
