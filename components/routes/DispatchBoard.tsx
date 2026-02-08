@@ -16,6 +16,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { AlertTriangle } from 'lucide-react';
 import {
   useRouteList,
   useUnassignedStops,
@@ -23,6 +24,7 @@ import {
   useDeleteRoute,
   useAddStop,
 } from '@/hooks/routes';
+import { useDriverList } from '@/hooks/drivers/useDriverList';
 import { DateNavigator } from './DateNavigator';
 import { CreateRouteDialog } from './CreateRouteDialog';
 import { UnassignedStopsList } from './UnassignedStopsList';
@@ -30,6 +32,8 @@ import { RouteCard } from './RouteCard';
 import { AddOrderDialog } from './AddOrderDialog';
 import { UnassignedStopContent } from './DraggableUnassignedStop';
 import { RouteMap } from './RouteMap';
+import { DispatchSummaryBar } from './DispatchSummaryBar';
+import { ReassignStopDialog } from './ReassignStopDialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { UnassignedStop } from '@/services/routeService';
 
@@ -67,6 +71,8 @@ export function DispatchBoard() {
   const [selectedStopId, setSelectedStopId] = useState<number | null>(null);
   const [selectedUnassignedKey, setSelectedUnassignedKey] = useState<string | null>(null);
   const [activeDragStop, setActiveDragStop] = useState<UnassignedStop | null>(null);
+  const [reassignStopId, setReassignStopId] = useState<number | null>(null);
+  const [unassignedExpanded, setUnassignedExpanded] = useState(false);
 
   const dateStr = format(date, 'yyyy-MM-dd');
 
@@ -77,6 +83,7 @@ export function DispatchBoard() {
   const { data: unassignedStops, isLoading: unassignedLoading } = useUnassignedStops({
     date: dateStr,
   });
+  const { data: driversData } = useDriverList({ perPage: 100 });
 
   const reorderStops = useReorderStops();
   const deleteRoute = useDeleteRoute();
@@ -84,11 +91,36 @@ export function DispatchBoard() {
 
   const routes = useMemo(() => (routesData?.items ?? []) as RouteData[], [routesData?.items]);
   const unassigned = useMemo(() => (unassignedStops ?? []) as UnassignedStop[], [unassignedStops]);
+  const drivers = useMemo(
+    () =>
+      (driversData?.items ?? []).map((d) => ({
+        id: d.id!,
+        name: d.user?.name ?? `Driver #${d.publicId}`,
+      })),
+    [driversData?.items]
+  );
 
   const selectedRoute = routes.find((r) => r.publicId === selectedRouteId) ?? null;
   const selectedRouteStops = useMemo(
     () => (selectedRoute?.stops ?? []) as RouteStopData[],
     [selectedRoute?.stops]
+  );
+
+  // Summary stats
+  const totalStops = useMemo(
+    () => routes.reduce((sum, r) => sum + ((r.stops as RouteStopData[]) ?? []).length, 0),
+    [routes]
+  );
+  const flaggedStops = useMemo(
+    () =>
+      routes.reduce(
+        (sum, r) =>
+          sum +
+          ((r.stops as RouteStopData[]) ?? []).filter((s: RouteStopData) => s.delayFlaggedAt)
+            .length,
+        0
+      ),
+    [routes]
   );
 
   const sensors = useSensors(
@@ -138,10 +170,8 @@ export function DispatchBoard() {
         let targetRouteId: string | null = null;
 
         if (overId.startsWith('route-')) {
-          // Dropped directly on a route card droppable
           targetRouteId = overId.replace('route-', '');
         } else {
-          // Dropped on a stop inside a route — find which route owns that stop
           const numericId = Number(overId);
           if (!Number.isNaN(numericId)) {
             const ownerRoute = routes.find((r) =>
@@ -152,13 +182,11 @@ export function DispatchBoard() {
         }
 
         if (targetRouteId) {
-          // Validate: can't add stops to completed/cancelled routes
           const targetRoute = routes.find((r) => r.publicId === targetRouteId);
           if (targetRoute?.status === 'completed' || targetRoute?.status === 'cancelled') {
             return;
           }
 
-          // Validate: dropoff needs its pickup completed or assigned to a route
           if (stopType === 'dropoff') {
             const order = unassigned.find(
               (s) => s.order.id === orderId && s.stopType === 'dropoff'
@@ -196,7 +224,6 @@ export function DispatchBoard() {
       if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
         const newOrder = arrayMove(stops, activeIndex, overIndex);
 
-        // Validate: dropoff can't come before its pickup
         if (!isValidStopOrder(newOrder)) {
           toast.error(
             t('routes:validation.pickup_before_dropoff', {
@@ -206,7 +233,6 @@ export function DispatchBoard() {
           return;
         }
 
-        // Optimistic update — instantly reorder in cache
         const routeListKey = ['routes', 'list', { date: dateStr, perPage: 50 }];
         const previousRoutes = queryClient.getQueryData<Paginated<RouteData>>(routeListKey);
 
@@ -276,26 +302,23 @@ export function DispatchBoard() {
           <CreateRouteDialog date={dateStr} />
         </div>
 
+        {/* Summary bar */}
+        <div className="border-b px-4 py-2">
+          <DispatchSummaryBar
+            assigned={totalStops}
+            outsourced={0}
+            unassigned={unassigned.length}
+            flagged={flaggedStops}
+          />
+        </div>
+
         {/* Main content */}
         <div className="flex min-h-0 flex-1">
-          {/* Left panel — sidebar with stops and routes */}
+          {/* Left panel — routes first (monitoring-first) */}
           <div className="w-80 shrink-0 overflow-hidden border-r">
             <ScrollArea className="h-full">
               <div className="space-y-4 p-4">
-                {/* Unassigned stops */}
-                <UnassignedStopsList
-                  stops={unassigned}
-                  isLoading={unassignedLoading}
-                  onStopClick={handleUnassignedClick}
-                  selectedStopKey={selectedUnassignedKey}
-                  date={dateStr}
-                  routes={routes}
-                />
-
-                {/* Divider */}
-                <hr />
-
-                {/* Routes */}
+                {/* Routes (primary content) */}
                 {routesLoading ? (
                   <div className="space-y-3">
                     {[1, 2].map((i) => (
@@ -304,7 +327,7 @@ export function DispatchBoard() {
                   </div>
                 ) : routes.length === 0 ? (
                   <p className="text-muted-foreground py-4 text-center text-sm">
-                    No routes for this date
+                    {t('routes:no_routes', { defaultValue: 'No routes found' })}
                   </p>
                 ) : (
                   <div className="space-y-3">
@@ -324,6 +347,7 @@ export function DispatchBoard() {
                           onStopClick={handleStopClick}
                           selectedStopId={selectedStopId}
                           onDelete={() => handleDeleteRoute(route.publicId!)}
+                          onReassignStop={(stopId) => setReassignStopId(stopId)}
                         />
                         {route.publicId && (
                           <div className="mt-1.5">
@@ -333,6 +357,34 @@ export function DispatchBoard() {
                       </div>
                     ))}
                   </div>
+                )}
+
+                {/* Unassigned stops — exception section, only shown when there are exceptions */}
+                {!unassignedLoading && unassigned.length > 0 && (
+                  <>
+                    <hr />
+                    <button
+                      className="flex w-full items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-left text-sm font-medium text-amber-800"
+                      onClick={() => setUnassignedExpanded(!unassignedExpanded)}
+                    >
+                      <AlertTriangle className="h-4 w-4 shrink-0" />
+                      <span>
+                        {t('routes:unassigned_stops', { defaultValue: 'Unassigned Stops' })} (
+                        {unassigned.length})
+                      </span>
+                      <span className="ml-auto text-xs">{unassignedExpanded ? '▲' : '▼'}</span>
+                    </button>
+                    {unassignedExpanded && (
+                      <UnassignedStopsList
+                        stops={unassigned}
+                        isLoading={unassignedLoading}
+                        onStopClick={handleUnassignedClick}
+                        selectedStopKey={selectedUnassignedKey}
+                        date={dateStr}
+                        routes={routes}
+                      />
+                    )}
+                  </>
                 )}
               </div>
             </ScrollArea>
@@ -357,6 +409,7 @@ export function DispatchBoard() {
           </div>
         </div>
       </div>
+
       <DragOverlay dropAnimation={null}>
         {activeDragStop && (
           <div className="w-72">
@@ -364,6 +417,19 @@ export function DispatchBoard() {
           </div>
         )}
       </DragOverlay>
+
+      {/* Reassign dialog */}
+      {reassignStopId !== null && (
+        <ReassignStopDialog
+          stopId={reassignStopId}
+          open
+          onOpenChange={(open) => {
+            if (!open) setReassignStopId(null);
+          }}
+          routes={routes}
+          drivers={drivers}
+        />
+      )}
     </DndContext>
   );
 }

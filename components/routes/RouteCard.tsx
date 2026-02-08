@@ -54,6 +54,7 @@ interface RouteCardProps {
   onStopClick?: (stop: RouteStopData) => void;
   selectedStopId?: number | null;
   onDelete?: () => void;
+  onReassignStop?: (stopId: number) => void;
 }
 
 export function RouteCard({
@@ -64,6 +65,7 @@ export function RouteCard({
   onStopClick,
   selectedStopId,
   onDelete,
+  onReassignStop,
 }: RouteCardProps) {
   const { t } = useTranslation();
   const updateRoute = useUpdateRoute();
@@ -198,6 +200,7 @@ export function RouteCard({
                   isSelected={selectedStopId === stop.id}
                   onClick={() => onStopClick?.(stop)}
                   onRemove={isLocked ? undefined : () => handleRemoveStop(stop.id)}
+                  onReassign={isLocked ? undefined : () => onReassignStop?.(stop.id)}
                   disabled={isLocked}
                 />
               );
