@@ -507,6 +507,7 @@ declare namespace App.Data.Route {
   export type AddStopData = {
     orderId: number;
     type: App.Enums.RouteStopType;
+    scheduledFor?: string | null;
   };
   export type BatchAddStopsData = {
     stops: Array<any>;
