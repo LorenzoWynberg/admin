@@ -227,6 +227,9 @@ declare namespace App.Data.Driver {
     licenseExpirationDate?: string;
     active?: boolean;
     isOutsourced?: boolean;
+    currentLatitude?: number | null;
+    currentLongitude?: number | null;
+    locationUpdatedAt?: string | null;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -247,6 +250,13 @@ declare namespace App.Data.Driver {
     licensePhotoBack?: string;
     licenseExpirationDate?: string;
     active?: boolean;
+  };
+  export type UpdateLanguageData = {
+    langCode: string;
+  };
+  export type UpdateLocationData = {
+    latitude: number;
+    longitude: number;
   };
 }
 declare namespace App.Data.ExchangeRate {
@@ -554,6 +564,8 @@ declare namespace App.Data.Route {
     date: string;
     status?: App.Enums.RouteStatus;
     notes?: string | null;
+    startsAt?: string | null;
+    endsAt?: string | null;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
