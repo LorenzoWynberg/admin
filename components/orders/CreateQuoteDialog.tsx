@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrencyList } from '@/hooks/currencies';
 import { useCalculatePricing } from '@/hooks/pricing';
 import { useCreateQuote, useSendQuote } from '@/hooks/quotes';
-import { validationAttribute } from '@/utils/lang';
+import { actionLabel, validationAttribute } from '@/utils/lang';
 import {
   formatCurrency,
   applyRounding,
@@ -608,7 +608,7 @@ export function CreateQuoteDialog({
                   }}
                 >
                   <Pencil className="mr-1 h-3 w-3" />
-                  {t('common:edit', { defaultValue: 'Edit' })}
+                  {actionLabel('edit')}
                 </Button>
               </div>
               <div className="mt-2 grid grid-cols-2 gap-4">
