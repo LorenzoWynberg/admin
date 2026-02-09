@@ -11,5 +11,6 @@ export function useFeasibilityCheck({ orderPublicId, enabled = true }: UseFeasib
     queryKey: ['feasibility', orderPublicId],
     queryFn: () => FeasibilityService.check(orderPublicId),
     enabled: enabled && !!orderPublicId,
+    gcTime: 0,
   });
 }
