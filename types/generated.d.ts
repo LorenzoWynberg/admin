@@ -281,6 +281,7 @@ declare namespace App.Data.Feasibility {
     suggestedPickup: string | null;
     suggestedDelivery: string | null;
     score: number;
+    travelTimeMinutes: number | null;
   };
   export type FeasibilityResult = {
     level: App.Enums.FeasibilityLevel;
