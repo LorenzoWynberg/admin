@@ -9,7 +9,7 @@ import {
   DialogTitle,
   Dialog,
 } from '@/components/ui/dialog';
-import { FileText, Send, Loader2, Pencil } from 'lucide-react';
+import { FileText, Send, Loader2, Pencil, Clock, AlertTriangle } from 'lucide-react';
 
 import { FeasibilityBadge } from './FeasibilityBadge';
 import { useMemo, useState } from 'react';
@@ -40,6 +40,9 @@ interface CreateQuoteDialogProps {
   customerCurrencyCode?: string | null;
   customerDesiredDelivery?: string | null;
   customerDesiredPickup?: string | null;
+  windowStart?: string | null;
+  windowEnd?: string | null;
+  timeSensitive?: boolean;
 }
 
 export function CreateQuoteDialog({
@@ -50,6 +53,9 @@ export function CreateQuoteDialog({
   customerCurrencyCode,
   customerDesiredDelivery,
   customerDesiredPickup,
+  windowStart,
+  windowEnd,
+  timeSensitive = false,
 }: CreateQuoteDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -469,38 +475,80 @@ export function CreateQuoteDialog({
             />
           </div>
 
-          {/* Customer Requested Pickup */}
-          {customerDesiredPickup && (
-            <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
-              <div>
-                <p className="text-muted-foreground text-sm font-medium">
-                  {t('quotes:create.customer_requested_pickup', {
-                    defaultValue: 'Customer Requested Pickup',
+          {/* Delivery Window or Time-Sensitive Constraints */}
+          {timeSensitive && customerDesiredPickup ? (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                  {t('quotes:detail.time_sensitive_label', {
+                    defaultValue: 'Time-Sensitive Constraints',
                   })}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  {t('quotes:create.from_order_request', { defaultValue: 'From order request' })}
-                </p>
+                </span>
               </div>
-              <p className="text-lg font-semibold">{formatDateTime(customerDesiredPickup)}</p>
-            </div>
-          )}
-
-          {/* Customer Requested Delivery */}
-          {customerDesiredDelivery && (
-            <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
-              <div>
-                <p className="text-muted-foreground text-sm font-medium">
-                  {t('quotes:create.customer_requested_delivery', {
-                    defaultValue: 'Customer Requested Delivery',
-                  })}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  {t('quotes:create.from_order_request', { defaultValue: 'From order request' })}
-                </p>
+              <div className="mt-2 grid grid-cols-2 gap-4">
+                {customerDesiredPickup && (
+                  <div>
+                    <p className="text-muted-foreground text-xs">
+                      {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })} ±15
+                      min
+                    </p>
+                    <p className="text-sm font-semibold">{formatDateTime(customerDesiredPickup)}</p>
+                  </div>
+                )}
+                {customerDesiredDelivery && (
+                  <div>
+                    <p className="text-muted-foreground text-xs">
+                      {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}{' '}
+                      ±15 min
+                    </p>
+                    <p className="text-sm font-semibold">
+                      {formatDateTime(customerDesiredDelivery)}
+                    </p>
+                  </div>
+                )}
               </div>
-              <p className="text-lg font-semibold">{formatDateTime(customerDesiredDelivery)}</p>
             </div>
+          ) : windowStart && windowEnd ? (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  {t('quotes:detail.window_label', { defaultValue: 'Delivery Window' })}
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                {formatDateTime(windowStart)} — {formatDateTime(windowEnd)}
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Fallback: show individual requested times */}
+              {customerDesiredPickup && (
+                <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
+                  <div>
+                    <p className="text-muted-foreground text-sm font-medium">
+                      {t('quotes:create.customer_requested_pickup', {
+                        defaultValue: 'Customer Requested Pickup',
+                      })}
+                    </p>
+                  </div>
+                  <p className="text-lg font-semibold">{formatDateTime(customerDesiredPickup)}</p>
+                </div>
+              )}
+              {customerDesiredDelivery && (
+                <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
+                  <div>
+                    <p className="text-muted-foreground text-sm font-medium">
+                      {t('quotes:create.customer_requested_delivery', {
+                        defaultValue: 'Customer Requested Delivery',
+                      })}
+                    </p>
+                  </div>
+                  <p className="text-lg font-semibold">{formatDateTime(customerDesiredDelivery)}</p>
+                </div>
+              )}
+            </>
           )}
 
           {/* Proposed Pickup/Delivery — smart display with edit */}
@@ -534,7 +582,14 @@ export function CreateQuoteDialog({
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">
                   {t('quotes:create.proposed_times', { defaultValue: 'Proposed Times' })}
-                  {feasibility && !feasibility.outsourceRequired && (
+                  {!timeSensitive && (
+                    <span className="text-muted-foreground ml-2 text-xs font-normal">
+                      {t('quotes:detail.approximate_times', {
+                        defaultValue: 'Approximate (system-optimized)',
+                      })}
+                    </span>
+                  )}
+                  {feasibility && !feasibility.outsourceRequired && timeSensitive && (
                     <span className="text-muted-foreground ml-2 text-xs font-normal">
                       {t('quotes:feasibility.suggested', { defaultValue: '(suggested by system)' })}
                     </span>

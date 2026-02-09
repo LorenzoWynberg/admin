@@ -270,6 +270,7 @@ declare namespace App.Data.Feasibility {
     extraDistanceKm: number;
     suggestedPickup: string | null;
     suggestedDelivery: string | null;
+    score: number;
   };
   export type FeasibilityResult = {
     level: App.Enums.FeasibilityLevel;
@@ -277,6 +278,9 @@ declare namespace App.Data.Feasibility {
     outsourceRequired: boolean;
     suggestedPickup: string | null;
     suggestedDelivery: string | null;
+    windowStart: string | null;
+    windowEnd: string | null;
+    timeSensitive: boolean;
   };
 }
 declare namespace App.Data.Location {
@@ -325,6 +329,8 @@ declare namespace App.Data.Order {
     deliveryScheduledFor?: string | null;
     desiredDeliveryAt?: string | null;
     desiredPickupAt?: string | null;
+    windowStart?: string | null;
+    windowEnd?: string | null;
     pickupCompletedAt?: string | null;
     deliveryCompletedAt?: string | null;
     paidAt?: string | null;
@@ -496,13 +502,13 @@ declare namespace App.Data.Quote {
   };
   export type StoreQuoteData = {
     orderId: number;
-    pickupProposedFor: string;
-    deliveryProposedFor: string;
     validUntil?: string;
     distanceKm: number;
     timeFee: number | null;
     surcharge: number | null;
     discountRate: number | null;
+    pickupProposedFor: string | null;
+    deliveryProposedFor: string | null;
     notes?: string | null;
   };
 }
@@ -524,6 +530,13 @@ declare namespace App.Data.Route {
   };
   export type FlagDelayData = {
     reason: string;
+  };
+  export type OptimizationResult = {
+    success: boolean;
+    stopsOptimized: number;
+    conflictsFound: number;
+    reassignedOrderIds: Array<any>;
+    message: string;
   };
   export type ReassignStopData = {
     targetRouteId: number | null;
@@ -555,6 +568,8 @@ declare namespace App.Data.Route {
     sequence: number;
     status: App.Enums.RouteStopStatus;
     scheduledFor?: string | null;
+    windowStart?: string | null;
+    windowEnd?: string | null;
     delayFlaggedAt?: string | null;
     delayReason?: string | null;
     notes?: string | null;
@@ -885,6 +900,7 @@ declare namespace App.Enums {
   }
   export enum RouteStopStatus {
     PENDING = 'pending',
+    EN_ROUTE = 'en_route',
     ARRIVED = 'arrived',
     COMPLETED = 'completed',
     SKIPPED = 'skipped',

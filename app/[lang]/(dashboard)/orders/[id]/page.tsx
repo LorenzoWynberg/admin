@@ -139,6 +139,9 @@ export default function OrderDetailPage() {
               customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
               customerDesiredDelivery={order.desiredDeliveryAt}
               customerDesiredPickup={order.desiredPickupAt}
+              windowStart={order.windowStart}
+              windowEnd={order.windowEnd}
+              timeSensitive={order.timeSensitive}
             />
           )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
