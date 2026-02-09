@@ -12,6 +12,7 @@ import {
   Route,
   Phone,
   Clock,
+  Timer,
   Truck,
   User,
 } from 'lucide-react';
@@ -28,7 +29,7 @@ import { QuoteDetailDialog } from '@/components/quotes/QuoteDetailDialog';
 import { PaymentSection } from '@/components/payments/PaymentSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
-import { formatDate, formatCurrency } from '@/utils/format';
+import { formatDate, formatDateTime, formatCurrency } from '@/utils/format';
 import { useOrder, useDeleteOrder } from '@/hooks/orders';
 import { useCurrencyList } from '@/hooks/currencies';
 
@@ -285,7 +286,36 @@ export default function OrderDetailPage() {
                 )}
               </div>
             )}
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-2">
+              {order.deliveryTier && (
+                <Badge
+                  variant={
+                    order.deliveryTier === 'custom'
+                      ? 'outline'
+                      : order.deliveryTier === 'cheapest'
+                        ? 'secondary'
+                        : 'default'
+                  }
+                  className={
+                    order.deliveryTier === 'expedited'
+                      ? 'border-transparent bg-blue-600 text-white'
+                      : undefined
+                  }
+                >
+                  {t(`orders:tiers.${order.deliveryTier}`, {
+                    defaultValue: order.deliveryTier,
+                  })}
+                </Badge>
+              )}
+              {order.timeSensitive && (
+                <Badge
+                  variant="outline"
+                  className="border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-400"
+                >
+                  <Timer className="h-3 w-3" />
+                  {t('orders:window.time_sensitive', { defaultValue: 'Time-Sensitive' })}
+                </Badge>
+              )}
               {order.requiresPin && (
                 <Badge variant="secondary">
                   {t('orders:detail.requiresPin', { defaultValue: 'Requires PIN' })}
@@ -297,6 +327,20 @@ export default function OrderDetailPage() {
                 </Badge>
               )}
             </div>
+            {order.windowStart && order.windowEnd && (
+              <div className="flex items-start gap-3">
+                <Clock className="text-muted-foreground mt-0.5 h-4 w-4" />
+                <div>
+                  <p className="font-medium">
+                    {formatDateTime(order.windowStart)} — {formatDateTime(order.windowEnd)}
+                  </p>
+                  <p className="text-muted-foreground text-sm">
+                    {t('orders:window.window_start', { defaultValue: 'Window Start' })} –{' '}
+                    {t('orders:window.window_end', { defaultValue: 'Window End' })}
+                  </p>
+                </div>
+              </div>
+            )}
             {order.desiredPickupAt && (
               <div className="flex items-start gap-3">
                 <Calendar className="text-muted-foreground mt-0.5 h-4 w-4" />
