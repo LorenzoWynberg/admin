@@ -251,9 +251,6 @@ declare namespace App.Data.Driver {
     licenseExpirationDate?: string;
     active?: boolean;
   };
-  export type UpdateLanguageData = {
-    langCode: string;
-  };
   export type UpdateLocationData = {
     latitude: number;
     longitude: number;
