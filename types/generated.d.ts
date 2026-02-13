@@ -762,6 +762,10 @@ declare namespace App.Enums {
     PICKUP = 'pickup',
     DELIVERY = 'delivery',
   }
+  export enum ConflictReason {
+    WindowOverflow = 'window_overflow',
+    TimeSensitiveViolation = 'time_sensitive_violation',
+  }
   export enum CrudAction {
     Retrieved = 'retrieved',
     Created = 'created',
@@ -846,6 +850,13 @@ declare namespace App.Enums {
     Refund = 'refund',
     Route = 'route',
     RouteStop = 'route_stop',
+  }
+  export enum NotificationAction {
+    QuoteRequested = 'quote_requested',
+    QuoteSent = 'quote_sent',
+    ScheduleChanged = 'schedule_changed',
+    StopAssigned = 'stop_assigned',
+    DelayFlagged = 'delay_flagged',
   }
   export enum OrderStatus {
     PENDING = 'pending',
