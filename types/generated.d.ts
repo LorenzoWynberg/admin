@@ -599,6 +599,18 @@ declare namespace App.Data.Route {
     status?: string | null;
   };
 }
+declare namespace App.Data.Setting {
+  export type SettingData = {
+    noServiceStart: string;
+    noServiceEnd: string;
+    serviceWindowEnabled: boolean;
+  };
+  export type UpdateSettingData = {
+    noServiceStart?: string;
+    noServiceEnd?: string;
+    serviceWindowEnabled?: boolean;
+  };
+}
 declare namespace App.Data.Shared {
   export type FullLangData = {
     en: string;

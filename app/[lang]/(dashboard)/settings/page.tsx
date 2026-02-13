@@ -7,7 +7,7 @@ import {
   SelectItem,
   Select,
 } from '@/components/ui/select';
-import { Globe, Coins, ChevronRight } from 'lucide-react';
+import { Globe, Coins, Clock, ChevronRight } from 'lucide-react';
 
 import { Label } from '@/components/ui/label';
 import { useTranslation } from 'react-i18next';
@@ -100,6 +100,27 @@ export default function SettingsPage() {
           <CardDescription>
             {t('common:currency_settings_description', {
               defaultValue: 'Manage currencies and exchange rates',
+            })}
+          </CardDescription>
+        </CardHeader>
+      </Card>
+      <Card
+        className="hover:bg-muted/50 cursor-pointer transition-colors"
+        onClick={() => router.push(`/${currentLang}/settings/service-window`)}
+      >
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              <CardTitle>
+                {t('common:service_window', { defaultValue: 'Service Window' })}
+              </CardTitle>
+            </div>
+            <ChevronRight className="text-muted-foreground h-5 w-5" />
+          </div>
+          <CardDescription>
+            {t('common:service_window_description', {
+              defaultValue: 'Configure operating hours for the delivery service',
             })}
           </CardDescription>
         </CardHeader>
