@@ -14,8 +14,9 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     // Node.js scripts (CommonJS)
     'scripts/**',
-    // Generated files
+    // Generated files (synced from API — never edit manually)
     'types/generated.d.ts',
+    'types/response.d.ts',
     'coverage/**',
   ]),
 ]);

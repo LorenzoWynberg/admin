@@ -14,6 +14,7 @@ import {
   Database,
   DollarSign,
   Bell,
+  Settings,
 } from 'lucide-react';
 import { capitalize, resourceMessage } from '@/utils/lang';
 
@@ -98,6 +99,15 @@ const navItems = [
     href: '/notifications',
     color: 'text-pink-600',
     bgColor: 'bg-pink-100',
+  },
+  {
+    key: 'settings',
+    modelKey: 'settings',
+    icon: Settings,
+    href: '/settings',
+    color: 'text-gray-600',
+    bgColor: 'bg-gray-100',
+    descriptionKey: 'common:settings_description',
   },
 ];
 
