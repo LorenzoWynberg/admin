@@ -10,6 +10,10 @@ export interface NotifData {
   modelId?: number | null;
   modelName?: string | null;
   catalogId?: number | null;
+  translationKey?: string;
+  translationParams?: Record<string, string>;
+  /** @deprecated Pre-translated message from old notifications */
+  message?: string;
 }
 
 /**
@@ -47,8 +51,21 @@ export function getNotificationData(notification: NotificationData): NotifData {
 export function useNotificationHelpers() {
   const { t } = useTranslation();
 
-  // Title: "Catalog was updated" using resource:success.was_actioned
+  // Title: use translationKey if available, fall back to CRUD pattern
   const getTitle = (data: NotifData): string => {
+    if (data.translationKey) {
+      return t(data.translationKey, {
+        ...data.translationParams,
+        defaultValue: data.translationKey,
+      });
+    }
+
+    // Backward compat: old records with pre-translated message
+    if (data.message) {
+      return data.message;
+    }
+
+    // CRUD pattern: "Catalog was updated"
     const model = data.model || 'catalog';
     const action = data.action || 'updated';
     return t('resource:success.was_actioned', {
@@ -58,8 +75,22 @@ export function useNotificationHelpers() {
     });
   };
 
-  // Message: 'Name was created' = resource:success.was_actioned with interpolation
+  // Message: model context for business notifications, CRUD pattern for others
   const getMessage = (data: NotifData): string => {
+    if (data.translationKey) {
+      // For business notifications with translationKey, show model context
+      if (data.modelName) {
+        return data.modelName;
+      }
+      return '';
+    }
+
+    // Backward compat: old records with pre-translated message
+    if (data.message) {
+      return data.message;
+    }
+
+    // CRUD pattern: "My Catalog was updated"
     const action = data.action || 'updated';
     const resource = data.modelName || t('common:unknown', { defaultValue: 'Unknown' });
     const actionText = actionLabel(action).toLowerCase();

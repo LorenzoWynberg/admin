@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEcho } from '@/providers/EchoProvider';
 import { useCatalogStore } from '@/stores/useCatalogStore';
@@ -12,12 +12,24 @@ export function useCatalogBroadcast() {
   const reset = useCatalogStore((state) => state.reset);
   const queryClient = useQueryClient();
 
+  // Use refs to avoid re-subscribing when callbacks change
+  const callbacksRef = useRef({ reset, queryClient });
+  useEffect(() => {
+    callbacksRef.current = { reset, queryClient };
+  });
+
   useEffect(() => {
     if (!echo) return;
 
     echo.channel('catalogs').listen('.catalogs.updated', () => {
-      reset();
-      queryClient.invalidateQueries({ queryKey: ['catalogs'] });
+      callbacksRef.current.reset();
+      callbacksRef.current.queryClient.invalidateQueries({
+        queryKey: ['catalogs'],
+      });
     });
-  }, [echo, reset, queryClient]);
+
+    return () => {
+      echo.leaveChannel('catalogs');
+    };
+  }, [echo]);
 }

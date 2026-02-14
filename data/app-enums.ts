@@ -70,8 +70,14 @@ export const Enums = {
     TIME_FEE: "timeFee",
     SURCHARGE: "surcharge",
     DISCOUNT: "discount",
+    DELIVERY_TIER: "deliveryTier",
+    TIME_SENSITIVE: "timeSensitive",
     PICKUP: "pickup",
     DELIVERY: "delivery",
+  },
+  ConflictReason: {
+    WindowOverflow: "window_overflow",
+    TimeSensitiveViolation: "time_sensitive_violation",
   },
   CrudAction: {
     Retrieved: "retrieved",
@@ -87,6 +93,12 @@ export const Enums = {
     Denied: "denied",
     Sent: "sent",
   },
+  DeliveryTier: {
+    Expedited: "expedited",
+    Regular: "regular",
+    Cheapest: "cheapest",
+    Custom: "custom",
+  },
   ErrorAction: {
     Retrieving: "retrieving",
     Creating: "creating",
@@ -99,6 +111,11 @@ export const Enums = {
     Approving: "approving",
     Denying: "denying",
     Sending: "sending",
+  },
+  FeasibilityLevel: {
+    Green: "green",
+    Yellow: "yellow",
+    Red: "red",
   },
   HttpStatus: {
     OK: 200,
@@ -144,6 +161,15 @@ export const Enums = {
     Payment: "payment",
     PaymentMethod: "payment_method",
     Refund: "refund",
+    Route: "route",
+    RouteStop: "route_stop",
+  },
+  NotificationAction: {
+    QuoteRequested: "quote_requested",
+    QuoteSent: "quote_sent",
+    ScheduleChanged: "schedule_changed",
+    StopAssigned: "stop_assigned",
+    DelayFlagged: "delay_flagged",
   },
   OrderStatus: {
     PENDING: "pending",
@@ -210,6 +236,24 @@ export const Enums = {
     CLIENT: "client",
     DRIVER: "driver",
     ADMIN: "admin",
+  },
+  RouteStatus: {
+    DRAFT: "draft",
+    SCHEDULED: "scheduled",
+    IN_PROGRESS: "in_progress",
+    COMPLETED: "completed",
+    CANCELLED: "cancelled",
+  },
+  RouteStopStatus: {
+    PENDING: "pending",
+    EN_ROUTE: "en_route",
+    ARRIVED: "arrived",
+    COMPLETED: "completed",
+    SKIPPED: "skipped",
+  },
+  RouteStopType: {
+    PICKUP: "pickup",
+    DROPOFF: "dropoff",
   },
   TransactionStatus: {
     Pending: "pending",

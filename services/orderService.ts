@@ -10,6 +10,10 @@ interface ListParams {
   perPage?: number;
   status?: string;
   search?: string;
+  pickupFrom?: string;
+  pickupTo?: string;
+  deliveryFrom?: string;
+  deliveryTo?: string;
 }
 
 function buildQueryString(params: ListParams): string {
@@ -18,6 +22,10 @@ function buildQueryString(params: ListParams): string {
   if (params.perPage) query.set('perPage', String(params.perPage));
   if (params.status) query.set('filter[status]', params.status);
   if (params.search) query.set('search', params.search);
+  if (params.pickupFrom) query.set('pickup_from', params.pickupFrom);
+  if (params.pickupTo) query.set('pickup_to', params.pickupTo);
+  if (params.deliveryFrom) query.set('delivery_from', params.deliveryFrom);
+  if (params.deliveryTo) query.set('delivery_to', params.deliveryTo);
   return query.toString();
 }
 

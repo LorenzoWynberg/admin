@@ -8,10 +8,12 @@ import {
   validationAttribute,
 } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { useDriver, useDeleteDriver } from '@/hooks/drivers';
+import { useDriver, useDeleteDriver, useUpdateDriver } from '@/hooks/drivers';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,6 +43,7 @@ export default function DriverDetailPage() {
 
   const { data: driver, isLoading, error } = useDriver(driverId);
   const deleteDriver = useDeleteDriver();
+  const updateDriver = useUpdateDriver();
 
   const handleDelete = () => {
     if (
@@ -97,10 +100,26 @@ export default function DriverDetailPage() {
             </p>
           </div>
         </div>
-        <Button variant="destructive" onClick={handleDelete} disabled={deleteDriver.isPending}>
-          <Trash2 className="mr-2 h-4 w-4" />
-          {actionLabel('delete')}
-        </Button>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={driver.active !== false}
+              onCheckedChange={(checked) =>
+                updateDriver.mutate({ id: driverId, data: { active: checked } })
+              }
+              disabled={updateDriver.isPending}
+            />
+            <Label className="text-sm font-medium">
+              {driver.active !== false
+                ? t('drivers:active', { defaultValue: 'Active' })
+                : t('drivers:inactive', { defaultValue: 'Inactive' })}
+            </Label>
+          </div>
+          <Button variant="destructive" onClick={handleDelete} disabled={deleteDriver.isPending}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            {actionLabel('delete')}
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

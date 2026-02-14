@@ -9,9 +9,11 @@ import {
   DialogTitle,
   Dialog,
 } from '@/components/ui/dialog';
-import { FileText, Send, Loader2 } from 'lucide-react';
+import { FileText, Send, Loader2, Pencil, Clock, AlertTriangle } from 'lucide-react';
 
+import { FeasibilityBadge } from './FeasibilityBadge';
 import { useMemo, useState } from 'react';
+import { useFeasibilityCheck } from '@/hooks/feasibility';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -20,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrencyList } from '@/hooks/currencies';
 import { useCalculatePricing } from '@/hooks/pricing';
 import { useCreateQuote, useSendQuote } from '@/hooks/quotes';
-import { validationAttribute } from '@/utils/lang';
+import { actionLabel, validationAttribute } from '@/utils/lang';
 import {
   formatCurrency,
   applyRounding,
@@ -32,23 +34,40 @@ import { formatRateDisplay } from '@/utils/currency';
 
 interface CreateQuoteDialogProps {
   orderId: number;
+  orderPublicId: string;
   orderDistanceKm?: number | null;
   orderEstimatedMinutes?: number | null;
   customerCurrencyCode?: string | null;
   customerDesiredDelivery?: string | null;
+  customerDesiredPickup?: string | null;
+  windowStart?: string | null;
+  windowEnd?: string | null;
+  timeSensitive?: boolean;
 }
 
 export function CreateQuoteDialog({
   orderId,
+  orderPublicId,
   orderDistanceKm,
   orderEstimatedMinutes,
   customerCurrencyCode,
   customerDesiredDelivery,
+  customerDesiredPickup,
+  windowStart,
+  windowEnd,
+  timeSensitive = false,
 }: CreateQuoteDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [editingTimes, setEditingTimes] = useState(false);
   const createQuote = useCreateQuote();
   const sendQuote = useSendQuote();
+
+  // Fetch feasibility when dialog is open
+  const { data: feasibility, isLoading: feasibilityLoading } = useFeasibilityCheck({
+    orderPublicId,
+    enabled: open,
+  });
 
   const getDefaultFormData = () => {
     const now = new Date();
@@ -68,10 +87,22 @@ export function CreateQuoteDialog({
 
   const [formData, setFormData] = useState(getDefaultFormData);
 
+  // Compute effective proposed times: feasibility suggestions override defaults when not editing
+  const effectivePickup =
+    !editingTimes && feasibility?.suggestedPickup
+      ? toDateTimeLocal(new Date(feasibility.suggestedPickup))
+      : formData.pickupProposedFor;
+
+  const effectiveDelivery =
+    !editingTimes && feasibility?.suggestedDelivery
+      ? toDateTimeLocal(new Date(feasibility.suggestedDelivery))
+      : formData.deliveryProposedFor;
+
   // Reset form with fresh defaults when dialog opens
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
       setFormData(getDefaultFormData());
+      setEditingTimes(false);
     }
     setOpen(isOpen);
   };
@@ -165,8 +196,8 @@ export function CreateQuoteDialog({
       surcharge: formData.surcharge ? parseFloat(formData.surcharge) : null,
       discountRate: formData.discountRate ? parseFloat(formData.discountRate) / 100 : null,
       notes: formData.notes || undefined,
-      pickupProposedFor: dateTimeLocalToISO(formData.pickupProposedFor),
-      deliveryProposedFor: dateTimeLocalToISO(formData.deliveryProposedFor),
+      pickupProposedFor: dateTimeLocalToISO(effectivePickup),
+      deliveryProposedFor: dateTimeLocalToISO(effectiveDelivery),
     };
 
     createQuote.mutate(data, {
@@ -207,6 +238,23 @@ export function CreateQuoteDialog({
               defaultValue: 'Enter distance to calculate pricing from the active pricing rule.',
             })}
           </DialogDescription>
+          {feasibilityLoading ? (
+            <div className="flex items-center gap-2 pt-2">
+              <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+              <span className="text-muted-foreground text-sm">
+                {t('quotes:feasibility.checking', {
+                  defaultValue: 'Checking driver availability...',
+                })}
+              </span>
+            </div>
+          ) : feasibility ? (
+            <div className="pt-2">
+              <FeasibilityBadge
+                level={feasibility.level}
+                candidateCount={feasibility.candidates?.length || 0}
+              />
+            </div>
+          ) : null}
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
@@ -427,54 +475,166 @@ export function CreateQuoteDialog({
             />
           </div>
 
-          {/* Customer Requested Delivery */}
-          {customerDesiredDelivery && (
-            <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
-              <div>
-                <p className="text-muted-foreground text-sm font-medium">
-                  {t('quotes:create.customer_requested_delivery', {
-                    defaultValue: 'Customer Requested Delivery',
+          {/* Delivery Window or Time-Sensitive Constraints */}
+          {timeSensitive && customerDesiredPickup ? (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                  {t('quotes:detail.time_sensitive_label', {
+                    defaultValue: 'Time-Sensitive Constraints',
                   })}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  {t('quotes:create.from_order_request', { defaultValue: 'From order request' })}
-                </p>
+                </span>
               </div>
-              <p className="text-lg font-semibold">{formatDateTime(customerDesiredDelivery)}</p>
+              <div className="mt-2 grid grid-cols-2 gap-4">
+                {customerDesiredPickup && (
+                  <div>
+                    <p className="text-muted-foreground text-xs">
+                      {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })} ±15
+                      min
+                    </p>
+                    <p className="text-sm font-semibold">{formatDateTime(customerDesiredPickup)}</p>
+                  </div>
+                )}
+                {customerDesiredDelivery && (
+                  <div>
+                    <p className="text-muted-foreground text-xs">
+                      {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}{' '}
+                      ±15 min
+                    </p>
+                    <p className="text-sm font-semibold">
+                      {formatDateTime(customerDesiredDelivery)}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
+          ) : windowStart && windowEnd ? (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  {t('quotes:detail.window_label', { defaultValue: 'Delivery Window' })}
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                {formatDateTime(windowStart)} — {formatDateTime(windowEnd)}
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Fallback: show individual requested times */}
+              {customerDesiredPickup && (
+                <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
+                  <div>
+                    <p className="text-muted-foreground text-sm font-medium">
+                      {t('quotes:create.customer_requested_pickup', {
+                        defaultValue: 'Customer Requested Pickup',
+                      })}
+                    </p>
+                  </div>
+                  <p className="text-lg font-semibold">{formatDateTime(customerDesiredPickup)}</p>
+                </div>
+              )}
+              {customerDesiredDelivery && (
+                <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
+                  <div>
+                    <p className="text-muted-foreground text-sm font-medium">
+                      {t('quotes:create.customer_requested_delivery', {
+                        defaultValue: 'Customer Requested Delivery',
+                      })}
+                    </p>
+                  </div>
+                  <p className="text-lg font-semibold">{formatDateTime(customerDesiredDelivery)}</p>
+                </div>
+              )}
+            </>
           )}
 
-          {/* Proposed Pickup/Delivery */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="pickupProposedFor">
-                {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })}
-              </Label>
-              <Input
-                id="pickupProposedFor"
-                type="datetime-local"
-                value={formData.pickupProposedFor}
-                onChange={(e) => handleChange('pickupProposedFor', e.target.value)}
-              />
-              <p className="text-muted-foreground text-xs">
-                {t('quotes:create.default_pickup_hint', { defaultValue: 'Default: +2 hours' })}
-              </p>
+          {/* Proposed Pickup/Delivery — smart display with edit */}
+          {editingTimes ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="pickupProposedFor">
+                  {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })}
+                </Label>
+                <Input
+                  id="pickupProposedFor"
+                  type="datetime-local"
+                  value={formData.pickupProposedFor}
+                  onChange={(e) => handleChange('pickupProposedFor', e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="deliveryProposedFor">
+                  {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}
+                </Label>
+                <Input
+                  id="deliveryProposedFor"
+                  type="datetime-local"
+                  value={formData.deliveryProposedFor}
+                  onChange={(e) => handleChange('deliveryProposedFor', e.target.value)}
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="deliveryProposedFor">
-                {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}
-              </Label>
-              <Input
-                id="deliveryProposedFor"
-                type="datetime-local"
-                value={formData.deliveryProposedFor}
-                onChange={(e) => handleChange('deliveryProposedFor', e.target.value)}
-              />
-              <p className="text-muted-foreground text-xs">
-                {t('quotes:create.default_delivery_hint', { defaultValue: 'Default: +4 hours' })}
-              </p>
+          ) : (
+            <div className="bg-muted/50 rounded-lg border p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">
+                  {t('quotes:create.proposed_times', { defaultValue: 'Proposed Times' })}
+                  {!timeSensitive && (
+                    <span className="text-muted-foreground ml-2 text-xs font-normal">
+                      {t('quotes:detail.approximate_times', {
+                        defaultValue: 'Approximate (system-optimized)',
+                      })}
+                    </span>
+                  )}
+                  {feasibility && !feasibility.outsourceRequired && timeSensitive && (
+                    <span className="text-muted-foreground ml-2 text-xs font-normal">
+                      {t('quotes:feasibility.suggested', { defaultValue: '(suggested by system)' })}
+                    </span>
+                  )}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      pickupProposedFor: effectivePickup,
+                      deliveryProposedFor: effectiveDelivery,
+                    }));
+                    setEditingTimes(true);
+                  }}
+                >
+                  <Pencil className="mr-1 h-3 w-3" />
+                  {actionLabel('edit')}
+                </Button>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })}
+                  </p>
+                  <p className="text-sm font-semibold">
+                    {effectivePickup
+                      ? formatDateTime(new Date(effectivePickup).toISOString())
+                      : '—'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}
+                  </p>
+                  <p className="text-sm font-semibold">
+                    {effectiveDelivery
+                      ? formatDateTime(new Date(effectiveDelivery).toISOString())
+                      : '—'}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <DialogFooter className="flex gap-2">

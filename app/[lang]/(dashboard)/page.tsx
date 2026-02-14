@@ -3,10 +3,30 @@
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, FileText, Users, Truck, Building2, MapPin } from 'lucide-react';
+import {
+  Package,
+  FileText,
+  Users,
+  Truck,
+  Building2,
+  MapPin,
+  Route,
+  Database,
+  DollarSign,
+  Bell,
+  Settings,
+} from 'lucide-react';
 import { capitalize, resourceMessage } from '@/utils/lang';
 
 const navItems = [
+  {
+    key: 'routes',
+    modelKey: 'route',
+    icon: Route,
+    href: '/routes',
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-100',
+  },
   {
     key: 'orders',
     modelKey: 'order',
@@ -55,6 +75,40 @@ const navItems = [
     color: 'text-red-600',
     bgColor: 'bg-red-100',
   },
+  {
+    key: 'catalogs',
+    modelKey: 'catalog',
+    icon: Database,
+    href: '/catalogs',
+    color: 'text-teal-600',
+    bgColor: 'bg-teal-100',
+  },
+  {
+    key: 'pricing',
+    modelKey: 'pricing',
+    icon: DollarSign,
+    href: '/pricing',
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-100',
+    descriptionKey: 'pricing:manage_description',
+  },
+  {
+    key: 'notifications',
+    modelKey: 'notification',
+    icon: Bell,
+    href: '/notifications',
+    color: 'text-pink-600',
+    bgColor: 'bg-pink-100',
+  },
+  {
+    key: 'settings',
+    modelKey: 'settings',
+    icon: Settings,
+    href: '/settings',
+    color: 'text-gray-600',
+    bgColor: 'bg-gray-100',
+    descriptionKey: 'common:settings_description',
+  },
 ];
 
 export default function DashboardPage() {
@@ -66,11 +120,18 @@ export default function DashboardPage() {
   }
 
   const stats = navItems.map((item) => {
-    const name = t(`models:${item.modelKey}_other`, { defaultValue: item.key });
+    const name =
+      'descriptionKey' in item
+        ? t(`${item.key}:title`, { defaultValue: item.key })
+        : t(`models:${item.modelKey}_other`, { defaultValue: item.key });
+    const descKey =
+      'descriptionKey' in item && item.descriptionKey
+        ? item.descriptionKey
+        : `${item.key}:manage_description`;
     return {
       ...item,
       name: capitalize(name),
-      description: t(`${item.key}:manage_description`, { defaultValue: `Manage ${item.key}` }),
+      description: t(descKey, { defaultValue: `Manage ${item.key}` }),
     };
   });
 

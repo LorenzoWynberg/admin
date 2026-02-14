@@ -17,10 +17,12 @@ import {
   DollarSign,
   Bell,
   Settings,
+  Route,
 } from 'lucide-react';
 
 const navigation = [
   { modelKey: 'dashboard', href: '/', icon: LayoutDashboard, isModel: false },
+  { modelKey: 'route', href: '/routes', icon: Route, isModel: true },
   { modelKey: 'order', href: '/orders', icon: Package, isModel: true },
   { modelKey: 'quote', href: '/quotes', icon: FileText, isModel: true },
   { modelKey: 'user', href: '/users', icon: Users, isModel: true },

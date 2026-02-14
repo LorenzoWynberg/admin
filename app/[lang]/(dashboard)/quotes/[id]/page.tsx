@@ -16,7 +16,16 @@ import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { useQuote, useSendQuote, useDeleteQuote } from '@/hooks/quotes';
 import { useCurrencyList } from '@/hooks/currencies';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, FileText, DollarSign, Calendar, Send, Trash2, Package } from 'lucide-react';
+import {
+  ArrowLeft,
+  FileText,
+  DollarSign,
+  Calendar,
+  Send,
+  Trash2,
+  Package,
+  MessageSquare,
+} from 'lucide-react';
 
 type QuoteStatus = App.Enums.QuoteStatus;
 
@@ -180,6 +189,23 @@ export default function QuoteDetailPage() {
                 <p className="mt-1">{quote.notes}</p>
               </div>
             )}
+            {quote.rejectionReason && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950">
+                <div className="flex items-start gap-2">
+                  <MessageSquare className="mt-0.5 h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                      {t('quotes:detail.rejection_reason', {
+                        defaultValue: 'Customer Feedback',
+                      })}
+                    </p>
+                    <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
+                      {quote.rejectionReason}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -264,13 +290,15 @@ export default function QuoteDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {quote.order?.fulfilledBefore && (
+            {quote.order?.desiredDeliveryAt && (
               <>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
-                    {t('quotes:detail.fulfilled_before', { defaultValue: 'Requested By' })}
+                    {t('quotes:detail.desired_delivery_at', {
+                      defaultValue: 'Requested Delivery By',
+                    })}
                   </span>
-                  <span className="font-medium">{formatDate(quote.order.fulfilledBefore)}</span>
+                  <span className="font-medium">{formatDate(quote.order.desiredDeliveryAt)}</span>
                 </div>
                 <div className="border-t" />
               </>

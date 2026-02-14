@@ -225,6 +225,11 @@ declare namespace App.Data.Driver {
     licensePhotoFront?: string;
     licensePhotoBack?: string;
     licenseExpirationDate?: string;
+    active?: boolean;
+    isOutsourced?: boolean;
+    currentLatitude?: number | null;
+    currentLongitude?: number | null;
+    locationUpdatedAt?: string | null;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -244,6 +249,11 @@ declare namespace App.Data.Driver {
     licensePhotoFront?: string;
     licensePhotoBack?: string;
     licenseExpirationDate?: string;
+    active?: boolean;
+  };
+  export type UpdateLocationData = {
+    latitude: number;
+    longitude: number;
   };
 }
 declare namespace App.Data.ExchangeRate {
@@ -258,6 +268,27 @@ declare namespace App.Data.ExchangeRate {
     fetchedAt?: string;
     createdAt?: string;
     updatedAt?: string;
+  };
+}
+declare namespace App.Data.Feasibility {
+  export type DriverCandidate = {
+    driverId: number;
+    driverName: string;
+    extraDistanceKm: number;
+    suggestedPickup: string | null;
+    suggestedDelivery: string | null;
+    score: number;
+    travelTimeMinutes: number | null;
+  };
+  export type FeasibilityResult = {
+    level: App.Enums.FeasibilityLevel;
+    candidates: Array<App.Data.Feasibility.DriverCandidate>;
+    outsourceRequired: boolean;
+    suggestedPickup: string | null;
+    suggestedDelivery: string | null;
+    windowStart: string | null;
+    windowEnd: string | null;
+    timeSensitive: boolean;
   };
 }
 declare namespace App.Data.Location {
@@ -292,6 +323,8 @@ declare namespace App.Data.Order {
     pin?: string | null;
     requiresPin?: boolean;
     isContactless?: boolean;
+    deliveryTier?: App.Enums.DeliveryTier;
+    timeSensitive?: boolean;
     description?: string | null;
     distanceKm?: number | null;
     estimatedMinutes?: number | null;
@@ -302,7 +335,10 @@ declare namespace App.Data.Order {
     deletedAt?: string | null;
     pickupScheduledFor?: string | null;
     deliveryScheduledFor?: string | null;
-    fulfilledBefore?: string | null;
+    desiredDeliveryAt?: string | null;
+    desiredPickupAt?: string | null;
+    windowStart?: string | null;
+    windowEnd?: string | null;
     pickupCompletedAt?: string | null;
     deliveryCompletedAt?: string | null;
     paidAt?: string | null;
@@ -314,6 +350,7 @@ declare namespace App.Data.Order {
     currentQuote?: App.Data.Quote.QuoteData;
     fromAddress?: App.Data.Address.AddressData;
     toAddress?: App.Data.Address.AddressData;
+    quotes?: Array<App.Data.Quote.QuoteData>;
   };
   export type StoreOrderData = {
     fromName: string;
@@ -324,9 +361,12 @@ declare namespace App.Data.Order {
     toAddress: App.Data.Address.StoreSnapshotAddressData;
     currencyCode: string;
     description?: string;
-    fulfilledBefore: string | null;
+    desiredDeliveryAt: string | null;
+    desiredPickupAt: string | null;
     requiresPin: boolean;
     isContactless: boolean;
+    deliveryTier: App.Enums.DeliveryTier;
+    timeSensitive: boolean;
   };
 }
 declare namespace App.Data.Payment {
@@ -470,14 +510,105 @@ declare namespace App.Data.Quote {
   };
   export type StoreQuoteData = {
     orderId: number;
-    pickupProposedFor: string;
-    deliveryProposedFor: string;
     validUntil?: string;
     distanceKm: number;
     timeFee: number | null;
     surcharge: number | null;
     discountRate: number | null;
+    pickupProposedFor: string | null;
+    deliveryProposedFor: string | null;
     notes?: string | null;
+  };
+}
+declare namespace App.Data.Route {
+  export type AddStopData = {
+    orderId: number;
+    type: App.Enums.RouteStopType;
+    scheduledFor?: string | null;
+  };
+  export type BatchAddStopsData = {
+    stops: Array<any>;
+    optimize: boolean;
+  };
+  export type CreateRouteWithStopsData = {
+    date: string;
+    driverId: number | null;
+    stops: Array<any>;
+    optimize: boolean;
+  };
+  export type FlagDelayData = {
+    reason: string;
+  };
+  export type OptimizationResult = {
+    success: boolean;
+    stopsOptimized: number;
+    conflictsFound: number;
+    reassignedOrderIds: Array<any>;
+    message: string;
+  };
+  export type ReassignStopData = {
+    targetRouteId: number | null;
+    newDriverId: number | null;
+    date: string | null;
+    optimize: boolean;
+  };
+  export type ReorderStopsData = {
+    stopIds: Array<any>;
+  };
+  export type RouteData = {
+    id?: number;
+    publicId?: string;
+    driverId?: number | null;
+    date: string;
+    status?: App.Enums.RouteStatus;
+    notes?: string | null;
+    startsAt?: string | null;
+    endsAt?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+    deletedAt?: string | null;
+    driver?: App.Data.Driver.DriverData | null;
+    stops?: Array<App.Data.Route.RouteStopData>;
+  };
+  export type RouteStopData = {
+    id: number;
+    routeId?: number;
+    orderId?: number;
+    type: App.Enums.RouteStopType;
+    sequence: number;
+    status: App.Enums.RouteStopStatus;
+    scheduledFor?: string | null;
+    windowStart?: string | null;
+    windowEnd?: string | null;
+    delayFlaggedAt?: string | null;
+    delayReason?: string | null;
+    notes?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+    order?: App.Data.Order.OrderData;
+  };
+  export type StoreRouteData = {
+    date: string;
+    driverId?: number | null;
+    notes?: string | null;
+  };
+  export type UpdateRouteData = {
+    date?: string;
+    driverId?: number | null;
+    notes?: string | null;
+    status?: string | null;
+  };
+}
+declare namespace App.Data.Setting {
+  export type SettingData = {
+    noServiceStart: string;
+    noServiceEnd: string;
+    serviceWindowEnabled: boolean;
+  };
+  export type UpdateSettingData = {
+    noServiceStart?: string;
+    noServiceEnd?: string;
+    serviceWindowEnabled?: boolean;
   };
 }
 declare namespace App.Data.Shared {
@@ -626,8 +757,14 @@ declare namespace App.Enums {
     TIME_FEE = 'timeFee',
     SURCHARGE = 'surcharge',
     DISCOUNT = 'discount',
+    DELIVERY_TIER = 'deliveryTier',
+    TIME_SENSITIVE = 'timeSensitive',
     PICKUP = 'pickup',
     DELIVERY = 'delivery',
+  }
+  export enum ConflictReason {
+    WindowOverflow = 'window_overflow',
+    TimeSensitiveViolation = 'time_sensitive_violation',
   }
   export enum CrudAction {
     Retrieved = 'retrieved',
@@ -643,6 +780,12 @@ declare namespace App.Enums {
     Denied = 'denied',
     Sent = 'sent',
   }
+  export enum DeliveryTier {
+    Expedited = 'expedited',
+    Regular = 'regular',
+    Cheapest = 'cheapest',
+    Custom = 'custom',
+  }
   export enum ErrorAction {
     Retrieving = 'retrieving',
     Creating = 'creating',
@@ -655,6 +798,11 @@ declare namespace App.Enums {
     Approving = 'approving',
     Denying = 'denying',
     Sending = 'sending',
+  }
+  export enum FeasibilityLevel {
+    Green = 'green',
+    Yellow = 'yellow',
+    Red = 'red',
   }
   export enum HttpStatus {
     OK = 200,
@@ -700,6 +848,15 @@ declare namespace App.Enums {
     Payment = 'payment',
     PaymentMethod = 'payment_method',
     Refund = 'refund',
+    Route = 'route',
+    RouteStop = 'route_stop',
+  }
+  export enum NotificationAction {
+    QuoteRequested = 'quote_requested',
+    QuoteSent = 'quote_sent',
+    ScheduleChanged = 'schedule_changed',
+    StopAssigned = 'stop_assigned',
+    DelayFlagged = 'delay_flagged',
   }
   export enum OrderStatus {
     PENDING = 'pending',
@@ -766,6 +923,24 @@ declare namespace App.Enums {
     CLIENT = 'client',
     DRIVER = 'driver',
     ADMIN = 'admin',
+  }
+  export enum RouteStatus {
+    DRAFT = 'draft',
+    SCHEDULED = 'scheduled',
+    IN_PROGRESS = 'in_progress',
+    COMPLETED = 'completed',
+    CANCELLED = 'cancelled',
+  }
+  export enum RouteStopStatus {
+    PENDING = 'pending',
+    EN_ROUTE = 'en_route',
+    ARRIVED = 'arrived',
+    COMPLETED = 'completed',
+    SKIPPED = 'skipped',
+  }
+  export enum RouteStopType {
+    PICKUP = 'pickup',
+    DROPOFF = 'dropoff',
   }
   export enum TransactionStatus {
     Pending = 'pending',

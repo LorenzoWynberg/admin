@@ -15,7 +15,7 @@ import { Enums } from '@/data/app-enums';
 type PaymentData = App.Data.Payment.PaymentData;
 
 interface PaymentSectionProps {
-  orderId: number;
+  orderPublicId: string;
   currencySymbol?: string;
 }
 
@@ -120,9 +120,9 @@ function PaymentCard({
   );
 }
 
-export function PaymentSection({ orderId, currencySymbol = '$' }: PaymentSectionProps) {
+export function PaymentSection({ orderPublicId, currencySymbol = '$' }: PaymentSectionProps) {
   const { t } = useTranslation();
-  const { data: payments, isLoading, error } = useOrderPayments({ orderId });
+  const { data: payments, isLoading, error } = useOrderPayments({ orderPublicId });
 
   return (
     <Card>

@@ -51,7 +51,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import {
   usePricingRuleList,
   useActivatePricingRule,

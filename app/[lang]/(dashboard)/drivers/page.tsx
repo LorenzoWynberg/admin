@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Search, Truck } from 'lucide-react';
 import { formatDate } from '@/utils/format';
 
@@ -109,6 +110,7 @@ export default function DriversPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('models:driver_one', { defaultValue: 'Driver' })}</TableHead>
+                  <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
                   <TableHead>{validationAttribute('licenseNumber', true)}</TableHead>
                   <TableHead>{validationAttribute('licensePlate', true)}</TableHead>
                   <TableHead>{validationAttribute('licenseExpires', true)}</TableHead>
@@ -132,6 +134,13 @@ export default function DriversPage() {
                           {driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}
                         </span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={driver.active !== false ? 'default' : 'secondary'}>
+                        {driver.active !== false
+                          ? t('drivers:active', { defaultValue: 'Active' })
+                          : t('drivers:inactive', { defaultValue: 'Inactive' })}
+                      </Badge>
                     </TableCell>
                     <TableCell>{driver.licenseNumber || '-'}</TableCell>
                     <TableCell>{driver.licensePlateNumber || '-'}</TableCell>
