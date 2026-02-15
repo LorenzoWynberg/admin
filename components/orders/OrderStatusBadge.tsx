@@ -21,6 +21,7 @@ const statusStyles: Record<OrderStatus, string> = {
   completed: 'bg-green-100 text-green-800 border-green-200',
   delivery_failed: 'bg-red-100 text-red-800 border-red-200',
   returned_to_sender: 'bg-gray-100 text-gray-600 border-gray-200',
+  pending_owner_approval: 'bg-amber-100 text-amber-800 border-amber-200',
 };
 
 interface OrderStatusBadgeProps {
