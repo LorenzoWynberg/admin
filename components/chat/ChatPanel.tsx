@@ -21,18 +21,15 @@ interface ChatPanelProps {
   isReadOnly?: boolean;
 }
 
-export function ChatPanel({
-  orderPublicId,
-  orderId,
-  channel,
-  isReadOnly,
-}: ChatPanelProps) {
+export function ChatPanel({ orderPublicId, orderId, channel, isReadOnly }: ChatPanelProps) {
   const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useChatMessages(orderPublicId, channel);
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useChatMessages(
+    orderPublicId,
+    channel
+  );
   const sendMessage = useSendMessage(orderPublicId, channel);
   const markRead = useMarkRead(orderPublicId, channel);
 
@@ -72,7 +69,7 @@ export function ChatPanel({
           <div className="mb-4 flex justify-center">
             <button
               type="button"
-              className="text-xs text-muted-foreground hover:underline"
+              className="text-muted-foreground text-xs hover:underline"
               onClick={() => fetchNextPage()}
               disabled={isFetchingNextPage}
             >
@@ -85,34 +82,28 @@ export function ChatPanel({
 
         {isLoading && (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
           </div>
         )}
 
         {!isLoading && messages.length === 0 && (
           <div className="flex items-center justify-center py-8">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {t('chat:no_messages', { defaultValue: 'No messages yet' })}
             </p>
           </div>
         )}
 
         {messages.map((message) => (
-          <ChatMessage
-            key={message.id}
-            message={message}
-            isOwn={message.userId === user?.id}
-          />
+          <ChatMessage key={message.id} message={message} isOwn={message.userId === user?.id} />
         ))}
       </ScrollArea>
 
-      {!isReadOnly && (
-        <ChatInput onSend={handleSend} disabled={sendMessage.isPending} />
-      )}
+      {!isReadOnly && <ChatInput onSend={handleSend} disabled={sendMessage.isPending} />}
 
       {isReadOnly && (
         <div className="border-t p-3 text-center">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             {t('chat:admin_read_only', {
               defaultValue: 'Read-only for admins',
             })}

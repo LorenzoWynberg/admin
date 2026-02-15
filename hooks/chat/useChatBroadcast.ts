@@ -3,10 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEcho } from '@/providers/EchoProvider';
 import { useAuthStore } from '@/stores/useAuthStore';
 
-export function useChatBroadcast(
-  orderId: number | undefined,
-  channel: string
-) {
+export function useChatBroadcast(orderId: number | undefined, channel: string) {
   const echo = useEcho();
   const token = useAuthStore((state) => state.token);
   const queryClient = useQueryClient();

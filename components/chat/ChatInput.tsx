@@ -36,12 +36,10 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
     <div className="border-t p-3">
       {image && (
         <div className="mb-2 flex items-center gap-2">
-          <span className="text-xs text-muted-foreground truncate max-w-[200px]">
-            {image.name}
-          </span>
+          <span className="text-muted-foreground max-w-[200px] truncate text-xs">{image.name}</span>
           <button
             type="button"
-            className="text-xs text-destructive hover:underline"
+            className="text-destructive text-xs hover:underline"
             onClick={() => {
               setImage(null);
               if (fileInputRef.current) fileInputRef.current.value = '';

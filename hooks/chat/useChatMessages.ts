@@ -3,11 +3,7 @@ import { ChatService } from '@/services/chatService';
 
 type OrderMessageData = App.Data.Chat.OrderMessageData;
 
-export function useChatMessages(
-  orderPublicId: string,
-  channel: string,
-  enabled = true
-) {
+export function useChatMessages(orderPublicId: string, channel: string, enabled = true) {
   return useInfiniteQuery({
     queryKey: ['chat', orderPublicId, channel],
     queryFn: async ({ pageParam }: { pageParam: number | undefined }) => {
