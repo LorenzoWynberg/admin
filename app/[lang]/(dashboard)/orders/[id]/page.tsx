@@ -27,11 +27,13 @@ import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { QuoteDetailDialog } from '@/components/quotes/QuoteDetailDialog';
 import { PaymentSection } from '@/components/payments/PaymentSection';
+import { ChatTabs } from '@/components/chat/ChatTabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { formatDate, formatDateTime, formatCurrency } from '@/utils/format';
 import { useOrder, useDeleteOrder } from '@/hooks/orders';
 import { useCurrencyList } from '@/hooks/currencies';
+import { Enums } from '@/data/app-enums';
 
 type QuoteStatus = App.Enums.QuoteStatus;
 
@@ -585,6 +587,41 @@ export default function OrderDetailPage() {
             </CardHeader>
             <CardContent>
               <p className="font-medium">{order.business.name}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Chat */}
+        {order.publicId && order.id && (
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                {t('chat:title', { defaultValue: 'Chat' })}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChatTabs
+                orderPublicId={order.publicId}
+                orderId={order.id}
+                showDelivery={
+                  !!(
+                    order.status &&
+                    ([
+                      Enums.OrderStatus.ASSIGNED,
+                      Enums.OrderStatus.PICKING_UP,
+                      Enums.OrderStatus.ARRIVED_AT_PICKUP,
+                      Enums.OrderStatus.PICKED_UP,
+                      Enums.OrderStatus.IN_TRANSIT,
+                      Enums.OrderStatus.ARRIVED_AT_DROP_OFF,
+                      Enums.OrderStatus.WAITING_CONFIRMATION,
+                      Enums.OrderStatus.COMPLETED,
+                      Enums.OrderStatus.DELIVERY_FAILED,
+                      Enums.OrderStatus.RETURNED_TO_SENDER,
+                    ] as string[]).includes(order.status)
+                  )
+                }
+              />
             </CardContent>
           </Card>
         )}

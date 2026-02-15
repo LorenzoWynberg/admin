@@ -191,6 +191,19 @@ declare namespace App.Data.CatalogElement {
     meta?: Array<any>;
   };
 }
+declare namespace App.Data.Chat {
+  export type OrderMessageData = {
+    id: number;
+    orderId: number;
+    businessId: number | null;
+    userId: number;
+    channel: App.Enums.ChatChannel;
+    body: string | null;
+    imageUrl: string | null;
+    createdAt: string;
+    user?: App.Data.User.UserData;
+  };
+}
 declare namespace App.Data.Currency {
   export type CurrencyData = {
     code?: string;
@@ -632,6 +645,16 @@ declare namespace App.Data.User {
   export type SetPasswordData = {
     password: string;
   };
+  export type StoreBusinessUserData = {
+    name: string;
+    email: string;
+    dateOfBirth: any;
+    password: string;
+    phone: string;
+    sexId: number;
+    langCode: string;
+    avatar?: string;
+  };
   export type StoreUserData = {
     name: string;
     email: string;
@@ -762,6 +785,10 @@ declare namespace App.Enums {
     PICKUP = 'pickup',
     DELIVERY = 'delivery',
   }
+  export enum ChatChannel {
+    Support = 'support',
+    Delivery = 'delivery',
+  }
   export enum ConflictReason {
     WindowOverflow = 'window_overflow',
     TimeSensitiveViolation = 'time_sensitive_violation',
@@ -850,6 +877,7 @@ declare namespace App.Enums {
     Refund = 'refund',
     Route = 'route',
     RouteStop = 'route_stop',
+    OrderMessage = 'order_message',
   }
   export enum NotificationAction {
     QuoteRequested = 'quote_requested',
@@ -857,8 +885,10 @@ declare namespace App.Enums {
     ScheduleChanged = 'schedule_changed',
     StopAssigned = 'stop_assigned',
     DelayFlagged = 'delay_flagged',
+    OrderPendingApproval = 'order_pending_approval',
   }
   export enum OrderStatus {
+    PENDING_OWNER_APPROVAL = 'pending_owner_approval',
     PENDING = 'pending',
     ESTIMATED = 'estimated',
     APPROVED = 'approved',
