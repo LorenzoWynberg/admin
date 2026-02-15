@@ -105,6 +105,16 @@ declare namespace App.Data.Address {
     additionalInfo: string | null;
   };
 }
+declare namespace App.Data.Auth {
+  export type ForgotPasswordData = {
+    email: string;
+  };
+  export type ResetPasswordData = {
+    email: string;
+    code: string;
+    password: string;
+  };
+}
 declare namespace App.Data.Business {
   export type BusinessData = {
     id: number;
@@ -335,6 +345,8 @@ declare namespace App.Data.Order {
     currentQuoteId?: number | null;
     pin?: string | null;
     requiresPin?: boolean;
+    requiresPhoto?: boolean;
+    requiresSignature?: boolean;
     isContactless?: boolean;
     deliveryTier?: App.Enums.DeliveryTier;
     timeSensitive?: boolean;
@@ -377,6 +389,8 @@ declare namespace App.Data.Order {
     desiredDeliveryAt: string | null;
     desiredPickupAt: string | null;
     requiresPin: boolean;
+    requiresPhoto: boolean;
+    requiresSignature: boolean;
     isContactless: boolean;
     deliveryTier: App.Enums.DeliveryTier;
     timeSensitive: boolean;
@@ -596,6 +610,12 @@ declare namespace App.Data.Route {
     delayFlaggedAt?: string | null;
     delayReason?: string | null;
     notes?: string | null;
+    podPhotoPath?: string | null;
+    podSignaturePath?: string | null;
+    podPhotoUrl?: string | null;
+    podSignatureUrl?: string | null;
+    podPinVerifiedAt?: string | null;
+    completedAt?: string | null;
     createdAt?: string;
     updatedAt?: string;
     order?: App.Data.Order.OrderData;
@@ -649,7 +669,6 @@ declare namespace App.Data.User {
     name: string;
     email: string;
     dateOfBirth: any;
-    password: string;
     phone: string;
     sexId: number;
     langCode: string;
@@ -704,6 +723,7 @@ declare namespace App.Data.User {
     updatedAt?: string;
     dateOfBirth?: string;
     emailVerifiedAt?: string | null;
+    mustChangePassword?: boolean;
     deletedAt?: string | null;
     rememberToken?: string | null;
     business?: App.Data.Business.BusinessData;
@@ -878,6 +898,7 @@ declare namespace App.Enums {
     Route = 'route',
     RouteStop = 'route_stop',
     OrderMessage = 'order_message',
+    DeviceToken = 'device_token',
   }
   export enum NotificationAction {
     QuoteRequested = 'quote_requested',
@@ -886,6 +907,12 @@ declare namespace App.Enums {
     StopAssigned = 'stop_assigned',
     DelayFlagged = 'delay_flagged',
     OrderPendingApproval = 'order_pending_approval',
+    Welcome = 'welcome',
+    OrderConfirmed = 'order_confirmed',
+    DeliveryCompleted = 'delivery_completed',
+    PaymentReceipt = 'payment_receipt',
+    OrderCancelled = 'order_cancelled',
+    PasswordReset = 'password_reset',
   }
   export enum OrderStatus {
     PENDING_OWNER_APPROVAL = 'pending_owner_approval',

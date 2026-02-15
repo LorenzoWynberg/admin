@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { CreateQuoteDialog } from '@/components/orders/CreateQuoteDialog';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
+import { ProofOfDeliveryCard } from '@/components/orders/ProofOfDeliveryCard';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { QuoteDetailDialog } from '@/components/quotes/QuoteDetailDialog';
 import { PaymentSection } from '@/components/payments/PaymentSection';
@@ -328,6 +329,16 @@ export default function OrderDetailPage() {
                   {t('orders:detail.isContactless', { defaultValue: 'Contactless' })}
                 </Badge>
               )}
+              {order.requiresPhoto && (
+                <Badge variant="secondary">
+                  {t('routes:pod.require_photo', { defaultValue: 'Photo Proof' })}
+                </Badge>
+              )}
+              {order.requiresSignature && (
+                <Badge variant="secondary">
+                  {t('routes:pod.require_signature', { defaultValue: 'Signature' })}
+                </Badge>
+              )}
             </div>
             {order.windowStart && order.windowEnd && (
               <div className="flex items-start gap-3">
@@ -543,6 +554,11 @@ export default function OrderDetailPage() {
           </CardContent>
         </Card>
 
+        {/* Proof of Delivery */}
+        {order.status === Enums.OrderStatus.COMPLETED && order.publicId && (
+          <ProofOfDeliveryCard orderPublicId={order.publicId} />
+        )}
+
         {/* Assigned Driver */}
         {order.driver && (
           <Card>
@@ -607,18 +623,20 @@ export default function OrderDetailPage() {
                 showDelivery={
                   !!(
                     order.status &&
-                    ([
-                      Enums.OrderStatus.ASSIGNED,
-                      Enums.OrderStatus.PICKING_UP,
-                      Enums.OrderStatus.ARRIVED_AT_PICKUP,
-                      Enums.OrderStatus.PICKED_UP,
-                      Enums.OrderStatus.IN_TRANSIT,
-                      Enums.OrderStatus.ARRIVED_AT_DROP_OFF,
-                      Enums.OrderStatus.WAITING_CONFIRMATION,
-                      Enums.OrderStatus.COMPLETED,
-                      Enums.OrderStatus.DELIVERY_FAILED,
-                      Enums.OrderStatus.RETURNED_TO_SENDER,
-                    ] as string[]).includes(order.status)
+                    (
+                      [
+                        Enums.OrderStatus.ASSIGNED,
+                        Enums.OrderStatus.PICKING_UP,
+                        Enums.OrderStatus.ARRIVED_AT_PICKUP,
+                        Enums.OrderStatus.PICKED_UP,
+                        Enums.OrderStatus.IN_TRANSIT,
+                        Enums.OrderStatus.ARRIVED_AT_DROP_OFF,
+                        Enums.OrderStatus.WAITING_CONFIRMATION,
+                        Enums.OrderStatus.COMPLETED,
+                        Enums.OrderStatus.DELIVERY_FAILED,
+                        Enums.OrderStatus.RETURNED_TO_SENDER,
+                      ] as string[]
+                    ).includes(order.status)
                   )
                 }
               />
