@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Package,
@@ -113,7 +113,7 @@ const navItems = [
 
 export default function DashboardPage() {
   const { t, ready } = useTranslation();
-  const router = useRouter();
+  const router = useLocalizedRouter();
 
   if (!ready) {
     return null;
