@@ -13,17 +13,16 @@ import { Label } from '@/components/ui/label';
 import { useTranslation } from 'react-i18next';
 import { Lang } from '@/services/langService';
 import type { LangCode } from '@/stores/useLangStore';
-import { useParams, useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 
 const languageCodes = ['en', 'es', 'fr'] as const;
 
 export default function SettingsPage() {
   const { t, ready } = useTranslation();
-  const params = useParams();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const pathname = usePathname();
-  const currentLang = (params?.lang as string) || 'en';
 
   // Wait for translations to load
   if (!ready) {
@@ -36,9 +35,9 @@ export default function SettingsPage() {
     const rest = segments.slice(1).join('/');
     const nextPath = `/${nextLang}${rest ? '/' + rest : ''}`;
 
-    // Change language via service and navigate
+    // Change language via service and navigate (use raw Next.js push to avoid double-prefix)
     await Lang.setActive(nextLang as LangCode);
-    router.push(nextPath);
+    window.location.href = nextPath;
   };
 
   return (
@@ -67,7 +66,7 @@ export default function SettingsPage() {
             <Label htmlFor="language">
               {t('common:language_one', { defaultValue: 'Language' })}
             </Label>
-            <Select value={currentLang} onValueChange={handleLanguageChange}>
+            <Select value={router.lang} onValueChange={handleLanguageChange}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue />
               </SelectTrigger>
@@ -85,7 +84,7 @@ export default function SettingsPage() {
 
       <Card
         className="hover:bg-muted/50 cursor-pointer transition-colors"
-        onClick={() => router.push(`/${currentLang}/settings/currencies`)}
+        onClick={() => router.push('/settings/currencies')}
       >
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -106,7 +105,7 @@ export default function SettingsPage() {
       </Card>
       <Card
         className="hover:bg-muted/50 cursor-pointer transition-colors"
-        onClick={() => router.push(`/${currentLang}/settings/service-window`)}
+        onClick={() => router.push('/settings/service-window')}
       >
         <CardHeader>
           <div className="flex items-center justify-between">
