@@ -23,8 +23,8 @@ function buildQueryString(params: ListParams): string {
   if (params.status) query.set('filter[status]', params.status);
   if (params.orderId) query.set('filter[orderId]', String(params.orderId));
   if (params.search) query.set('search', params.search);
-  if (params.fromDate) query.set('from_date', params.fromDate);
-  if (params.toDate) query.set('to_date', params.toDate);
+  if (params.fromDate) query.set('fromDate', params.fromDate);
+  if (params.toDate) query.set('toDate', params.toDate);
   return query.toString();
 }
 

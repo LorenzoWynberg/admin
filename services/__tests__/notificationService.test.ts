@@ -36,7 +36,7 @@ describe('NotificationService', () => {
 
       await NotificationService.list({ unreadOnly: true });
 
-      expect(api.get).toHaveBeenCalledWith('/notifications?unread_only=true');
+      expect(api.get).toHaveBeenCalledWith('/notifications?unreadOnly=true');
     });
 
     it('builds query params for pagination', async () => {
@@ -44,7 +44,7 @@ describe('NotificationService', () => {
 
       await NotificationService.list({ page: 2, perPage: 10 });
 
-      expect(api.get).toHaveBeenCalledWith('/notifications?per_page=10&page=2');
+      expect(api.get).toHaveBeenCalledWith('/notifications?perPage=10&page=2');
     });
 
     it('builds query params for search', async () => {
@@ -92,9 +92,7 @@ describe('NotificationService', () => {
 
       await NotificationService.list({ fromDate: '2026-01-01', toDate: '2026-01-19' });
 
-      expect(api.get).toHaveBeenCalledWith(
-        '/notifications?from_date=2026-01-01&to_date=2026-01-19'
-      );
+      expect(api.get).toHaveBeenCalledWith('/notifications?fromDate=2026-01-01&toDate=2026-01-19');
     });
 
     it('builds query params with multiple filters', async () => {
@@ -110,11 +108,11 @@ describe('NotificationService', () => {
       });
 
       const calledUrl = vi.mocked(api.get).mock.calls[0][0];
-      expect(calledUrl).toContain('unread_only=true');
+      expect(calledUrl).toContain('unreadOnly=true');
       expect(calledUrl).toContain('search=test');
       expect(calledUrl).toContain('model=Catalog');
       expect(calledUrl).toContain('action=updated');
-      expect(calledUrl).toContain('per_page=20');
+      expect(calledUrl).toContain('perPage=20');
       expect(calledUrl).toContain('page=1');
     });
   });

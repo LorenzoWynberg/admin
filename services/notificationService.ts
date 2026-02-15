@@ -24,15 +24,15 @@ interface NotificationsResponse extends Paginated<NotificationData> {
 export const NotificationService = {
   async list(params: ListParams = {}): Promise<NotificationsResponse> {
     const query = new URLSearchParams();
-    if (params.unreadOnly) query.set('unread_only', 'true');
+    if (params.unreadOnly) query.set('unreadOnly', 'true');
     if (params.status) query.set('status', params.status);
-    if (params.perPage) query.set('per_page', String(params.perPage));
+    if (params.perPage) query.set('perPage', String(params.perPage));
     if (params.page) query.set('page', String(params.page));
     if (params.search) query.set('search', params.search);
     if (params.model) query.set('model', params.model);
     if (params.action) query.set('action', params.action);
-    if (params.fromDate) query.set('from_date', params.fromDate);
-    if (params.toDate) query.set('to_date', params.toDate);
+    if (params.fromDate) query.set('fromDate', params.fromDate);
+    if (params.toDate) query.set('toDate', params.toDate);
 
     const queryString = query.toString();
     const url = `/notifications${queryString ? `?${queryString}` : ''}`;

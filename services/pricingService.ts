@@ -29,7 +29,7 @@ interface CalculateResult {
 function buildQueryString(params: ListParams): string {
   const query = new URLSearchParams();
   if (params.page) query.set('page', String(params.page));
-  if (params.perPage) query.set('per_page', String(params.perPage));
+  if (params.perPage) query.set('perPage', String(params.perPage));
   if (params.status) query.set('status', params.status);
   return query.toString();
 }
@@ -98,7 +98,7 @@ export const PricingService = {
    */
   async calculate(params: CalculateParams): Promise<CalculateResult> {
     const query = new URLSearchParams();
-    query.set('distance_km', String(params.distanceKm));
+    query.set('distanceKm', String(params.distanceKm));
     // API returns data at root level (not wrapped in item)
     return api.get<CalculateResult>(`/pricing-rules/calculate?${query.toString()}`);
   },
