@@ -12,10 +12,10 @@ export const ChatService = {
     beforeId?: number
   ): Promise<OrderMessageData[]> {
     const params = beforeId ? `?beforeId=${beforeId}` : '';
-    const response = await api.get<{ item: OrderMessageData[] }>(
+    const response = await api.get<{ items: OrderMessageData[] }>(
       `/orders/${orderPublicId}/chat/${channel}${params}`
     );
-    return response.item;
+    return response.items;
   },
 
   async sendMessage(
