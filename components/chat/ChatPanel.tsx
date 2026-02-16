@@ -64,7 +64,7 @@ export function ChatPanel({ orderPublicId, orderId, channel, isReadOnly }: ChatP
 
   return (
     <div className="flex h-[400px] flex-col">
-      <ScrollArea ref={scrollRef} className="flex-1 p-4">
+      <ScrollArea viewportRef={scrollRef} className="flex-1 p-4">
         {hasNextPage && (
           <div className="mb-4 flex justify-center">
             <button
