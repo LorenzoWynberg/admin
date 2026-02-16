@@ -17,6 +17,7 @@ import {
   DollarSign,
   Bell,
   Settings,
+  ScrollText,
   Route,
 } from 'lucide-react';
 
@@ -38,6 +39,7 @@ const navigation = [
     translationKey: 'pricing:title',
   },
   { modelKey: 'notification', href: '/notifications', icon: Bell, isModel: true },
+  { modelKey: 'audit_log', href: '/audit-logs', icon: ScrollText, isModel: true },
 ];
 
 export function Sidebar() {

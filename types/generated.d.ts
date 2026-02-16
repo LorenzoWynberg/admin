@@ -105,6 +105,21 @@ declare namespace App.Data.Address {
     additionalInfo: string | null;
   };
 }
+declare namespace App.Data.AuditLog {
+  export type AuditLogData = {
+    id: number;
+    userId: number | null;
+    userName: string | null;
+    action: string;
+    modelType: string;
+    modelId: number | null;
+    modelKey: string;
+    data: { [key: string]: any };
+    previousData: { [key: string]: any } | null;
+    ipAddress: string | null;
+    createdAt: string;
+  };
+}
 declare namespace App.Data.Auth {
   export type ForgotPasswordData = {
     email: string;
@@ -376,6 +391,18 @@ declare namespace App.Data.Order {
     fromAddress?: App.Data.Address.AddressData;
     toAddress?: App.Data.Address.AddressData;
     quotes?: Array<App.Data.Quote.QuoteData>;
+  };
+  export type OrderTrackingData = {
+    publicId: string;
+    status: App.Enums.OrderStatus;
+    driverLatitude: number | null;
+    driverLongitude: number | null;
+    pickupLatitude: number;
+    pickupLongitude: number;
+    pickupAddress: string;
+    dropoffLatitude: number;
+    dropoffLongitude: number;
+    dropoffAddress: string;
   };
   export type StoreOrderData = {
     fromName: string;
@@ -899,6 +926,8 @@ declare namespace App.Enums {
     RouteStop = 'route_stop',
     OrderMessage = 'order_message',
     DeviceToken = 'device_token',
+    Setting = 'setting',
+    AuditLog = 'audit_log',
   }
   export enum NotificationAction {
     QuoteRequested = 'quote_requested',

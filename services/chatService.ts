@@ -54,10 +54,10 @@ export const ChatService = {
   },
 
   async getUnreadCounts(orderPublicId: string): Promise<{ support: number; delivery: number }> {
-    const response = await api.get<{
-      item: { support: number; delivery: number };
-    }>(`/orders/${orderPublicId}/chat-unread`);
-    return response.item;
+    const response = await api.get<{ support: number; delivery: number }>(
+      `/orders/${orderPublicId}/chat-unread`
+    );
+    return { support: response.support, delivery: response.delivery };
   },
 };
 
