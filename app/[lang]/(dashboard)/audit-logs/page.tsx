@@ -16,7 +16,7 @@ import {
   Select,
 } from '@/components/ui/select';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, Fragment } from 'react';
 import { actionLabel, capitalize, modelLabel } from '@/utils/lang';
 import { formatDateTime } from '@/utils/format';
 import { Input } from '@/components/ui/input';
@@ -240,9 +240,8 @@ export default function AuditLogsPage() {
               </TableHeader>
               <TableBody>
                 {logs.map((log) => (
-                  <>
+                  <Fragment key={log.id}>
                     <TableRow
-                      key={log.id}
                       className="hover:bg-muted/50 cursor-pointer"
                       onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
                     >
@@ -292,7 +291,7 @@ export default function AuditLogsPage() {
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </Fragment>
                 ))}
               </TableBody>
             </Table>
