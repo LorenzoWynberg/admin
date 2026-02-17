@@ -139,7 +139,7 @@ export default function QuotesPage() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label>{t('common:from_date', { defaultValue: 'From date' })}</Label>
+              <Label>{validationAttribute('from_date')}</Label>
               <div className="relative">
                 <Input
                   type="date"
@@ -167,7 +167,7 @@ export default function QuotesPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>{t('common:to_date', { defaultValue: 'To date' })}</Label>
+              <Label>{validationAttribute('to_date')}</Label>
               <div className="relative">
                 <Input
                   type="date"

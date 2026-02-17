@@ -2,6 +2,7 @@
 
 import { useState, useRef, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { actionLabel } from '@/utils/lang';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ImagePlus, Send } from 'lucide-react';
@@ -45,7 +46,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
               if (fileInputRef.current) fileInputRef.current.value = '';
             }}
           >
-            {t('common:remove', { defaultValue: 'Remove' })}
+            {actionLabel('remove')}
           </button>
         </div>
       )}

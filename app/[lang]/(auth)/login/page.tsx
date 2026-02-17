@@ -113,7 +113,7 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">{t('common:password', { defaultValue: 'Password' })}</Label>
+              <Label htmlFor="password">{validationAttribute('password')}</Label>
               <Input
                 id="password"
                 type="password"
