@@ -147,7 +147,7 @@ export function ElementEditDialog({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground text-sm">
-                {t('common:language', { defaultValue: 'Language' })}:
+                {t('common:language', { count: 1, defaultValue: 'Language' })}:
               </span>
               <Select value={selectedLang} onValueChange={(v) => setSelectedLang(v as Language)}>
                 <SelectTrigger className="w-40">

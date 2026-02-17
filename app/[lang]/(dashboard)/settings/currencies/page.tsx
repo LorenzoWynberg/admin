@@ -34,7 +34,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { resourceMessage, validationAttribute } from '@/utils/lang';
+import { capitalize, resourceMessage, statusLabel, validationAttribute } from '@/utils/lang';
 import { formatDate } from '@/utils/format';
 import { useCurrencyList, useUpdateCurrency } from '@/hooks/currencies';
 import { useSyncExchangeRates } from '@/hooks/exchange-rates';
@@ -263,7 +263,7 @@ export default function CurrencySettingsPage() {
                       ) : currency.isEnabled ? (
                         <Badge variant="default" className="bg-green-600">
                           <CheckCircle2 className="mr-1 h-3 w-3" />
-                          {t('common:active', { defaultValue: 'Active' })}
+                          {capitalize(statusLabel('active'))}
                         </Badge>
                       ) : (
                         <Badge variant="secondary">
