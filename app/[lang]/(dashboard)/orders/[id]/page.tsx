@@ -397,10 +397,10 @@ export default function OrderDetailPage() {
                       key={quote.publicId || quote.id}
                       className={`rounded-lg border p-3 ${isCurrent ? 'border-primary bg-primary/5' : 'bg-muted/30'}`}
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-sm">{quote.publicId}</span>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 space-y-1">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="truncate font-mono text-sm">{quote.publicId}</span>
                             <QuoteStatusBadge status={quote.status as QuoteStatus} />
                             {isCurrent && (
                               <Badge variant="outline" className="text-xs">
@@ -412,11 +412,9 @@ export default function OrderDetailPage() {
                             v{quote.version || 1} &middot; {formatDate(quote.createdAt)}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-lg font-semibold">
-                            {formatCurrency(quote.total || 0, currencySymbol)}
-                          </p>
-                        </div>
+                        <p className="shrink-0 text-lg font-semibold">
+                          {formatCurrency(quote.total || 0, currencySymbol)}
+                        </p>
                       </div>
                       {quote.rejectionReason && (
                         <div className="mt-2 flex items-start gap-2 rounded border border-amber-200 bg-amber-50 p-2 dark:border-amber-900 dark:bg-amber-950">
