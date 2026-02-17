@@ -8,6 +8,7 @@ export interface NotifData {
   action?: string;
   model?: string;
   modelId?: number | null;
+  modelPublicId?: string | null;
   modelName?: string | null;
   catalogId?: number | null;
   translationKey?: string;
@@ -24,10 +25,13 @@ export const notificationRoutes: Record<string, (data: NotifData) => string | nu
   catalog: (data) => (data.modelId ? `/catalogs/${data.modelId}` : null),
   element: (data) =>
     data.catalogId ? buildUrl(`/catalogs/${data.catalogId}`, { element: data.modelId }) : null,
-  order: (data) => (data.modelName ? `/orders/${data.modelName}` : null),
-  user: (data) => (data.modelId ? `/users/${data.modelId}` : null),
-  business: (data) => (data.modelId ? `/businesses/${data.modelId}` : null),
-  driver: (data) => (data.modelId ? `/drivers/${data.modelId}` : null),
+  order: (data) =>
+    (data.modelPublicId ?? data.modelName)
+      ? `/orders/${data.modelPublicId ?? data.modelName}`
+      : null,
+  user: (data) => (data.modelPublicId ? `/users/${data.modelPublicId}` : null),
+  business: (data) => (data.modelPublicId ? `/businesses/${data.modelPublicId}` : null),
+  driver: (data) => (data.modelPublicId ? `/drivers/${data.modelPublicId}` : null),
 };
 
 /**
