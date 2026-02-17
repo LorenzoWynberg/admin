@@ -59,7 +59,7 @@ export function Header() {
                   {user?.name || t('common:unknown', { defaultValue: 'Admin' })}
                 </p>
                 <p className="text-muted-foreground text-xs leading-none">
-                  {user?.email || 'admin@example.com'}
+                  {user?.email || t('common:no_email', { defaultValue: 'No email' })}
                 </p>
               </div>
             </DropdownMenuLabel>

@@ -104,7 +104,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@example.com"
+                placeholder={t('auth:email_placeholder', { defaultValue: 'admin@example.com' })}
                 autoComplete="email"
                 disabled={loginMutation.isPending}
                 {...register('email')}

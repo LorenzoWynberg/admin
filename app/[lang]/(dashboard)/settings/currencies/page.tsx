@@ -220,7 +220,9 @@ export default function CurrencySettingsPage() {
                     <TableCell>{currency.symbol}</TableCell>
                     <TableCell>
                       {currency.isBase ? (
-                        <span className="text-muted-foreground">1.000000 (base)</span>
+                        <span className="text-muted-foreground">
+                          1.000000 ({t('common:base', { defaultValue: 'base' })})
+                        </span>
                       ) : currency.currentRate ? (
                         formatRate(currency.currentRate)
                       ) : (

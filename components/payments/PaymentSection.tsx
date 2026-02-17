@@ -11,6 +11,7 @@ import { RefundDialog } from './RefundDialog';
 import { formatDate, formatCurrency } from '@/utils/format';
 import { capitalize } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
+import type { TFunction } from 'i18next';
 
 type PaymentData = App.Data.Payment.PaymentData;
 
@@ -35,18 +36,22 @@ function getStatusBadgeVariant(
   }
 }
 
-function getPaymentMethodLabel(method?: string | null, brand?: string | null): string {
-  if (!method) return 'Unknown';
+function getPaymentMethodLabel(
+  t: TFunction,
+  method?: string | null,
+  brand?: string | null
+): string {
+  if (!method) return t('payments:unknown_method', { defaultValue: 'Unknown' });
 
   switch (method) {
     case Enums.PaymentMethodType.Card:
-      return brand ? capitalize(brand) : 'Card';
+      return brand ? capitalize(brand) : t('payments:card', { defaultValue: 'Card' });
     case Enums.PaymentMethodType.ApplePay:
       return 'Apple Pay';
     case Enums.PaymentMethodType.SinpeMobile:
       return 'SINPE Movil';
     case Enums.PaymentMethodType.Cash:
-      return 'Cash';
+      return t('payments:cash', { defaultValue: 'Cash' });
     default:
       return capitalize(method);
   }
@@ -75,8 +80,9 @@ function PaymentCard({
             </Badge>
           </div>
           <p className="text-muted-foreground text-xs">
-            {getPaymentMethodLabel(payment.method, null)}
-            {payment.provider && ` via ${capitalize(payment.provider)}`}
+            {getPaymentMethodLabel(t, payment.method, null)}
+            {payment.provider &&
+              ` ${t('payments:via_provider', { defaultValue: 'via' })} ${capitalize(payment.provider)}`}
           </p>
         </div>
         <div className="text-right">

@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 import { useState, useCallback } from 'react';
-import { capitalize, modelLabel } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel } from '@/utils/lang';
 import { formatDateTime } from '@/utils/format';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -159,7 +159,7 @@ export default function AuditLogsPage() {
               <SelectContent>
                 {ACTION_OPTIONS.map((a) => (
                   <SelectItem key={a} value={a}>
-                    {a === 'all' ? t('statuses:all', { defaultValue: 'All' }) : capitalize(a)}
+                    {a === 'all' ? t('statuses:all', { defaultValue: 'All' }) : actionLabel(a)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -251,7 +251,7 @@ export default function AuditLogsPage() {
                       </TableCell>
                       <TableCell>{log.userName || '-'}</TableCell>
                       <TableCell>
-                        <Badge variant={actionVariant(log.action)}>{log.action}</Badge>
+                        <Badge variant={actionVariant(log.action)}>{actionLabel(log.action)}</Badge>
                       </TableCell>
                       <TableCell>{shortModelType(log.modelType)}</TableCell>
                       <TableCell className="font-mono text-sm">{log.modelId ?? '-'}</TableCell>

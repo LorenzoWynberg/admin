@@ -68,7 +68,9 @@ export function ReassignStopDialog({
         <DialogHeader>
           <DialogTitle>{t('routes:reassign.title', { defaultValue: 'Reassign Stop' })}</DialogTitle>
           <DialogDescription>
-            {t('routes:reassign.title', { defaultValue: 'Reassign Stop' })}
+            {t('routes:reassign.description', {
+              defaultValue: 'Move this stop to another route or create a new one',
+            })}
           </DialogDescription>
         </DialogHeader>
 
