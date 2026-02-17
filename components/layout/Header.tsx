@@ -14,13 +14,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, Menu, User } from 'lucide-react';
 import { NotificationBell } from '@/components/notifications';
+import { useSidebarStore } from '@/stores/useSidebarStore';
 
 export function Header() {
   const { t } = useTranslation();
   const router = useLocalizedRouter();
   const { user } = useAuth();
+  const { setOpen } = useSidebarStore();
 
   const handleLogout = async () => {
     await Auth.logout();
@@ -37,7 +39,12 @@ export function Header() {
 
   return (
     <header className="bg-card flex h-16 items-center justify-between border-b px-6">
-      <div className="lg:hidden">{/* Mobile menu button would go here */}</div>
+      <div className="lg:hidden">
+        <Button variant="ghost" size="icon" onClick={() => setOpen(true)}>
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </div>
 
       <div className="flex-1" />
 
