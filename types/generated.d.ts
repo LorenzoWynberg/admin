@@ -37,6 +37,15 @@ declare namespace App.Data.Address {
     deletedAt?: string | null;
     owner?: App.Data.User.UserData | App.Data.Business.BusinessData;
   };
+  export type AddressSuggestionData = {
+    publicId: string;
+    type: App.Enums.AddressType;
+    label: string | null;
+    humanReadableAddress: string;
+    latitude: number;
+    longitude: number;
+    placeId: string | null;
+  };
   export type FetchAddressData = {
     latitude: number;
     longitude: number;
