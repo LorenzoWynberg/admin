@@ -752,6 +752,7 @@ declare namespace App.Data.User {
     emailVerifiedAt?: string | null;
     mustChangePassword?: boolean;
     deletedAt?: string | null;
+    deletionRequestedAt?: string | null;
     rememberToken?: string | null;
     business?: App.Data.Business.BusinessData;
     driver?: App.Data.Driver.DriverData;
