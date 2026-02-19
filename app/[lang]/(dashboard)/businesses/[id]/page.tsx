@@ -16,6 +16,8 @@ import { useBusiness, useDeleteBusiness } from '@/hooks/businesses';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Building2, User, MapPin, Calendar, Trash2 } from 'lucide-react';
 import { formatDate } from '@/utils/format';
+import { useBusinessTaxProfile } from '@/hooks/tax-profiles';
+import { TaxProfileCard } from '@/components/TaxProfileCard';
 
 export default function BusinessDetailPage() {
   const params = useParams();
@@ -24,6 +26,7 @@ export default function BusinessDetailPage() {
   const businessId = params.id as string;
 
   const { data: business, isLoading, error } = useBusiness(businessId);
+  const { data: taxProfile } = useBusinessTaxProfile(businessId);
   const deleteBusiness = useDeleteBusiness();
 
   const formatAddress = (address?: App.Data.Address.AddressData | null): string => {
@@ -187,6 +190,8 @@ export default function BusinessDetailPage() {
             </div>
           </CardContent>
         </Card>
+
+        {taxProfile && <TaxProfileCard taxProfile={taxProfile} />}
       </div>
     </div>
   );

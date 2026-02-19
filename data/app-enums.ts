@@ -171,6 +171,7 @@ export const Enums = {
     DeviceToken: 'device_token',
     Setting: 'setting',
     AuditLog: 'audit_log',
+    TaxProfile: 'tax_profile',
   },
   NotificationAction: {
     QuoteRequested: 'quote_requested',
@@ -270,6 +271,13 @@ export const Enums = {
   RouteStopType: {
     PICKUP: 'pickup',
     DROPOFF: 'dropoff',
+  },
+  TipoIdentificacion: {
+    Fisica: '01',
+    Juridica: '02',
+    Dimex: '03',
+    Nite: '04',
+    Extranjero: '05',
   },
   TransactionStatus: {
     Pending: 'pending',

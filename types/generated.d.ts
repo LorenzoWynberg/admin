@@ -692,6 +692,55 @@ declare namespace App.Data.Shared {
     fr?: string;
   };
 }
+declare namespace App.Data.TaxProfile {
+  export type HaciendaLocationData = {
+    code: string;
+    name: string;
+  };
+  export type HaciendaLookupData = {
+    nombre: string;
+    tipoIdentificacion: string;
+    cedula: string;
+    situacion: string | null;
+    regimen: string | null;
+    activities: Array<App.Data.TaxProfile.TaxProfileActivityData>;
+  };
+  export type TaxProfileActivityData = {
+    code: string;
+    description: string;
+  };
+  export type TaxProfileData = {
+    id: number;
+    publicId: string;
+    ownerId: number | null;
+    ownerType: string | null;
+    tipoIdentificacion: App.Enums.TipoIdentificacion;
+    cedula: string;
+    nombreRegistrado: string;
+    provinciaCodigo: string;
+    cantonCodigo: string;
+    distritoCodigo: string;
+    direccionExacta?: string | null;
+    telefonoCodigoPais: string;
+    telefonoNumero?: string | null;
+    activities: Array<App.Data.TaxProfile.TaxProfileActivityData>;
+    createdAt?: string;
+    updatedAt?: string;
+    deletedAt?: string | null;
+  };
+  export type UpsertTaxProfileData = {
+    tipoIdentificacion: string;
+    cedula: string;
+    nombreRegistrado: string;
+    provinciaCodigo: string;
+    cantonCodigo: string;
+    distritoCodigo: string;
+    direccionExacta?: string;
+    telefonoCodigoPais?: string;
+    telefonoNumero?: string;
+    activities?: Array<any>;
+  };
+}
 declare namespace App.Data.User {
   export type LoginData = {
     email: string;
@@ -938,6 +987,7 @@ declare namespace App.Enums {
     DeviceToken = 'device_token',
     Setting = 'setting',
     AuditLog = 'audit_log',
+    TaxProfile = 'tax_profile',
   }
   export enum NotificationAction {
     QuoteRequested = 'quote_requested',
@@ -1037,6 +1087,13 @@ declare namespace App.Enums {
   export enum RouteStopType {
     PICKUP = 'pickup',
     DROPOFF = 'dropoff',
+  }
+  export enum TipoIdentificacion {
+    Fisica = '01',
+    Juridica = '02',
+    Dimex = '03',
+    Nite = '04',
+    Extranjero = '05',
   }
   export enum TransactionStatus {
     Pending = 'pending',

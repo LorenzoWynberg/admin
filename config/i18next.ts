@@ -30,6 +30,7 @@ const namespaces = [
   'resource',
   'routes',
   'statuses',
+  'tax',
   'users',
   'validation',
 ] as const;
