@@ -19,13 +19,13 @@ import {
 } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useDriverList } from '@/hooks/drivers';
-import { useRouter } from 'next/navigation';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Search, Truck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Search, Truck } from 'lucide-react';
 import { formatDate } from '@/utils/format';
 
 function getInitials(name?: string): string {
@@ -40,7 +40,7 @@ function getInitials(name?: string): string {
 
 export default function DriversPage() {
   const { t, ready } = useTranslation();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
@@ -66,6 +66,10 @@ export default function DriversPage() {
             {t('drivers:manage_description', { defaultValue: 'Manage driver accounts' })}
           </p>
         </div>
+        <Button onClick={() => router.push('/drivers/create')}>
+          <Plus className="mr-2 h-4 w-4" />
+          {resourceMessage('create_one', 'driver')}
+        </Button>
       </div>
 
       <Card>

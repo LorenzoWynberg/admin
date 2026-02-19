@@ -4,7 +4,27 @@ import { toast } from 'sonner';
 import { isApiError } from '@/lib/api/error';
 import { crudErrorMessage, crudSuccessMessage } from '@/utils/lang';
 
+type StoreDriverData = App.Data.Driver.StoreDriverData;
 type UpdateDriverData = App.Data.Driver.UpdateDriverData;
+
+export function useCreateDriver() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: StoreDriverData) => DriverService.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['drivers'] });
+      toast.success(crudSuccessMessage('created', 'driver'));
+    },
+    onError: (error) => {
+      if (isApiError(error)) {
+        toast.error(error.message);
+      } else {
+        toast.error(crudErrorMessage('creating', 'driver'));
+      }
+    },
+  });
+}
 
 export function useUpdateDriver() {
   const queryClient = useQueryClient();

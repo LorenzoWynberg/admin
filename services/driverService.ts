@@ -1,6 +1,7 @@
 import { api } from '@/lib/api/client';
 
 type DriverData = App.Data.Driver.DriverData;
+type StoreDriverData = App.Data.Driver.StoreDriverData;
 type UpdateDriverData = App.Data.Driver.UpdateDriverData;
 type Single<T> = Api.Response.Single<T>;
 type Paginated<T> = Api.Response.Paginated<T>;
@@ -34,6 +35,11 @@ export const DriverService = {
 
   async update(id: string, data: UpdateDriverData): Promise<DriverData> {
     const response = await api.patch<Single<DriverData>>(`/drivers/${id}`, data);
+    return response.item;
+  },
+
+  async create(data: StoreDriverData): Promise<DriverData> {
+    const response = await api.post<Single<DriverData>>('/drivers', data);
     return response.item;
   },
 
