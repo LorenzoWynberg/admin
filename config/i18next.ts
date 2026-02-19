@@ -77,6 +77,9 @@ export async function ensureI18nInitialized(pathname?: string) {
       } as DetectorOptions,
       backend: {
         loadPath: '/locales/{{lng}}/{{ns}}.json',
+        requestOptions: {
+          cache: 'no-store',
+        },
       },
       react: {
         useSuspense: false,
