@@ -359,12 +359,9 @@ declare namespace App.Data.Order {
     userId?: number;
     businessId?: number | null;
     driverId?: number | null;
-    fromName?: string;
-    fromPhone?: string;
-    fromAddressId?: number;
-    toName?: string;
-    toPhone?: string;
-    toAddressId?: number;
+    deliveryAddressId?: number | null;
+    contactName?: string | null;
+    contactPhone?: string | null;
     currencyCode?: string | null;
     currentQuoteId?: number | null;
     pin?: string | null;
@@ -375,31 +372,66 @@ declare namespace App.Data.Order {
     deliveryTier?: App.Enums.DeliveryTier;
     timeSensitive?: boolean;
     description?: string | null;
-    distanceKm?: number | null;
-    estimatedMinutes?: number | null;
+    totalDistanceKm?: number | null;
+    totalEstimatedMinutes?: number | null;
     status?: App.Enums.OrderStatus;
     paymentStatus?: App.Enums.PaymentStatus;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
-    pickupScheduledFor?: string | null;
-    deliveryScheduledFor?: string | null;
     desiredDeliveryAt?: string | null;
     desiredPickupAt?: string | null;
     windowStart?: string | null;
     windowEnd?: string | null;
-    pickupCompletedAt?: string | null;
-    deliveryCompletedAt?: string | null;
     paidAt?: string | null;
     reconciledAt?: string | null;
     refundedAt?: string | null;
+    cancelledAt?: string | null;
+    cancelReason?: string | null;
+    cancelFee?: number | null;
     user?: App.Data.User.UserData;
     business?: App.Data.Business.BusinessData | null;
     driver?: App.Data.Driver.DriverData | null;
     currentQuote?: App.Data.Quote.QuoteData;
-    fromAddress?: App.Data.Address.AddressData;
-    toAddress?: App.Data.Address.AddressData;
+    deliveryAddress?: App.Data.Address.AddressData;
+    stops?: any;
     quotes?: Array<App.Data.Quote.QuoteData>;
+    receipts?: any;
+  };
+  export type OrderReceiptData = {
+    id?: number;
+    publicId?: string;
+    orderId?: number;
+    filePath?: string;
+    originalName?: string | null;
+    mimeType?: string | null;
+    sizeBytes?: number | null;
+    notes?: string | null;
+    uploadedBy?: number | null;
+    createdAt?: string;
+    updatedAt?: string;
+    fileUrl?: string | null;
+    uploader?: App.Data.User.UserData;
+  };
+  export type OrderStopData = {
+    id?: number;
+    publicId?: string;
+    orderId?: number;
+    addressId?: number | null;
+    name?: string | null;
+    type?: App.Enums.OrderStopType;
+    sequence?: number;
+    status?: App.Enums.OrderStopStatus;
+    contactName?: string | null;
+    contactPhone?: string | null;
+    instructions?: string | null;
+    createdBy?: number;
+    completedAt?: string | null;
+    skippedAt?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+    address?: App.Data.Address.AddressData;
+    creator?: App.Data.User.UserData;
   };
   export type OrderTrackingData = {
     publicId: string;
@@ -414,13 +446,10 @@ declare namespace App.Data.Order {
     dropoffAddress: string;
   };
   export type StoreOrderData = {
-    fromName: string;
-    fromPhone: string;
-    fromAddress: App.Data.Address.StoreSnapshotAddressData;
-    toName: string;
-    toPhone: string;
-    toAddress: App.Data.Address.StoreSnapshotAddressData;
+    deliveryAddress: App.Data.Address.StoreSnapshotAddressData;
     currencyCode: string;
+    contactName?: string;
+    contactPhone?: string;
     description?: string;
     desiredDeliveryAt: string | null;
     desiredPickupAt: string | null;
@@ -430,6 +459,23 @@ declare namespace App.Data.Order {
     isContactless: boolean;
     deliveryTier: App.Enums.DeliveryTier;
     timeSensitive: boolean;
+    pickup: App.Data.Order.StoreOrderStopData | null;
+  };
+  export type StoreOrderStopData = {
+    addressId: number | null;
+    name?: string | null;
+    type: App.Enums.OrderStopType;
+    contactName?: string | null;
+    contactPhone?: string | null;
+    instructions?: string | null;
+  };
+  export type UpdateOrderStopData = {
+    addressId?: number | null;
+    name?: string | null;
+    contactName?: string | null;
+    contactPhone?: string | null;
+    instructions?: string | null;
+    sequence?: number;
   };
 }
 declare namespace App.Data.Payment {
@@ -547,6 +593,8 @@ declare namespace App.Data.Quote {
     publicId?: string;
     orderId?: number;
     pricingRuleId?: number | null;
+    type?: App.Enums.QuoteType;
+    originalQuoteId?: number | null;
     version?: number;
     status?: App.Enums.QuoteStatus;
     isFinal?: boolean;
@@ -570,6 +618,21 @@ declare namespace App.Data.Quote {
     deletedAt?: string | null;
     order?: App.Data.Order.OrderData;
     pricingRule?: App.Data.Pricing.PricingRuleData;
+    items?: Array<App.Data.Quote.QuoteItemData>;
+  };
+  export type QuoteItemData = {
+    id?: number;
+    publicId?: string;
+    quoteId?: number;
+    orderStopId?: number | null;
+    label?: string;
+    quantity?: number;
+    unitPrice?: number;
+    total?: number;
+    sortOrder?: number;
+    createdAt?: string;
+    updatedAt?: string;
+    orderStop?: App.Data.Order.OrderStopData;
   };
   export type StoreQuoteData = {
     orderId: number;
@@ -581,6 +644,13 @@ declare namespace App.Data.Quote {
     pickupProposedFor: string | null;
     deliveryProposedFor: string | null;
     notes?: string | null;
+    items?: { [key: number]: any };
+  };
+  export type StoreQuoteItemData = {
+    orderStopId: number | null;
+    label: string;
+    quantity: number;
+    unitPrice: number;
   };
 }
 declare namespace App.Data.Route {
@@ -851,12 +921,9 @@ declare namespace App.Enums {
     DELETED_AT = 'deletedAt',
     DATE_OF_BIRTH = 'dateOfBirth',
     EMAIL_VERIFIED_AT = 'emailVerifiedAt',
-    FROM_NAME = 'fromName',
-    FROM_PHONE = 'fromPhone',
-    FROM_ADDRESS = 'fromAddress',
-    TO_NAME = 'toName',
-    TO_PHONE = 'toPhone',
-    TO_ADDRESS = 'toAddress',
+    CONTACT_NAME = 'contactName',
+    CONTACT_PHONE = 'contactPhone',
+    DELIVERY_ADDRESS = 'deliveryAddress',
     DESCRIPTION = 'description',
     CURRENCY = 'currency',
     TIMESTAMPS = 'timestamps',
@@ -983,7 +1050,10 @@ declare namespace App.Enums {
     Refund = 'refund',
     Route = 'route',
     RouteStop = 'route_stop',
+    OrderStop = 'order_stop',
     OrderMessage = 'order_message',
+    OrderReceipt = 'order_receipt',
+    QuoteItem = 'quote_item',
     DeviceToken = 'device_token',
     Setting = 'setting',
     AuditLog = 'audit_log',
@@ -1020,6 +1090,18 @@ declare namespace App.Enums {
     DELIVERY_FAILED = 'delivery_failed',
     RETURNED_TO_SENDER = 'returned_to_sender',
     CANCELED = 'canceled',
+  }
+  export enum OrderStopStatus {
+    Pending = 'pending',
+    EnRoute = 'en_route',
+    Arrived = 'arrived',
+    Completed = 'completed',
+    Skipped = 'skipped',
+  }
+  export enum OrderStopType {
+    Purchase = 'purchase',
+    Pickup = 'pickup',
+    Dropoff = 'dropoff',
   }
   export enum PaymentMethodType {
     Card = 'card',
@@ -1063,6 +1145,10 @@ declare namespace App.Enums {
     EXPIRED = 'expired',
     FINALIZED = 'finalized',
   }
+  export enum QuoteType {
+    Standard = 'standard',
+    Reconciliation = 'reconciliation',
+  }
   export enum Role {
     BUSINESS_OWNER = 'business.owner',
     BUSINESS_USER = 'business.user',
@@ -1085,6 +1171,7 @@ declare namespace App.Enums {
     SKIPPED = 'skipped',
   }
   export enum RouteStopType {
+    PURCHASE = 'purchase',
     PICKUP = 'pickup',
     DROPOFF = 'dropoff',
   }
