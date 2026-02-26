@@ -5,8 +5,10 @@ import {
   ArrowLeft,
   Calendar,
   FileText,
+  ListOrdered,
   MessageSquare,
   Package,
+  ShoppingBag,
   Trash2,
   MapPin,
   Route,
@@ -101,6 +103,8 @@ export default function OrderDetailPage() {
     );
   }
 
+  const orderStops = (order?.stops ?? []) as App.Data.Order.OrderStopData[];
+
   const isQuoteExpired = order.currentQuote?.status === 'expired';
   // Can create quote for: pending (no/expired quote), or denied (re-quote after rejection)
   const canCreateQuote =
@@ -138,8 +142,8 @@ export default function OrderDetailPage() {
             <CreateQuoteDialog
               orderId={order.id}
               orderPublicId={order.publicId}
-              orderDistanceKm={order.distanceKm}
-              orderEstimatedMinutes={order.estimatedMinutes}
+              orderDistanceKm={order.totalDistanceKm}
+              orderEstimatedMinutes={order.totalEstimatedMinutes}
               customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
               customerDesiredDelivery={order.desiredDeliveryAt}
               customerDesiredPickup={order.desiredPickupAt}
@@ -156,93 +160,122 @@ export default function OrderDetailPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Pickup Details */}
+        {/* Stops */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-600">
-              <MapPin className="h-5 w-5" />
-              {t('orders:detail.pickup', { defaultValue: 'Pickup' })}
+            <CardTitle className="flex items-center gap-2">
+              <ListOrdered className="h-5 w-5" />
+              {t('orders:detail.stops', { defaultValue: 'Stops' })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-start gap-3">
-              <User className="text-muted-foreground mt-0.5 h-4 w-4" />
-              <div>
-                <p className="font-medium">
-                  {order.fromName ||
-                    t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
+            {(order.contactName || order.contactPhone) && (
+              <div className="rounded-lg border p-3">
+                <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
+                  {t('orders:detail.order_contact', { defaultValue: 'Order Contact' })}
                 </p>
-                <p className="text-muted-foreground text-sm">
-                  {t('orders:detail.contact_name', { defaultValue: 'Contact Name' })}
-                </p>
+                {order.contactName && (
+                  <div className="flex items-center gap-2">
+                    <User className="text-muted-foreground h-4 w-4" />
+                    <span className="font-medium">{order.contactName}</span>
+                  </div>
+                )}
+                {order.contactPhone && (
+                  <div className="mt-1 flex items-center gap-2">
+                    <Phone className="text-muted-foreground h-4 w-4" />
+                    <span className="font-medium">{order.contactPhone}</span>
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Phone className="text-muted-foreground mt-0.5 h-4 w-4" />
-              <div>
-                <p className="font-medium">
-                  {order.fromPhone ||
-                    t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  {validationAttribute('phone', true)}
-                </p>
+            )}
+            {orderStops.length > 0 ? (
+              <div className="space-y-3">
+                {orderStops
+                  .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0))
+                  .map((stop, idx) => (
+                    <div key={stop.publicId || idx} className="rounded-lg border p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          {stop.type === 'purchase' && (
+                            <ShoppingBag className="h-4 w-4 text-green-600" />
+                          )}
+                          {stop.type === 'pickup' && <MapPin className="h-4 w-4 text-green-600" />}
+                          {stop.type === 'dropoff' && <MapPin className="h-4 w-4 text-red-600" />}
+                          <Badge
+                            variant="outline"
+                            className={
+                              stop.type === 'dropoff'
+                                ? 'border-red-300 text-red-700 dark:border-red-700 dark:text-red-400'
+                                : 'border-green-300 text-green-700 dark:border-green-700 dark:text-green-400'
+                            }
+                          >
+                            {t(`orders:stop_types.${stop.type}`, {
+                              defaultValue: capitalize(stop.type || 'stop'),
+                            })}
+                          </Badge>
+                          {stop.name && <span className="text-sm font-medium">{stop.name}</span>}
+                        </div>
+                        {stop.status && (
+                          <Badge variant="secondary">
+                            {t(`statuses:${stop.status}`, {
+                              defaultValue: capitalize(stop.status),
+                            })}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="mt-2 space-y-1 pl-6">
+                        {stop.address && (
+                          <div className="flex items-start gap-2">
+                            <MapPin className="text-muted-foreground mt-0.5 h-3.5 w-3.5" />
+                            <span className="text-sm">{formatAddress(stop.address)}</span>
+                          </div>
+                        )}
+                        {stop.contactName && (
+                          <div className="flex items-center gap-2">
+                            <User className="text-muted-foreground h-3.5 w-3.5" />
+                            <span className="text-sm">{stop.contactName}</span>
+                          </div>
+                        )}
+                        {stop.contactPhone && (
+                          <div className="flex items-center gap-2">
+                            <Phone className="text-muted-foreground h-3.5 w-3.5" />
+                            <span className="text-sm">{stop.contactPhone}</span>
+                          </div>
+                        )}
+                        {stop.instructions && (
+                          <div className="flex items-start gap-2">
+                            <FileText className="text-muted-foreground mt-0.5 h-3.5 w-3.5" />
+                            <span className="text-sm">{stop.instructions}</span>
+                          </div>
+                        )}
+                        {stop.completedAt && (
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3.5 w-3.5 text-green-600" />
+                            <span className="text-sm text-green-600">
+                              {formatDateTime(stop.completedAt)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
               </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
-              <div>
-                <p className="font-medium">{formatAddress(order.fromAddress)}</p>
-                <p className="text-muted-foreground text-sm">
-                  {t('orders:detail.address', { defaultValue: 'Address' })}
+            ) : (
+              <p className="text-muted-foreground text-center text-sm">
+                {t('orders:detail.no_stops', { defaultValue: 'No stops' })}
+              </p>
+            )}
+            {order.deliveryAddress && (
+              <div className="rounded-lg border p-3">
+                <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
+                  {t('orders:detail.delivery_address', { defaultValue: 'Delivery Address' })}
                 </p>
+                <div className="flex items-start gap-2">
+                  <MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
+                  <span className="font-medium">{formatAddress(order.deliveryAddress)}</span>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Delivery Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
-              <MapPin className="h-5 w-5" />
-              {t('orders:detail.delivery', { defaultValue: 'Delivery' })}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start gap-3">
-              <User className="text-muted-foreground mt-0.5 h-4 w-4" />
-              <div>
-                <p className="font-medium">
-                  {order.toName ||
-                    t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  {t('orders:detail.contact_name', { defaultValue: 'Contact Name' })}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Phone className="text-muted-foreground mt-0.5 h-4 w-4" />
-              <div>
-                <p className="font-medium">
-                  {order.toPhone ||
-                    t('orders:detail.not_specified', { defaultValue: 'Not specified' })}
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  {validationAttribute('phone', true)}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
-              <div>
-                <p className="font-medium">{formatAddress(order.toAddress)}</p>
-                <p className="text-muted-foreground text-sm">
-                  {t('orders:detail.address', { defaultValue: 'Address' })}
-                </p>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
@@ -263,24 +296,24 @@ export default function OrderDetailPage() {
                 <p className="font-medium">{order.description}</p>
               </div>
             )}
-            {(order.distanceKm || order.estimatedMinutes) && (
+            {(order.totalDistanceKm || order.totalEstimatedMinutes) && (
               <div className="flex gap-6">
-                {order.distanceKm && (
+                {order.totalDistanceKm && (
                   <div className="flex items-start gap-3">
                     <Route className="text-muted-foreground mt-0.5 h-4 w-4" />
                     <div>
-                      <p className="font-medium">{order.distanceKm} km</p>
+                      <p className="font-medium">{order.totalDistanceKm} km</p>
                       <p className="text-muted-foreground text-sm">
                         {validationAttribute('distance', true)}
                       </p>
                     </div>
                   </div>
                 )}
-                {order.estimatedMinutes && (
+                {order.totalEstimatedMinutes && (
                   <div className="flex items-start gap-3">
                     <Clock className="text-muted-foreground mt-0.5 h-4 w-4" />
                     <div>
-                      <p className="font-medium">{order.estimatedMinutes} min</p>
+                      <p className="font-medium">{order.totalEstimatedMinutes} min</p>
                       <p className="text-muted-foreground text-sm">
                         {t('orders:detail.est_trip_time', { defaultValue: 'Est. Trip Time' })}
                       </p>
@@ -453,8 +486,8 @@ export default function OrderDetailPage() {
               <CreateQuoteDialog
                 orderId={order.id}
                 orderPublicId={order.publicId}
-                orderDistanceKm={order.distanceKm}
-                orderEstimatedMinutes={order.estimatedMinutes}
+                orderDistanceKm={order.totalDistanceKm}
+                orderEstimatedMinutes={order.totalEstimatedMinutes}
                 customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
                 customerDesiredDelivery={order.desiredDeliveryAt}
                 customerDesiredPickup={order.desiredPickupAt}
@@ -503,48 +536,32 @@ export default function OrderDetailPage() {
                 <span className="font-medium">{formatDate(order.desiredDeliveryAt)}</span>
               </div>
             )}
-            {order.pickupScheduledFor && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('orders:detail.pickup_scheduled', { defaultValue: 'Pickup Scheduled' })}
-                </span>
-                <span className="font-medium">{formatDate(order.pickupScheduledFor)}</span>
-              </div>
-            )}
-            {order.deliveryScheduledFor && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('orders:detail.delivery_scheduled', { defaultValue: 'Delivery Scheduled' })}
-                </span>
-                <span className="font-medium">{formatDate(order.deliveryScheduledFor)}</span>
-              </div>
-            )}
-            {order.pickupCompletedAt && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('orders:detail.pickup_completed', { defaultValue: 'Pickup Completed' })}
-                </span>
-                <span className="font-medium text-green-600">
-                  {formatDate(order.pickupCompletedAt)}
-                </span>
-              </div>
-            )}
-            {order.deliveryCompletedAt && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('orders:detail.delivery_completed', { defaultValue: 'Delivery Completed' })}
-                </span>
-                <span className="font-medium text-green-600">
-                  {formatDate(order.deliveryCompletedAt)}
-                </span>
+            {orderStops.some((s) => s.completedAt) && (
+              <div className="space-y-2 border-t pt-3">
+                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                  {t('orders:detail.stop_completions', { defaultValue: 'Stop Completions' })}
+                </p>
+                {orderStops
+                  .filter((s) => s.completedAt)
+                  .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0))
+                  .map((stop, idx) => (
+                    <div key={stop.publicId || idx} className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        {stop.name ||
+                          t(`orders:stop_types.${stop.type}`, {
+                            defaultValue: capitalize(stop.type || 'stop'),
+                          })}
+                      </span>
+                      <span className="font-medium text-green-600">
+                        {formatDateTime(stop.completedAt!)}
+                      </span>
+                    </div>
+                  ))}
               </div>
             )}
             {!order.desiredDeliveryAt &&
               !order.desiredPickupAt &&
-              !order.pickupScheduledFor &&
-              !order.deliveryScheduledFor &&
-              !order.pickupCompletedAt &&
-              !order.deliveryCompletedAt && (
+              !orderStops.some((s) => s.completedAt) && (
                 <p className="text-muted-foreground text-center">
                   {t('orders:detail.no_schedule', { defaultValue: 'No schedule set' })}
                 </p>

@@ -30,9 +30,12 @@ export function UnassignedStopContent({
     ? 'border-l-sky-500 bg-sky-50/50'
     : 'border-l-violet-500 bg-violet-50/50';
   const iconColor = isPickup ? 'text-sky-600' : 'text-violet-600';
-  const address = isPickup ? stop.order.fromAddress : stop.order.toAddress;
-  const contactName = isPickup ? stop.order.fromName : stop.order.toName;
-  const contactPhone = isPickup ? stop.order.fromPhone : stop.order.toPhone;
+  const orderStops = (stop.order.stops ?? []) as App.Data.Order.OrderStopData[];
+  const matchingStop = orderStops.find((s) => s.type === stop.stopType);
+  const address =
+    matchingStop?.address ?? (stop.stopType === 'dropoff' ? stop.order.deliveryAddress : undefined);
+  const contactName = matchingStop?.contactName ?? stop.order.contactName;
+  const contactPhone = matchingStop?.contactPhone ?? stop.order.contactPhone;
   const businessName = stop.order.business?.name;
 
   return (

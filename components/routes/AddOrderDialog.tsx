@@ -66,7 +66,11 @@ export function AddOrderDialog({ routeId, unassignedStops }: AddOrderDialogProps
               const isPickup = stop.stopType === 'pickup';
               const key = `${stop.order.publicId}-${stop.stopType}`;
               const iconColor = isPickup ? 'text-sky-600' : 'text-violet-600';
-              const address = isPickup ? stop.order.fromAddress : stop.order.toAddress;
+              const orderStops = (stop.order.stops ?? []) as App.Data.Order.OrderStopData[];
+              const matchingOrderStop = orderStops.find((s) => s.type === stop.stopType);
+              const address =
+                matchingOrderStop?.address ??
+                (stop.stopType === 'dropoff' ? stop.order.deliveryAddress : undefined);
 
               return (
                 <div

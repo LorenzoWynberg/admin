@@ -280,10 +280,14 @@ export default function OrdersPage() {
                       <PaymentStatusBadge status={order.paymentStatus} />
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">
-                      {formatAddress(order.fromAddress)}
+                      {formatAddress(
+                        ((order.stops ?? []) as App.Data.Order.OrderStopData[]).find(
+                          (s) => s.type !== 'dropoff'
+                        )?.address
+                      )}
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">
-                      {formatAddress(order.toAddress)}
+                      {formatAddress(order.deliveryAddress)}
                     </TableCell>
                     <TableCell>
                       {order.currentQuote?.total

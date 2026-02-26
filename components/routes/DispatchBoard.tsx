@@ -192,7 +192,8 @@ export function DispatchBoard() {
               (s) => s.order.id === orderId && s.stopType === 'dropoff'
             )?.order;
 
-            const pickupCompleted = !!order?.pickupCompletedAt;
+            const orderStops = (order?.stops ?? []) as App.Data.Order.OrderStopData[];
+            const pickupCompleted = orderStops.some((s) => s.type === 'pickup' && !!s.completedAt);
             const pickupInARoute = routes.some((r) =>
               (r.stops ?? []).some(
                 (s: RouteStopData) => s.orderId === orderId && s.type === 'pickup'

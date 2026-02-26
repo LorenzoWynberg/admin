@@ -105,11 +105,17 @@ function MapContent({
   const routeMarkers = useMemo(() => {
     return routeStops
       .filter((stop) => {
-        const addr = stop.type === 'pickup' ? stop.order?.fromAddress : stop.order?.toAddress;
+        const orderStops = (stop.order?.stops ?? []) as App.Data.Order.OrderStopData[];
+        const match = orderStops.find((s) => (s.type as string) === stop.type);
+        const addr =
+          match?.address ?? (stop.type === 'dropoff' ? stop.order?.deliveryAddress : undefined);
         return addr?.latitude && addr?.longitude;
       })
       .map((stop) => {
-        const addr = stop.type === 'pickup' ? stop.order?.fromAddress : stop.order?.toAddress;
+        const orderStops = (stop.order?.stops ?? []) as App.Data.Order.OrderStopData[];
+        const match = orderStops.find((s) => (s.type as string) === stop.type);
+        const addr =
+          match?.address ?? (stop.type === 'dropoff' ? stop.order?.deliveryAddress : undefined);
         return {
           id: stop.id,
           lat: addr!.latitude,
@@ -131,11 +137,17 @@ function MapContent({
   const unassignedMarkers = useMemo(() => {
     return unassignedStops
       .filter((stop) => {
-        const addr = stop.stopType === 'pickup' ? stop.order.fromAddress : stop.order.toAddress;
+        const orderStops = (stop.order.stops ?? []) as App.Data.Order.OrderStopData[];
+        const match = orderStops.find((s) => s.type === stop.stopType);
+        const addr =
+          match?.address ?? (stop.stopType === 'dropoff' ? stop.order.deliveryAddress : undefined);
         return addr?.latitude && addr?.longitude;
       })
       .map((stop) => {
-        const addr = stop.stopType === 'pickup' ? stop.order.fromAddress : stop.order.toAddress;
+        const orderStops = (stop.order.stops ?? []) as App.Data.Order.OrderStopData[];
+        const match = orderStops.find((s) => s.type === stop.stopType);
+        const addr =
+          match?.address ?? (stop.stopType === 'dropoff' ? stop.order.deliveryAddress : undefined);
         const key = `${stop.order.publicId}-${stop.stopType}`;
         return {
           key,

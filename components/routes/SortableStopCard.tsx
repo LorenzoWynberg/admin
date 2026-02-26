@@ -59,9 +59,12 @@ export function SortableStopCard({
   const iconColor = isPickup ? 'text-sky-600' : 'text-violet-600';
 
   const order = stop.order;
-  const address = isPickup ? order?.fromAddress : order?.toAddress;
-  const contactName = isPickup ? order?.fromName : order?.toName;
-  const contactPhone = isPickup ? order?.fromPhone : order?.toPhone;
+  const orderStops = (order?.stops ?? []) as App.Data.Order.OrderStopData[];
+  const matchingStop = orderStops.find((s) => (s.type as string) === stop.type);
+  const address =
+    matchingStop?.address ?? (stop.type === 'dropoff' ? order?.deliveryAddress : undefined);
+  const contactName = matchingStop?.contactName ?? order?.contactName;
+  const contactPhone = matchingStop?.contactPhone ?? order?.contactPhone;
   const businessName = order?.business?.name;
 
   return (
