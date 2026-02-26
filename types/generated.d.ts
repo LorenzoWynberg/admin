@@ -459,7 +459,7 @@ declare namespace App.Data.Order {
     isContactless: boolean;
     deliveryTier: App.Enums.DeliveryTier;
     timeSensitive: boolean;
-    pickup: App.Data.Order.StoreOrderStopData | null;
+    stops: Array<App.Data.Order.StoreOrderStopData>;
   };
   export type StoreOrderStopData = {
     addressId: number | null;
@@ -658,6 +658,7 @@ declare namespace App.Data.Route {
     orderId: number;
     type: App.Enums.RouteStopType;
     scheduledFor?: string | null;
+    orderStopId?: number | null;
   };
   export type BatchAddStopsData = {
     stops: Array<any>;
@@ -957,6 +958,7 @@ declare namespace App.Enums {
     TIME_SENSITIVE = 'timeSensitive',
     PICKUP = 'pickup',
     DELIVERY = 'delivery',
+    INSTRUCTIONS = 'instructions',
   }
   export enum ChatChannel {
     Support = 'support',
