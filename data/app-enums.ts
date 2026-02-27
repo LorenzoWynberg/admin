@@ -71,6 +71,7 @@ export const Enums = {
     TIME_SENSITIVE: "timeSensitive",
     PICKUP: "pickup",
     DELIVERY: "delivery",
+    INSTRUCTIONS: "instructions",
   },
   ChatChannel: {
     Support: "support",
@@ -112,6 +113,7 @@ export const Enums = {
     Approving: "approving",
     Denying: "denying",
     Sending: "sending",
+    Reconciling: "reconciling",
   },
   FeasibilityLevel: {
     Green: "green",
@@ -231,7 +233,6 @@ export const Enums = {
   PaymentStatus: {
     UNPAID: "unpaid",
     PAID: "paid",
-    RECONCILING: "reconciling",
     REFUND_DUE: "refund_due",
     REFUNDED: "refunded",
     SURCHARGE_DUE: "surcharge_due",

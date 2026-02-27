@@ -394,9 +394,9 @@ declare namespace App.Data.Order {
     driver?: App.Data.Driver.DriverData | null;
     currentQuote?: App.Data.Quote.QuoteData;
     deliveryAddress?: App.Data.Address.AddressData;
-    stops?: any;
+    stops?: Array<App.Data.Order.OrderStopData>;
     quotes?: Array<App.Data.Quote.QuoteData>;
-    receipts?: any;
+    receipts?: Array<App.Data.Order.OrderReceiptData>;
   };
   export type OrderReceiptData = {
     id?: number;
@@ -445,12 +445,15 @@ declare namespace App.Data.Order {
     dropoffLongitude: number;
     dropoffAddress: string;
   };
+  export type ReconcileOrderData = {
+    items: Array<App.Data.Quote.StoreQuoteItemData>;
+    notes: string | null;
+  };
   export type StoreOrderData = {
     deliveryAddress: App.Data.Address.StoreSnapshotAddressData;
     currencyCode: string;
     contactName?: string;
     contactPhone?: string;
-    description?: string;
     desiredDeliveryAt: string | null;
     desiredPickupAt: string | null;
     requiresPin: boolean;
@@ -463,6 +466,7 @@ declare namespace App.Data.Order {
   };
   export type StoreOrderStopData = {
     addressId: number | null;
+    address?: App.Data.Address.StoreSnapshotAddressData | null;
     name?: string | null;
     type: App.Enums.OrderStopType;
     contactName?: string | null;
@@ -1000,6 +1004,7 @@ declare namespace App.Enums {
     Approving = 'approving',
     Denying = 'denying',
     Sending = 'sending',
+    Reconciling = 'reconciling',
   }
   export enum FeasibilityLevel {
     Green = 'green',
@@ -1119,7 +1124,6 @@ declare namespace App.Enums {
   export enum PaymentStatus {
     UNPAID = 'unpaid',
     PAID = 'paid',
-    RECONCILING = 'reconciling',
     REFUND_DUE = 'refund_due',
     REFUNDED = 'refunded',
     SURCHARGE_DUE = 'surcharge_due',
