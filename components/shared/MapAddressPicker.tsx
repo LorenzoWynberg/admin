@@ -224,6 +224,7 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
           className="h-full w-full"
           gestureHandling="cooperative"
           scrollwheel={false}
+          zoomControl={true}
           onCameraChanged={handleCameraChanged}
           onDragstart={handleDragStart}
           onDragend={handleDragEnd}
