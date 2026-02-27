@@ -186,11 +186,16 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
         activePlaceId.current = details.placeId;
         map?.panTo({ lat: details.lat, lng: details.lng });
         map?.setZoom(17);
+        onCoordsChange({
+          lat: details.lat,
+          lng: details.lng,
+          placeId: details.placeId,
+        });
       } catch {
         // Details fetch failed — ignore
       }
     },
-    [map]
+    [map, onCoordsChange]
   );
 
   // POI click — user clicks a place (store, restaurant, etc.) on the map
@@ -200,10 +205,12 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
       const lng = e.detail.latLng?.lng;
       if (lat == null || lng == null) return;
 
-      activePlaceId.current = e.detail.placeId ?? undefined;
+      const placeId = e.detail.placeId ?? undefined;
+      activePlaceId.current = placeId;
       map?.panTo({ lat, lng });
+      onCoordsChange({ lat, lng, placeId });
     },
-    [map]
+    [map, onCoordsChange]
   );
 
   return (
