@@ -130,10 +130,13 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
   const map = useMap();
   const [pinLifted, setPinLifted] = useState(false);
   const [mapCenter, setMapCenter] = useState(initialCenter ?? DEFAULT_CENTER);
-  const programmaticMove = useRef(false);
   const settleTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isDragging = useRef(false);
-  const mapContainerRef = useRef<HTMLDivElement>(null);
+  // The "locked" center — only updated by drag, search, or click.
+  // Zoom should always snap back to this point.
+  const lockedCenter = useRef(initialCenter ?? DEFAULT_CENTER);
+  const lastZoom = useRef<number | null>(null);
+  const snapBackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Report initial center on mount
   useEffect(() => {
@@ -142,40 +145,6 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Center-locked scroll zoom: disable Google's cursor-biased zoom and use
-  // setZoom() which always zooms at center. Throttle to one zoom step every
-  // 300ms while scrolling — feels continuous but not overwhelming.
-  useEffect(() => {
-    const container = mapContainerRef.current;
-    if (!container || !map) return;
-
-    let lastDirection = 0;
-    let throttled = false;
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      lastDirection = e.deltaY > 0 ? -1 : 1;
-
-      if (throttled) return;
-      throttled = true;
-
-      // Apply immediately on first scroll event
-      const zoom = map.getZoom();
-      if (zoom != null) {
-        programmaticMove.current = true;
-        map.setZoom(Math.max(1, Math.min(21, zoom + lastDirection)));
-      }
-
-      // Then allow next step after 300ms
-      setTimeout(() => {
-        throttled = false;
-      }, 300);
-    };
-
-    container.addEventListener('wheel', handleWheel, { passive: false });
-    return () => container.removeEventListener('wheel', handleWheel);
-  }, [map]);
 
   const liftPin = useCallback(() => {
     setPinLifted(true);
@@ -191,22 +160,31 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
   const handleCameraChanged = useCallback(
     (e: MapCameraChangedEvent) => {
       const { lat, lng } = e.detail.center;
+      const zoom = e.detail.zoom;
 
       if (isDragging.current) {
+        // Dragging — update the locked center
         liftPin();
+        lockedCenter.current = { lat, lng };
+        setMapCenter({ lat, lng });
+        onCoordsChange({ lat, lng });
+      } else if (lastZoom.current !== null && zoom !== lastZoom.current) {
+        // Zoom changed (not dragging) — schedule a snap-back to locked center.
+        // Use a short timer so we snap after the zoom animation settles,
+        // not on every intermediate frame.
+        if (snapBackTimer.current) clearTimeout(snapBackTimer.current);
+        snapBackTimer.current = setTimeout(() => {
+          map?.panTo(lockedCenter.current);
+        }, 50);
+        setMapCenter({ lat, lng });
       } else {
-        settlePin();
+        // Programmatic pan (search/click) — just update state
+        setMapCenter({ lat, lng });
       }
 
-      setMapCenter({ lat, lng });
-
-      if (programmaticMove.current) {
-        programmaticMove.current = false;
-        return;
-      }
-      onCoordsChange({ lat, lng });
+      lastZoom.current = zoom;
     },
-    [onCoordsChange, liftPin, settlePin]
+    [map, onCoordsChange, liftPin]
   );
 
   const handleDragStart = useCallback(() => {
@@ -222,7 +200,7 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     async (item: PlaceAutocompleteItemData) => {
       try {
         const details = await GeoService.placeDetails(item.placeId);
-        programmaticMove.current = true;
+        lockedCenter.current = { lat: details.lat, lng: details.lng };
         map?.panTo({ lat: details.lat, lng: details.lng });
         map?.setZoom(17);
         onCoordsChange({
@@ -244,7 +222,7 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
       const lng = e.detail.latLng?.lng;
       if (lat == null || lng == null) return;
 
-      programmaticMove.current = true;
+      lockedCenter.current = { lat, lng };
       map?.panTo({ lat, lng });
       onCoordsChange({
         lat,
@@ -259,17 +237,13 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     <div className="space-y-3">
       <SearchBar mapCenter={mapCenter} onSelect={handleSearchSelect} />
 
-      <div
-        ref={mapContainerRef}
-        className="relative h-[500px] w-full overflow-hidden rounded-lg border"
-      >
+      <div className="relative h-[500px] w-full overflow-hidden rounded-lg border">
         <Map
           defaultCenter={initialCenter ?? DEFAULT_CENTER}
           defaultZoom={initialCenter ? 17 : 12}
           mapId="address-picker-map"
           className="h-full w-full"
           gestureHandling="greedy"
-          scrollwheel={false}
           onCameraChanged={handleCameraChanged}
           onDragstart={handleDragStart}
           onDragend={handleDragEnd}
