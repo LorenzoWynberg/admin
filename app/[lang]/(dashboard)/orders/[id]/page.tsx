@@ -113,10 +113,13 @@ export default function OrderDetailPage() {
   const orderStops = (order?.stops ?? []) as App.Data.Order.OrderStopData[];
 
   const isQuoteExpired = order.currentQuote?.status === 'expired';
+  const allStopsHaveAddresses = orderStops.length > 0 && orderStops.every((s) => s.address != null);
   // Can create quote for: pending (no/expired quote), or denied (re-quote after rejection)
+  // All stops must have addresses assigned before quoting
   const canCreateQuote =
-    (order.status === 'pending' && (!order.currentQuote || isQuoteExpired)) ||
-    order.status === 'denied';
+    allStopsHaveAddresses &&
+    ((order.status === 'pending' && (!order.currentQuote || isQuoteExpired)) ||
+      order.status === 'denied');
 
   // Sort quotes newest first (highest version first)
   const sortedQuotes = [...(order.quotes || [])].sort(
