@@ -1,7 +1,13 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { APIProvider, Map, useMap, type MapCameraChangedEvent } from '@vis.gl/react-google-maps';
+import {
+  APIProvider,
+  Map,
+  useMap,
+  type MapCameraChangedEvent,
+  type MapMouseEvent,
+} from '@vis.gl/react-google-maps';
 import { Search, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
@@ -183,6 +189,24 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     [map, onCoordsChange]
   );
 
+  // POI click — user clicks a place (store, restaurant, etc.) on the map
+  const handleMapClick = useCallback(
+    (e: MapMouseEvent) => {
+      const lat = e.detail.latLng?.lat;
+      const lng = e.detail.latLng?.lng;
+      if (lat == null || lng == null) return;
+
+      programmaticMove.current = true;
+      map?.panTo({ lat, lng });
+      onCoordsChange({
+        lat,
+        lng,
+        placeId: e.detail.placeId ?? undefined,
+      });
+    },
+    [map, onCoordsChange]
+  );
+
   return (
     <div className="space-y-3">
       <SearchBar mapCenter={mapCenter} onSelect={handleSearchSelect} />
@@ -196,6 +220,7 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
           gestureHandling="greedy"
           onCameraChanged={handleCameraChanged}
           onDragstart={handleDragStart}
+          onClick={handleMapClick}
         />
 
         {/* Fixed center pin */}
