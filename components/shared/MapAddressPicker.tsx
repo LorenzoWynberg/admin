@@ -145,28 +145,47 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
 
   // Intercept scroll wheel: prevent Google's cursor-biased zoom, do our own
   // center-locked zoom so the pin never drifts.
+  // Accumulate deltaY and throttle to one zoom step per 80ms.
   useEffect(() => {
     const container = mapContainerRef.current;
     if (!container || !map) return;
 
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const currentZoom = map.getZoom();
-      if (currentZoom == null) return;
+    let accumulated = 0;
+    let throttleId: ReturnType<typeof setTimeout> | null = null;
 
-      const delta = e.deltaY > 0 ? -1 : 1;
+    const applyZoom = () => {
+      throttleId = null;
+      const currentZoom = map.getZoom();
       const center = map.getCenter();
-      if (!center) return;
+      if (currentZoom == null || !center) {
+        accumulated = 0;
+        return;
+      }
+
+      // Convert accumulated scroll into a small zoom step
+      const step = accumulated > 0 ? -0.5 : 0.5;
+      accumulated = 0;
 
       programmaticMove.current = true;
       map.moveCamera({
-        zoom: Math.max(1, Math.min(21, currentZoom + delta)),
+        zoom: Math.max(1, Math.min(21, currentZoom + step)),
         center: { lat: center.lat(), lng: center.lng() },
       });
     };
 
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      accumulated += e.deltaY;
+      if (!throttleId) {
+        throttleId = setTimeout(applyZoom, 80);
+      }
+    };
+
     container.addEventListener('wheel', handleWheel, { passive: false });
-    return () => container.removeEventListener('wheel', handleWheel);
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+      if (throttleId) clearTimeout(throttleId);
+    };
   }, [map]);
 
   const liftPin = useCallback(() => {
