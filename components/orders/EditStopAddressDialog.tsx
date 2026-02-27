@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useUpdateStop } from '@/hooks/orders';
 import { MapAddressPicker } from '@/components/shared/MapAddressPicker';
-import type { PlaceResult } from '@/components/shared/PlacesAutocompleteInput';
+import { GeoService } from '@/services/geoService';
 
 type OrderStopData = App.Data.Order.OrderStopData;
 
@@ -31,34 +31,59 @@ export function EditStopAddressDialog({
 }: EditStopAddressDialogProps) {
   const { t } = useTranslation();
   const updateStop = useUpdateStop();
-  const [selectedPlace, setSelectedPlace] = useState<PlaceResult | null>(null);
+  const [saving, setSaving] = useState(false);
+  const coordsRef = useRef<{ lat: number; lng: number; placeId?: string } | null>(null);
 
   const initialCenter =
     stop.address?.latitude && stop.address?.longitude
       ? { lat: stop.address.latitude, lng: stop.address.longitude }
       : undefined;
 
-  const handleSubmit = async () => {
-    if (!selectedPlace || !stop.id) return;
+  const handleCoordsChange = useCallback(
+    (coords: { lat: number; lng: number; placeId?: string }) => {
+      coordsRef.current = coords;
+    },
+    []
+  );
 
+  const handleSubmit = async () => {
+    const coords = coordsRef.current;
+    if (!coords || !stop.id) return;
+
+    setSaving(true);
     try {
+      // If we have a placeId from search, use it directly.
+      // Otherwise reverse geocode to get address data (like AddressPickerModal).
+      const placeId = coords.placeId || '';
+      if (!placeId) {
+        try {
+          await GeoService.reverseGeocode(coords.lat, coords.lng);
+        } catch {
+          // Continue with empty placeId — API can handle coords-only
+        }
+      }
+
       await updateStop.mutateAsync({
         orderPublicId,
         stopId: stop.id,
         data: {
           address: {
-            latitude: selectedPlace.latitude,
-            longitude: selectedPlace.longitude,
-            placeId: selectedPlace.placeId,
+            latitude: coords.lat,
+            longitude: coords.lng,
+            placeId,
           },
         },
       });
-      setSelectedPlace(null);
+      coordsRef.current = null;
       onOpenChange(false);
     } catch {
       // Error handled by mutation hook
+    } finally {
+      setSaving(false);
     }
   };
+
+  const isPending = saving || updateStop.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -70,14 +95,14 @@ export function EditStopAddressDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <MapAddressPicker initialCenter={initialCenter} onSelect={setSelectedPlace} />
+        <MapAddressPicker initialCenter={initialCenter} onCoordsChange={handleCoordsChange} />
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             {t('common:cancel', { defaultValue: 'Cancel' })}
           </Button>
-          <Button onClick={handleSubmit} disabled={!selectedPlace || updateStop.isPending}>
-            {updateStop.isPending
+          <Button onClick={handleSubmit} disabled={!coordsRef.current || isPending}>
+            {isPending
               ? t('common:saving', { defaultValue: 'Saving...' })
               : t('common:save', { defaultValue: 'Save' })}
           </Button>

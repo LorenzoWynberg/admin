@@ -1,18 +1,11 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
-import {
-  APIProvider,
-  Map,
-  AdvancedMarker,
-  useMap,
-  type MapMouseEvent,
-} from '@vis.gl/react-google-maps';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { APIProvider, Map, useMap, type MapCameraChangedEvent } from '@vis.gl/react-google-maps';
 import {
   PlacesAutocompleteInner,
   type PlaceResult,
 } from '@/components/shared/PlacesAutocompleteInput';
-import { GeoService } from '@/services/geoService';
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 
@@ -20,122 +13,110 @@ const DEFAULT_CENTER = { lat: 9.9281, lng: -84.0907 };
 
 export interface MapAddressPickerProps {
   initialCenter?: { lat: number; lng: number };
-  onSelect: (place: PlaceResult) => void;
+  onCoordsChange: (coords: { lat: number; lng: number; placeId?: string }) => void;
 }
 
-function MapPickerContent({ initialCenter, onSelect }: MapAddressPickerProps) {
+function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerProps) {
   const map = useMap();
-  const [markerPosition, setMarkerPosition] = useState<{ lat: number; lng: number } | null>(
-    initialCenter ?? null
-  );
-  const [addressText, setAddressText] = useState('');
-  const reverseGeocodeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [pinLifted, setPinLifted] = useState(false);
+  const programmaticMove = useRef(false);
+  const settleTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleReverseGeocode = useCallback(
-    async (lat: number, lng: number) => {
-      try {
-        const data = await GeoService.reverseGeocode(lat, lng);
-        setAddressText(data.humanReadableAddress);
-        onSelect({
-          placeId: '',
-          description: data.humanReadableAddress,
-          latitude: lat,
-          longitude: lng,
-        });
-      } catch {
-        // Reverse geocode failed — keep position, clear text
-        setAddressText('');
+  // Report initial center on mount
+  useEffect(() => {
+    if (initialCenter) {
+      onCoordsChange({ lat: initialCenter.lat, lng: initialCenter.lng });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const liftPin = useCallback(() => {
+    setPinLifted(true);
+    // Safety timeout — force settle after 2s (mirrors client pattern)
+    if (settleTimeout.current) clearTimeout(settleTimeout.current);
+    settleTimeout.current = setTimeout(() => setPinLifted(false), 2000);
+  }, []);
+
+  const settlePin = useCallback(() => {
+    if (settleTimeout.current) clearTimeout(settleTimeout.current);
+    setPinLifted(false);
+  }, []);
+
+  const handleCameraChanged = useCallback(
+    (e: MapCameraChangedEvent) => {
+      settlePin();
+      if (programmaticMove.current) {
+        programmaticMove.current = false;
+        return;
       }
+      const { lat, lng } = e.detail.center;
+      onCoordsChange({ lat, lng });
     },
-    [onSelect]
+    [onCoordsChange, settlePin]
   );
 
-  const moveMarkerTo = useCallback(
-    (lat: number, lng: number) => {
-      setMarkerPosition({ lat, lng });
-      map?.panTo({ lat, lng });
-
-      if (reverseGeocodeTimeout.current) clearTimeout(reverseGeocodeTimeout.current);
-      reverseGeocodeTimeout.current = setTimeout(() => {
-        handleReverseGeocode(lat, lng);
-      }, 300);
-    },
-    [map, handleReverseGeocode]
-  );
+  const handleDragStart = useCallback(() => {
+    liftPin();
+  }, [liftPin]);
 
   const handlePlaceSelect = useCallback(
     (place: PlaceResult) => {
-      setMarkerPosition({ lat: place.latitude, lng: place.longitude });
-      setAddressText(place.description);
+      programmaticMove.current = true;
       map?.panTo({ lat: place.latitude, lng: place.longitude });
       map?.setZoom(17);
-      onSelect(place);
+      onCoordsChange({
+        lat: place.latitude,
+        lng: place.longitude,
+        placeId: place.placeId,
+      });
     },
-    [map, onSelect]
-  );
-
-  const handleMapClick = useCallback(
-    (e: MapMouseEvent) => {
-      const lat = e.detail.latLng?.lat;
-      const lng = e.detail.latLng?.lng;
-      if (lat != null && lng != null) {
-        moveMarkerTo(lat, lng);
-      }
-    },
-    [moveMarkerTo]
-  );
-
-  const handleDragEnd = useCallback(
-    (e: google.maps.MapMouseEvent) => {
-      const lat = e.latLng?.lat();
-      const lng = e.latLng?.lng();
-      if (lat != null && lng != null) {
-        moveMarkerTo(lat, lng);
-      }
-    },
-    [moveMarkerTo]
+    [map, onCoordsChange]
   );
 
   return (
-    <div className="space-y-3">
-      <div className="relative">
-        <div className="relative h-[350px] w-full overflow-hidden rounded-lg border">
-          <Map
-            defaultCenter={initialCenter ?? DEFAULT_CENTER}
-            defaultZoom={initialCenter ? 17 : 12}
-            mapId="address-picker-map"
-            className="h-full w-full"
-            gestureHandling="greedy"
-            onClick={handleMapClick}
-          >
-            {markerPosition && (
-              <AdvancedMarker position={markerPosition} draggable onDragEnd={handleDragEnd}>
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg ring-2 ring-white">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="h-5 w-5"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 3.362 2.98l.464.313Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </AdvancedMarker>
-            )}
-          </Map>
+    <div className="relative h-[400px] w-full overflow-hidden rounded-lg border">
+      <Map
+        defaultCenter={initialCenter ?? DEFAULT_CENTER}
+        defaultZoom={initialCenter ? 17 : 12}
+        mapId="address-picker-map"
+        className="h-full w-full"
+        gestureHandling="greedy"
+        onCameraChanged={handleCameraChanged}
+        onDragstart={handleDragStart}
+      />
 
-          {/* Search bar overlay */}
-          <div className="absolute top-3 right-3 left-3 z-10">
-            <PlacesAutocompleteInner onPlaceSelect={handlePlaceSelect} />
-          </div>
+      {/* Fixed center pin — pointer-events: none so map receives all gestures */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div
+          className="flex flex-col items-center"
+          style={{
+            transform: `translateY(${pinLifted ? '-14px' : '0'})`,
+            transition: `transform ${pinLifted ? '120ms' : '220ms'} ease-out`,
+          }}
+        >
+          {/* Pin dot */}
+          <div className="h-[18px] w-[18px] rounded-full border-2 border-white bg-emerald-500" />
+          {/* Pin stick */}
+          <div className="h-[18px] w-[2px] bg-emerald-500" />
         </div>
+        {/* Shadow */}
+        <div
+          className="absolute rounded-full bg-black"
+          style={{
+            width: 12,
+            height: 12,
+            marginTop: 24,
+            opacity: pinLifted ? 0.45 : 0,
+            transform: `scale(${pinLifted ? 1 : 0.5})`,
+            transition: `opacity ${pinLifted ? '120ms' : '220ms'} ease-out, transform ${pinLifted ? '120ms' : '220ms'} ease-out`,
+          }}
+        />
       </div>
 
-      {addressText && <p className="text-muted-foreground text-sm">{addressText}</p>}
+      {/* Search bar overlay */}
+      <div className="absolute top-3 right-3 left-3 z-10">
+        <PlacesAutocompleteInner onPlaceSelect={handlePlaceSelect} />
+      </div>
     </div>
   );
 }
@@ -143,7 +124,7 @@ function MapPickerContent({ initialCenter, onSelect }: MapAddressPickerProps) {
 export function MapAddressPicker(props: MapAddressPickerProps) {
   if (!GOOGLE_MAPS_API_KEY) {
     return (
-      <div className="bg-muted text-muted-foreground flex h-[350px] items-center justify-center rounded-lg border">
+      <div className="bg-muted text-muted-foreground flex h-[400px] items-center justify-center rounded-lg border">
         <p className="text-sm">Set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to enable map</p>
       </div>
     );
