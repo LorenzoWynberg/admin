@@ -126,17 +126,14 @@ function SearchBar({ mapCenter, onSelect }: SearchBarProps) {
 
 // ─── Map picker content ────────────────────────────────────────────────────
 
-// Threshold for detecting center movement (drag) vs pure zoom
-const CENTER_MOVE_THRESHOLD = 0.0001;
-
 function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerProps) {
   const map = useMap();
   const [pinLifted, setPinLifted] = useState(false);
   const [mapCenter, setMapCenter] = useState(initialCenter ?? DEFAULT_CENTER);
   const programmaticMove = useRef(false);
   const settleTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const prevCenterRef = useRef(initialCenter ?? DEFAULT_CENTER);
   const isDragging = useRef(false);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   // Report initial center on mount
   useEffect(() => {
@@ -145,6 +142,32 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Intercept scroll wheel: prevent Google's cursor-biased zoom, do our own
+  // center-locked zoom so the pin never drifts.
+  useEffect(() => {
+    const container = mapContainerRef.current;
+    if (!container || !map) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const currentZoom = map.getZoom();
+      if (currentZoom == null) return;
+
+      const delta = e.deltaY > 0 ? -1 : 1;
+      const center = map.getCenter();
+      if (!center) return;
+
+      programmaticMove.current = true;
+      map.moveCamera({
+        zoom: Math.max(1, Math.min(21, currentZoom + delta)),
+        center: { lat: center.lat(), lng: center.lng() },
+      });
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, [map]);
 
   const liftPin = useCallback(() => {
     setPinLifted(true);
@@ -160,27 +183,13 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
   const handleCameraChanged = useCallback(
     (e: MapCameraChangedEvent) => {
       const { lat, lng } = e.detail.center;
-      const prev = prevCenterRef.current;
 
-      // Detect if center actually moved (drag) vs pure zoom
-      const centerMoved =
-        Math.abs(lat - prev.lat) > CENTER_MOVE_THRESHOLD ||
-        Math.abs(lng - prev.lng) > CENTER_MOVE_THRESHOLD;
-
-      // On scroll-zoom the mouse position biases the zoom, shifting center.
-      // Snap center back so the pin stays on the same coords.
-      if (centerMoved && !isDragging.current && !programmaticMove.current) {
-        map?.moveCamera({ center: prev });
-        return;
-      }
-
-      if (centerMoved && isDragging.current) {
+      if (isDragging.current) {
         liftPin();
       } else {
         settlePin();
       }
 
-      prevCenterRef.current = { lat, lng };
       setMapCenter({ lat, lng });
 
       if (programmaticMove.current) {
@@ -189,7 +198,7 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
       }
       onCoordsChange({ lat, lng });
     },
-    [map, onCoordsChange, liftPin, settlePin]
+    [onCoordsChange, liftPin, settlePin]
   );
 
   const handleDragStart = useCallback(() => {
@@ -242,13 +251,17 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     <div className="space-y-3">
       <SearchBar mapCenter={mapCenter} onSelect={handleSearchSelect} />
 
-      <div className="relative h-[500px] w-full overflow-hidden rounded-lg border">
+      <div
+        ref={mapContainerRef}
+        className="relative h-[500px] w-full overflow-hidden rounded-lg border"
+      >
         <Map
           defaultCenter={initialCenter ?? DEFAULT_CENTER}
           defaultZoom={initialCenter ? 17 : 12}
           mapId="address-picker-map"
           className="h-full w-full"
           gestureHandling="greedy"
+          scrollwheel={false}
           onCameraChanged={handleCameraChanged}
           onDragstart={handleDragStart}
           onDragend={handleDragEnd}
