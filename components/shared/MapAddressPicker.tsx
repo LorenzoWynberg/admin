@@ -126,12 +126,17 @@ function SearchBar({ mapCenter, onSelect }: SearchBarProps) {
 
 // ─── Map picker content ────────────────────────────────────────────────────
 
+// Threshold for detecting center movement (drag) vs pure zoom
+const CENTER_MOVE_THRESHOLD = 0.0001;
+
 function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerProps) {
   const map = useMap();
   const [pinLifted, setPinLifted] = useState(false);
   const [mapCenter, setMapCenter] = useState(initialCenter ?? DEFAULT_CENTER);
   const programmaticMove = useRef(false);
   const settleTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevCenterRef = useRef(initialCenter ?? DEFAULT_CENTER);
+  const isDragging = useRef(false);
 
   // Report initial center on mount
   useEffect(() => {
@@ -154,21 +159,40 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
 
   const handleCameraChanged = useCallback(
     (e: MapCameraChangedEvent) => {
-      settlePin();
       const { lat, lng } = e.detail.center;
+      const prev = prevCenterRef.current;
+
+      // Detect if center actually moved (drag) vs pure zoom
+      const centerMoved =
+        Math.abs(lat - prev.lat) > CENTER_MOVE_THRESHOLD ||
+        Math.abs(lng - prev.lng) > CENTER_MOVE_THRESHOLD;
+
+      if (centerMoved && isDragging.current) {
+        liftPin();
+      } else {
+        settlePin();
+      }
+
+      prevCenterRef.current = { lat, lng };
       setMapCenter({ lat, lng });
+
       if (programmaticMove.current) {
         programmaticMove.current = false;
         return;
       }
       onCoordsChange({ lat, lng });
     },
-    [onCoordsChange, settlePin]
+    [onCoordsChange, liftPin, settlePin]
   );
 
   const handleDragStart = useCallback(() => {
-    liftPin();
-  }, [liftPin]);
+    isDragging.current = true;
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    isDragging.current = false;
+    settlePin();
+  }, [settlePin]);
 
   const handleSearchSelect = useCallback(
     async (item: PlaceAutocompleteItemData) => {
@@ -220,6 +244,7 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
           gestureHandling="greedy"
           onCameraChanged={handleCameraChanged}
           onDragstart={handleDragStart}
+          onDragend={handleDragEnd}
           onClick={handleMapClick}
         />
 
