@@ -12,7 +12,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useUpdateStop } from '@/hooks/orders';
 import { MapAddressPicker, type MapPickerCoords } from '@/components/shared/MapAddressPicker';
-import { GeoService } from '@/services/geoService';
 
 type OrderStopData = App.Data.Order.OrderStopData;
 
@@ -51,15 +50,6 @@ export function EditStopAddressDialog({
 
     setSaving(true);
     try {
-      const placeId = coords.placeId || '';
-      if (!placeId) {
-        try {
-          await GeoService.reverseGeocode(coords.lat, coords.lng);
-        } catch {
-          // Continue — API can handle coords-only
-        }
-      }
-
       await updateStop.mutateAsync({
         orderPublicId,
         stopId: stop.id,
@@ -67,7 +57,7 @@ export function EditStopAddressDialog({
           address: {
             latitude: coords.lat,
             longitude: coords.lng,
-            placeId,
+            ...(coords.placeId ? { placeId: coords.placeId } : {}),
           },
         },
       });
