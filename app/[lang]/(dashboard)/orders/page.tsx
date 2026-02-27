@@ -259,7 +259,7 @@ export default function OrdersPage() {
                   <TableHead>
                     {t('orders:detail.payment_status', { defaultValue: 'Payment' })}
                   </TableHead>
-                  <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
+                  <TableHead>{t('orders:detail.stops', { defaultValue: 'Stops' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
                   <TableHead>{capitalize(modelLabel('quote'))}</TableHead>
                   <TableHead>{actionLabel('created')}</TableHead>
@@ -279,12 +279,12 @@ export default function OrdersPage() {
                     <TableCell>
                       <PaymentStatusBadge status={order.paymentStatus} />
                     </TableCell>
-                    <TableCell className="max-w-[200px] truncate">
-                      {formatAddress(
-                        ((order.stops ?? []) as App.Data.Order.OrderStopData[]).find(
+                    <TableCell className="text-center">
+                      {
+                        ((order.stops ?? []) as App.Data.Order.OrderStopData[]).filter(
                           (s) => s.type !== 'dropoff'
-                        )?.address
-                      )}
+                        ).length
+                      }
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">
                       {formatAddress(order.deliveryAddress)}

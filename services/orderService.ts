@@ -66,4 +66,27 @@ export const OrderService = {
   async destroy(id: string): Promise<SuccessBasic> {
     return api.destroy<SuccessBasic>(`/orders/${id}`);
   },
+
+  /**
+   * Calculate distance for an order based on its stops
+   */
+  async calculateDistance(publicId: string): Promise<OrderData> {
+    const response = await api.post<Single<OrderData>>(`/orders/${publicId}/calculate-distance`);
+    return response.item;
+  },
+
+  /**
+   * Update a stop on an order
+   */
+  async updateStop(
+    orderPublicId: string,
+    stopId: number,
+    data: Record<string, unknown>
+  ): Promise<App.Data.Order.OrderStopData> {
+    const response = await api.patch<Single<App.Data.Order.OrderStopData>>(
+      `/orders/${orderPublicId}/stops/${stopId}`,
+      data
+    );
+    return response.item;
+  },
 };

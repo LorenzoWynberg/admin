@@ -475,6 +475,7 @@ declare namespace App.Data.Order {
   };
   export type UpdateOrderStopData = {
     addressId?: number | null;
+    address?: App.Data.Address.StoreSnapshotAddressData | null;
     name?: string | null;
     contactName?: string | null;
     contactPhone?: string | null;
