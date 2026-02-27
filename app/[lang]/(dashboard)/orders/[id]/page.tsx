@@ -291,7 +291,7 @@ export default function OrderDetailPage() {
                 {t('orders:detail.no_stops', { defaultValue: 'No stops' })}
               </p>
             )}
-            {order.deliveryAddress && (
+            {order.deliveryAddress && !orderStops.some((s) => s.type === 'dropoff') && (
               <div className="rounded-lg border p-3">
                 <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
                   {t('orders:detail.delivery_address', { defaultValue: 'Delivery Address' })}
