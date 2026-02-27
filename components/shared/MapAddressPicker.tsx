@@ -167,6 +167,13 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
         Math.abs(lat - prev.lat) > CENTER_MOVE_THRESHOLD ||
         Math.abs(lng - prev.lng) > CENTER_MOVE_THRESHOLD;
 
+      // On scroll-zoom the mouse position biases the zoom, shifting center.
+      // Snap center back so the pin stays on the same coords.
+      if (centerMoved && !isDragging.current && !programmaticMove.current) {
+        map?.moveCamera({ center: prev });
+        return;
+      }
+
       if (centerMoved && isDragging.current) {
         liftPin();
       } else {
@@ -182,7 +189,7 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
       }
       onCoordsChange({ lat, lng });
     },
-    [onCoordsChange, liftPin, settlePin]
+    [map, onCoordsChange, liftPin, settlePin]
   );
 
   const handleDragStart = useCallback(() => {
