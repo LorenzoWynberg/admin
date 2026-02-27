@@ -216,16 +216,11 @@ export default function OrderDetailPage() {
                                 : 'border-green-300 text-green-700 dark:border-green-700 dark:text-green-400'
                             }
                           >
-                            {t(`orders:stop_types.${stop.type}`, {
+                            {t(`routes:stop_types.${stop.type}`, {
                               defaultValue: capitalize(stop.type || 'stop'),
                             })}
                           </Badge>
-                          {(stop.name || stop.type === 'dropoff') && (
-                            <span className="text-sm font-medium">
-                              {stop.name ||
-                                t('orders:detail.delivery', { defaultValue: 'Delivery' })}
-                            </span>
-                          )}
+                          {stop.name && <span className="text-sm font-medium">{stop.name}</span>}
                         </div>
                         {stop.status && (
                           <Badge variant="secondary">
