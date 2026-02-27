@@ -132,6 +132,7 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
   const [mapCenter, setMapCenter] = useState(initialCenter ?? DEFAULT_CENTER);
   const settleTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isDragging = useRef(false);
+  const activePlaceId = useRef<string | undefined>(undefined);
 
   // Report initial center on mount
   useEffect(() => {
@@ -163,13 +164,14 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
       }
 
       setMapCenter({ lat, lng });
-      onCoordsChange({ lat, lng });
+      onCoordsChange({ lat, lng, placeId: activePlaceId.current });
     },
     [onCoordsChange, liftPin, settlePin]
   );
 
   const handleDragStart = useCallback(() => {
     isDragging.current = true;
+    activePlaceId.current = undefined;
   }, []);
 
   const handleDragEnd = useCallback(() => {
@@ -181,18 +183,14 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     async (item: PlaceAutocompleteItemData) => {
       try {
         const details = await GeoService.placeDetails(item.placeId);
+        activePlaceId.current = details.placeId;
         map?.panTo({ lat: details.lat, lng: details.lng });
         map?.setZoom(17);
-        onCoordsChange({
-          lat: details.lat,
-          lng: details.lng,
-          placeId: details.placeId,
-        });
       } catch {
         // Details fetch failed — ignore
       }
     },
-    [map, onCoordsChange]
+    [map]
   );
 
   // POI click — user clicks a place (store, restaurant, etc.) on the map
@@ -202,14 +200,10 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
       const lng = e.detail.latLng?.lng;
       if (lat == null || lng == null) return;
 
+      activePlaceId.current = e.detail.placeId ?? undefined;
       map?.panTo({ lat, lng });
-      onCoordsChange({
-        lat,
-        lng,
-        placeId: e.detail.placeId ?? undefined,
-      });
     },
-    [map, onCoordsChange]
+    [map]
   );
 
   return (
