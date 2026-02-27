@@ -233,7 +233,6 @@ export default function OrderDetailPage() {
                       <div className="mt-2 space-y-1 pl-6">
                         {stop.address ? (
                           <div className="flex items-start gap-2">
-                            <MapPin className="text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
                             <span className="text-sm">{formatAddress(stop.address)}</span>
                             <Button
                               variant="ghost"
