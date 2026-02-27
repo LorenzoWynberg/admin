@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useUpdateStop } from '@/hooks/orders';
-import { MapAddressPicker } from '@/components/shared/MapAddressPicker';
+import { MapAddressPicker, type MapPickerCoords } from '@/components/shared/MapAddressPicker';
 import { GeoService } from '@/services/geoService';
 
 type OrderStopData = App.Data.Order.OrderStopData;
@@ -32,19 +32,18 @@ export function EditStopAddressDialog({
   const { t } = useTranslation();
   const updateStop = useUpdateStop();
   const [saving, setSaving] = useState(false);
-  const coordsRef = useRef<{ lat: number; lng: number; placeId?: string } | null>(null);
+  const [hasCoords, setHasCoords] = useState(false);
+  const coordsRef = useRef<MapPickerCoords | null>(null);
 
   const initialCenter =
     stop.address?.latitude && stop.address?.longitude
       ? { lat: stop.address.latitude, lng: stop.address.longitude }
       : undefined;
 
-  const handleCoordsChange = useCallback(
-    (coords: { lat: number; lng: number; placeId?: string }) => {
-      coordsRef.current = coords;
-    },
-    []
-  );
+  const handleCoordsChange = useCallback((coords: MapPickerCoords) => {
+    coordsRef.current = coords;
+    setHasCoords(true);
+  }, []);
 
   const handleSubmit = async () => {
     const coords = coordsRef.current;
@@ -52,14 +51,12 @@ export function EditStopAddressDialog({
 
     setSaving(true);
     try {
-      // If we have a placeId from search, use it directly.
-      // Otherwise reverse geocode to get address data (like AddressPickerModal).
       const placeId = coords.placeId || '';
       if (!placeId) {
         try {
           await GeoService.reverseGeocode(coords.lat, coords.lng);
         } catch {
-          // Continue with empty placeId — API can handle coords-only
+          // Continue — API can handle coords-only
         }
       }
 
@@ -75,6 +72,7 @@ export function EditStopAddressDialog({
         },
       });
       coordsRef.current = null;
+      setHasCoords(false);
       onOpenChange(false);
     } catch {
       // Error handled by mutation hook
@@ -101,7 +99,7 @@ export function EditStopAddressDialog({
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             {t('common:cancel', { defaultValue: 'Cancel' })}
           </Button>
-          <Button onClick={handleSubmit} disabled={!coordsRef.current || isPending}>
+          <Button onClick={handleSubmit} disabled={!hasCoords || isPending}>
             {isPending
               ? t('common:saving', { defaultValue: 'Saving...' })
               : t('common:save', { defaultValue: 'Save' })}

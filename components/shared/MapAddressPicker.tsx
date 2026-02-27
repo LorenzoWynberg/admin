@@ -2,23 +2,128 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { APIProvider, Map, useMap, type MapCameraChangedEvent } from '@vis.gl/react-google-maps';
-import {
-  PlacesAutocompleteInner,
-  type PlaceResult,
-} from '@/components/shared/PlacesAutocompleteInput';
+import { Search, Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { useTranslation } from 'react-i18next';
+import { GeoService } from '@/services/geoService';
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
-
 const DEFAULT_CENTER = { lat: 9.9281, lng: -84.0907 };
+
+type PlaceAutocompleteItemData = App.Data.Address.PlaceAutocompleteItemData;
+
+export interface MapPickerCoords {
+  lat: number;
+  lng: number;
+  placeId?: string;
+}
 
 export interface MapAddressPickerProps {
   initialCenter?: { lat: number; lng: number };
-  onCoordsChange: (coords: { lat: number; lng: number; placeId?: string }) => void;
+  onCoordsChange: (coords: MapPickerCoords) => void;
 }
+
+// ─── Custom search with backend-proxied autocomplete ───────────────────────
+
+interface SearchBarProps {
+  mapCenter: { lat: number; lng: number };
+  onSelect: (item: PlaceAutocompleteItemData) => void;
+}
+
+function SearchBar({ mapCenter, onSelect }: SearchBarProps) {
+  const { t } = useTranslation();
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<PlaceAutocompleteItemData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleChange = (value: string) => {
+    setQuery(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (!value.trim()) {
+      setSuggestions([]);
+      setOpen(false);
+      return;
+    }
+
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const results = await GeoService.autocomplete(value, mapCenter.lat, mapCenter.lng);
+        setSuggestions(results);
+        setOpen(results.length > 0);
+      } catch {
+        setSuggestions([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 350);
+  };
+
+  const handleSelect = (item: PlaceAutocompleteItemData) => {
+    setQuery(item.description);
+    setOpen(false);
+    setSuggestions([]);
+    onSelect(item);
+  };
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <div className="relative">
+        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+        <Input
+          value={query}
+          onChange={(e) => handleChange(e.target.value)}
+          onFocus={() => suggestions.length > 0 && setOpen(true)}
+          placeholder={t('orders:detail.search_address', {
+            defaultValue: 'Search for an address...',
+          })}
+          className="pr-9 pl-9"
+        />
+        {loading && (
+          <Loader2 className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-spin" />
+        )}
+      </div>
+
+      {open && suggestions.length > 0 && (
+        <div className="bg-popover absolute top-full right-0 left-0 z-50 mt-1 max-h-[240px] overflow-y-auto rounded-md border shadow-md">
+          {suggestions.map((item) => (
+            <button
+              key={item.placeId}
+              type="button"
+              className="hover:bg-accent flex w-full items-center gap-2 px-3 py-2 text-left text-sm"
+              onClick={() => handleSelect(item)}
+            >
+              <Search className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">{item.description}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Map picker content ────────────────────────────────────────────────────
 
 function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerProps) {
   const map = useMap();
   const [pinLifted, setPinLifted] = useState(false);
+  const [mapCenter, setMapCenter] = useState(initialCenter ?? DEFAULT_CENTER);
   const programmaticMove = useRef(false);
   const settleTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -32,7 +137,6 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
 
   const liftPin = useCallback(() => {
     setPinLifted(true);
-    // Safety timeout — force settle after 2s (mirrors client pattern)
     if (settleTimeout.current) clearTimeout(settleTimeout.current);
     settleTimeout.current = setTimeout(() => setPinLifted(false), 2000);
   }, []);
@@ -45,11 +149,12 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
   const handleCameraChanged = useCallback(
     (e: MapCameraChangedEvent) => {
       settlePin();
+      const { lat, lng } = e.detail.center;
+      setMapCenter({ lat, lng });
       if (programmaticMove.current) {
         programmaticMove.current = false;
         return;
       }
-      const { lat, lng } = e.detail.center;
       onCoordsChange({ lat, lng });
     },
     [onCoordsChange, settlePin]
@@ -59,24 +164,28 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     liftPin();
   }, [liftPin]);
 
-  const handlePlaceSelect = useCallback(
-    (place: PlaceResult) => {
-      programmaticMove.current = true;
-      map?.panTo({ lat: place.latitude, lng: place.longitude });
-      map?.setZoom(17);
-      onCoordsChange({
-        lat: place.latitude,
-        lng: place.longitude,
-        placeId: place.placeId,
-      });
+  const handleSearchSelect = useCallback(
+    async (item: PlaceAutocompleteItemData) => {
+      try {
+        const details = await GeoService.placeDetails(item.placeId);
+        programmaticMove.current = true;
+        map?.panTo({ lat: details.lat, lng: details.lng });
+        map?.setZoom(17);
+        onCoordsChange({
+          lat: details.lat,
+          lng: details.lng,
+          placeId: details.placeId,
+        });
+      } catch {
+        // Details fetch failed — ignore
+      }
     },
     [map, onCoordsChange]
   );
 
   return (
     <div className="space-y-3">
-      {/* Search bar above the map — avoids collision with Google map controls */}
-      <PlacesAutocompleteInner onPlaceSelect={handlePlaceSelect} />
+      <SearchBar mapCenter={mapCenter} onSelect={handleSearchSelect} />
 
       <div className="relative h-[500px] w-full overflow-hidden rounded-lg border">
         <Map
@@ -89,7 +198,7 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
           onDragstart={handleDragStart}
         />
 
-        {/* Fixed center pin — pointer-events: none so map receives all gestures */}
+        {/* Fixed center pin */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div
             className="flex flex-col items-center"
@@ -98,9 +207,7 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
               transition: `transform ${pinLifted ? '120ms' : '220ms'} ease-out`,
             }}
           >
-            {/* Pin dot */}
             <div className="h-[18px] w-[18px] rounded-full border-2 border-white bg-emerald-500" />
-            {/* Pin stick */}
             <div className="h-[18px] w-[2px] bg-emerald-500" />
           </div>
           {/* Shadow */}
@@ -120,6 +227,8 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     </div>
   );
 }
+
+// ─── Public component ──────────────────────────────────────────────────────
 
 export function MapAddressPicker(props: MapAddressPickerProps) {
   if (!GOOGLE_MAPS_API_KEY) {
