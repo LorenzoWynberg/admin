@@ -12,7 +12,7 @@ import {
 import { FileText, Send, Loader2, Pencil, Clock, AlertTriangle } from 'lucide-react';
 
 import { FeasibilityBadge } from './FeasibilityBadge';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFeasibilityCheck } from '@/hooks/feasibility';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrencyList } from '@/hooks/currencies';
 import { useCalculatePricing } from '@/hooks/pricing';
 import { useCreateQuote, useSendQuote } from '@/hooks/quotes';
+import { useCalculateDistance } from '@/hooks/orders';
 import { actionLabel, validationAttribute } from '@/utils/lang';
 import {
   formatCurrency,
@@ -62,6 +63,7 @@ export function CreateQuoteDialog({
   const [editingTimes, setEditingTimes] = useState(false);
   const createQuote = useCreateQuote();
   const sendQuote = useSendQuote();
+  const calculateDistance = useCalculateDistance();
 
   // Fetch feasibility when dialog is open
   const { data: feasibility, isLoading: feasibilityLoading } = useFeasibilityCheck({
@@ -97,6 +99,24 @@ export function CreateQuoteDialog({
     !editingTimes && feasibility?.suggestedDelivery
       ? toDateTimeLocal(new Date(feasibility.suggestedDelivery))
       : formData.deliveryProposedFor;
+
+  // Auto-calculate distance when dialog opens if not yet calculated
+  useEffect(() => {
+    if (open && !orderDistanceKm && !calculateDistance.isPending) {
+      calculateDistance.mutate(orderPublicId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  // Update form distance when calculation completes
+  useEffect(() => {
+    if (calculateDistance.data?.totalDistanceKm) {
+      setFormData((prev) => ({
+        ...prev,
+        distanceKm: calculateDistance.data!.totalDistanceKm!.toString(),
+      }));
+    }
+  }, [calculateDistance.data]);
 
   // Reset form with fresh defaults when dialog opens
   const handleOpenChange = (isOpen: boolean) => {
