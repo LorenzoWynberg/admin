@@ -144,30 +144,43 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
   }, []);
 
   // Center-locked scroll zoom: disable Google's cursor-biased zoom and use
-  // setZoom() which always zooms at center. One RAF gate prevents stacking.
+  // setZoom() which always zooms at center. Debounce scroll events into a
+  // single zoom step after the user stops scrolling (150ms quiet period).
   useEffect(() => {
     const container = mapContainerRef.current;
     if (!container || !map) return;
 
-    let rafPending = false;
-    let direction = 0;
+    let accumulatedDelta = 0;
+    let debounceId: ReturnType<typeof setTimeout> | null = null;
+
+    const applyZoom = () => {
+      debounceId = null;
+      const zoom = map.getZoom();
+      if (zoom == null || accumulatedDelta === 0) {
+        accumulatedDelta = 0;
+        return;
+      }
+      // Normalize: trackpads send many small deltas, mice send few large ones.
+      // Clamp to ±1 zoom level per gesture regardless of accumulated amount.
+      const step = accumulatedDelta > 0 ? -1 : 1;
+      accumulatedDelta = 0;
+      programmaticMove.current = true;
+      map.setZoom(Math.max(1, Math.min(21, zoom + step)));
+    };
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
-      direction = e.deltaY > 0 ? -1 : 1;
-      if (rafPending) return;
-      rafPending = true;
-      requestAnimationFrame(() => {
-        rafPending = false;
-        const zoom = map.getZoom();
-        if (zoom == null) return;
-        programmaticMove.current = true;
-        map.setZoom(Math.max(1, Math.min(21, zoom + direction)));
-      });
+      accumulatedDelta += e.deltaY;
+      // Reset timer on each scroll tick — only apply after 150ms of quiet
+      if (debounceId) clearTimeout(debounceId);
+      debounceId = setTimeout(applyZoom, 150);
     };
 
     container.addEventListener('wheel', handleWheel, { passive: false });
-    return () => container.removeEventListener('wheel', handleWheel);
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+      if (debounceId) clearTimeout(debounceId);
+    };
   }, [map]);
 
   const liftPin = useCallback(() => {
