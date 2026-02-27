@@ -17,8 +17,12 @@ import {
   Timer,
   Truck,
   User,
+  Calculator,
+  Pencil,
+  Plus,
 } from 'lucide-react';
 
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -30,11 +34,12 @@ import { ProofOfDeliveryCard } from '@/components/orders/ProofOfDeliveryCard';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { QuoteDetailDialog } from '@/components/quotes/QuoteDetailDialog';
 import { PaymentSection } from '@/components/payments/PaymentSection';
+import { EditStopAddressDialog } from '@/components/orders/EditStopAddressDialog';
 import { ChatTabs } from '@/components/chat/ChatTabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { formatDate, formatDateTime, formatCurrency } from '@/utils/format';
-import { useOrder, useDeleteOrder } from '@/hooks/orders';
+import { useOrder, useDeleteOrder, useCalculateDistance } from '@/hooks/orders';
 import { useCurrencyList } from '@/hooks/currencies';
 import { Enums } from '@/data/app-enums';
 
@@ -50,7 +55,9 @@ export default function OrderDetailPage() {
 
   const { data: order, isLoading, error } = useOrder({ id: orderId });
   const deleteOrder = useDeleteOrder();
+  const calculateDistance = useCalculateDistance();
   const { data: currencyData } = useCurrencyList();
+  const [editingStop, setEditingStop] = useState<App.Data.Order.OrderStopData | null>(null);
 
   // Get currency symbol for the order's currency
   const currencies = currencyData?.items || [];
@@ -224,11 +231,31 @@ export default function OrderDetailPage() {
                         )}
                       </div>
                       <div className="mt-2 space-y-1 pl-6">
-                        {stop.address && (
+                        {stop.address ? (
                           <div className="flex items-start gap-2">
-                            <MapPin className="text-muted-foreground mt-0.5 h-3.5 w-3.5" />
+                            <MapPin className="text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
                             <span className="text-sm">{formatAddress(stop.address)}</span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 shrink-0"
+                              onClick={() => setEditingStop(stop)}
+                            >
+                              <Pencil className="h-3 w-3" />
+                            </Button>
                           </div>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs"
+                            onClick={() => setEditingStop(stop)}
+                          >
+                            <Plus className="mr-1 h-3 w-3" />
+                            {t('orders:detail.add_address', {
+                              defaultValue: 'Add Address',
+                            })}
+                          </Button>
                         )}
                         {stop.contactName && (
                           <div className="flex items-center gap-2">
@@ -271,7 +298,7 @@ export default function OrderDetailPage() {
                   {t('orders:detail.delivery_address', { defaultValue: 'Delivery Address' })}
                 </p>
                 <div className="flex items-start gap-2">
-                  <MapPin className="text-muted-foreground mt-0.5 h-4 w-4" />
+                  <MapPin className="text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
                   <span className="font-medium">{formatAddress(order.deliveryAddress)}</span>
                 </div>
               </div>
@@ -322,6 +349,23 @@ export default function OrderDetailPage() {
                 )}
               </div>
             )}
+            {!order.totalDistanceKm &&
+              orderStops.length >= 2 &&
+              orderStops.every((s) => s.address) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => order.publicId && calculateDistance.mutate(order.publicId)}
+                  disabled={calculateDistance.isPending}
+                >
+                  <Calculator className="mr-2 h-4 w-4" />
+                  {calculateDistance.isPending
+                    ? t('common:loading', { defaultValue: 'Loading...' })
+                    : t('orders:detail.calculate_distance', {
+                        defaultValue: 'Calculate Distance',
+                      })}
+                </Button>
+              )}
             <div className="flex flex-wrap gap-2">
               {order.deliveryTier && (
                 <Badge
@@ -659,6 +703,16 @@ export default function OrderDetailPage() {
           </Card>
         )}
       </div>
+
+      {/* Edit Stop Address Dialog */}
+      {order.publicId && editingStop && (
+        <EditStopAddressDialog
+          open={!!editingStop}
+          onOpenChange={(open) => !open && setEditingStop(null)}
+          stop={editingStop}
+          orderPublicId={order.publicId}
+        />
+      )}
     </div>
   );
 }
