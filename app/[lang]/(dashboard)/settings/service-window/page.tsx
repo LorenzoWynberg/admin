@@ -63,6 +63,11 @@ function ServiceWindowForm({ data }: { data: SettingData }) {
   const [noServiceStart, setNoServiceStart] = useState(data.noServiceStart.slice(0, 5));
   const [noServiceEnd, setNoServiceEnd] = useState(data.noServiceEnd.slice(0, 5));
 
+  const isDirty =
+    enabled !== data.serviceWindowEnabled ||
+    noServiceStart !== data.noServiceStart.slice(0, 5) ||
+    noServiceEnd !== data.noServiceEnd.slice(0, 5);
+
   const handleSave = () => {
     updateMutation.mutate({
       noServiceStart,
@@ -169,7 +174,7 @@ function ServiceWindowForm({ data }: { data: SettingData }) {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={updateMutation.isPending}>
+        <Button onClick={handleSave} disabled={!isDirty || updateMutation.isPending}>
           {updateMutation.isPending
             ? t('common:loading', { defaultValue: 'Loading...' })
             : t('common:save', { defaultValue: 'Save' })}
