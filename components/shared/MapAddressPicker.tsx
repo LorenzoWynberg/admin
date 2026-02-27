@@ -143,49 +143,31 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Intercept scroll wheel: prevent Google's cursor-biased zoom, do our own
-  // center-locked zoom so the pin never drifts.
-  // Accumulate deltaY and throttle to one zoom step per 80ms.
+  // Center-locked scroll zoom: disable Google's cursor-biased zoom and use
+  // setZoom() which always zooms at center. One RAF gate prevents stacking.
   useEffect(() => {
     const container = mapContainerRef.current;
     if (!container || !map) return;
 
-    let accumulated = 0;
-    let throttleId: ReturnType<typeof setTimeout> | null = null;
-
-    const applyZoom = () => {
-      throttleId = null;
-      const currentZoom = map.getZoom();
-      const center = map.getCenter();
-      if (currentZoom == null || !center) {
-        accumulated = 0;
-        return;
-      }
-
-      // Convert accumulated scroll into a small zoom step
-      const step = accumulated > 0 ? -0.5 : 0.5;
-      accumulated = 0;
-
-      programmaticMove.current = true;
-      map.moveCamera({
-        zoom: Math.max(1, Math.min(21, currentZoom + step)),
-        center: { lat: center.lat(), lng: center.lng() },
-      });
-    };
+    let rafPending = false;
+    let direction = 0;
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
-      accumulated += e.deltaY;
-      if (!throttleId) {
-        throttleId = setTimeout(applyZoom, 80);
-      }
+      direction = e.deltaY > 0 ? -1 : 1;
+      if (rafPending) return;
+      rafPending = true;
+      requestAnimationFrame(() => {
+        rafPending = false;
+        const zoom = map.getZoom();
+        if (zoom == null) return;
+        programmaticMove.current = true;
+        map.setZoom(Math.max(1, Math.min(21, zoom + direction)));
+      });
     };
 
     container.addEventListener('wheel', handleWheel, { passive: false });
-    return () => {
-      container.removeEventListener('wheel', handleWheel);
-      if (throttleId) clearTimeout(throttleId);
-    };
+    return () => container.removeEventListener('wheel', handleWheel);
   }, [map]);
 
   const liftPin = useCallback(() => {
