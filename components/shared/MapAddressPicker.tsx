@@ -132,11 +132,6 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
   const [mapCenter, setMapCenter] = useState(initialCenter ?? DEFAULT_CENTER);
   const settleTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isDragging = useRef(false);
-  // The "locked" center — only updated by drag, search, or click.
-  // Zoom should always snap back to this point.
-  const lockedCenter = useRef(initialCenter ?? DEFAULT_CENTER);
-  const lastZoom = useRef<number | null>(null);
-  const snapBackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Report initial center on mount
   useEffect(() => {
@@ -160,31 +155,17 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
   const handleCameraChanged = useCallback(
     (e: MapCameraChangedEvent) => {
       const { lat, lng } = e.detail.center;
-      const zoom = e.detail.zoom;
 
       if (isDragging.current) {
-        // Dragging — update the locked center
         liftPin();
-        lockedCenter.current = { lat, lng };
-        setMapCenter({ lat, lng });
-        onCoordsChange({ lat, lng });
-      } else if (lastZoom.current !== null && zoom !== lastZoom.current) {
-        // Zoom changed (not dragging) — schedule a snap-back to locked center.
-        // Use a short timer so we snap after the zoom animation settles,
-        // not on every intermediate frame.
-        if (snapBackTimer.current) clearTimeout(snapBackTimer.current);
-        snapBackTimer.current = setTimeout(() => {
-          map?.panTo(lockedCenter.current);
-        }, 50);
-        setMapCenter({ lat, lng });
       } else {
-        // Programmatic pan (search/click) — just update state
-        setMapCenter({ lat, lng });
+        settlePin();
       }
 
-      lastZoom.current = zoom;
+      setMapCenter({ lat, lng });
+      onCoordsChange({ lat, lng });
     },
-    [map, onCoordsChange, liftPin]
+    [onCoordsChange, liftPin, settlePin]
   );
 
   const handleDragStart = useCallback(() => {
@@ -200,7 +181,6 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
     async (item: PlaceAutocompleteItemData) => {
       try {
         const details = await GeoService.placeDetails(item.placeId);
-        lockedCenter.current = { lat: details.lat, lng: details.lng };
         map?.panTo({ lat: details.lat, lng: details.lng });
         map?.setZoom(17);
         onCoordsChange({
@@ -222,7 +202,6 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
       const lng = e.detail.latLng?.lng;
       if (lat == null || lng == null) return;
 
-      lockedCenter.current = { lat, lng };
       map?.panTo({ lat, lng });
       onCoordsChange({
         lat,
@@ -243,7 +222,8 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
           defaultZoom={initialCenter ? 17 : 12}
           mapId="address-picker-map"
           className="h-full w-full"
-          gestureHandling="greedy"
+          gestureHandling="cooperative"
+          scrollwheel={false}
           onCameraChanged={handleCameraChanged}
           onDragstart={handleDragStart}
           onDragend={handleDragEnd}
