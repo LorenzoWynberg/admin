@@ -220,7 +220,12 @@ export default function OrderDetailPage() {
                               defaultValue: capitalize(stop.type || 'stop'),
                             })}
                           </Badge>
-                          {stop.name && <span className="text-sm font-medium">{stop.name}</span>}
+                          {(stop.name || stop.type === 'dropoff') && (
+                            <span className="text-sm font-medium">
+                              {stop.name ||
+                                t('orders:detail.delivery', { defaultValue: 'Delivery' })}
+                            </span>
+                          )}
                         </div>
                         {stop.status && (
                           <Badge variant="secondary">
