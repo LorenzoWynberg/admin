@@ -223,27 +223,29 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
           onClick={handleMapClick}
         />
 
-        {/* Fixed center pin */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        {/* Fixed center pin — bottom of stick anchored to exact map center */}
+        <div className="pointer-events-none absolute inset-0">
+          {/* Pin group: positioned so bottom of stick = 50% */}
           <div
-            className="flex flex-col items-center"
+            className="absolute top-1/2 left-1/2 flex flex-col items-center"
             style={{
-              transform: `translateY(${pinLifted ? '-14px' : '0'})`,
+              transform: `translate(-50%, -100%) translateY(${pinLifted ? '-14px' : '0px'})`,
               transition: `transform ${pinLifted ? '120ms' : '220ms'} ease-out`,
             }}
           >
+            {/* Pin dot */}
             <div className="h-[18px] w-[18px] rounded-full border-2 border-white bg-emerald-500" />
+            {/* Pin stick */}
             <div className="h-[18px] w-[2px] bg-emerald-500" />
           </div>
-          {/* Shadow */}
+          {/* Shadow: sits right at map center */}
           <div
-            className="absolute rounded-full bg-black"
+            className="absolute top-1/2 left-1/2 rounded-full bg-black"
             style={{
               width: 12,
               height: 12,
-              marginTop: 24,
+              transform: `translate(-50%, -50%) scale(${pinLifted ? 1 : 0.5})`,
               opacity: pinLifted ? 0.45 : 0,
-              transform: `scale(${pinLifted ? 1 : 0.5})`,
               transition: `opacity ${pinLifted ? '120ms' : '220ms'} ease-out, transform ${pinLifted ? '120ms' : '220ms'} ease-out`,
             }}
           />
