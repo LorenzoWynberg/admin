@@ -52,23 +52,23 @@ export const DriverService = {
     overrides: App.Data.Driver.DriverScheduleOverrideData[];
   }> {
     const response = await api.get<
-      Api.Response.Single<{
+      Api.Response.SuccessBasic & {
         schedules: App.Data.Driver.DriverScheduleData[];
         overrides: App.Data.Driver.DriverScheduleOverrideData[];
-      }>
+      }
     >(`/drivers/${driverId}/schedules`);
-    return response.item;
+    return { schedules: response.schedules, overrides: response.overrides };
   },
 
   async syncSchedules(
     driverId: string,
     schedules: App.Data.Driver.DriverScheduleData[]
   ): Promise<App.Data.Driver.DriverScheduleData[]> {
-    const response = await api.put<Api.Response.Single<App.Data.Driver.DriverScheduleData[]>>(
+    const response = await api.put<Api.Response.Multiple<App.Data.Driver.DriverScheduleData>>(
       `/drivers/${driverId}/schedules`,
       { schedules }
     );
-    return response.item;
+    return response.items;
   },
 
   async syncOverrides(
@@ -76,8 +76,8 @@ export const DriverService = {
     overrides: App.Data.Driver.DriverScheduleOverrideData[]
   ): Promise<App.Data.Driver.DriverScheduleOverrideData[]> {
     const response = await api.put<
-      Api.Response.Single<App.Data.Driver.DriverScheduleOverrideData[]>
+      Api.Response.Multiple<App.Data.Driver.DriverScheduleOverrideData>
     >(`/drivers/${driverId}/schedule-overrides`, { overrides });
-    return response.item;
+    return response.items;
   },
 };
