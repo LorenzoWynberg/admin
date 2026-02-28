@@ -10,7 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -20,8 +20,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapAddressPicker, type MapPickerCoords } from '@/components/shared/MapAddressPicker';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { DriverScheduleTab } from '@/components/drivers/DriverScheduleTab';
-import { ArrowLeft, User, CreditCard, Car, Calendar, Trash2, MapPin } from 'lucide-react';
+import { ArrowLeft, User, CreditCard, Car, Calendar, Trash2, MapPin, Pencil } from 'lucide-react';
 import { formatDate } from '@/utils/format';
 
 function getInitials(name?: string): string {
@@ -63,7 +70,34 @@ export default function DriverDetailPage() {
     }
   };
 
-  const [pickedCoords, setPickedCoords] = useState<MapPickerCoords | null>(null);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [mapSaving, setMapSaving] = useState(false);
+  const [hasCoords, setHasCoords] = useState(false);
+  const coordsRef = useRef<MapPickerCoords | null>(null);
+
+  const handleCoordsChange = useCallback((coords: MapPickerCoords) => {
+    coordsRef.current = coords;
+    setHasCoords(true);
+  }, []);
+
+  const handleSaveBaseLocation = async () => {
+    const coords = coordsRef.current;
+    if (!coords) return;
+    setMapSaving(true);
+    try {
+      await updateDriver.mutateAsync({
+        id: driverId,
+        data: { baseLatitude: coords.lat, baseLongitude: coords.lng },
+      });
+      coordsRef.current = null;
+      setHasCoords(false);
+      setMapOpen(false);
+    } catch {
+      // Error handled by mutation hook
+    } finally {
+      setMapSaving(false);
+    }
+  };
 
   if (!ready || isLoading) {
     return (
@@ -252,44 +286,59 @@ export default function DriverDetailPage() {
 
             {/* Base Location — internal drivers only */}
             {!driver.isOutsourced && (
-              <Card className="lg:col-span-2">
-                <CardHeader className="flex flex-row items-center justify-between">
+              <Card>
+                <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
                     {t('drivers:detail.base_location', { defaultValue: 'Base Location' })}
                   </CardTitle>
-                  <Button
-                    size="sm"
-                    disabled={!pickedCoords || updateDriver.isPending}
-                    onClick={() => {
-                      if (!pickedCoords) return;
-                      updateDriver.mutate(
-                        {
-                          id: driverId,
-                          data: {
-                            baseLatitude: pickedCoords.lat,
-                            baseLongitude: pickedCoords.lng,
-                          },
-                        },
-                        { onSuccess: () => setPickedCoords(null) }
-                      );
-                    }}
-                  >
-                    {updateDriver.isPending
-                      ? t('common:saving', { defaultValue: 'Saving...' })
-                      : t('common:save', { defaultValue: 'Save' })}
-                  </Button>
                 </CardHeader>
-                <CardContent>
-                  {(pickedCoords || baseCenter) && (
-                    <p className="text-muted-foreground mb-3 text-sm">
-                      {(pickedCoords ?? baseCenter)!.lat.toFixed(5)},{' '}
-                      {(pickedCoords ?? baseCenter)!.lng.toFixed(5)}
+                <CardContent className="space-y-3">
+                  {baseCenter ? (
+                    <p className="font-medium">
+                      {baseCenter.lat.toFixed(5)}, {baseCenter.lng.toFixed(5)}
+                    </p>
+                  ) : (
+                    <p className="text-muted-foreground text-sm">
+                      {t('drivers:detail.no_base_location', {
+                        defaultValue: 'No base location set',
+                      })}
                     </p>
                   )}
-                  <div className="h-[300px] overflow-hidden rounded-lg border">
-                    <MapAddressPicker initialCenter={baseCenter} onCoordsChange={setPickedCoords} />
-                  </div>
+                  <Button variant="outline" size="sm" onClick={() => setMapOpen(true)}>
+                    <Pencil className="mr-2 h-3.5 w-3.5" />
+                    {baseCenter
+                      ? t('common:edit', { defaultValue: 'Edit' })
+                      : t('common:set', { defaultValue: 'Set' })}
+                  </Button>
+
+                  <Dialog open={mapOpen} onOpenChange={setMapOpen}>
+                    <DialogContent className="sm:max-w-3xl">
+                      <DialogHeader>
+                        <DialogTitle>
+                          {t('drivers:detail.base_location', {
+                            defaultValue: 'Base Location',
+                          })}
+                        </DialogTitle>
+                      </DialogHeader>
+
+                      <MapAddressPicker
+                        initialCenter={baseCenter}
+                        onCoordsChange={handleCoordsChange}
+                      />
+
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setMapOpen(false)}>
+                          {t('common:cancel', { defaultValue: 'Cancel' })}
+                        </Button>
+                        <Button onClick={handleSaveBaseLocation} disabled={!hasCoords || mapSaving}>
+                          {mapSaving
+                            ? t('common:saving', { defaultValue: 'Saving...' })
+                            : t('common:save', { defaultValue: 'Save' })}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
             )}
