@@ -20,6 +20,7 @@ import {
   Calculator,
   Pencil,
   Plus,
+  ExternalLink,
 } from 'lucide-react';
 
 import { useState } from 'react';
@@ -39,7 +40,7 @@ import { ChatTabs } from '@/components/chat/ChatTabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
 import { formatDate, formatDateTime, formatCurrency } from '@/utils/format';
-import { useOrder, useDeleteOrder, useCalculateDistance } from '@/hooks/orders';
+import { useOrder, useDeleteOrder, useCalculateDistance, useOutsourceOrder } from '@/hooks/orders';
 import { useCurrencyList } from '@/hooks/currencies';
 import { Enums } from '@/data/app-enums';
 
@@ -56,6 +57,7 @@ export default function OrderDetailPage() {
   const { data: order, isLoading, error } = useOrder({ id: orderId });
   const deleteOrder = useDeleteOrder();
   const calculateDistance = useCalculateDistance();
+  const outsourceOrder = useOutsourceOrder();
   const { data: currencyData } = useCurrencyList();
   const [editingStop, setEditingStop] = useState<App.Data.Order.OrderStopData | null>(null);
 
@@ -160,8 +162,21 @@ export default function OrderDetailPage() {
               windowStart={order.windowStart}
               windowEnd={order.windowEnd}
               timeSensitive={order.timeSensitive}
+              deliveryTier={order.deliveryTier}
             />
           )}
+          {(order.status === Enums.OrderStatus.APPROVED ||
+            order.status === Enums.OrderStatus.ESTIMATED) &&
+            !order.driver && (
+              <Button
+                variant="outline"
+                onClick={() => order.publicId && outsourceOrder.mutate(order.publicId)}
+                disabled={outsourceOrder.isPending}
+              >
+                <ExternalLink className="mr-2 h-4 w-4" />
+                {t('orders:detail.outsource', { defaultValue: 'Outsource' })}
+              </Button>
+            )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
             <Trash2 className="mr-2 h-4 w-4" />
             {actionLabel('delete')}
@@ -537,6 +552,7 @@ export default function OrderDetailPage() {
                 customerCurrencyCode={order.user?.preferredCurrency || order.currencyCode}
                 customerDesiredDelivery={order.desiredDeliveryAt}
                 customerDesiredPickup={order.desiredPickupAt}
+                deliveryTier={order.deliveryTier}
               />
             )}
             <div className="flex justify-between border-t pt-2">
@@ -713,6 +729,7 @@ export default function OrderDetailPage() {
           onOpenChange={(open) => !open && setEditingStop(null)}
           stop={editingStop}
           orderPublicId={order.publicId}
+          otherStops={orderStops}
         />
       )}
     </div>

@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrencyList } from '@/hooks/currencies';
 import { useCalculatePricing } from '@/hooks/pricing';
 import { useCreateQuote, useSendQuote } from '@/hooks/quotes';
-import { useCalculateDistance } from '@/hooks/orders';
+import { useCalculateDistance, useChangeTier } from '@/hooks/orders';
 import { actionLabel, validationAttribute } from '@/utils/lang';
 import {
   formatCurrency,
@@ -44,6 +44,7 @@ interface CreateQuoteDialogProps {
   windowStart?: string | null;
   windowEnd?: string | null;
   timeSensitive?: boolean;
+  deliveryTier?: string;
 }
 
 export function CreateQuoteDialog({
@@ -57,6 +58,7 @@ export function CreateQuoteDialog({
   windowStart,
   windowEnd,
   timeSensitive = false,
+  deliveryTier,
 }: CreateQuoteDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -273,6 +275,9 @@ export function CreateQuoteDialog({
                 level={feasibility.level}
                 candidateCount={feasibility.candidates?.length || 0}
               />
+              {feasibility.level === 'red' && deliveryTier && deliveryTier !== 'cheapest' && (
+                <TierAdjustmentCallout currentTier={deliveryTier} orderPublicId={orderPublicId} />
+              )}
             </div>
           ) : null}
         </DialogHeader>
@@ -672,5 +677,68 @@ export function CreateQuoteDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function TierAdjustmentCallout({
+  currentTier,
+  orderPublicId,
+}: {
+  currentTier: string;
+  orderPublicId: string;
+}) {
+  const { t } = useTranslation();
+  const changeTier = useChangeTier();
+
+  const tierLabel = (tier: string) => t(`orders:tiers.${tier}`, { defaultValue: tier });
+
+  const tierOptions: { value: string; hours: number }[] = [];
+  if (currentTier === 'expedited') {
+    tierOptions.push({ value: 'regular', hours: 24 }, { value: 'cheapest', hours: 72 });
+  } else if (currentTier === 'regular') {
+    tierOptions.push({ value: 'cheapest', hours: 72 });
+  }
+
+  if (tierOptions.length === 0) return null;
+
+  return (
+    <div className="mt-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950">
+      <div className="flex items-start gap-2">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+        <div className="space-y-2">
+          <p className="text-sm text-amber-800 dark:text-amber-300">
+            {t('quotes:feasibility.no_drivers_for_tier', {
+              tier: tierLabel(currentTier),
+              defaultValue: `No drivers available for ${tierLabel(currentTier)}`,
+            })}
+          </p>
+          <p className="text-muted-foreground text-xs">
+            {t('quotes:feasibility.try_longer_window', {
+              defaultValue: 'Try a longer window:',
+            })}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {tierOptions.map((opt) => (
+              <Button
+                key={opt.value}
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs"
+                disabled={changeTier.isPending}
+                onClick={() =>
+                  changeTier.mutate({ publicId: orderPublicId, deliveryTier: opt.value })
+                }
+              >
+                {t('quotes:feasibility.change_to_tier', {
+                  tier: tierLabel(opt.value),
+                  hours: opt.hours,
+                  defaultValue: `Change to ${tierLabel(opt.value)} (${opt.hours}h)`,
+                })}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

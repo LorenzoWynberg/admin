@@ -76,6 +76,24 @@ export const OrderService = {
   },
 
   /**
+   * Change order delivery tier (admin only)
+   */
+  async changeTier(publicId: string, deliveryTier: string): Promise<OrderData> {
+    const response = await api.patch<Single<OrderData>>(`/orders/${publicId}/tier`, {
+      delivery_tier: deliveryTier,
+    });
+    return response.item;
+  },
+
+  /**
+   * Manually outsource an order to external provider (admin only)
+   */
+  async outsource(publicId: string): Promise<OrderData> {
+    const response = await api.post<Single<OrderData>>(`/orders/${publicId}/outsource`);
+    return response.item;
+  },
+
+  /**
    * Update a stop on an order
    */
   async updateStop(

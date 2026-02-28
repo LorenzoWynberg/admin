@@ -11,7 +11,11 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useUpdateStop } from '@/hooks/orders';
-import { MapAddressPicker, type MapPickerCoords } from '@/components/shared/MapAddressPicker';
+import {
+  MapAddressPicker,
+  type MapPickerCoords,
+  type MapMarker,
+} from '@/components/shared/MapAddressPicker';
 
 type OrderStopData = App.Data.Order.OrderStopData;
 
@@ -20,6 +24,7 @@ interface EditStopAddressDialogProps {
   onOpenChange: (open: boolean) => void;
   stop: OrderStopData;
   orderPublicId: string;
+  otherStops?: OrderStopData[];
 }
 
 export function EditStopAddressDialog({
@@ -27,6 +32,7 @@ export function EditStopAddressDialog({
   onOpenChange,
   stop,
   orderPublicId,
+  otherStops,
 }: EditStopAddressDialogProps) {
   const { t } = useTranslation();
   const updateStop = useUpdateStop();
@@ -38,6 +44,15 @@ export function EditStopAddressDialog({
     stop.address?.latitude && stop.address?.longitude
       ? { lat: stop.address.latitude, lng: stop.address.longitude }
       : undefined;
+
+  const markers: MapMarker[] = (otherStops ?? [])
+    .filter((s) => s.id !== stop.id && s.address?.latitude && s.address?.longitude)
+    .map((s) => ({
+      lat: s.address!.latitude,
+      lng: s.address!.longitude,
+      type: (s.type ?? 'pickup') as MapMarker['type'],
+      label: s.name ?? undefined,
+    }));
 
   const handleCoordsChange = useCallback((coords: MapPickerCoords) => {
     coordsRef.current = coords;
@@ -83,7 +98,11 @@ export function EditStopAddressDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <MapAddressPicker initialCenter={initialCenter} onCoordsChange={handleCoordsChange} />
+        <MapAddressPicker
+          initialCenter={initialCenter}
+          onCoordsChange={handleCoordsChange}
+          markers={markers}
+        />
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

@@ -12,6 +12,7 @@ import { Search, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
 import { GeoService } from '@/services/geoService';
+import { StopMarker } from '@/components/routes/StopMarker';
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 const DEFAULT_CENTER = { lat: 9.9281, lng: -84.0907 };
@@ -24,9 +25,17 @@ export interface MapPickerCoords {
   placeId?: string;
 }
 
+export interface MapMarker {
+  lat: number;
+  lng: number;
+  type: 'pickup' | 'dropoff' | 'purchase';
+  label?: string;
+}
+
 export interface MapAddressPickerProps {
   initialCenter?: { lat: number; lng: number };
   onCoordsChange: (coords: MapPickerCoords) => void;
+  markers?: MapMarker[];
 }
 
 // ─── Custom search with backend-proxied autocomplete ───────────────────────
@@ -126,7 +135,7 @@ function SearchBar({ mapCenter, onSelect }: SearchBarProps) {
 
 // ─── Map picker content ────────────────────────────────────────────────────
 
-function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerProps) {
+function MapPickerContent({ initialCenter, onCoordsChange, markers }: MapAddressPickerProps) {
   const map = useMap();
   const [pinLifted, setPinLifted] = useState(false);
   const [mapCenter, setMapCenter] = useState(initialCenter ?? DEFAULT_CENTER);
@@ -232,7 +241,17 @@ function MapPickerContent({ initialCenter, onCoordsChange }: MapAddressPickerPro
           onDragstart={handleDragStart}
           onDragend={handleDragEnd}
           onClick={handleMapClick}
-        />
+        >
+          {markers?.map((marker, i) => (
+            <StopMarker
+              key={i}
+              lat={marker.lat}
+              lng={marker.lng}
+              type={marker.type === 'purchase' ? 'pickup' : marker.type}
+              label={marker.label}
+            />
+          ))}
+        </Map>
 
         {/* Fixed center pin — bottom of stick anchored to exact map center */}
         <div className="pointer-events-none absolute inset-0">

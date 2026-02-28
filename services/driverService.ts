@@ -46,4 +46,38 @@ export const DriverService = {
   async destroy(id: string): Promise<SuccessBasic> {
     return api.destroy<SuccessBasic>(`/drivers/${id}`);
   },
+
+  async getSchedules(driverId: string): Promise<{
+    schedules: App.Data.Driver.DriverScheduleData[];
+    overrides: App.Data.Driver.DriverScheduleOverrideData[];
+  }> {
+    const response = await api.get<
+      Api.Response.Single<{
+        schedules: App.Data.Driver.DriverScheduleData[];
+        overrides: App.Data.Driver.DriverScheduleOverrideData[];
+      }>
+    >(`/drivers/${driverId}/schedules`);
+    return response.item;
+  },
+
+  async syncSchedules(
+    driverId: string,
+    schedules: App.Data.Driver.DriverScheduleData[]
+  ): Promise<App.Data.Driver.DriverScheduleData[]> {
+    const response = await api.put<Api.Response.Single<App.Data.Driver.DriverScheduleData[]>>(
+      `/drivers/${driverId}/schedules`,
+      { schedules }
+    );
+    return response.item;
+  },
+
+  async syncOverrides(
+    driverId: string,
+    overrides: App.Data.Driver.DriverScheduleOverrideData[]
+  ): Promise<App.Data.Driver.DriverScheduleOverrideData[]> {
+    const response = await api.put<
+      Api.Response.Single<App.Data.Driver.DriverScheduleOverrideData[]>
+    >(`/drivers/${driverId}/schedule-overrides`, { overrides });
+    return response.item;
+  },
 };

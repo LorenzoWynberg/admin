@@ -46,11 +46,13 @@ npm run lint && npm run typecheck && npm run format
 ## Cross-Project Sync
 
 When modifying DTOs/Enums in API:
+
 1. Run `types` to regenerate TypeScript types
 2. Copy to admin and front-end
 3. Run `npm run gen:enums` in both
 4. Commit in all affected repos
 
 When modifying translations in API:
+
 1. Run `langs` to regenerate JSON
 2. No manual sync needed (served at runtime)

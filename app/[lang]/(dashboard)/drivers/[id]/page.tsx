@@ -17,7 +17,10 @@ import { useDriver, useDeleteDriver, useUpdateDriver } from '@/hooks/drivers';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, User, CreditCard, Car, Calendar, Trash2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MapAddressPicker, type MapPickerCoords } from '@/components/shared/MapAddressPicker';
+import { DriverScheduleTab } from '@/components/drivers/DriverScheduleTab';
+import { ArrowLeft, User, CreditCard, Car, Calendar, Trash2, MapPin } from 'lucide-react';
 import { formatDate } from '@/utils/format';
 
 function getInitials(name?: string): string {
@@ -59,6 +62,13 @@ export default function DriverDetailPage() {
     }
   };
 
+  const handleBaseLocationChange = (coords: MapPickerCoords) => {
+    updateDriver.mutate({
+      id: driverId,
+      data: { baseLatitude: coords.lat, baseLongitude: coords.lng },
+    });
+  };
+
   if (!ready || isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -79,6 +89,10 @@ export default function DriverDetailPage() {
   }
 
   const expired = isLicenseExpired(driver.licenseExpirationDate);
+  const baseCenter =
+    driver.baseLatitude != null && driver.baseLongitude != null
+      ? { lat: driver.baseLatitude, lng: driver.baseLongitude }
+      : undefined;
 
   return (
     <div className="space-y-6">
@@ -122,105 +136,151 @@ export default function DriverDetailPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              {t('drivers:detail.user_account', { defaultValue: 'User Account' })}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('name', true)}</span>
-              <span className="font-medium">{driver.user?.name || '-'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('email', true)}</span>
-              <span className="font-medium">{driver.user?.email || '-'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{validationAttribute('phone', true)}</span>
-              <span className="font-medium">{driver.user?.phone || '-'}</span>
-            </div>
-            {driver.user?.publicId && (
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => router.push(`/users/${driver.user?.publicId}`)}
-              >
-                {t('drivers:detail.view_user_profile', { defaultValue: 'View User Profile' })}
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="details">
+        <TabsList>
+          <TabsTrigger value="details">
+            {t('drivers:tabs.details', { defaultValue: 'Details' })}
+          </TabsTrigger>
+          <TabsTrigger value="schedule">
+            {t('drivers:tabs.schedule', { defaultValue: 'Schedule' })}
+          </TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
-              {t('drivers:detail.license_info', { defaultValue: 'License Information' })}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {validationAttribute('licenseNumber', true)}
-              </span>
-              <span className="font-medium">{driver.licenseNumber || '-'}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">
-                {validationAttribute('expirationDate', true)}
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{formatDate(driver.licenseExpirationDate)}</span>
-                {expired && (
-                  <Badge variant="destructive">
-                    {t('drivers:detail.expired', { defaultValue: 'Expired' })}
-                  </Badge>
+        <TabsContent value="details" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  {t('drivers:detail.user_account', { defaultValue: 'User Account' })}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{validationAttribute('name', true)}</span>
+                  <span className="font-medium">{driver.user?.name || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {validationAttribute('email', true)}
+                  </span>
+                  <span className="font-medium">{driver.user?.email || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {validationAttribute('phone', true)}
+                  </span>
+                  <span className="font-medium">{driver.user?.phone || '-'}</span>
+                </div>
+                {driver.user?.publicId && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => router.push(`/users/${driver.user?.publicId}`)}
+                  >
+                    {t('drivers:detail.view_user_profile', {
+                      defaultValue: 'View User Profile',
+                    })}
+                  </Button>
                 )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Car className="h-5 w-5" />
-              {t('drivers:detail.vehicle_info', { defaultValue: 'Vehicle Information' })}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {validationAttribute('licensePlate', true)}
-              </span>
-              <span className="font-medium">{driver.licensePlateNumber || '-'}</span>
-            </div>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  {t('drivers:detail.license_info', { defaultValue: 'License Information' })}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {validationAttribute('licenseNumber', true)}
+                  </span>
+                  <span className="font-medium">{driver.licenseNumber || '-'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">
+                    {validationAttribute('expirationDate', true)}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{formatDate(driver.licenseExpirationDate)}</span>
+                    {expired && (
+                      <Badge variant="destructive">
+                        {t('drivers:detail.expired', { defaultValue: 'Expired' })}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              {validationAttribute('timestamps', true)}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{actionLabel('created')}</span>
-              <span className="font-medium">{formatDate(driver.createdAt)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{actionLabel('updated')}</span>
-              <span className="font-medium">{formatDate(driver.updatedAt)}</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Car className="h-5 w-5" />
+                  {t('drivers:detail.vehicle_info', { defaultValue: 'Vehicle Information' })}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {validationAttribute('licensePlate', true)}
+                  </span>
+                  <span className="font-medium">{driver.licensePlateNumber || '-'}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  {validationAttribute('timestamps', true)}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{actionLabel('created')}</span>
+                  <span className="font-medium">{formatDate(driver.createdAt)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{actionLabel('updated')}</span>
+                  <span className="font-medium">{formatDate(driver.updatedAt)}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Base Location */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  {t('drivers:detail.base_location', { defaultValue: 'Base Location' })}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {baseCenter && (
+                  <p className="text-muted-foreground mb-3 text-sm">
+                    {baseCenter.lat.toFixed(5)}, {baseCenter.lng.toFixed(5)}
+                  </p>
+                )}
+                <div className="h-[300px] overflow-hidden rounded-lg border">
+                  <MapAddressPicker
+                    initialCenter={baseCenter}
+                    onCoordsChange={handleBaseLocationChange}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="schedule">
+          <DriverScheduleTab driverId={driverId} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
