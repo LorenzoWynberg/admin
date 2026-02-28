@@ -10,6 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -62,12 +63,7 @@ export default function DriverDetailPage() {
     }
   };
 
-  const handleBaseLocationChange = (coords: MapPickerCoords) => {
-    updateDriver.mutate({
-      id: driverId,
-      data: { baseLatitude: coords.lat, baseLongitude: coords.lng },
-    });
-  };
+  const [pickedCoords, setPickedCoords] = useState<MapPickerCoords | null>(null);
 
   if (!ready || isLoading) {
     return (
@@ -257,23 +253,42 @@ export default function DriverDetailPage() {
             {/* Base Location — internal drivers only */}
             {!driver.isOutsourced && (
               <Card className="lg:col-span-2">
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
                     {t('drivers:detail.base_location', { defaultValue: 'Base Location' })}
                   </CardTitle>
+                  <Button
+                    size="sm"
+                    disabled={!pickedCoords || updateDriver.isPending}
+                    onClick={() => {
+                      if (!pickedCoords) return;
+                      updateDriver.mutate(
+                        {
+                          id: driverId,
+                          data: {
+                            baseLatitude: pickedCoords.lat,
+                            baseLongitude: pickedCoords.lng,
+                          },
+                        },
+                        { onSuccess: () => setPickedCoords(null) }
+                      );
+                    }}
+                  >
+                    {updateDriver.isPending
+                      ? t('common:saving', { defaultValue: 'Saving...' })
+                      : t('common:save', { defaultValue: 'Save' })}
+                  </Button>
                 </CardHeader>
                 <CardContent>
-                  {baseCenter && (
+                  {(pickedCoords || baseCenter) && (
                     <p className="text-muted-foreground mb-3 text-sm">
-                      {baseCenter.lat.toFixed(5)}, {baseCenter.lng.toFixed(5)}
+                      {(pickedCoords ?? baseCenter)!.lat.toFixed(5)},{' '}
+                      {(pickedCoords ?? baseCenter)!.lng.toFixed(5)}
                     </p>
                   )}
                   <div className="h-[300px] overflow-hidden rounded-lg border">
-                    <MapAddressPicker
-                      initialCenter={baseCenter}
-                      onCoordsChange={handleBaseLocationChange}
-                    />
+                    <MapAddressPicker initialCenter={baseCenter} onCoordsChange={setPickedCoords} />
                   </div>
                 </CardContent>
               </Card>
