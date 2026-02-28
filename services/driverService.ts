@@ -1,5 +1,12 @@
 import { api } from '@/lib/api/client';
 
+export interface AffectedOrder {
+  publicId: string;
+  status: 'reassigned' | 'unassigned';
+  newDriverId: number | null;
+  dispatchSuccess: boolean;
+}
+
 type DriverData = App.Data.Driver.DriverData;
 type StoreDriverData = App.Data.Driver.StoreDriverData;
 type UpdateDriverData = App.Data.Driver.UpdateDriverData;
@@ -74,10 +81,38 @@ export const DriverService = {
   async syncOverrides(
     driverId: string,
     overrides: App.Data.Driver.DriverScheduleOverrideData[]
-  ): Promise<App.Data.Driver.DriverScheduleOverrideData[]> {
+  ): Promise<{
+    overrides: App.Data.Driver.DriverScheduleOverrideData[];
+    affectedOrders?: AffectedOrder[];
+  }> {
     const response = await api.put<
-      Api.Response.Multiple<App.Data.Driver.DriverScheduleOverrideData>
+      Api.Response.SuccessBasic & {
+        overrides: App.Data.Driver.DriverScheduleOverrideData[];
+        affectedOrders?: AffectedOrder[];
+      }
     >(`/drivers/${driverId}/schedule-overrides`, { overrides });
-    return response.items;
+    return {
+      overrides: response.overrides,
+      affectedOrders: response.affectedOrders,
+    };
+  },
+
+  async syncSchedulesWithCascade(
+    driverId: string,
+    schedules: App.Data.Driver.DriverScheduleData[]
+  ): Promise<{
+    schedules: App.Data.Driver.DriverScheduleData[];
+    affectedOrders?: AffectedOrder[];
+  }> {
+    const response = await api.put<
+      Api.Response.SuccessBasic & {
+        schedules: App.Data.Driver.DriverScheduleData[];
+        affectedOrders?: AffectedOrder[];
+      }
+    >(`/drivers/${driverId}/schedules`, { schedules });
+    return {
+      schedules: response.schedules,
+      affectedOrders: response.affectedOrders,
+    };
   },
 };
