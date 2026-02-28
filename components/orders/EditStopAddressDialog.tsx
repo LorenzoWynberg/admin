@@ -51,7 +51,7 @@ export function EditStopAddressDialog({
       lat: s.address!.latitude,
       lng: s.address!.longitude,
       type: (s.type ?? 'pickup') as MapMarker['type'],
-      label: s.name ?? undefined,
+      label: s.instructions ?? undefined,
     }));
 
   const handleCoordsChange = useCallback((coords: MapPickerCoords) => {
@@ -94,7 +94,7 @@ export function EditStopAddressDialog({
         <DialogHeader>
           <DialogTitle>
             {t('orders:detail.edit_stop_address', { defaultValue: 'Set Stop Address' })}
-            {stop.name && ` — ${stop.name}`}
+            {stop.instructions && ` — ${stop.instructions}`}
           </DialogTitle>
         </DialogHeader>
 

@@ -397,7 +397,6 @@ declare namespace App.Data.Order {
     isContactless?: boolean;
     deliveryTier?: App.Enums.DeliveryTier;
     timeSensitive?: boolean;
-    description?: string | null;
     totalDistanceKm?: number | null;
     totalEstimatedMinutes?: number | null;
     status?: App.Enums.OrderStatus;
@@ -444,7 +443,6 @@ declare namespace App.Data.Order {
     publicId?: string;
     orderId?: number;
     addressId?: number | null;
-    name?: string | null;
     type?: App.Enums.OrderStopType;
     sequence?: number;
     status?: App.Enums.OrderStopStatus;
@@ -493,7 +491,6 @@ declare namespace App.Data.Order {
   export type StoreOrderStopData = {
     addressId: number | null;
     address?: App.Data.Address.StoreSnapshotAddressData | null;
-    name?: string | null;
     type: App.Enums.OrderStopType;
     contactName?: string | null;
     contactPhone?: string | null;
@@ -502,7 +499,6 @@ declare namespace App.Data.Order {
   export type UpdateOrderStopData = {
     addressId?: number | null;
     address?: App.Data.Address.StoreSnapshotAddressData | null;
-    name?: string | null;
     contactName?: string | null;
     contactPhone?: string | null;
     instructions?: string | null;

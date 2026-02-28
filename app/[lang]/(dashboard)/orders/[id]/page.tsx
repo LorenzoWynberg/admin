@@ -238,7 +238,6 @@ export default function OrderDetailPage() {
                               defaultValue: capitalize(stop.type || 'stop'),
                             })}
                           </Badge>
-                          {stop.name && <span className="text-sm font-medium">{stop.name}</span>}
                         </div>
                         {stop.status && (
                           <Badge variant="secondary">
@@ -332,14 +331,6 @@ export default function OrderDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {order.description && (
-              <div>
-                <p className="text-muted-foreground text-sm">
-                  {validationAttribute('description', true)}
-                </p>
-                <p className="font-medium">{order.description}</p>
-              </div>
-            )}
             {(order.totalDistanceKm || order.totalEstimatedMinutes) && (
               <div className="flex gap-6">
                 {order.totalDistanceKm && (
@@ -612,7 +603,7 @@ export default function OrderDetailPage() {
                   .map((stop, idx) => (
                     <div key={stop.publicId || idx} className="flex justify-between">
                       <span className="text-muted-foreground">
-                        {stop.name ||
+                        {stop.instructions ||
                           t(`orders:stop_types.${stop.type}`, {
                             defaultValue: capitalize(stop.type || 'stop'),
                           })}
