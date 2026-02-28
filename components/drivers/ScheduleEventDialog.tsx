@@ -25,6 +25,7 @@ interface ScheduleEventDialogProps {
   endTime?: string;
   isOverride?: boolean;
   available?: boolean;
+  isSaving?: boolean;
   onSave: (override: OverrideEntry) => void;
   onDelete?: () => void;
   onMakeUnavailable?: () => void;
@@ -39,6 +40,7 @@ export function ScheduleEventDialog({
   endTime: initialEndTime,
   isOverride,
   available: initialAvailable,
+  isSaving,
   onSave,
   onDelete,
   onMakeUnavailable,
@@ -59,7 +61,11 @@ export function ScheduleEventDialog({
     setEndTime(initialEndTime ?? '17:00');
   }
 
+  const isTimeValid = !available || startTime < endTime;
+
   const handleSave = () => {
+    if (!isTimeValid) return;
+
     const override: OverrideEntry = {
       date,
       available,
@@ -104,25 +110,36 @@ export function ScheduleEventDialog({
           </div>
 
           {available && (
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <Label className="text-sm">{t('common:start', { defaultValue: 'Start' })}</Label>
-                <Input
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="mt-1"
-                />
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <Label className="text-sm">{t('common:start', { defaultValue: 'Start' })}</Label>
+                  <Input
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="flex-1">
+                  <Label className="text-sm">{t('common:end', { defaultValue: 'End' })}</Label>
+                  <Input
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
               </div>
-              <div className="flex-1">
-                <Label className="text-sm">{t('common:end', { defaultValue: 'End' })}</Label>
-                <Input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
+              {!isTimeValid && (
+                <p className="text-destructive text-xs">
+                  {t('validation:after', {
+                    attribute: t('common:end', { defaultValue: 'End' }),
+                    date: t('common:start', { defaultValue: 'Start' }),
+                    defaultValue: 'End time must be after start time',
+                  })}
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -131,6 +148,7 @@ export function ScheduleEventDialog({
           {mode === 'edit' && !isOverride && onMakeUnavailable && (
             <Button
               variant="destructive"
+              disabled={isSaving}
               onClick={() => {
                 onMakeUnavailable();
                 onOpenChange(false);
@@ -142,6 +160,7 @@ export function ScheduleEventDialog({
           {mode === 'edit' && isOverride && onDelete && (
             <Button
               variant="outline"
+              disabled={isSaving}
               onClick={() => {
                 onDelete();
                 onOpenChange(false);
@@ -150,7 +169,9 @@ export function ScheduleEventDialog({
               {t('drivers:schedule.revert_to_template', { defaultValue: 'Revert to default' })}
             </Button>
           )}
-          <Button onClick={handleSave}>{t('common:save', { defaultValue: 'Save' })}</Button>
+          <Button onClick={handleSave} disabled={isSaving || !isTimeValid}>
+            {t('common:save', { defaultValue: 'Save' })}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

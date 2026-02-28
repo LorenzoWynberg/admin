@@ -65,8 +65,8 @@ export function buildCalendarEvents(
         });
       } else {
         // Available override with custom times
-        const startTime = override.startTime ?? '08:00';
-        const endTime = override.endTime ?? '17:00';
+        const startTime = override.startTime || '08:00';
+        const endTime = override.endTime || '17:00';
         events.push({
           id: `override-${dateStr}`,
           start: Temporal.ZonedDateTime.from(`${dateStr}T${startTime}:00[${TIMEZONE}]`),

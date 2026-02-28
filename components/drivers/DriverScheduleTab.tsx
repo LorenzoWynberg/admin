@@ -115,7 +115,9 @@ export function DriverScheduleTab({ driverId }: Props) {
 
   const handleEventClick = useCallback(
     (event: CalendarEventExternal) => {
-      const dateStr = event._date as string;
+      const dateStr =
+        (event._date as string | undefined) ??
+        extractDateFromTemporal(event.start as Temporal.ZonedDateTime);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const clickedDate = new Date(dateStr + 'T00:00:00');
@@ -129,7 +131,7 @@ export function DriverScheduleTab({ driverId }: Props) {
         return;
       }
 
-      const isOverride = event._isOverride as boolean;
+      const isOverride = (event._isOverride as boolean | undefined) ?? false;
       const calendarId = event.calendarId ?? '';
 
       setDialogMode('edit');
@@ -374,6 +376,7 @@ export function DriverScheduleTab({ driverId }: Props) {
         endTime={dialogEndTime}
         isOverride={dialogIsOverride}
         available={dialogAvailable}
+        isSaving={syncOverrides.isPending}
         onSave={handleSaveOverride}
         onDelete={handleDeleteOverride}
         onMakeUnavailable={handleMakeUnavailable}
