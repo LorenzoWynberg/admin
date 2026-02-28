@@ -141,9 +141,11 @@ export default function DriverDetailPage() {
           <TabsTrigger value="details">
             {t('drivers:tabs.details', { defaultValue: 'Details' })}
           </TabsTrigger>
-          <TabsTrigger value="schedule">
-            {t('drivers:tabs.schedule', { defaultValue: 'Schedule' })}
-          </TabsTrigger>
+          {!driver.isOutsourced && (
+            <TabsTrigger value="schedule">
+              {t('drivers:tabs.schedule', { defaultValue: 'Schedule' })}
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="details" className="space-y-6">
@@ -252,34 +254,38 @@ export default function DriverDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Base Location */}
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  {t('drivers:detail.base_location', { defaultValue: 'Base Location' })}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {baseCenter && (
-                  <p className="text-muted-foreground mb-3 text-sm">
-                    {baseCenter.lat.toFixed(5)}, {baseCenter.lng.toFixed(5)}
-                  </p>
-                )}
-                <div className="h-[300px] overflow-hidden rounded-lg border">
-                  <MapAddressPicker
-                    initialCenter={baseCenter}
-                    onCoordsChange={handleBaseLocationChange}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            {/* Base Location — internal drivers only */}
+            {!driver.isOutsourced && (
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    {t('drivers:detail.base_location', { defaultValue: 'Base Location' })}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {baseCenter && (
+                    <p className="text-muted-foreground mb-3 text-sm">
+                      {baseCenter.lat.toFixed(5)}, {baseCenter.lng.toFixed(5)}
+                    </p>
+                  )}
+                  <div className="h-[300px] overflow-hidden rounded-lg border">
+                    <MapAddressPicker
+                      initialCenter={baseCenter}
+                      onCoordsChange={handleBaseLocationChange}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </TabsContent>
 
-        <TabsContent value="schedule">
-          <DriverScheduleTab driverId={driverId} />
-        </TabsContent>
+        {!driver.isOutsourced && (
+          <TabsContent value="schedule">
+            <DriverScheduleTab driverId={driverId} />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
