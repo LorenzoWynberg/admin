@@ -277,10 +277,25 @@ declare namespace App.Data.Driver {
     currentLatitude?: number | null;
     currentLongitude?: number | null;
     locationUpdatedAt?: string | null;
+    baseLatitude?: number | null;
+    baseLongitude?: number | null;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
     user?: App.Data.User.UserData;
+  };
+  export type DriverScheduleData = {
+    id?: number;
+    dayOfWeek: number;
+    startTime: string;
+    endTime: string;
+  };
+  export type DriverScheduleOverrideData = {
+    id?: number;
+    date: string;
+    available: boolean;
+    startTime?: string | null;
+    endTime?: string | null;
   };
   export type StoreDriverData = {
     user: App.Data.User.StoreUserData;
@@ -290,6 +305,12 @@ declare namespace App.Data.Driver {
     licensePhotoBack: string;
     licenseExpirationDate: string;
   };
+  export type SyncDriverScheduleData = {
+    schedules: Array<App.Data.Driver.DriverScheduleData>;
+  };
+  export type SyncDriverScheduleOverridesData = {
+    overrides: Array<App.Data.Driver.DriverScheduleOverrideData>;
+  };
   export type UpdateDriverData = {
     licenseNumber?: string;
     licensePlateNumber?: string;
@@ -297,6 +318,8 @@ declare namespace App.Data.Driver {
     licensePhotoBack?: string;
     licenseExpirationDate?: string;
     active?: boolean;
+    baseLatitude?: number | null;
+    baseLongitude?: number | null;
   };
   export type UpdateLocationData = {
     latitude: number;
@@ -336,6 +359,7 @@ declare namespace App.Data.Feasibility {
     windowStart: string | null;
     windowEnd: string | null;
     timeSensitive: boolean;
+    planningMode: boolean;
   };
 }
 declare namespace App.Data.Location {
