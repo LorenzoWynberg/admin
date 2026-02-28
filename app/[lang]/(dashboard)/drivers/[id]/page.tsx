@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/dialog';
 import { DriverScheduleTab } from '@/components/drivers/DriverScheduleTab';
 import { ArrowLeft, User, CreditCard, Car, Calendar, Trash2, MapPin, Pencil } from 'lucide-react';
+import { GeoService } from '@/services/geoService';
 import { formatDate } from '@/utils/format';
 
 function getInitials(name?: string): string {
@@ -85,9 +86,16 @@ export default function DriverDetailPage() {
     if (!coords) return;
     setMapSaving(true);
     try {
+      let baseAddress: string | null = null;
+      try {
+        const geo = await GeoService.reverseGeocode(coords.lat, coords.lng);
+        baseAddress = geo.humanReadableAddress;
+      } catch {
+        // Non-critical — save coords even if geocode fails
+      }
       await updateDriver.mutateAsync({
         id: driverId,
-        data: { baseLatitude: coords.lat, baseLongitude: coords.lng },
+        data: { baseLatitude: coords.lat, baseLongitude: coords.lng, baseAddress },
       });
       coordsRef.current = null;
       setHasCoords(false);
@@ -295,9 +303,12 @@ export default function DriverDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {baseCenter ? (
-                    <p className="font-medium">
-                      {baseCenter.lat.toFixed(5)}, {baseCenter.lng.toFixed(5)}
-                    </p>
+                    <div>
+                      {driver.baseAddress && <p className="font-medium">{driver.baseAddress}</p>}
+                      <p className="text-muted-foreground text-sm">
+                        {baseCenter.lat.toFixed(5)}, {baseCenter.lng.toFixed(5)}
+                      </p>
+                    </div>
                   ) : (
                     <p className="text-muted-foreground text-sm">
                       {t('drivers:detail.no_base_location', {

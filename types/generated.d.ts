@@ -279,6 +279,7 @@ declare namespace App.Data.Driver {
     locationUpdatedAt?: string | null;
     baseLatitude?: number | null;
     baseLongitude?: number | null;
+    baseAddress?: string | null;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -320,6 +321,7 @@ declare namespace App.Data.Driver {
     active?: boolean;
     baseLatitude?: number | null;
     baseLongitude?: number | null;
+    baseAddress?: string | null;
   };
   export type UpdateLocationData = {
     latitude: number;
