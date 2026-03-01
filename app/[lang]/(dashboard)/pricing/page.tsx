@@ -193,7 +193,7 @@ export default function PricingPage() {
                   <TableHead>{validationAttribute('version', true)}</TableHead>
                   <TableHead>{validationAttribute('tiers', true)}</TableHead>
                   <TableHead>{validationAttribute('status', true)}</TableHead>
-                  <TableHead className="w-[50px]">{t('common:actions')}</TableHead>
+                  <TableHead className="w-[50px]">{t('common:actions_label')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -327,7 +327,7 @@ export default function PricingPage() {
             <AlertDialogDescription>{t('confirm_activate')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
+            <AlertDialogCancel>{actionLabel('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleActivate}>
               {actionLabel('activate')}
             </AlertDialogAction>
@@ -343,7 +343,7 @@ export default function PricingPage() {
             <AlertDialogDescription>{t('confirm_delete')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common:cancel', { defaultValue: 'Cancel' })}</AlertDialogCancel>
+            <AlertDialogCancel>{actionLabel('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"

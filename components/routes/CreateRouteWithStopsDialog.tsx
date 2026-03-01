@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { actionLabel } from '@/utils/lang';
 import { useDriverList } from '@/hooks/drivers/useDriverList';
 import { useCreateRouteWithStops } from '@/hooks/routes';
 import { Button } from '@/components/ui/button';
@@ -114,7 +115,7 @@ export function CreateRouteWithStopsDialog({
 
         <DialogFooter className="mt-6">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            {t('common:cancel', { defaultValue: 'Cancel' })}
+            {actionLabel('cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={createRouteWithStops.isPending}>
             {t('common:create', { defaultValue: 'Create' })}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { actionLabel } from '@/utils/lang';
 import { useBatchAddStops } from '@/hooks/routes';
 import { Enums } from '@/data/app-enums';
 import { Button } from '@/components/ui/button';
@@ -121,7 +122,7 @@ export function BatchAddStopsDialog({
 
         <DialogFooter className="mt-6">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            {t('common:cancel', { defaultValue: 'Cancel' })}
+            {actionLabel('cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={!targetRouteId || batchAddStops.isPending}>
             {t('routes:add_to_route', { defaultValue: 'Add to Route' })}

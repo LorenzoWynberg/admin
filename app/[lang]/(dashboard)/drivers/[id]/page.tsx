@@ -340,12 +340,12 @@ export default function DriverDetailPage() {
 
                       <DialogFooter>
                         <Button variant="outline" onClick={() => setMapOpen(false)}>
-                          {t('common:cancel', { defaultValue: 'Cancel' })}
+                          {actionLabel('cancel')}
                         </Button>
                         <Button onClick={handleSaveBaseLocation} disabled={!hasCoords || mapSaving}>
                           {mapSaving
                             ? t('common:saving', { defaultValue: 'Saving...' })
-                            : t('common:save', { defaultValue: 'Save' })}
+                            : actionLabel('save')}
                         </Button>
                       </DialogFooter>
                     </DialogContent>

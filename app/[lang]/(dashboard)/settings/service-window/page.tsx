@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { actionLabel } from '@/utils/lang';
 import { useServiceWindow, useUpdateServiceWindow } from '@/hooks/settings';
 
 type SettingData = App.Data.Setting.SettingData;
@@ -29,7 +30,7 @@ export default function ServiceWindowPage() {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" onClick={() => router.push('/settings')}>
           <ChevronLeft className="mr-1 h-4 w-4" />
-          {t('common:back', { defaultValue: 'Back' })}
+          {actionLabel('back')}
         </Button>
       </div>
 
@@ -177,7 +178,7 @@ function ServiceWindowForm({ data }: { data: SettingData }) {
         <Button onClick={handleSave} disabled={!isDirty || updateMutation.isPending}>
           {updateMutation.isPending
             ? t('common:loading', { defaultValue: 'Loading...' })
-            : t('common:save', { defaultValue: 'Save' })}
+            : actionLabel('save')}
         </Button>
       </div>
     </>

@@ -34,7 +34,13 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { capitalize, resourceMessage, statusLabel, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  resourceMessage,
+  statusLabel,
+  validationAttribute,
+} from '@/utils/lang';
 import { formatDate } from '@/utils/format';
 import { useCurrencyList, useUpdateCurrency } from '@/hooks/currencies';
 import { useSyncExchangeRates } from '@/hooks/exchange-rates';
@@ -110,7 +116,7 @@ export default function CurrencySettingsPage() {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" onClick={() => router.push('/settings')}>
           <ChevronLeft className="mr-1 h-4 w-4" />
-          {t('common:back', { defaultValue: 'Back' })}
+          {actionLabel('back')}
         </Button>
       </div>
 
@@ -208,7 +214,7 @@ export default function CurrencySettingsPage() {
                   <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{t('common:enabled', { defaultValue: 'Enabled' })}</TableHead>
                   <TableHead className="w-[100px]">
-                    {t('common:actions', { defaultValue: 'Actions' })}
+                    {t('common:actions_label', { defaultValue: 'Actions' })}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -361,10 +367,10 @@ export default function CurrencySettingsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              {t('common:cancel', { defaultValue: 'Cancel' })}
+              {actionLabel('cancel')}
             </Button>
             <Button onClick={handleSaveRounding} disabled={updateMutation.isPending}>
-              {t('common:save', { defaultValue: 'Save' })}
+              {actionLabel('save')}
             </Button>
           </DialogFooter>
         </DialogContent>

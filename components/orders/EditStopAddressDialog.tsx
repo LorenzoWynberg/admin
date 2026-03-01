@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useUpdateStop } from '@/hooks/orders';
+import { actionLabel } from '@/utils/lang';
 import {
   MapAddressPicker,
   type MapPickerCoords,
@@ -106,12 +107,10 @@ export function EditStopAddressDialog({
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            {t('common:cancel', { defaultValue: 'Cancel' })}
+            {actionLabel('cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={!hasCoords || isPending}>
-            {isPending
-              ? t('common:saving', { defaultValue: 'Saving...' })
-              : t('common:save', { defaultValue: 'Save' })}
+            {isPending ? t('common:saving', { defaultValue: 'Saving...' }) : actionLabel('save')}
           </Button>
         </DialogFooter>
       </DialogContent>

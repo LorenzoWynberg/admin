@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useCancelOrder } from '@/hooks/orders/useNeedsAttention';
 import { X } from 'lucide-react';
+import { actionLabel } from '@/utils/lang';
 
 interface CancelOrderDialogProps {
   publicId: string;
@@ -69,7 +70,7 @@ export function CancelOrderDialog({ publicId }: CancelOrderDialogProps) {
         />
         <AlertDialogFooter>
           <AlertDialogCancel disabled={cancelMutation.isPending}>
-            {t('common:cancel', { defaultValue: 'Cancel' })}
+            {actionLabel('cancel')}
           </AlertDialogCancel>
           <Button
             variant="destructive"

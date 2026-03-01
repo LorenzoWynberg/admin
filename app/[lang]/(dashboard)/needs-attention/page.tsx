@@ -7,6 +7,7 @@ import { NeedsAttentionCard } from '@/components/orders/NeedsAttentionCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { actionLabel } from '@/utils/lang';
 
 type Urgency = 'critical' | 'high' | 'medium' | 'low';
 
@@ -40,7 +41,7 @@ export default function NeedsAttentionPage() {
         </div>
         <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isRefetching}>
           <RefreshCw className={`mr-1 h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`} />
-          {t('common:refresh', { defaultValue: 'Refresh' })}
+          {actionLabel('refresh')}
         </Button>
       </div>
 

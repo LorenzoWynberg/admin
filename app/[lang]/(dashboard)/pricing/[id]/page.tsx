@@ -257,7 +257,7 @@ export default function PricingRuleDetailPage() {
             <AlertDialogDescription>{t('confirm_activate')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
+            <AlertDialogCancel>{actionLabel('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleActivate}>
               {actionLabel('activate')}
             </AlertDialogAction>
@@ -273,7 +273,7 @@ export default function PricingRuleDetailPage() {
             <AlertDialogDescription>{t('confirm_delete')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
+            <AlertDialogCancel>{actionLabel('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"

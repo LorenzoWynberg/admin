@@ -30,7 +30,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { applyApiErrorsToForm } from '@/utils/form';
-import { resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
 
 const tierSchema = z.object({
@@ -414,12 +414,12 @@ export default function EditPricingRulePage() {
           {/* Actions */}
           <div className="flex justify-end gap-4">
             <Button type="button" variant="outline" onClick={() => router.back()}>
-              {t('common:cancel', { defaultValue: 'Cancel' })}
+              {actionLabel('cancel')}
             </Button>
             <Button type="submit" disabled={updateMutation.isPending}>
               {updateMutation.isPending
                 ? t('common:saving', { defaultValue: 'Saving...' })
-                : t('common:save', { defaultValue: 'Save' })}
+                : actionLabel('save')}
             </Button>
           </div>
         </form>

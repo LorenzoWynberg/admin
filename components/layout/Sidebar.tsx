@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { actionLabel, capitalize } from '@/utils/lang';
+import { capitalize } from '@/utils/lang';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import {
@@ -133,7 +133,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           )}
         >
           <Settings className="h-5 w-5" />
-          {ready ? actionLabel('settings_other') : ''}
+          {ready ? capitalize(t('common:settings', { count: 2 })) : ''}
         </Link>
       </div>
     </div>

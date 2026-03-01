@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import { actionLabel } from '@/utils/lang';
 
 type OverrideEntry = App.Data.Driver.DriverScheduleOverrideData;
 
@@ -170,7 +171,7 @@ export function ScheduleEventDialog({
             </Button>
           )}
           <Button onClick={handleSave} disabled={isSaving || !isTimeValid}>
-            {t('common:save', { defaultValue: 'Save' })}
+            {actionLabel('save')}
           </Button>
         </DialogFooter>
       </DialogContent>

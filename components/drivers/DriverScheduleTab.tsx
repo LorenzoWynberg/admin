@@ -17,6 +17,7 @@ import {
   extractTimeFromTemporal,
 } from '@/utils/scheduleEvents';
 import { ChevronDown, Clock, Plus, Trash2 } from 'lucide-react';
+import { actionLabel } from '@/utils/lang';
 import { toast } from 'sonner';
 
 import '@schedule-x/theme-default/dist/index.css';
@@ -282,7 +283,7 @@ export function DriverScheduleTab({ driverId }: Props) {
           <Button onClick={handleSaveOverrides} disabled={syncOverrides.isPending} size="sm">
             {syncOverrides.isPending
               ? t('common:saving', { defaultValue: 'Saving...' })
-              : t('common:save', { defaultValue: 'Save' })}
+              : actionLabel('save')}
           </Button>
         </CardHeader>
         <CardContent>{calendar && <ScheduleXCalendar calendarApp={calendar} />}</CardContent>
@@ -308,7 +309,7 @@ export function DriverScheduleTab({ driverId }: Props) {
             <Button onClick={handleSaveSchedules} disabled={syncSchedules.isPending} size="sm">
               {syncSchedules.isPending
                 ? t('common:saving', { defaultValue: 'Saving...' })
-                : t('common:save', { defaultValue: 'Save' })}
+                : actionLabel('save')}
             </Button>
           </CardHeader>
           <CollapsibleContent>

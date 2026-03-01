@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
 import { useProcessRefund } from '@/hooks/payments';
-import { validationAttribute } from '@/utils/lang';
+import { actionLabel, validationAttribute } from '@/utils/lang';
 import { formatCurrency } from '@/utils/format';
 
 type PaymentData = App.Data.Payment.PaymentData;
@@ -169,7 +169,7 @@ export function RefundDialog({ payment, currencySymbol = '$' }: RefundDialogProp
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            {t('common:cancel', { defaultValue: 'Cancel' })}
+            {actionLabel('cancel')}
           </Button>
           <Button
             variant="destructive"

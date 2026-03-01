@@ -183,7 +183,7 @@ export default function CatalogDetailPage() {
                   <TableHead>{validationAttribute('name', true)}</TableHead>
                   <TableHead>{validationAttribute('order', true)}</TableHead>
                   <TableHead className="w-20">
-                    {t('common:actions', { defaultValue: 'Actions' })}
+                    {t('common:actions_label', { defaultValue: 'Actions' })}
                   </TableHead>
                 </TableRow>
               </TableHeader>

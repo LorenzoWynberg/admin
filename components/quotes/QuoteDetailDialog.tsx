@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { QuoteStatusBadge } from './QuoteStatusBadge';
 import { formatDate, formatDateTime, formatCurrency } from '@/utils/format';
-import { validationAttribute } from '@/utils/lang';
+import { actionLabel, validationAttribute } from '@/utils/lang';
 import {
   Dialog,
   DialogContent,
@@ -178,7 +178,7 @@ export function QuoteDetailDialog({
 
         <div className="flex justify-end">
           <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
-            {t('common:close', { defaultValue: 'Close' })}
+            {actionLabel('close')}
           </Button>
         </div>
       </DialogContent>

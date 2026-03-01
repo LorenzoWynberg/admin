@@ -15,7 +15,7 @@ import { ReasonBadge } from './ReasonBadge';
 import { CancelOrderDialog } from './CancelOrderDialog';
 import { useChangeTier, useOutsourceOrder } from '@/hooks/orders';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
-import { capitalize } from '@/utils/lang';
+import { actionLabel, capitalize } from '@/utils/lang';
 import { MessageSquare, FileText, Truck, Eye } from 'lucide-react';
 import type { NeedsAttentionOrder } from '@/services/orderService';
 
@@ -127,7 +127,7 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
             onClick={handleOutsource}
           >
             <Truck className="mr-1 h-4 w-4" />
-            {t('common:outsource', { defaultValue: 'Outsource' })}
+            {actionLabel('outsource')}
           </Button>
 
           <CancelOrderDialog publicId={order.publicId as string} />

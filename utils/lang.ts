@@ -80,7 +80,7 @@ export const orderStatusLabel = (status: string | undefined): string => {
  * @returns Translated action label
  */
 export const actionLabel = (action: string): string => {
-  return capitalize(i18next.t(`common:${action}`, { defaultValue: action }));
+  return capitalize(i18next.t(`common:actions.${action}`, { defaultValue: action }));
 };
 
 /**
