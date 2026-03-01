@@ -1,9 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { viewWeek, viewMonthGrid, type CalendarEventExternal } from '@schedule-x/calendar';
-import { useCalendarApp, ScheduleXCalendar } from '@schedule-x/react';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import type { DatesSetArg, EventClickArg } from '@fullcalendar/core';
+import type { DateClickArg } from '@fullcalendar/interaction';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,21 +15,29 @@ import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ScheduleEventDialog } from './ScheduleEventDialog';
 import { useDriverSchedules, useSyncSchedules, useSyncOverrides } from '@/hooks/drivers';
-import {
-  buildCalendarEvents,
-  extractDateFromTemporal,
-  extractTimeFromTemporal,
-} from '@/utils/scheduleEvents';
+import { buildCalendarEvents, EVENT_TYPE_UNAVAILABLE } from '@/utils/scheduleEvents';
+import type { CalendarEventProps } from '@/utils/scheduleEvents';
+import { APP_TIMEZONE, getTodayAppTz, toAppTzComponents, padNumber } from '@/utils/format';
 import { ChevronDown, Clock, Plus, Trash2 } from 'lucide-react';
 import { actionLabel } from '@/utils/lang';
 import { toast } from 'sonner';
-
-import '@schedule-x/theme-default/dist/index.css';
 
 type ScheduleEntry = App.Data.Driver.DriverScheduleData;
 type OverrideEntry = App.Data.Driver.DriverScheduleOverrideData;
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+
+const CALENDAR_PLUGINS = [dayGridPlugin, timeGridPlugin, interactionPlugin];
+const CALENDAR_HEADER_TOOLBAR = {
+  left: 'prev,next today',
+  center: 'title',
+  right: 'dayGridMonth,timeGridWeek',
+};
+
+function formatTimeHHMM(date: Date): string {
+  const c = toAppTzComponents(date);
+  return `${padNumber(c.hour)}:${padNumber(c.minute)}`;
+}
 
 interface Props {
   driverId: string;
@@ -51,18 +63,8 @@ export function DriverScheduleTab({ driverId }: Props) {
   const [dialogIsOverride, setDialogIsOverride] = useState(false);
   const [dialogAvailable, setDialogAvailable] = useState(true);
 
-  // Calendar visible range
-  const [visibleRange, setVisibleRange] = useState<{
-    start: Date;
-    end: Date;
-  }>(() => {
-    const now = new Date();
-    const start = new Date(now);
-    start.setDate(start.getDate() - start.getDay());
-    const end = new Date(start);
-    end.setDate(end.getDate() + 6);
-    return { start, end };
-  });
+  // Calendar visible range — null until FullCalendar reports its first range
+  const [visibleRange, setVisibleRange] = useState<{ start: Date; end: Date } | null>(null);
 
   // Initialize local state from fetched data
   if (data && !initialized) {
@@ -73,24 +75,21 @@ export function DriverScheduleTab({ driverId }: Props) {
 
   // Compute calendar events when data changes
   const calendarEvents = useMemo(
-    () => buildCalendarEvents(schedules, overrides, visibleRange.start, visibleRange.end),
+    () =>
+      visibleRange
+        ? buildCalendarEvents(schedules, overrides, visibleRange.start, visibleRange.end)
+        : [],
     [schedules, overrides, visibleRange]
   );
 
-  const handleRangeUpdate = useCallback(
-    (range: { start: Temporal.ZonedDateTime; end: Temporal.ZonedDateTime }) => {
-      const start = new Date(range.start.epochMilliseconds);
-      const end = new Date(range.end.epochMilliseconds);
-      setVisibleRange({ start, end });
-    },
-    []
-  );
+  const handleDatesSet = useCallback((arg: DatesSetArg) => {
+    setVisibleRange({ start: arg.start, end: arg.end });
+  }, []);
 
-  const handleClickDateTime = useCallback(
-    (dateTime: Temporal.ZonedDateTime) => {
-      const dateStr = extractDateFromTemporal(dateTime);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+  const handleDateClick = useCallback(
+    (arg: DateClickArg) => {
+      const dateStr = arg.dateStr.slice(0, 10);
+      const today = getTodayAppTz();
       const clickedDate = new Date(dateStr + 'T00:00:00');
 
       if (clickedDate < today) {
@@ -102,7 +101,9 @@ export function DriverScheduleTab({ driverId }: Props) {
         return;
       }
 
-      const timeStr = extractTimeFromTemporal(dateTime);
+      // Extract time from the ISO string (e.g. "2026-03-01T10:00:00")
+      const timeStr = arg.dateStr.length > 10 ? arg.dateStr.slice(11, 16) : undefined;
+
       setDialogMode('create');
       setDialogDate(dateStr);
       setDialogStartTime(timeStr);
@@ -115,12 +116,10 @@ export function DriverScheduleTab({ driverId }: Props) {
   );
 
   const handleEventClick = useCallback(
-    (event: CalendarEventExternal) => {
-      const dateStr =
-        (event._date as string | undefined) ??
-        extractDateFromTemporal(event.start as Temporal.ZonedDateTime);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    (arg: EventClickArg) => {
+      const props = arg.event.extendedProps as CalendarEventProps;
+      const dateStr = props._date ?? arg.event.startStr.slice(0, 10);
+      const today = getTodayAppTz();
       const clickedDate = new Date(dateStr + 'T00:00:00');
 
       if (clickedDate < today) {
@@ -132,24 +131,24 @@ export function DriverScheduleTab({ driverId }: Props) {
         return;
       }
 
-      const isOverride = (event._isOverride as boolean | undefined) ?? false;
-      const calendarId = event.calendarId ?? '';
+      const isOverride = props._isOverride ?? false;
+      const isUnavailable = props._type === EVENT_TYPE_UNAVAILABLE;
 
       setDialogMode('edit');
       setDialogDate(dateStr);
       setDialogIsOverride(isOverride);
 
-      if (calendarId === 'unavailable') {
+      if (isUnavailable) {
         setDialogAvailable(false);
         setDialogStartTime(undefined);
         setDialogEndTime(undefined);
       } else {
         setDialogAvailable(true);
-        if (event.start instanceof Temporal.ZonedDateTime) {
-          setDialogStartTime(extractTimeFromTemporal(event.start));
+        if (arg.event.start) {
+          setDialogStartTime(formatTimeHHMM(arg.event.start));
         }
-        if (event.end instanceof Temporal.ZonedDateTime) {
-          setDialogEndTime(extractTimeFromTemporal(event.end));
+        if (arg.event.end) {
+          setDialogEndTime(formatTimeHHMM(arg.event.end));
         }
       }
 
@@ -157,46 +156,6 @@ export function DriverScheduleTab({ driverId }: Props) {
     },
     [t]
   );
-
-  // Ref to hold latest callbacks so calendar config stays stable
-  const callbacksRef = useRef({
-    onRangeUpdate: handleRangeUpdate,
-    onClickDateTime: handleClickDateTime,
-    onEventClick: handleEventClick,
-  });
-  useEffect(() => {
-    callbacksRef.current = {
-      onRangeUpdate: handleRangeUpdate,
-      onClickDateTime: handleClickDateTime,
-      onEventClick: handleEventClick,
-    };
-  });
-
-  const calendar = useCalendarApp({
-    views: [viewWeek, viewMonthGrid],
-    defaultView: 'week',
-    firstDayOfWeek: 7, // Sunday (Schedule-X: 7 = Sunday)
-    dayBoundaries: { start: '05:00', end: '22:00' },
-    calendars: {
-      template: { colorName: 'blue', label: 'Scheduled' },
-      override: { colorName: 'green', label: 'Override' },
-      unavailable: { colorName: 'red', label: 'Unavailable' },
-      past: { colorName: 'gray', label: 'Past', readonly: true },
-    },
-    callbacks: {
-      onRangeUpdate: (range) => callbacksRef.current.onRangeUpdate(range),
-      onClickDateTime: (dateTime) => callbacksRef.current.onClickDateTime(dateTime),
-      onEventClick: (event) => callbacksRef.current.onEventClick(event),
-    },
-    events: calendarEvents,
-  });
-
-  // Update calendar events when they change
-  useEffect(() => {
-    if (calendar) {
-      calendar.events.set(calendarEvents);
-    }
-  }, [calendar, calendarEvents]);
 
   // -- Override management --
 
@@ -286,7 +245,22 @@ export function DriverScheduleTab({ driverId }: Props) {
               : actionLabel('save')}
           </Button>
         </CardHeader>
-        <CardContent>{calendar && <ScheduleXCalendar calendarApp={calendar} />}</CardContent>
+        <CardContent>
+          <FullCalendar
+            plugins={CALENDAR_PLUGINS}
+            initialView="timeGridWeek"
+            headerToolbar={CALENDAR_HEADER_TOOLBAR}
+            firstDay={0}
+            timeZone={APP_TIMEZONE}
+            slotMinTime="05:00:00"
+            slotMaxTime="22:00:00"
+            height={800}
+            events={calendarEvents}
+            datesSet={handleDatesSet}
+            dateClick={handleDateClick}
+            eventClick={handleEventClick}
+          />
+        </CardContent>
       </Card>
 
       {/* Collapsible Weekly Template Editor */}

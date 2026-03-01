@@ -1,31 +1,45 @@
-import type { CalendarEventExternal } from '@schedule-x/calendar';
-import { getTodayAppTz } from '@/utils/format';
+import type { EventInput } from '@fullcalendar/core';
+import { getTodayAppTz, toDateString, toAppTzComponents } from '@/utils/format';
 
 type ScheduleEntry = App.Data.Driver.DriverScheduleData;
 type OverrideEntry = App.Data.Driver.DriverScheduleOverrideData;
-
-const TIMEZONE = 'America/Costa_Rica';
 
 /** Normalize a time string to HH:MM:SS (handles HH:MM and HH:MM:SS) */
 function normalizeTime(time: string): string {
   return time.length === 5 ? `${time}:00` : time;
 }
 
+const COLORS = {
+  template: '#3b82f6',
+  override: '#22c55e',
+  unavailable: '#ef4444',
+  past: '#9ca3af',
+} as const;
+
+export const EVENT_TYPE_UNAVAILABLE = 'unavailable' as const;
+
+export interface CalendarEventProps {
+  _date: string;
+  _isOverride: boolean;
+  _type?: typeof EVENT_TYPE_UNAVAILABLE;
+  _dayOfWeek?: number;
+}
+
 /**
- * Build Schedule-X calendar events from weekly templates and date overrides.
+ * Build FullCalendar events from weekly templates and date overrides.
  *
  * For each day in the visible range:
  * 1. Check overrides first (date-specific exceptions)
  * 2. Fall back to weekly template
- * 3. Past dates get 'past' calendarId (gray, read-only)
+ * 3. Past dates get gray color (read-only)
  */
 export function buildCalendarEvents(
   schedules: ScheduleEntry[],
   overrides: OverrideEntry[],
   rangeStart: Date,
   rangeEnd: Date
-): CalendarEventExternal[] {
-  const events: CalendarEventExternal[] = [];
+): EventInput[] {
+  const events: EventInput[] = [];
   const today = getTodayAppTz();
 
   // Index overrides by date string for fast lookup
@@ -50,36 +64,47 @@ export function buildCalendarEvents(
   end.setHours(23, 59, 59, 999);
 
   while (current <= end) {
-    const dateStr = formatDateString(current);
+    const dateStr = toDateString(current);
     const isPast = current < today;
-    const dayOfWeek = current.getDay();
+    // Use app timezone to get the correct day-of-week (device TZ may differ)
+    const dayOfWeek = new Date(`${dateStr}T12:00:00`).getDay();
 
     const override = overrideMap.get(dateStr);
 
     if (override) {
       if (!override.available) {
-        // Unavailable override — red full-day event
+        // Unavailable override — red background event
         events.push({
           id: `override-${dateStr}`,
-          start: Temporal.PlainDate.from(dateStr),
-          end: Temporal.PlainDate.from(dateStr),
           title: 'Unavailable',
-          calendarId: isPast ? 'past' : 'unavailable',
-          _isOverride: true,
-          _date: dateStr,
+          start: dateStr,
+          end: dateStr,
+          allDay: true,
+          display: 'background',
+          backgroundColor: isPast ? COLORS.past : COLORS.unavailable,
+          borderColor: isPast ? COLORS.past : COLORS.unavailable,
+          extendedProps: {
+            _isOverride: true,
+            _date: dateStr,
+            _type: EVENT_TYPE_UNAVAILABLE,
+          } satisfies CalendarEventProps,
         });
       } else {
         // Available override with custom times
         const startTime = override.startTime || '08:00';
         const endTime = override.endTime || '17:00';
+        const color = isPast ? COLORS.past : COLORS.override;
         events.push({
           id: `override-${dateStr}`,
-          start: Temporal.ZonedDateTime.from(`${dateStr}T${normalizeTime(startTime)}[${TIMEZONE}]`),
-          end: Temporal.ZonedDateTime.from(`${dateStr}T${normalizeTime(endTime)}[${TIMEZONE}]`),
           title: 'Scheduled',
-          calendarId: isPast ? 'past' : 'override',
-          _isOverride: true,
-          _date: dateStr,
+          start: `${dateStr}T${normalizeTime(startTime)}`,
+          end: `${dateStr}T${normalizeTime(endTime)}`,
+          backgroundColor: color,
+          borderColor: color,
+          extendedProps: {
+            _isOverride: true,
+            _date: dateStr,
+          } satisfies CalendarEventProps,
         });
       }
     } else {
@@ -87,15 +112,19 @@ export function buildCalendarEvents(
       const daySchedules = schedulesByDay.get(dayOfWeek);
       if (daySchedules) {
         for (const schedule of daySchedules) {
+          const color = isPast ? COLORS.past : COLORS.template;
           events.push({
             id: `template-${dayOfWeek}-${dateStr}`,
-            start: Temporal.ZonedDateTime.from(`${dateStr}T${normalizeTime(schedule.startTime)}[${TIMEZONE}]`),
-            end: Temporal.ZonedDateTime.from(`${dateStr}T${normalizeTime(schedule.endTime)}[${TIMEZONE}]`),
             title: 'Scheduled',
-            calendarId: isPast ? 'past' : 'template',
-            _isOverride: false,
-            _date: dateStr,
-            _dayOfWeek: dayOfWeek,
+            start: `${dateStr}T${normalizeTime(schedule.startTime)}`,
+            end: `${dateStr}T${normalizeTime(schedule.endTime)}`,
+            backgroundColor: color,
+            borderColor: color,
+            extendedProps: {
+              _isOverride: false,
+              _date: dateStr,
+              _dayOfWeek: dayOfWeek,
+            } satisfies CalendarEventProps,
           });
         }
       }
@@ -107,25 +136,3 @@ export function buildCalendarEvents(
   return events;
 }
 
-function formatDateString(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-/**
- * Extract date string from a Temporal.ZonedDateTime click event.
- */
-export function extractDateFromTemporal(dateTime: Temporal.ZonedDateTime): string {
-  return dateTime.toPlainDate().toString();
-}
-
-/**
- * Extract time string (HH:mm) from a Temporal.ZonedDateTime click event.
- */
-export function extractTimeFromTemporal(dateTime: Temporal.ZonedDateTime): string {
-  const hour = String(dateTime.hour).padStart(2, '0');
-  const minute = String(dateTime.minute).padStart(2, '0');
-  return `${hour}:${minute}`;
-}

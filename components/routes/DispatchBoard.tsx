@@ -35,6 +35,7 @@ import { RouteMap } from './RouteMap';
 import { DispatchSummaryBar } from './DispatchSummaryBar';
 import { ReassignStopDialog } from './ReassignStopDialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { getTodayAppTz } from '@/utils/format';
 import type { UnassignedStop } from '@/services/routeService';
 
 type RouteData = App.Data.Route.RouteData;
@@ -66,7 +67,7 @@ export function DispatchBoard() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(() => getTodayAppTz());
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedStopId, setSelectedStopId] = useState<number | null>(null);
   const [selectedUnassignedKey, setSelectedUnassignedKey] = useState<string | null>(null);

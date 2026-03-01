@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Package, MapPin, Info, Phone, Building2 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { capitalize } from '@/utils/lang';
+import { APP_TIMEZONE } from '@/utils/format';
 import type { UnassignedStop } from '@/services/routeService';
 
 interface DraggableUnassignedStopProps {
@@ -94,6 +95,7 @@ export function UnassignedStopContent({
         {stop.scheduledFor && (
           <p className="text-muted-foreground">
             {new Date(stop.scheduledFor).toLocaleTimeString([], {
+              timeZone: APP_TIMEZONE,
               hour: '2-digit',
               minute: '2-digit',
             })}
