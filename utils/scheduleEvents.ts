@@ -1,9 +1,15 @@
 import type { CalendarEventExternal } from '@schedule-x/calendar';
+import { getTodayAppTz } from '@/utils/format';
 
 type ScheduleEntry = App.Data.Driver.DriverScheduleData;
 type OverrideEntry = App.Data.Driver.DriverScheduleOverrideData;
 
 const TIMEZONE = 'America/Costa_Rica';
+
+/** Normalize a time string to HH:MM:SS (handles HH:MM and HH:MM:SS) */
+function normalizeTime(time: string): string {
+  return time.length === 5 ? `${time}:00` : time;
+}
 
 /**
  * Build Schedule-X calendar events from weekly templates and date overrides.
@@ -20,8 +26,7 @@ export function buildCalendarEvents(
   rangeEnd: Date
 ): CalendarEventExternal[] {
   const events: CalendarEventExternal[] = [];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = getTodayAppTz();
 
   // Index overrides by date string for fast lookup
   const overrideMap = new Map<string, OverrideEntry>();
@@ -69,9 +74,9 @@ export function buildCalendarEvents(
         const endTime = override.endTime || '17:00';
         events.push({
           id: `override-${dateStr}`,
-          start: Temporal.ZonedDateTime.from(`${dateStr}T${startTime}:00[${TIMEZONE}]`),
-          end: Temporal.ZonedDateTime.from(`${dateStr}T${endTime}:00[${TIMEZONE}]`),
-          title: 'Override',
+          start: Temporal.ZonedDateTime.from(`${dateStr}T${normalizeTime(startTime)}[${TIMEZONE}]`),
+          end: Temporal.ZonedDateTime.from(`${dateStr}T${normalizeTime(endTime)}[${TIMEZONE}]`),
+          title: 'Scheduled',
           calendarId: isPast ? 'past' : 'override',
           _isOverride: true,
           _date: dateStr,
@@ -84,8 +89,8 @@ export function buildCalendarEvents(
         for (const schedule of daySchedules) {
           events.push({
             id: `template-${dayOfWeek}-${dateStr}`,
-            start: Temporal.ZonedDateTime.from(`${dateStr}T${schedule.startTime}:00[${TIMEZONE}]`),
-            end: Temporal.ZonedDateTime.from(`${dateStr}T${schedule.endTime}:00[${TIMEZONE}]`),
+            start: Temporal.ZonedDateTime.from(`${dateStr}T${normalizeTime(schedule.startTime)}[${TIMEZONE}]`),
+            end: Temporal.ZonedDateTime.from(`${dateStr}T${normalizeTime(schedule.endTime)}[${TIMEZONE}]`),
             title: 'Scheduled',
             calendarId: isPast ? 'past' : 'template',
             _isOverride: false,
