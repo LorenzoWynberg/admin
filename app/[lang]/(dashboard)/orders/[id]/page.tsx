@@ -297,12 +297,21 @@ export default function OrderDetailPage() {
                             <span className="text-sm">{stop.contactPhone}</span>
                           </div>
                         )}
-                        {stop.instructions && (
+                        {stop.instructions ? (
                           <div className="flex items-start gap-2">
                             <FileText className="text-muted-foreground mt-0.5 h-3.5 w-3.5" />
                             <span className="text-sm">{stop.instructions}</span>
                           </div>
-                        )}
+                        ) : stop.type !== 'dropoff' ? (
+                          <div className="flex items-start gap-2">
+                            <FileText className="text-muted-foreground mt-0.5 h-3.5 w-3.5" />
+                            <span className="text-muted-foreground text-sm italic">
+                              {t('orders:detail.no_description', {
+                                defaultValue: 'No description provided',
+                              })}
+                            </span>
+                          </div>
+                        ) : null}
                         {stop.completedAt && (
                           <div className="flex items-center gap-2">
                             <Clock className="h-3.5 w-3.5 text-green-600" />
