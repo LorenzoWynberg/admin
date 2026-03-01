@@ -185,6 +185,17 @@ export default function OrderDetailPage() {
         </div>
       </div>
 
+      {!allStopsHaveAddresses && (
+        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+          <p className="text-sm text-amber-700 dark:text-amber-400">
+            {t('orders:detail.all_stops_need_address', {
+              defaultValue: 'All stops must have an address before a quote can be created.',
+            })}
+          </p>
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Stops */}
         <Card>
@@ -474,16 +485,6 @@ export default function OrderDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {!allStopsHaveAddresses && (
-              <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950">
-                <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-                <p className="text-sm text-amber-700 dark:text-amber-400">
-                  {t('orders:detail.all_stops_need_address', {
-                    defaultValue: 'All stops must have an address before a quote can be created.',
-                  })}
-                </p>
-              </div>
-            )}
             {sortedQuotes.length > 0 ? (
               <div className="space-y-3">
                 {sortedQuotes.map((quote) => {
