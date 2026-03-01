@@ -21,10 +21,20 @@ import {
   Settings,
   ScrollText,
   Route,
+  AlertTriangle,
 } from 'lucide-react';
+import { useNeedsAttention } from '@/hooks/orders/useNeedsAttention';
 
 const navigation = [
   { modelKey: 'dashboard', href: '/', icon: LayoutDashboard, isModel: false },
+  {
+    modelKey: 'needs_attention',
+    href: '/needs-attention',
+    icon: AlertTriangle,
+    isModel: false,
+    translationKey: 'orders:needs_attention.title',
+    hasBadge: true,
+  },
   { modelKey: 'route', href: '/routes', icon: Route, isModel: true },
   { modelKey: 'order', href: '/orders', icon: Package, isModel: true },
   { modelKey: 'quote', href: '/quotes', icon: FileText, isModel: true },
@@ -49,6 +59,9 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const params = useParams();
   const lang = (params?.lang as string) || 'en';
+  const { data: needsAttentionData } = useNeedsAttention();
+  const urgentCount =
+    (needsAttentionData?.summary.critical ?? 0) + (needsAttentionData?.summary.high ?? 0);
 
   const withLang = (href: string) => `/${lang}${href === '/' ? '' : href}`;
   const pathWithoutLang = pathname.replace(new RegExp(`^/${lang}`), '') || '/';
@@ -97,6 +110,11 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             >
               <item.icon className="h-5 w-5" />
               {getNavLabel(item)}
+              {'hasBadge' in item && item.hasBadge && urgentCount > 0 && (
+                <span className="ml-auto rounded-full bg-red-500 px-1.5 py-0.5 text-xs font-medium text-white">
+                  {urgentCount}
+                </span>
+              )}
             </Link>
           );
         })}

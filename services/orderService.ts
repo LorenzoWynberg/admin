@@ -3,8 +3,40 @@ import { api } from '@/lib/api/client';
 type OrderData = App.Data.Order.OrderData;
 type RouteStopData = App.Data.Route.RouteStopData;
 type Single<T> = Api.Response.Single<T>;
+type Multiple<T> = Api.Response.Multiple<T>;
 type Paginated<T> = Api.Response.Paginated<T>;
 type SuccessBasic = Api.Response.SuccessBasic;
+
+export interface NeedsAttentionOrder {
+  order: OrderData;
+  urgency: 'critical' | 'high' | 'medium' | 'low';
+  reason: string;
+  outsourceEligible: boolean;
+  hoursUntilWindowEnd: number | null;
+}
+
+export interface NeedsAttentionSummary {
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+}
+
+export interface NeedsAttentionResponse {
+  data: NeedsAttentionOrder[];
+  summary: NeedsAttentionSummary;
+}
+
+export interface ChangeTierResult {
+  order: OrderData;
+  dispatchResult?: {
+    success: boolean;
+    outsourced: boolean;
+    driverId: number | null;
+    routeId: number | null;
+    message: string;
+  };
+}
 
 interface ListParams {
   page?: number;
@@ -77,12 +109,17 @@ export const OrderService = {
 
   /**
    * Change order delivery tier (admin only)
+   * Returns order + optional dispatch result if auto-re-dispatch was attempted
    */
-  async changeTier(publicId: string, deliveryTier: string): Promise<OrderData> {
+  async changeTier(publicId: string, deliveryTier: string): Promise<ChangeTierResult> {
     const response = await api.patch<Single<OrderData>>(`/orders/${publicId}/tier`, {
       delivery_tier: deliveryTier,
     });
-    return response.item;
+    const extra = response.extra as { dispatchResult?: ChangeTierResult['dispatchResult'] };
+    return {
+      order: response.item,
+      dispatchResult: extra.dispatchResult,
+    };
   },
 
   /**
@@ -91,6 +128,25 @@ export const OrderService = {
   async outsource(publicId: string): Promise<OrderData> {
     const response = await api.post<Single<OrderData>>(`/orders/${publicId}/outsource`);
     return response.item;
+  },
+
+  /**
+   * Get orders needing admin attention (admin only)
+   */
+  async getNeedsAttention(): Promise<NeedsAttentionResponse> {
+    const response = await api.get<Multiple<NeedsAttentionOrder>>('/orders/needs-attention');
+    const extra = response.extra as { summary: NeedsAttentionSummary };
+    return {
+      data: response.items,
+      summary: extra.summary,
+    };
+  },
+
+  /**
+   * Cancel an order with a reason (admin action — delegates to CancellationService)
+   */
+  async cancelOrder(publicId: string, reason: string): Promise<SuccessBasic> {
+    return api.post<SuccessBasic>(`/orders/${publicId}/cancel`, { reason });
   },
 
   /**

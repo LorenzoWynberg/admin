@@ -379,6 +379,13 @@ declare namespace App.Data.Location {
   };
 }
 declare namespace App.Data.Order {
+  export type NeedsAttentionOrderData = {
+    order: App.Data.Order.OrderData;
+    urgency: string;
+    reason: string;
+    outsourceEligible: boolean;
+    hoursUntilWindowEnd: number | null;
+  };
   export type OrderData = {
     id?: number;
     publicId?: string;

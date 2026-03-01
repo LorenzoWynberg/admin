@@ -10,10 +10,19 @@ export function useChangeTier() {
   return useMutation({
     mutationFn: ({ publicId, deliveryTier }: { publicId: string; deliveryTier: string }) =>
       OrderService.changeTier(publicId, deliveryTier),
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['feasibility'] });
-      toast.success(crudSuccessMessage('updated', 'order'));
+
+      if (result.dispatchResult) {
+        if (result.dispatchResult.success) {
+          toast.success('Tier changed — order dispatched successfully');
+        } else {
+          toast.warning('Tier changed — still no drivers available');
+        }
+      } else {
+        toast.success(crudSuccessMessage('updated', 'order'));
+      }
     },
     onError: (error) => {
       if (isApiError(error)) {

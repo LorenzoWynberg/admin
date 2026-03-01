@@ -5,3 +5,4 @@ export { useCalculateDistance } from './useCalculateDistance';
 export { useUpdateStop } from './useUpdateStop';
 export { useChangeTier } from './useChangeTier';
 export { useOutsourceOrder } from './useOutsourceOrder';
+export { useNeedsAttention, useCancelOrder } from './useNeedsAttention';
