@@ -63,8 +63,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const { data: needsAttentionData } = useNeedsAttention();
   const { data: pendingReconciliationData } = usePendingReconciliation();
   const urgentCount =
-    (needsAttentionData?.summary?.critical ?? 0) +
-    (needsAttentionData?.summary?.high ?? 0);
+    (needsAttentionData?.summary?.critical ?? 0) + (needsAttentionData?.summary?.high ?? 0);
   const reconciliationCount = pendingReconciliationData?.summary?.count ?? 0;
 
   const withLang = (href: string) => `/${lang}${href === '/' ? '' : href}`;
@@ -114,11 +113,13 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             >
               <item.icon className="h-5 w-5" />
               {getNavLabel(item)}
-              {'hasBadge' in item && item.hasBadge && (urgentCount + reconciliationCount) > 0 && (
-                <span className={cn(
-                  'ml-auto rounded-full px-1.5 py-0.5 text-xs font-medium text-white',
-                  urgentCount > 0 ? 'bg-red-500' : 'bg-amber-500'
-                )}>
+              {'hasBadge' in item && item.hasBadge && urgentCount + reconciliationCount > 0 && (
+                <span
+                  className={cn(
+                    'ml-auto rounded-full px-1.5 py-0.5 text-xs font-medium text-white',
+                    urgentCount > 0 ? 'bg-red-500' : 'bg-amber-500'
+                  )}
+                >
                   {urgentCount + reconciliationCount}
                 </span>
               )}
