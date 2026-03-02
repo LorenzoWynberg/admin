@@ -1,7 +1,7 @@
 'use client';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, Plus, X } from 'lucide-react';
+import { ChevronDown, FileText, Plus, X } from 'lucide-react';
 
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
@@ -83,6 +83,7 @@ export function QuoteLineItemsEditor({
         <ItemSection
           key={stop.publicId}
           title={stopLabel(stop)}
+          instructions={stop.instructions}
           sectionItems={sectionItems}
           currencySymbol={currencySymbol}
           onAdd={() => addItem(stop.publicId || null)}
@@ -99,6 +100,7 @@ export function QuoteLineItemsEditor({
 
 interface ItemSectionProps {
   title: string;
+  instructions?: string | null;
   sectionItems: QuoteLineItem[];
   currencySymbol: string;
   onAdd: () => void;
@@ -109,6 +111,7 @@ interface ItemSectionProps {
 
 function ItemSection({
   title,
+  instructions,
   sectionItems,
   currencySymbol,
   onAdd,
@@ -139,6 +142,12 @@ function ItemSection({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="space-y-2 px-3 pb-3">
+            {instructions && (
+              <div className="bg-muted/50 flex items-start gap-2 rounded-md px-2.5 py-2 text-sm">
+                <FileText className="text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span className="text-muted-foreground italic">{instructions}</span>
+              </div>
+            )}
             {sectionItems.length > 0 && (
               <div className="text-muted-foreground grid grid-cols-[1fr_60px_80px_70px_28px] items-center gap-2 text-xs">
                 <span>{t('quotes:items.label', { defaultValue: 'Label' })}</span>
