@@ -9,3 +9,4 @@ export { useOutsourceOrder } from './useOutsourceOrder';
 export { useNeedsAttention, useCancelOrder } from './useNeedsAttention';
 export { useNeedsAttentionBroadcast } from './useNeedsAttentionBroadcast';
 export { useReconcileOrder } from './useReconcileOrder';
+export { usePendingReconciliation } from './usePendingReconciliation';

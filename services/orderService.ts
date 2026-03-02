@@ -28,6 +28,11 @@ export interface NeedsAttentionResponse {
   summary: NeedsAttentionSummary;
 }
 
+export interface PendingReconciliationResponse {
+  data: OrderData[];
+  summary: { count: number };
+}
+
 export interface ChangeTierResult {
   order: OrderData;
   dispatchResult?: {
@@ -137,6 +142,18 @@ export const OrderService = {
   async getNeedsAttention(): Promise<NeedsAttentionResponse> {
     const response = await api.get<Multiple<NeedsAttentionOrder>>('/orders/needs-attention');
     const extra = response.extra as { summary: NeedsAttentionSummary };
+    return {
+      data: response.items,
+      summary: extra.summary,
+    };
+  },
+
+  /**
+   * Get orders pending manual reconciliation (admin only)
+   */
+  async getPendingReconciliation(): Promise<PendingReconciliationResponse> {
+    const response = await api.get<Multiple<OrderData>>('/orders/pending-reconciliation');
+    const extra = response.extra as { summary: { count: number } };
     return {
       data: response.items,
       summary: extra.summary,

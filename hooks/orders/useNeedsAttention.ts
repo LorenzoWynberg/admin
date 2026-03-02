@@ -8,6 +8,7 @@ export function useNeedsAttention() {
   return useQuery({
     queryKey: ['orders', 'needs-attention'],
     queryFn: () => OrderService.getNeedsAttention(),
+    staleTime: 30_000,
   });
 }
 

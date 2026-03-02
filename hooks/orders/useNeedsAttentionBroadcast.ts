@@ -23,6 +23,9 @@ export function useNeedsAttentionBroadcast() {
       queryClientRef.current.invalidateQueries({
         queryKey: ['orders', 'needs-attention'],
       });
+      queryClientRef.current.invalidateQueries({
+        queryKey: ['orders', 'pending-reconciliation'],
+      });
     });
 
     return () => {

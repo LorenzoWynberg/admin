@@ -51,7 +51,7 @@ import {
 } from '@/utils/lang';
 import { formatDate, formatDateTime, formatCurrency } from '@/utils/format';
 import { useOrder, useDeleteOrder, useCalculateDistance, useOutsourceOrder } from '@/hooks/orders';
-import { useCurrencyList } from '@/hooks/currencies';
+import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { Enums } from '@/data/app-enums';
 
 type QuoteStatus = App.Enums.QuoteStatus;
@@ -68,19 +68,12 @@ export default function OrderDetailPage() {
   const deleteOrder = useDeleteOrder();
   const calculateDistance = useCalculateDistance();
   const outsourceOrder = useOutsourceOrder();
-  const { data: currencyData } = useCurrencyList();
+  const currencySymbol = useOrderCurrencySymbol(order?.currencyCode);
   const [editingStop, setEditingStop] = useState<App.Data.Order.OrderStopData | null>(null);
   const [editingStopDetails, setEditingStopDetails] = useState<App.Data.Order.OrderStopData | null>(
     null
   );
   const [addStopOpen, setAddStopOpen] = useState(false);
-
-  // Get currency symbol for the order's currency
-  const currencies = currencyData?.items || [];
-  const orderCurrency = order?.currencyCode
-    ? currencies.find((c) => c.code === order.currencyCode)
-    : null;
-  const currencySymbol = orderCurrency?.symbol || order?.currencyCode || '$';
 
   const formatAddress = (address?: App.Data.Address.AddressData | null): string => {
     const notSpecified = t('orders:detail.not_specified', { defaultValue: 'Not specified' });

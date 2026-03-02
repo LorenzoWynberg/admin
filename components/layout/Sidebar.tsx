@@ -24,6 +24,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useNeedsAttention } from '@/hooks/orders/useNeedsAttention';
+import { usePendingReconciliation } from '@/hooks/orders/usePendingReconciliation';
 
 const navigation = [
   { modelKey: 'dashboard', href: '/', icon: LayoutDashboard, isModel: false },
@@ -60,8 +61,11 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const params = useParams();
   const lang = (params?.lang as string) || 'en';
   const { data: needsAttentionData } = useNeedsAttention();
+  const { data: pendingReconciliationData } = usePendingReconciliation();
   const urgentCount =
-    (needsAttentionData?.summary?.critical ?? 0) + (needsAttentionData?.summary?.high ?? 0);
+    (needsAttentionData?.summary?.critical ?? 0) +
+    (needsAttentionData?.summary?.high ?? 0);
+  const reconciliationCount = pendingReconciliationData?.summary?.count ?? 0;
 
   const withLang = (href: string) => `/${lang}${href === '/' ? '' : href}`;
   const pathWithoutLang = pathname.replace(new RegExp(`^/${lang}`), '') || '/';
@@ -110,9 +114,12 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             >
               <item.icon className="h-5 w-5" />
               {getNavLabel(item)}
-              {'hasBadge' in item && item.hasBadge && urgentCount > 0 && (
-                <span className="ml-auto rounded-full bg-red-500 px-1.5 py-0.5 text-xs font-medium text-white">
-                  {urgentCount}
+              {'hasBadge' in item && item.hasBadge && (urgentCount + reconciliationCount) > 0 && (
+                <span className={cn(
+                  'ml-auto rounded-full px-1.5 py-0.5 text-xs font-medium text-white',
+                  urgentCount > 0 ? 'bg-red-500' : 'bg-amber-500'
+                )}>
+                  {urgentCount + reconciliationCount}
                 </span>
               )}
             </Link>

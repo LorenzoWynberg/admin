@@ -80,7 +80,7 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
           )}
           {stopCount > 0 && (
             <span className="text-muted-foreground text-xs">
-              {stopCount} {stopCount === 1 ? 'stop' : 'stops'}
+              {stopCount} {t('models:order_stop', { count: stopCount })}
             </span>
           )}
         </div>
