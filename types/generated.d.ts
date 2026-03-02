@@ -377,6 +377,44 @@ declare namespace App.Data.Feasibility {
     driversEvaluated: number;
   };
 }
+declare namespace App.Data.Invoice {
+  export type InvoiceData = {
+    id?: number;
+    publicId?: string;
+    orderId?: number;
+    userId?: number;
+    paymentId?: number | null;
+    refundId?: number | null;
+    type?: App.Enums.InvoiceType;
+    sequenceNumber?: number;
+    sequenceYear?: number;
+    currencyCode?: string;
+    subtotal?: number;
+    discountAmount?: number;
+    taxRate?: number;
+    taxTotal?: number;
+    total?: number;
+    notes?: string | null;
+    pdfPath?: string | null;
+    documentNumber?: string;
+    items?: Array<App.Data.Invoice.InvoiceItemData>;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  export type InvoiceItemData = {
+    id?: number;
+    publicId?: string;
+    invoiceId?: number;
+    orderStopId?: number | null;
+    label?: string;
+    quantity?: number;
+    unitPrice?: number;
+    total?: number;
+    sortOrder?: number;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+}
 declare namespace App.Data.Location {
   export type LocationData = {
     id?: number;
@@ -1089,6 +1127,12 @@ declare namespace App.Enums {
     NotImplemented = 501,
     ServiceUnavailable = 503,
   }
+  export enum InvoiceType {
+    PaymentReceipt = 'payment_receipt',
+    RefundReceipt = 'refund_receipt',
+    SurchargeReceipt = 'surcharge_receipt',
+    FinalReceipt = 'final_receipt',
+  }
   export enum LogLevel {
     Emergency = 'emergency',
     Alert = 'alert',
@@ -1127,6 +1171,8 @@ declare namespace App.Enums {
     Setting = 'setting',
     AuditLog = 'audit_log',
     TaxProfile = 'tax_profile',
+    Invoice = 'invoice',
+    InvoiceItem = 'invoice_item',
   }
   export enum NotificationAction {
     QuoteRequested = 'quote_requested',
@@ -1142,6 +1188,9 @@ declare namespace App.Enums {
     PaymentReceipt = 'payment_receipt',
     OrderCancelled = 'order_cancelled',
     PasswordReset = 'password_reset',
+    RefundReceipt = 'refund_receipt',
+    SurchargeReceipt = 'surcharge_receipt',
+    FinalReceipt = 'final_receipt',
   }
   export enum OrderStatus {
     PENDING_OWNER_APPROVAL = 'pending_owner_approval',

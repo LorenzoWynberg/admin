@@ -37,6 +37,7 @@ import { ProofOfDeliveryCard } from '@/components/orders/ProofOfDeliveryCard';
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { QuoteDetailDialog } from '@/components/quotes/QuoteDetailDialog';
 import { PaymentSection } from '@/components/payments/PaymentSection';
+import { InvoiceSection } from '@/components/invoices/InvoiceSection';
 import { EditStopAddressDialog } from '@/components/orders/EditStopAddressDialog';
 import { EditStopDetailsDialog } from '@/components/orders/EditStopDetailsDialog';
 import { AddStopDialog } from '@/components/orders/AddStopDialog';
@@ -669,6 +670,11 @@ export default function OrderDetailPage() {
         {/* Payments Section */}
         {order.publicId && (
           <PaymentSection orderPublicId={order.publicId} currencySymbol={currencySymbol} />
+        )}
+
+        {/* Invoices Section */}
+        {order.publicId && (
+          <InvoiceSection orderPublicId={order.publicId} currencySymbol={currencySymbol} />
         )}
 
         {/* Trip Schedule */}
