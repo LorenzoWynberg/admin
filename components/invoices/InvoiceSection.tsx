@@ -34,20 +34,12 @@ function getTypeBadgeVariant(type?: string): 'default' | 'secondary' | 'destruct
   }
 }
 
-function getTypeLabel(type?: string): string {
-  switch (type) {
-    case Enums.InvoiceType.PaymentReceipt:
-      return 'Payment';
-    case Enums.InvoiceType.RefundReceipt:
-      return 'Refund';
-    case Enums.InvoiceType.SurchargeReceipt:
-      return 'Surcharge';
-    case Enums.InvoiceType.FinalReceipt:
-      return 'Final';
-    default:
-      return 'Receipt';
-  }
-}
+const TYPE_LABEL_KEYS: Record<string, string> = {
+  [Enums.InvoiceType.PaymentReceipt]: 'statuses:payment_receipt',
+  [Enums.InvoiceType.RefundReceipt]: 'statuses:refund_receipt',
+  [Enums.InvoiceType.SurchargeReceipt]: 'statuses:surcharge_receipt',
+  [Enums.InvoiceType.FinalReceipt]: 'statuses:final_receipt',
+};
 
 function InvoiceCard({
   invoice,
@@ -56,9 +48,14 @@ function InvoiceCard({
   invoice: InvoiceData;
   currencySymbol: string;
 }) {
+  const { t } = useTranslation();
   const docNumber =
     invoice.documentNumber ||
     `REC-${invoice.sequenceYear}-${String(invoice.sequenceNumber).padStart(4, '0')}`;
+
+  const typeLabel = invoice.type
+    ? t(TYPE_LABEL_KEYS[invoice.type] || 'statuses:receipt')
+    : t('statuses:receipt');
 
   return (
     <div className="bg-muted/30 rounded-lg border p-4">
@@ -66,7 +63,7 @@ function InvoiceCard({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="font-mono text-sm">{docNumber}</span>
-            <Badge variant={getTypeBadgeVariant(invoice.type)}>{getTypeLabel(invoice.type)}</Badge>
+            <Badge variant={getTypeBadgeVariant(invoice.type)}>{typeLabel}</Badge>
           </div>
           <p className="text-muted-foreground text-xs">{invoice.publicId}</p>
         </div>
