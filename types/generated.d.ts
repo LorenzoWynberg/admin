@@ -263,6 +263,15 @@ declare namespace App.Data.Currency {
   };
 }
 declare namespace App.Data.Driver {
+  export type DriverAddStopData = {
+    orderId: number;
+    type: App.Enums.OrderStopType;
+    addressId: number | null;
+    address?: App.Data.Address.StoreSnapshotAddressData | null;
+    contactName?: string | null;
+    contactPhone?: string | null;
+    instructions?: string | null;
+  };
   export type DriverData = {
     id?: number;
     publicId?: string;
@@ -290,6 +299,19 @@ declare namespace App.Data.Driver {
     date: string;
     startTime: string;
     endTime: string;
+  };
+  export type FailStopData = {
+    reason: string;
+  };
+  export type SplitStopData = {
+    splits: Array<App.Data.Driver.SplitStopEntryData>;
+  };
+  export type SplitStopEntryData = {
+    type: App.Enums.OrderStopType;
+    address?: App.Data.Address.StoreSnapshotAddressData | null;
+    instructions?: string | null;
+    contactName?: string | null;
+    contactPhone?: string | null;
   };
   export type StoreDriverData = {
     user: App.Data.User.StoreUserData;
@@ -450,6 +472,8 @@ declare namespace App.Data.Order {
     createdBy?: number;
     completedAt?: string | null;
     skippedAt?: string | null;
+    failedAt?: string | null;
+    failureReason?: string | null;
     createdAt?: string;
     updatedAt?: string;
     address?: App.Data.Address.AddressData;
@@ -748,6 +772,8 @@ declare namespace App.Data.Route {
     podSignatureUrl?: string | null;
     podPinVerifiedAt?: string | null;
     completedAt?: string | null;
+    failedAt?: string | null;
+    failureReason?: string | null;
     createdAt?: string;
     updatedAt?: string;
     order?: App.Data.Order.OrderData;
@@ -1107,6 +1133,7 @@ declare namespace App.Enums {
     ScheduleChanged = 'schedule_changed',
     StopAssigned = 'stop_assigned',
     DelayFlagged = 'delay_flagged',
+    StopFailed = 'stop_failed',
     OrderPendingApproval = 'order_pending_approval',
     Welcome = 'welcome',
     OrderConfirmed = 'order_confirmed',
@@ -1139,6 +1166,7 @@ declare namespace App.Enums {
     Arrived = 'arrived',
     Completed = 'completed',
     Skipped = 'skipped',
+    Failed = 'failed',
   }
   export enum OrderStopType {
     Purchase = 'purchase',
@@ -1210,11 +1238,16 @@ declare namespace App.Enums {
     ARRIVED = 'arrived',
     COMPLETED = 'completed',
     SKIPPED = 'skipped',
+    FAILED = 'failed',
   }
   export enum RouteStopType {
     PURCHASE = 'purchase',
     PICKUP = 'pickup',
     DROPOFF = 'dropoff',
+  }
+  export enum ScheduleChangeReason {
+    Reassigned = 'reassigned',
+    Rescheduled = 'rescheduled',
   }
   export enum TipoIdentificacion {
     Fisica = '01',

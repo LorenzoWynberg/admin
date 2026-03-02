@@ -37,6 +37,9 @@ import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { QuoteDetailDialog } from '@/components/quotes/QuoteDetailDialog';
 import { PaymentSection } from '@/components/payments/PaymentSection';
 import { EditStopAddressDialog } from '@/components/orders/EditStopAddressDialog';
+import { EditStopDetailsDialog } from '@/components/orders/EditStopDetailsDialog';
+import { AddStopDialog } from '@/components/orders/AddStopDialog';
+import { ReconciliationDialog } from '@/components/orders/ReconciliationDialog';
 import { ChatTabs } from '@/components/chat/ChatTabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -67,6 +70,10 @@ export default function OrderDetailPage() {
   const outsourceOrder = useOutsourceOrder();
   const { data: currencyData } = useCurrencyList();
   const [editingStop, setEditingStop] = useState<App.Data.Order.OrderStopData | null>(null);
+  const [editingStopDetails, setEditingStopDetails] = useState<App.Data.Order.OrderStopData | null>(
+    null
+  );
+  const [addStopOpen, setAddStopOpen] = useState(false);
 
   // Get currency symbol for the order's currency
   const currencies = currencyData?.items || [];
@@ -170,6 +177,7 @@ export default function OrderDetailPage() {
               windowEnd={order.windowEnd}
               timeSensitive={order.timeSensitive}
               deliveryTier={order.deliveryTier}
+              orderStops={orderStops}
             />
           )}
           {(order.status === Enums.OrderStatus.APPROVED ||
@@ -183,6 +191,17 @@ export default function OrderDetailPage() {
                 <ExternalLink className="mr-2 h-4 w-4" />
                 {t('orders:detail.outsource', { defaultValue: 'Outsource' })}
               </Button>
+            )}
+          {order.status === Enums.OrderStatus.COMPLETED &&
+            order.paymentStatus === Enums.PaymentStatus.PAID &&
+            !order.reconciledAt &&
+            order.publicId && (
+              <ReconciliationDialog
+                orderPublicId={order.publicId}
+                orderStops={orderStops}
+                originalQuoteTotal={order.currentQuote?.total || 0}
+                currencySymbol={currencySymbol}
+              />
             )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
             <Trash2 className="mr-2 h-4 w-4" />
@@ -206,10 +225,25 @@ export default function OrderDetailPage() {
         {/* Stops */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ListOrdered className="h-5 w-5" />
-              {t('orders:detail.stops', { defaultValue: 'Stops' })}
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <ListOrdered className="h-5 w-5" />
+                {t('orders:detail.stops', { defaultValue: 'Stops' })}
+              </CardTitle>
+              {order.publicId &&
+                (order.status === Enums.OrderStatus.PENDING ||
+                  order.status === Enums.OrderStatus.ESTIMATED ||
+                  order.status === Enums.OrderStatus.APPROVED) && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setAddStopOpen(true)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {(order.contactName || order.contactPhone) && (
@@ -291,24 +325,40 @@ export default function OrderDetailPage() {
                             })}
                           </Button>
                         )}
-                        {stop.contactName && (
-                          <div className="flex items-center gap-2">
-                            <User className="text-muted-foreground h-3.5 w-3.5" />
-                            <span className="text-sm">{stop.contactName}</span>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="space-y-1">
+                            {stop.contactName && (
+                              <div className="flex items-center gap-2">
+                                <User className="text-muted-foreground h-3.5 w-3.5" />
+                                <span className="text-sm">{stop.contactName}</span>
+                              </div>
+                            )}
+                            {stop.contactPhone && (
+                              <div className="flex items-center gap-2">
+                                <Phone className="text-muted-foreground h-3.5 w-3.5" />
+                                <span className="text-sm">{stop.contactPhone}</span>
+                              </div>
+                            )}
+                            {stop.instructions && (
+                              <div className="flex items-start gap-2">
+                                <FileText className="text-muted-foreground mt-0.5 h-3.5 w-3.5" />
+                                <span className="text-sm">{stop.instructions}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                        {stop.contactPhone && (
-                          <div className="flex items-center gap-2">
-                            <Phone className="text-muted-foreground h-3.5 w-3.5" />
-                            <span className="text-sm">{stop.contactPhone}</span>
-                          </div>
-                        )}
-                        {stop.instructions && (
-                          <div className="flex items-start gap-2">
-                            <FileText className="text-muted-foreground mt-0.5 h-3.5 w-3.5" />
-                            <span className="text-sm">{stop.instructions}</span>
-                          </div>
-                        )}
+                          {(order.status === Enums.OrderStatus.PENDING ||
+                            order.status === Enums.OrderStatus.ESTIMATED ||
+                            order.status === Enums.OrderStatus.APPROVED) && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 shrink-0"
+                              onClick={() => setEditingStopDetails(stop)}
+                            >
+                              <Pencil className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
                         {stop.completedAt && (
                           <div className="flex items-center gap-2">
                             <Clock className="h-3.5 w-3.5 text-green-600" />
@@ -566,6 +616,7 @@ export default function OrderDetailPage() {
                 windowEnd={order.windowEnd}
                 timeSensitive={order.timeSensitive}
                 deliveryTier={order.deliveryTier}
+                orderStops={orderStops}
               />
             )}
             <div className="flex justify-between border-t pt-2">
@@ -742,6 +793,27 @@ export default function OrderDetailPage() {
           onOpenChange={(open) => !open && setEditingStop(null)}
           stop={editingStop}
           orderPublicId={order.publicId}
+          otherStops={orderStops}
+        />
+      )}
+
+      {/* Edit Stop Details Dialog */}
+      {order.publicId && editingStopDetails && (
+        <EditStopDetailsDialog
+          open={!!editingStopDetails}
+          onOpenChange={(open) => !open && setEditingStopDetails(null)}
+          stop={editingStopDetails}
+          orderPublicId={order.publicId}
+        />
+      )}
+
+      {/* Add Stop Dialog */}
+      {order.publicId && (
+        <AddStopDialog
+          open={addStopOpen}
+          onOpenChange={setAddStopOpen}
+          orderPublicId={order.publicId}
+          hasDropoff={orderStops.some((s) => s.type === Enums.OrderStopType.Dropoff)}
           otherStops={orderStops}
         />
       )}

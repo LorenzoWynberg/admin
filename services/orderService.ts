@@ -1,6 +1,7 @@
 import { api } from '@/lib/api/client';
 
 type OrderData = App.Data.Order.OrderData;
+type QuoteData = App.Data.Quote.QuoteData;
 type RouteStopData = App.Data.Route.RouteStopData;
 type Single<T> = Api.Response.Single<T>;
 type Multiple<T> = Api.Response.Multiple<T>;
@@ -147,6 +148,31 @@ export const OrderService = {
    */
   async cancelOrder(publicId: string, reason: string): Promise<SuccessBasic> {
     return api.post<SuccessBasic>(`/orders/${publicId}/cancel`, { reason });
+  },
+
+  /**
+   * Create a new stop on an order
+   */
+  async createStop(
+    orderPublicId: string,
+    data: Record<string, unknown>
+  ): Promise<App.Data.Order.OrderStopData> {
+    const response = await api.post<Single<App.Data.Order.OrderStopData>>(
+      `/orders/${orderPublicId}/stops`,
+      data
+    );
+    return response.item;
+  },
+
+  /**
+   * Reconcile a completed order with actual costs
+   */
+  async reconcile(
+    orderPublicId: string,
+    data: { items: Record<string, unknown>[]; notes?: string | null }
+  ): Promise<QuoteData> {
+    const response = await api.post<Single<QuoteData>>(`/orders/${orderPublicId}/reconcile`, data);
+    return response.item;
   },
 
   /**

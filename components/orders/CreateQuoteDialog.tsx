@@ -13,6 +13,7 @@ import { FileText, Send, Loader2, Pencil, Clock, AlertTriangle } from 'lucide-re
 
 import { FeasibilityBadge } from './FeasibilityBadge';
 import { useEffect, useMemo, useState } from 'react';
+import { QuoteLineItemsEditor, type QuoteLineItem } from '@/components/quotes/QuoteLineItemsEditor';
 import { useFeasibilityCheck } from '@/hooks/feasibility';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -46,6 +47,7 @@ interface CreateQuoteDialogProps {
   windowEnd?: string | null;
   timeSensitive?: boolean;
   deliveryTier?: string;
+  orderStops?: App.Data.Order.OrderStopData[];
 }
 
 export function CreateQuoteDialog({
@@ -60,6 +62,7 @@ export function CreateQuoteDialog({
   windowEnd,
   timeSensitive = false,
   deliveryTier,
+  orderStops = [],
 }: CreateQuoteDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -91,6 +94,7 @@ export function CreateQuoteDialog({
   };
 
   const [formData, setFormData] = useState(getDefaultFormData);
+  const [items, setItems] = useState<QuoteLineItem[]>([]);
 
   // Compute effective proposed times: feasibility suggestions override defaults when not editing
   const effectivePickup =
@@ -126,6 +130,7 @@ export function CreateQuoteDialog({
     if (isOpen) {
       setFormData(getDefaultFormData());
       setEditingTimes(false);
+      setItems([]);
     }
     setOpen(isOpen);
   };
@@ -178,6 +183,12 @@ export function CreateQuoteDialog({
     };
   }, [pricing, formData.timeFee, formData.surcharge, formData.discountRate]);
 
+  // Calculate line items total
+  const itemsTotal = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
+    [items]
+  );
+
   // Calculate customer currency conversion
   const customerConversion = (() => {
     if (!calculation) return null;
@@ -212,7 +223,21 @@ export function CreateQuoteDialog({
       return;
     }
 
-    const data = {
+    // Map stopPublicId to orderStopId (numeric)
+    const stopIdMap = new Map(
+      orderStops.filter((s) => s.publicId && s.id).map((s) => [s.publicId!, s.id!])
+    );
+
+    const mappedItems = items
+      .filter((item) => item.label.trim())
+      .map((item) => ({
+        orderStopId: item.stopPublicId ? (stopIdMap.get(item.stopPublicId) ?? null) : null,
+        label: item.label.trim(),
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      }));
+
+    const data: App.Data.Quote.StoreQuoteData = {
       orderId,
       distanceKm,
       timeFee: formData.timeFee ? parseFloat(formData.timeFee) : null,
@@ -221,6 +246,9 @@ export function CreateQuoteDialog({
       notes: formData.notes || undefined,
       pickupProposedFor: dateTimeLocalToISO(effectivePickup),
       deliveryProposedFor: dateTimeLocalToISO(effectiveDelivery),
+      ...(mappedItems.length > 0 && {
+        items: Object.fromEntries(mappedItems.map((item, idx) => [idx, item])),
+      }),
     };
 
     createQuote.mutate(data, {
@@ -248,7 +276,7 @@ export function CreateQuoteDialog({
           {t('quotes:create.button', { defaultValue: 'Create Quote' })}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-xl">
         <DialogHeader>
           <DialogTitle>
             {t('quotes:create.title', {
@@ -502,6 +530,24 @@ export function CreateQuoteDialog({
               onChange={(e) => handleChange('notes', e.target.value)}
             />
           </div>
+
+          {/* Line Items Editor */}
+          <QuoteLineItemsEditor
+            stops={orderStops}
+            items={items}
+            onItemsChange={setItems}
+            currencySymbol={baseSymbol}
+          />
+
+          {/* Items Total Preview */}
+          {itemsTotal > 0 && (
+            <div className="flex justify-between rounded-lg border px-3 py-2 text-sm">
+              <span className="text-muted-foreground">
+                {t('quotes:items.items_total', { defaultValue: 'Items Total' })}
+              </span>
+              <span className="font-medium">{formatCurrency(itemsTotal, baseSymbol)}</span>
+            </div>
+          )}
 
           {/* Delivery Window or Time-Sensitive Constraints */}
           {timeSensitive && customerDesiredPickup ? (

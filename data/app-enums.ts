@@ -195,6 +195,7 @@ export const Enums = {
     ScheduleChanged: 'schedule_changed',
     StopAssigned: 'stop_assigned',
     DelayFlagged: 'delay_flagged',
+    StopFailed: 'stop_failed',
     OrderPendingApproval: 'order_pending_approval',
     Welcome: 'welcome',
     OrderConfirmed: 'order_confirmed',
@@ -227,6 +228,7 @@ export const Enums = {
     Arrived: 'arrived',
     Completed: 'completed',
     Skipped: 'skipped',
+    Failed: 'failed',
   },
   OrderStopType: {
     Purchase: 'purchase',
@@ -298,11 +300,16 @@ export const Enums = {
     ARRIVED: 'arrived',
     COMPLETED: 'completed',
     SKIPPED: 'skipped',
+    FAILED: 'failed',
   },
   RouteStopType: {
     PURCHASE: 'purchase',
     PICKUP: 'pickup',
     DROPOFF: 'dropoff',
+  },
+  ScheduleChangeReason: {
+    Reassigned: 'reassigned',
+    Rescheduled: 'rescheduled',
   },
   TipoIdentificacion: {
     Fisica: '01',
