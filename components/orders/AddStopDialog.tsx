@@ -148,7 +148,9 @@ export function AddStopDialog({
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{capitalize(t('validation:attributes.type', { defaultValue: 'Type' }))}</FormLabel>
+                  <FormLabel>
+                    {capitalize(t('validation:attributes.type', { defaultValue: 'Type' }))}
+                  </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>

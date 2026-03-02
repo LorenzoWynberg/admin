@@ -525,6 +525,7 @@ declare namespace App.Data.Order {
     contactPhone?: string | null;
     instructions?: string | null;
     sequence?: number;
+    type?: App.Enums.OrderStopType;
   };
 }
 declare namespace App.Data.Payment {

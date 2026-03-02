@@ -22,6 +22,7 @@ import {
   Plus,
   ExternalLink,
   Info,
+  Loader2,
 } from 'lucide-react';
 
 import { useState } from 'react';
@@ -50,7 +51,13 @@ import {
   validationAttribute,
 } from '@/utils/lang';
 import { formatDate, formatDateTime, formatCurrency } from '@/utils/format';
-import { useOrder, useDeleteOrder, useCalculateDistance, useOutsourceOrder } from '@/hooks/orders';
+import {
+  useOrder,
+  useDeleteOrder,
+  useCalculateDistance,
+  useOutsourceOrder,
+  useUpdateStop,
+} from '@/hooks/orders';
 import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { Enums } from '@/data/app-enums';
 
@@ -68,12 +75,14 @@ export default function OrderDetailPage() {
   const deleteOrder = useDeleteOrder();
   const calculateDistance = useCalculateDistance();
   const outsourceOrder = useOutsourceOrder();
+  const updateStop = useUpdateStop();
   const currencySymbol = useOrderCurrencySymbol(order?.currencyCode);
   const [editingStop, setEditingStop] = useState<App.Data.Order.OrderStopData | null>(null);
   const [editingStopDetails, setEditingStopDetails] = useState<App.Data.Order.OrderStopData | null>(
     null
   );
   const [addStopOpen, setAddStopOpen] = useState(false);
+  const [updatingStopTypeId, setUpdatingStopTypeId] = useState<number | null>(null);
 
   const formatAddress = (address?: App.Data.Address.AddressData | null): string => {
     const notSpecified = t('orders:detail.not_specified', { defaultValue: 'Not specified' });
@@ -275,18 +284,50 @@ export default function OrderDetailPage() {
                           {stop.type === Enums.OrderStopType.Dropoff && (
                             <MapPin className="h-4 w-4 text-red-600" />
                           )}
-                          <Badge
-                            variant="outline"
-                            className={
-                              stop.type === Enums.OrderStopType.Dropoff
-                                ? 'border-red-300 text-red-700 dark:border-red-700 dark:text-red-400'
-                                : 'border-green-300 text-green-700 dark:border-green-700 dark:text-green-400'
-                            }
-                          >
-                            {t(`routes:stop_types.${stop.type}`, {
-                              defaultValue: capitalize(stop.type || 'stop'),
-                            })}
-                          </Badge>
+                          {(() => {
+                            const isEditable =
+                              stop.type !== Enums.OrderStopType.Dropoff &&
+                              (order.status === Enums.OrderStatus.PENDING ||
+                                order.status === Enums.OrderStatus.ESTIMATED ||
+                                order.status === Enums.OrderStatus.APPROVED);
+                            const isLoading =
+                              updatingStopTypeId === stop.id && updateStop.isPending;
+                            return (
+                              <Badge
+                                variant="outline"
+                                className={`${
+                                  stop.type === Enums.OrderStopType.Dropoff
+                                    ? 'border-red-300 text-red-700 dark:border-red-700 dark:text-red-400'
+                                    : 'border-green-300 text-green-700 dark:border-green-700 dark:text-green-400'
+                                }${isEditable ? ' cursor-pointer transition-colors hover:bg-green-50 dark:hover:bg-green-950' : ''}`}
+                                onClick={() => {
+                                  if (!isEditable || !stop.id || !order.publicId || isLoading)
+                                    return;
+                                  setUpdatingStopTypeId(stop.id);
+                                  const newType =
+                                    stop.type === Enums.OrderStopType.Purchase
+                                      ? Enums.OrderStopType.Pickup
+                                      : Enums.OrderStopType.Purchase;
+                                  updateStop.mutate(
+                                    {
+                                      orderPublicId: order.publicId,
+                                      stopId: stop.id,
+                                      data: { type: newType },
+                                    },
+                                    { onSettled: () => setUpdatingStopTypeId(null) }
+                                  );
+                                }}
+                              >
+                                {isLoading ? (
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                  t(`routes:stop_types.${stop.type}`, {
+                                    defaultValue: capitalize(stop.type || 'stop'),
+                                  })
+                                )}
+                              </Badge>
+                            );
+                          })()}
                         </div>
                         {stop.status && (
                           <Badge variant="secondary">{statusLabel(stop.status)}</Badge>
