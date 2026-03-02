@@ -33,8 +33,7 @@ export function QuoteLineItemsEditor({
 }: QuoteLineItemsEditorProps) {
   const { t } = useTranslation();
 
-  // Group items by stopPublicId
-  const generalItems = items.filter((item) => !item.stopPublicId);
+  // Group items by stop
   const stopGroups = stops.map((stop) => ({
     stop,
     items: items.filter((item) => item.stopPublicId === stop.publicId),
@@ -80,20 +79,6 @@ export function QuoteLineItemsEditor({
         {t('quotes:items.title', { defaultValue: 'Line Items' })}
       </Label>
 
-      {/* General section (no stop) */}
-      <ItemSection
-        title={t('quotes:items.general', { defaultValue: 'General' })}
-        sectionItems={generalItems}
-        currencySymbol={currencySymbol}
-        onAdd={() => addItem(null)}
-        onRemove={(localIdx) => removeItem(getGlobalIndex(null, localIdx))}
-        onUpdate={(localIdx, field, value) =>
-          updateItem(getGlobalIndex(null, localIdx), field, value)
-        }
-        t={t}
-      />
-
-      {/* Per-stop sections */}
       {stopGroups.map(({ stop, items: sectionItems }) => (
         <ItemSection
           key={stop.publicId}

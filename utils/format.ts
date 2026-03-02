@@ -181,7 +181,7 @@ export function formatDate(dateString: string | null | undefined, fallback: stri
   }
 }
 
-/** Extract the YYYY-MM-DD date part from an ISO datetime string. */
+/** Extract the YYYY-MM-DD date part from a datetime string (handles both `T` and space separators). */
 export function extractDatePart(date: string | undefined | null): string {
-  return typeof date === 'string' ? date.split('T')[0] : '';
+  return typeof date === 'string' ? date.split(/[T ]/)[0] : '';
 }

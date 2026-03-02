@@ -15,6 +15,7 @@ const COLORS = {
 
 export interface CalendarEventProps {
   _date: string;
+  _startTime: string;
 }
 
 /**
@@ -26,23 +27,29 @@ export interface CalendarEventProps {
 export function buildCalendarEvents(schedules: ScheduleEntry[], title = 'Scheduled'): EventInput[] {
   const events: EventInput[] = [];
   const today = getTodayAppTz();
+  const indexByDate: Record<string, number> = {};
 
   for (const schedule of schedules) {
     const dateStr = extractDatePart(schedule.date);
     if (!dateStr) continue;
 
+    const index = indexByDate[dateStr] ?? 0;
+    indexByDate[dateStr] = index + 1;
+
     const isPast = new Date(dateStr + 'T00:00:00') < today;
     const color = isPast ? COLORS.past : COLORS.scheduled;
+    const normalizedStart = normalizeTime(schedule.startTime);
 
     events.push({
-      id: `schedule-${dateStr}`,
+      id: `schedule-${dateStr}-${index}`,
       title,
-      start: `${dateStr}T${normalizeTime(schedule.startTime)}`,
+      start: `${dateStr}T${normalizedStart}`,
       end: `${dateStr}T${normalizeTime(schedule.endTime)}`,
       backgroundColor: color,
       borderColor: color,
       extendedProps: {
         _date: dateStr,
+        _startTime: schedule.startTime,
       } satisfies CalendarEventProps,
     });
   }

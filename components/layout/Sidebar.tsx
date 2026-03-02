@@ -61,7 +61,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const lang = (params?.lang as string) || 'en';
   const { data: needsAttentionData } = useNeedsAttention();
   const urgentCount =
-    (needsAttentionData?.summary.critical ?? 0) + (needsAttentionData?.summary.high ?? 0);
+    (needsAttentionData?.summary?.critical ?? 0) + (needsAttentionData?.summary?.high ?? 0);
 
   const withLang = (href: string) => `/${lang}${href === '/' ? '' : href}`;
   const pathWithoutLang = pathname.replace(new RegExp(`^/${lang}`), '') || '/';

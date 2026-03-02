@@ -783,7 +783,7 @@ function TierAdjustmentCallout({
               >
                 {t('quotes:feasibility.change_to_tier', {
                   tier: tierLabel(opt.value),
-                  hours: opt.hours,
+                  hours: `${opt.hours}h`,
                   defaultValue: `Change to ${tierLabel(opt.value)} (${opt.hours}h)`,
                 })}
               </Button>

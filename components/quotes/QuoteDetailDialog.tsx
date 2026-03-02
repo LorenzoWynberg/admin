@@ -202,18 +202,18 @@ function QuoteLineItemsSection({
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
   // Group items by stop
-  const generalItems = items.filter((item) => !item.orderStopId);
   const stopGroups = new Map<
     number,
     { stop: QuoteItemData['orderStop']; items: QuoteItemData[] }
   >();
 
   for (const item of items) {
-    if (item.orderStopId) {
-      if (!stopGroups.has(item.orderStopId)) {
-        stopGroups.set(item.orderStopId, { stop: item.orderStop, items: [] });
+    const stopId = item.orderStopId;
+    if (stopId) {
+      if (!stopGroups.has(stopId)) {
+        stopGroups.set(stopId, { stop: item.orderStop, items: [] });
       }
-      stopGroups.get(item.orderStopId)!.items.push(item);
+      stopGroups.get(stopId)!.items.push(item);
     }
   }
 
@@ -232,7 +232,7 @@ function QuoteLineItemsSection({
   );
 
   const stopLabel = (stop?: QuoteItemData['orderStop']) => {
-    if (!stop) return t('quotes:items.general', { defaultValue: 'General' });
+    if (!stop) return '';
     const type = stop.type
       ? t(`routes:stop_types.${stop.type}`, { defaultValue: capitalize(stop.type) })
       : '';
@@ -247,14 +247,6 @@ function QuoteLineItemsSection({
         {t('quotes:items.title', { defaultValue: 'Line Items' })}
       </div>
       <div className="space-y-3">
-        {generalItems.length > 0 && (
-          <div className="space-y-1">
-            <p className="text-muted-foreground text-xs font-medium">
-              {t('quotes:items.general', { defaultValue: 'General' })}
-            </p>
-            {generalItems.map(renderItemRow)}
-          </div>
-        )}
         {Array.from(stopGroups.entries()).map(([stopId, { stop, items: stopItems }]) => (
           <div key={stopId} className="space-y-1">
             <p className="text-muted-foreground truncate text-xs font-medium">{stopLabel(stop)}</p>

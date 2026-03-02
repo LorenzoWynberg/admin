@@ -59,6 +59,8 @@ export function DriverScheduleTab({ driverId }: Props) {
   const [dialogDate, setDialogDate] = useState('');
   const [dialogStartTime, setDialogStartTime] = useState<string | undefined>();
   const [dialogEndTime, setDialogEndTime] = useState<string | undefined>();
+  // Track original startTime when editing, so we can identify which block to replace
+  const [editOriginalStartTime, setEditOriginalStartTime] = useState<string | undefined>();
 
   // Initialize local state from fetched data
   if (data && !initialized) {
@@ -113,6 +115,7 @@ export function DriverScheduleTab({ driverId }: Props) {
 
       setDialogMode('edit');
       setDialogDate(dateStr);
+      setEditOriginalStartTime(props._startTime);
 
       if (arg.event.start) {
         setDialogStartTime(formatTimeHHMM(arg.event.start));
@@ -128,19 +131,37 @@ export function DriverScheduleTab({ driverId }: Props) {
 
   // -- Schedule management --
 
-  const handleSaveEntry = useCallback((entry: ScheduleEntry) => {
-    setSchedules((prev) => {
-      const dateStr = extractDatePart(entry.date);
-      const filtered = prev.filter((s) => extractDatePart(s.date) !== dateStr);
-      return [...filtered, entry];
-    });
-  }, []);
+  const handleSaveEntry = useCallback(
+    (entry: ScheduleEntry) => {
+      setSchedules((prev) => {
+        if (dialogMode === 'edit' && editOriginalStartTime) {
+          // Replace the specific block matched by date + original start time
+          const dateStr = extractDatePart(entry.date);
+          return prev.map((s) => {
+            if (extractDatePart(s.date) === dateStr && s.startTime === editOriginalStartTime) {
+              return entry;
+            }
+            return s;
+          });
+        }
+        // Create mode: append the new block
+        return [...prev, entry];
+      });
+    },
+    [dialogMode, editOriginalStartTime]
+  );
 
   const handleDeleteEntry = useCallback(() => {
     setSchedules((prev) => {
-      return prev.filter((s) => extractDatePart(s.date) !== dialogDate);
+      return prev.filter((s) => {
+        // Only remove the specific block matched by date + original start time
+        if (extractDatePart(s.date) === dialogDate && s.startTime === editOriginalStartTime) {
+          return false;
+        }
+        return true;
+      });
     });
-  }, [dialogDate]);
+  }, [dialogDate, editOriginalStartTime]);
 
   const handleSaveSchedules = () => {
     syncSchedules.mutate(schedules);
@@ -178,8 +199,9 @@ export function DriverScheduleTab({ driverId }: Props) {
             headerToolbar={CALENDAR_HEADER_TOOLBAR}
             firstDay={0}
             timeZone={APP_TIMEZONE}
-            slotMinTime="05:00:00"
+            slotMinTime="04:00:00"
             slotMaxTime="22:00:00"
+            slotLabelFormat={{ hour: 'numeric', minute: '2-digit', hour12: true }}
             height={800}
             events={calendarEvents}
             dateClick={handleDateClick}

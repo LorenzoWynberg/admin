@@ -117,8 +117,8 @@ export default function DashboardPage() {
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
   const { data: needsAttentionData } = useNeedsAttention();
-  const totalNeedsAttention = needsAttentionData?.data.length ?? 0;
-  const criticalCount = needsAttentionData?.summary.critical ?? 0;
+  const totalNeedsAttention = needsAttentionData?.data?.length ?? 0;
+  const criticalCount = needsAttentionData?.summary?.critical ?? 0;
 
   if (!ready) {
     return null;
