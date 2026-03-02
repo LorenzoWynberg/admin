@@ -8,7 +8,6 @@ export function useNeedsAttention() {
   return useQuery({
     queryKey: ['orders', 'needs-attention'],
     queryFn: () => OrderService.getNeedsAttention(),
-    refetchInterval: 30_000,
   });
 }
 

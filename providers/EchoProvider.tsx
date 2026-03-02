@@ -13,6 +13,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { createEcho } from '@/lib/echo';
 import { useCatalogBroadcast } from '@/hooks/catalogs';
 import { useNotificationBroadcast } from '@/hooks/notifications';
+import { useNeedsAttentionBroadcast } from '@/hooks/orders';
 
 const EchoContext = createContext<Echo<'reverb'> | null>(null);
 
@@ -28,6 +29,7 @@ interface EchoProviderProps {
 function EchoBroadcasts({ children }: { children: ReactNode }) {
   useCatalogBroadcast();
   useNotificationBroadcast();
+  useNeedsAttentionBroadcast();
   return <>{children}</>;
 }
 
