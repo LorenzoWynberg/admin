@@ -6,27 +6,29 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import type { DatesSetArg, EventClickArg } from '@fullcalendar/core';
+import type { EventClickArg } from '@fullcalendar/core';
 import type { DateClickArg } from '@fullcalendar/interaction';
+import esLocale from '@fullcalendar/core/locales/es';
+import frLocale from '@fullcalendar/core/locales/fr';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ScheduleEventDialog } from './ScheduleEventDialog';
-import { useDriverSchedules, useSyncSchedules, useSyncOverrides } from '@/hooks/drivers';
-import { buildCalendarEvents, EVENT_TYPE_UNAVAILABLE } from '@/utils/scheduleEvents';
+import { useDriverSchedules, useSyncSchedules } from '@/hooks/drivers';
+import { buildCalendarEvents } from '@/utils/scheduleEvents';
 import type { CalendarEventProps } from '@/utils/scheduleEvents';
-import { APP_TIMEZONE, getTodayAppTz, toAppTzComponents, padNumber } from '@/utils/format';
-import { ChevronDown, Clock, Plus, Trash2 } from 'lucide-react';
+import {
+  APP_TIMEZONE,
+  extractDatePart,
+  getTodayAppTz,
+  toAppTzComponents,
+  padNumber,
+} from '@/utils/format';
 import { actionLabel } from '@/utils/lang';
 import { toast } from 'sonner';
 
 type ScheduleEntry = App.Data.Driver.DriverScheduleData;
-type OverrideEntry = App.Data.Driver.DriverScheduleOverrideData;
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
-
+const FC_LOCALES = [esLocale, frLocale];
 const CALENDAR_PLUGINS = [dayGridPlugin, timeGridPlugin, interactionPlugin];
 const CALENDAR_HEADER_TOOLBAR = {
   left: 'prev,next today',
@@ -44,15 +46,12 @@ interface Props {
 }
 
 export function DriverScheduleTab({ driverId }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data, isLoading } = useDriverSchedules(driverId);
   const syncSchedules = useSyncSchedules(driverId);
-  const syncOverrides = useSyncOverrides(driverId);
 
   const [schedules, setSchedules] = useState<ScheduleEntry[]>([]);
-  const [overrides, setOverrides] = useState<OverrideEntry[]>([]);
   const [initialized, setInitialized] = useState(false);
-  const [templateOpen, setTemplateOpen] = useState(false);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -60,155 +59,88 @@ export function DriverScheduleTab({ driverId }: Props) {
   const [dialogDate, setDialogDate] = useState('');
   const [dialogStartTime, setDialogStartTime] = useState<string | undefined>();
   const [dialogEndTime, setDialogEndTime] = useState<string | undefined>();
-  const [dialogIsOverride, setDialogIsOverride] = useState(false);
-  const [dialogAvailable, setDialogAvailable] = useState(true);
-
-  // Calendar visible range — null until FullCalendar reports its first range
-  const [visibleRange, setVisibleRange] = useState<{ start: Date; end: Date } | null>(null);
 
   // Initialize local state from fetched data
   if (data && !initialized) {
     setSchedules(data.schedules ?? []);
-    setOverrides(data.overrides ?? []);
     setInitialized(true);
   }
 
   // Compute calendar events when data changes
+  const scheduledLabel = t('drivers:schedule.scheduled', { defaultValue: 'Scheduled' });
   const calendarEvents = useMemo(
-    () =>
-      visibleRange
-        ? buildCalendarEvents(schedules, overrides, visibleRange.start, visibleRange.end)
-        : [],
-    [schedules, overrides, visibleRange]
+    () => buildCalendarEvents(schedules, scheduledLabel),
+    [schedules, scheduledLabel]
   );
 
-  const handleDatesSet = useCallback((arg: DatesSetArg) => {
-    setVisibleRange({ start: arg.start, end: arg.end });
-  }, []);
-
-  const handleDateClick = useCallback(
-    (arg: DateClickArg) => {
-      const dateStr = arg.dateStr.slice(0, 10);
+  const isPastDate = useCallback(
+    (dateStr: string): boolean => {
       const today = getTodayAppTz();
-      const clickedDate = new Date(dateStr + 'T00:00:00');
-
-      if (clickedDate < today) {
+      if (new Date(dateStr + 'T00:00:00') < today) {
         toast.info(
           t('drivers:schedule.past_readonly', {
             defaultValue: 'Past dates cannot be modified',
           })
         );
-        return;
+        return true;
       }
+      return false;
+    },
+    [t]
+  );
 
-      // Extract time from the ISO string (e.g. "2026-03-01T10:00:00")
+  const handleDateClick = useCallback(
+    (arg: DateClickArg) => {
+      const dateStr = extractDatePart(arg.dateStr);
+      if (isPastDate(dateStr)) return;
+
       const timeStr = arg.dateStr.length > 10 ? arg.dateStr.slice(11, 16) : undefined;
 
       setDialogMode('create');
       setDialogDate(dateStr);
       setDialogStartTime(timeStr);
       setDialogEndTime(undefined);
-      setDialogIsOverride(false);
-      setDialogAvailable(true);
       setDialogOpen(true);
     },
-    [t]
+    [isPastDate]
   );
 
   const handleEventClick = useCallback(
     (arg: EventClickArg) => {
       const props = arg.event.extendedProps as CalendarEventProps;
-      const dateStr = props._date ?? arg.event.startStr.slice(0, 10);
-      const today = getTodayAppTz();
-      const clickedDate = new Date(dateStr + 'T00:00:00');
-
-      if (clickedDate < today) {
-        toast.info(
-          t('drivers:schedule.past_readonly', {
-            defaultValue: 'Past dates cannot be modified',
-          })
-        );
-        return;
-      }
-
-      const isOverride = props._isOverride ?? false;
-      const isUnavailable = props._type === EVENT_TYPE_UNAVAILABLE;
+      const dateStr = props._date ?? extractDatePart(arg.event.startStr);
+      if (isPastDate(dateStr)) return;
 
       setDialogMode('edit');
       setDialogDate(dateStr);
-      setDialogIsOverride(isOverride);
 
-      if (isUnavailable) {
-        setDialogAvailable(false);
-        setDialogStartTime(undefined);
-        setDialogEndTime(undefined);
-      } else {
-        setDialogAvailable(true);
-        if (arg.event.start) {
-          setDialogStartTime(formatTimeHHMM(arg.event.start));
-        }
-        if (arg.event.end) {
-          setDialogEndTime(formatTimeHHMM(arg.event.end));
-        }
+      if (arg.event.start) {
+        setDialogStartTime(formatTimeHHMM(arg.event.start));
+      }
+      if (arg.event.end) {
+        setDialogEndTime(formatTimeHHMM(arg.event.end));
       }
 
       setDialogOpen(true);
     },
-    [t]
+    [isPastDate]
   );
 
-  // -- Override management --
+  // -- Schedule management --
 
-  const handleSaveOverride = useCallback((override: OverrideEntry) => {
-    setOverrides((prev) => {
-      const dateStr = typeof override.date === 'string' ? override.date.split('T')[0] : '';
-      const filtered = prev.filter((o) => {
-        const d = typeof o.date === 'string' ? o.date.split('T')[0] : '';
-        return d !== dateStr;
-      });
-      return [...filtered, override];
+  const handleSaveEntry = useCallback((entry: ScheduleEntry) => {
+    setSchedules((prev) => {
+      const dateStr = extractDatePart(entry.date);
+      const filtered = prev.filter((s) => extractDatePart(s.date) !== dateStr);
+      return [...filtered, entry];
     });
   }, []);
 
-  const handleDeleteOverride = useCallback(() => {
-    setOverrides((prev) => {
-      return prev.filter((o) => {
-        const d = typeof o.date === 'string' ? o.date.split('T')[0] : '';
-        return d !== dialogDate;
-      });
+  const handleDeleteEntry = useCallback(() => {
+    setSchedules((prev) => {
+      return prev.filter((s) => extractDatePart(s.date) !== dialogDate);
     });
   }, [dialogDate]);
-
-  const handleMakeUnavailable = useCallback(() => {
-    const override: OverrideEntry = {
-      date: dialogDate,
-      available: false,
-    } as OverrideEntry;
-    handleSaveOverride(override);
-  }, [dialogDate, handleSaveOverride]);
-
-  const handleSaveOverrides = () => {
-    syncOverrides.mutate(overrides);
-  };
-
-  // -- Template management --
-
-  const addScheduleEntry = (dayOfWeek: number) => {
-    setSchedules((prev) => [
-      ...prev,
-      { dayOfWeek, startTime: '08:00', endTime: '17:00' } as ScheduleEntry,
-    ]);
-  };
-
-  const removeScheduleEntry = (index: number) => {
-    setSchedules((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const updateScheduleEntry = (index: number, field: 'startTime' | 'endTime', value: string) => {
-    setSchedules((prev) =>
-      prev.map((entry, i) => (i === index ? { ...entry, [field]: value } : entry))
-    );
-  };
 
   const handleSaveSchedules = () => {
     syncSchedules.mutate(schedules);
@@ -222,16 +154,8 @@ export function DriverScheduleTab({ driverId }: Props) {
     );
   }
 
-  // Group schedule entries by day
-  const schedulesByDay = DAYS.map((_, dayIndex) =>
-    schedules
-      .map((entry, originalIndex) => ({ entry, originalIndex }))
-      .filter(({ entry }) => entry.dayOfWeek === dayIndex)
-  );
-
   return (
     <div className="space-y-6">
-      {/* Calendar */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>
@@ -239,8 +163,8 @@ export function DriverScheduleTab({ driverId }: Props) {
               defaultValue: 'Availability Calendar',
             })}
           </CardTitle>
-          <Button onClick={handleSaveOverrides} disabled={syncOverrides.isPending} size="sm">
-            {syncOverrides.isPending
+          <Button onClick={handleSaveSchedules} disabled={syncSchedules.isPending} size="sm">
+            {syncSchedules.isPending
               ? t('common:saving', { defaultValue: 'Saving...' })
               : actionLabel('save')}
           </Button>
@@ -248,6 +172,8 @@ export function DriverScheduleTab({ driverId }: Props) {
         <CardContent>
           <FullCalendar
             plugins={CALENDAR_PLUGINS}
+            locales={FC_LOCALES}
+            locale={i18n.language}
             initialView="timeGridWeek"
             headerToolbar={CALENDAR_HEADER_TOOLBAR}
             firstDay={0}
@@ -256,92 +182,12 @@ export function DriverScheduleTab({ driverId }: Props) {
             slotMaxTime="22:00:00"
             height={800}
             events={calendarEvents}
-            datesSet={handleDatesSet}
             dateClick={handleDateClick}
             eventClick={handleEventClick}
           />
         </CardContent>
       </Card>
 
-      {/* Collapsible Weekly Template Editor */}
-      <Collapsible open={templateOpen} onOpenChange={setTemplateOpen}>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 p-0 hover:bg-transparent">
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform ${templateOpen ? 'rotate-180' : ''}`}
-                />
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  {t('drivers:schedule.default_template', {
-                    defaultValue: 'Default Weekly Template',
-                  })}
-                </CardTitle>
-              </Button>
-            </CollapsibleTrigger>
-            <Button onClick={handleSaveSchedules} disabled={syncSchedules.isPending} size="sm">
-              {syncSchedules.isPending
-                ? t('common:saving', { defaultValue: 'Saving...' })
-                : actionLabel('save')}
-            </Button>
-          </CardHeader>
-          <CollapsibleContent>
-            <CardContent className="space-y-4">
-              {DAYS.map((dayName, dayIndex) => (
-                <div key={dayName} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-semibold">{dayName}</Label>
-                    <Button variant="ghost" size="sm" onClick={() => addScheduleEntry(dayIndex)}>
-                      <Plus className="mr-1 h-3 w-3" />
-                      {t('common:add', { defaultValue: 'Add' })}
-                    </Button>
-                  </div>
-                  {schedulesByDay[dayIndex].length === 0 ? (
-                    <p className="text-muted-foreground text-xs">
-                      {t('drivers:schedule.day_off', {
-                        defaultValue: 'Day off',
-                      })}
-                    </p>
-                  ) : (
-                    schedulesByDay[dayIndex].map(({ entry, originalIndex }) => (
-                      <div key={originalIndex} className="flex items-center gap-2">
-                        <Input
-                          type="time"
-                          value={entry.startTime}
-                          onChange={(e) =>
-                            updateScheduleEntry(originalIndex, 'startTime', e.target.value)
-                          }
-                          className="w-28"
-                        />
-                        <span className="text-muted-foreground text-sm">—</span>
-                        <Input
-                          type="time"
-                          value={entry.endTime}
-                          onChange={(e) =>
-                            updateScheduleEntry(originalIndex, 'endTime', e.target.value)
-                          }
-                          className="w-28"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => removeScheduleEntry(originalIndex)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5 text-red-500" />
-                        </Button>
-                      </div>
-                    ))
-                  )}
-                </div>
-              ))}
-            </CardContent>
-          </CollapsibleContent>
-        </Card>
-      </Collapsible>
-
-      {/* Schedule Event Dialog */}
       <ScheduleEventDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
@@ -349,12 +195,9 @@ export function DriverScheduleTab({ driverId }: Props) {
         date={dialogDate}
         startTime={dialogStartTime}
         endTime={dialogEndTime}
-        isOverride={dialogIsOverride}
-        available={dialogAvailable}
-        isSaving={syncOverrides.isPending}
-        onSave={handleSaveOverride}
-        onDelete={handleDeleteOverride}
-        onMakeUnavailable={handleMakeUnavailable}
+        isSaving={syncSchedules.isPending}
+        onSave={handleSaveEntry}
+        onDelete={handleDeleteEntry}
       />
     </div>
   );

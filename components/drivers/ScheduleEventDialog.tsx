@@ -10,12 +10,11 @@ import {
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { actionLabel } from '@/utils/lang';
 
-type OverrideEntry = App.Data.Driver.DriverScheduleOverrideData;
+type ScheduleEntry = App.Data.Driver.DriverScheduleData;
 
 interface ScheduleEventDialogProps {
   open: boolean;
@@ -24,12 +23,9 @@ interface ScheduleEventDialogProps {
   date: string;
   startTime?: string;
   endTime?: string;
-  isOverride?: boolean;
-  available?: boolean;
   isSaving?: boolean;
-  onSave: (override: OverrideEntry) => void;
+  onSave: (entry: ScheduleEntry) => void;
   onDelete?: () => void;
-  onMakeUnavailable?: () => void;
 }
 
 export function ScheduleEventDialog({
@@ -39,41 +35,34 @@ export function ScheduleEventDialog({
   date,
   startTime: initialStartTime,
   endTime: initialEndTime,
-  isOverride,
-  available: initialAvailable,
   isSaving,
   onSave,
   onDelete,
-  onMakeUnavailable,
 }: ScheduleEventDialogProps) {
   const { t } = useTranslation();
-  // Reset key — forces state reset when dialog props change
-  const resetKey = `${date}-${initialAvailable}-${initialStartTime}-${initialEndTime}`;
+  const resetKey = `${date}-${initialStartTime}-${initialEndTime}`;
   const [prevResetKey, setPrevResetKey] = useState(resetKey);
-  const [available, setAvailable] = useState(initialAvailable ?? true);
   const [startTime, setStartTime] = useState(initialStartTime ?? '08:00');
   const [endTime, setEndTime] = useState(initialEndTime ?? '17:00');
 
-  // Derive state from props during render (no useEffect needed)
   if (resetKey !== prevResetKey) {
     setPrevResetKey(resetKey);
-    setAvailable(initialAvailable ?? true);
     setStartTime(initialStartTime ?? '08:00');
     setEndTime(initialEndTime ?? '17:00');
   }
 
-  const isTimeValid = !available || startTime < endTime;
+  const isTimeValid = startTime < endTime;
 
   const handleSave = () => {
     if (!isTimeValid) return;
 
-    const override: OverrideEntry = {
+    const entry: ScheduleEntry = {
       date,
-      available,
-      ...(available ? { startTime, endTime } : {}),
-    } as OverrideEntry;
+      startTime,
+      endTime,
+    };
 
-    onSave(override);
+    onSave(entry);
     onOpenChange(false);
   };
 
@@ -101,73 +90,50 @@ export function ScheduleEventDialog({
             <p className="text-muted-foreground mt-1 text-sm">{date}</p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Switch checked={available} onCheckedChange={setAvailable} />
-            <Label>
-              {available
-                ? t('drivers:schedule.available', { defaultValue: 'Available' })
-                : t('drivers:schedule.unavailable', { defaultValue: 'Unavailable' })}
-            </Label>
-          </div>
-
-          {available && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
-                  <Label className="text-sm">{t('common:start', { defaultValue: 'Start' })}</Label>
-                  <Input
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="flex-1">
-                  <Label className="text-sm">{t('common:end', { defaultValue: 'End' })}</Label>
-                  <Input
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <Label className="text-sm">{t('common:start', { defaultValue: 'Start' })}</Label>
+                <Input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="mt-1"
+                />
               </div>
-              {!isTimeValid && (
-                <p className="text-destructive text-xs">
-                  {t('validation:after', {
-                    attribute: t('common:end', { defaultValue: 'End' }),
-                    date: t('common:start', { defaultValue: 'Start' }),
-                    defaultValue: 'End time must be after start time',
-                  })}
-                </p>
-              )}
+              <div className="flex-1">
+                <Label className="text-sm">{t('common:end', { defaultValue: 'End' })}</Label>
+                <Input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
             </div>
-          )}
+            {!isTimeValid && (
+              <p className="text-destructive text-xs">
+                {t('validation:after', {
+                  attribute: t('common:end', { defaultValue: 'End' }),
+                  date: t('common:start', { defaultValue: 'Start' }),
+                  defaultValue: 'End time must be after start time',
+                })}
+              </p>
+            )}
+          </div>
         </div>
 
         <DialogFooter className="gap-2">
-          {mode === 'edit' && !isOverride && onMakeUnavailable && (
+          {mode === 'edit' && onDelete && (
             <Button
               variant="destructive"
-              disabled={isSaving}
-              onClick={() => {
-                onMakeUnavailable();
-                onOpenChange(false);
-              }}
-            >
-              {t('drivers:schedule.make_unavailable', { defaultValue: 'Mark as unavailable' })}
-            </Button>
-          )}
-          {mode === 'edit' && isOverride && onDelete && (
-            <Button
-              variant="outline"
               disabled={isSaving}
               onClick={() => {
                 onDelete();
                 onOpenChange(false);
               }}
             >
-              {t('drivers:schedule.revert_to_template', { defaultValue: 'Revert to default' })}
+              {t('common:delete', { defaultValue: 'Delete' })}
             </Button>
           )}
           <Button onClick={handleSave} disabled={isSaving || !isTimeValid}>

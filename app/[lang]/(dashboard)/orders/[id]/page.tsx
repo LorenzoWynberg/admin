@@ -39,7 +39,13 @@ import { PaymentSection } from '@/components/payments/PaymentSection';
 import { EditStopAddressDialog } from '@/components/orders/EditStopAddressDialog';
 import { ChatTabs } from '@/components/chat/ChatTabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { actionLabel, capitalize, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  resourceMessage,
+  statusLabel,
+  validationAttribute,
+} from '@/utils/lang';
 import { formatDate, formatDateTime, formatCurrency } from '@/utils/format';
 import { useOrder, useDeleteOrder, useCalculateDistance, useOutsourceOrder } from '@/hooks/orders';
 import { useCurrencyList } from '@/hooks/currencies';
@@ -115,14 +121,14 @@ export default function OrderDetailPage() {
 
   const orderStops = (order?.stops ?? []) as App.Data.Order.OrderStopData[];
 
-  const isQuoteExpired = order.currentQuote?.status === 'expired';
+  const isQuoteExpired = order.currentQuote?.status === Enums.QuoteStatus.EXPIRED;
   const allStopsHaveAddresses = orderStops.length > 0 && orderStops.every((s) => s.address != null);
   // Can create quote for: pending (no/expired quote), or denied (re-quote after rejection)
   // All stops must have addresses assigned before quoting
   const canCreateQuote =
     allStopsHaveAddresses &&
-    ((order.status === 'pending' && (!order.currentQuote || isQuoteExpired)) ||
-      order.status === 'denied');
+    ((order.status === Enums.OrderStatus.PENDING && (!order.currentQuote || isQuoteExpired)) ||
+      order.status === Enums.OrderStatus.DENIED);
 
   // Sort quotes newest first (highest version first)
   const sortedQuotes = [...(order.quotes || [])].sort(
@@ -233,15 +239,19 @@ export default function OrderDetailPage() {
                     <div key={stop.publicId || idx} className="rounded-lg border p-3">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          {stop.type === 'purchase' && (
+                          {stop.type === Enums.OrderStopType.Purchase && (
                             <ShoppingBag className="h-4 w-4 text-green-600" />
                           )}
-                          {stop.type === 'pickup' && <MapPin className="h-4 w-4 text-green-600" />}
-                          {stop.type === 'dropoff' && <MapPin className="h-4 w-4 text-red-600" />}
+                          {stop.type === Enums.OrderStopType.Pickup && (
+                            <MapPin className="h-4 w-4 text-green-600" />
+                          )}
+                          {stop.type === Enums.OrderStopType.Dropoff && (
+                            <MapPin className="h-4 w-4 text-red-600" />
+                          )}
                           <Badge
                             variant="outline"
                             className={
-                              stop.type === 'dropoff'
+                              stop.type === Enums.OrderStopType.Dropoff
                                 ? 'border-red-300 text-red-700 dark:border-red-700 dark:text-red-400'
                                 : 'border-green-300 text-green-700 dark:border-green-700 dark:text-green-400'
                             }
@@ -252,11 +262,7 @@ export default function OrderDetailPage() {
                           </Badge>
                         </div>
                         {stop.status && (
-                          <Badge variant="secondary">
-                            {t(`statuses:${stop.status}`, {
-                              defaultValue: capitalize(stop.status),
-                            })}
-                          </Badge>
+                          <Badge variant="secondary">{statusLabel(stop.status)}</Badge>
                         )}
                       </div>
                       <div className="mt-2 space-y-1 pl-6">
@@ -320,17 +326,18 @@ export default function OrderDetailPage() {
                 {t('orders:detail.no_stops', { defaultValue: 'No stops' })}
               </p>
             )}
-            {order.deliveryAddress && !orderStops.some((s) => s.type === 'dropoff') && (
-              <div className="rounded-lg border p-3">
-                <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
-                  {t('orders:detail.delivery_address', { defaultValue: 'Delivery Address' })}
-                </p>
-                <div className="flex items-start gap-2">
-                  <MapPin className="text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
-                  <span className="font-medium">{formatAddress(order.deliveryAddress)}</span>
+            {order.deliveryAddress &&
+              !orderStops.some((s) => s.type === Enums.OrderStopType.Dropoff) && (
+                <div className="rounded-lg border p-3">
+                  <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
+                    {t('orders:detail.delivery_address', { defaultValue: 'Delivery Address' })}
+                  </p>
+                  <div className="flex items-start gap-2">
+                    <MapPin className="text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    <span className="font-medium">{formatAddress(order.deliveryAddress)}</span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </CardContent>
         </Card>
 
@@ -390,14 +397,14 @@ export default function OrderDetailPage() {
               {order.deliveryTier && (
                 <Badge
                   variant={
-                    order.deliveryTier === 'custom'
+                    order.deliveryTier === Enums.DeliveryTier.Custom
                       ? 'outline'
-                      : order.deliveryTier === 'cheapest'
+                      : order.deliveryTier === Enums.DeliveryTier.Cheapest
                         ? 'secondary'
                         : 'default'
                   }
                   className={
-                    order.deliveryTier === 'expedited'
+                    order.deliveryTier === Enums.DeliveryTier.Expedited
                       ? 'border-transparent bg-blue-600 text-white'
                       : undefined
                   }
@@ -565,10 +572,10 @@ export default function OrderDetailPage() {
               <span className="text-muted-foreground">
                 {t('orders:detail.payment_status', { defaultValue: 'Payment Status' })}
               </span>
-              <Badge variant={order.paymentStatus === 'paid' ? 'default' : 'secondary'}>
-                {t(`statuses:${order.paymentStatus || 'unpaid'}`, {
-                  defaultValue: capitalize(order.paymentStatus || 'unpaid'),
-                })}
+              <Badge
+                variant={order.paymentStatus === Enums.PaymentStatus.PAID ? 'default' : 'secondary'}
+              >
+                {statusLabel(order.paymentStatus || Enums.PaymentStatus.UNPAID)}
               </Badge>
             </div>
           </CardContent>

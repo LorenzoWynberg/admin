@@ -32,6 +32,7 @@ import {
   formatDateTime,
 } from '@/utils/format';
 import { formatRateDisplay } from '@/utils/currency';
+import { Enums } from '@/data/app-enums';
 
 interface CreateQuoteDialogProps {
   orderId: number;
@@ -275,9 +276,11 @@ export function CreateQuoteDialog({
                 level={feasibility.level}
                 candidateCount={feasibility.candidates?.length || 0}
               />
-              {feasibility.level === 'red' && deliveryTier && deliveryTier !== 'cheapest' && (
-                <TierAdjustmentCallout currentTier={deliveryTier} orderPublicId={orderPublicId} />
-              )}
+              {feasibility.level === Enums.FeasibilityLevel.Red &&
+                deliveryTier &&
+                deliveryTier !== Enums.DeliveryTier.Cheapest && (
+                  <TierAdjustmentCallout currentTier={deliveryTier} orderPublicId={orderPublicId} />
+                )}
             </div>
           ) : null}
         </DialogHeader>
@@ -693,10 +696,13 @@ function TierAdjustmentCallout({
   const tierLabel = (tier: string) => t(`orders:tiers.${tier}`, { defaultValue: tier });
 
   const tierOptions: { value: string; hours: number }[] = [];
-  if (currentTier === 'expedited') {
-    tierOptions.push({ value: 'regular', hours: 24 }, { value: 'cheapest', hours: 72 });
-  } else if (currentTier === 'regular') {
-    tierOptions.push({ value: 'cheapest', hours: 72 });
+  if (currentTier === Enums.DeliveryTier.Expedited) {
+    tierOptions.push(
+      { value: Enums.DeliveryTier.Regular, hours: 24 },
+      { value: Enums.DeliveryTier.Cheapest, hours: 72 }
+    );
+  } else if (currentTier === Enums.DeliveryTier.Regular) {
+    tierOptions.push({ value: Enums.DeliveryTier.Cheapest, hours: 72 });
   }
 
   if (tierOptions.length === 0) return null;

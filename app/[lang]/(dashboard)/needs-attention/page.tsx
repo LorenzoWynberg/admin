@@ -7,26 +7,27 @@ import { NeedsAttentionCard } from '@/components/orders/NeedsAttentionCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { Enums } from '@/data/app-enums';
 import { actionLabel } from '@/utils/lang';
 
-type Urgency = 'critical' | 'high' | 'medium' | 'low';
+const { AttentionUrgency } = Enums;
 
-const URGENCY_LEVELS: Urgency[] = ['critical', 'high', 'medium', 'low'];
+const URGENCY_LEVELS = Object.values(AttentionUrgency);
 
-const summaryStyles: Record<Urgency, string> = {
-  critical: 'bg-red-100 text-red-800',
-  high: 'bg-orange-100 text-orange-800',
-  medium: 'bg-amber-100 text-amber-800',
-  low: 'bg-gray-100 text-gray-800',
+const summaryStyles: Record<string, string> = {
+  [AttentionUrgency.Critical]: 'bg-red-100 text-red-800',
+  [AttentionUrgency.High]: 'bg-orange-100 text-orange-800',
+  [AttentionUrgency.Medium]: 'bg-amber-100 text-amber-800',
+  [AttentionUrgency.Low]: 'bg-gray-100 text-gray-800',
 };
 
 export default function NeedsAttentionPage() {
   const { t } = useTranslation('orders');
   const { data, isLoading, refetch, isRefetching } = useNeedsAttention();
-  const [filter, setFilter] = useState<Urgency | 'all'>('all');
+  const [filter, setFilter] = useState<string>('all');
 
   const items = data?.data ?? [];
-  const summary = data?.summary ?? { critical: 0, high: 0, medium: 0, low: 0 };
+  const summary = (data?.summary ?? {}) as Record<string, number>;
 
   const filtered = filter === 'all' ? items : items.filter((i) => i.urgency === filter);
 

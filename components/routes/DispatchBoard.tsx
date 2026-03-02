@@ -35,6 +35,7 @@ import { RouteMap } from './RouteMap';
 import { DispatchSummaryBar } from './DispatchSummaryBar';
 import { ReassignStopDialog } from './ReassignStopDialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Enums } from '@/data/app-enums';
 import { getTodayAppTz } from '@/utils/format';
 import type { UnassignedStop } from '@/services/routeService';
 
@@ -50,8 +51,8 @@ function isValidStopOrder(stops: RouteStopData[]): boolean {
     const orderId = stops[i].orderId;
     if (!orderId) continue;
     const entry = indices.get(orderId) ?? { pickup: -1, dropoff: -1 };
-    if (stops[i].type === 'pickup') entry.pickup = i;
-    else if (stops[i].type === 'dropoff') entry.dropoff = i;
+    if (stops[i].type === Enums.RouteStopType.PICKUP) entry.pickup = i;
+    else if (stops[i].type === Enums.RouteStopType.DROPOFF) entry.dropoff = i;
     indices.set(orderId, entry);
   }
 
@@ -184,20 +185,25 @@ export function DispatchBoard() {
 
         if (targetRouteId) {
           const targetRoute = routes.find((r) => r.publicId === targetRouteId);
-          if (targetRoute?.status === 'completed' || targetRoute?.status === 'cancelled') {
+          if (
+            targetRoute?.status === Enums.RouteStatus.COMPLETED ||
+            targetRoute?.status === Enums.RouteStatus.CANCELLED
+          ) {
             return;
           }
 
-          if (stopType === 'dropoff') {
+          if (stopType === Enums.RouteStopType.DROPOFF) {
             const order = unassigned.find(
-              (s) => s.order.id === orderId && s.stopType === 'dropoff'
+              (s) => s.order.id === orderId && s.stopType === Enums.RouteStopType.DROPOFF
             )?.order;
 
             const orderStops = (order?.stops ?? []) as App.Data.Order.OrderStopData[];
-            const pickupCompleted = orderStops.some((s) => s.type === 'pickup' && !!s.completedAt);
+            const pickupCompleted = orderStops.some(
+              (s) => s.type === Enums.OrderStopType.Pickup && !!s.completedAt
+            );
             const pickupInARoute = routes.some((r) =>
               (r.stops ?? []).some(
-                (s: RouteStopData) => s.orderId === orderId && s.type === 'pickup'
+                (s: RouteStopData) => s.orderId === orderId && s.type === Enums.RouteStopType.PICKUP
               )
             );
 

@@ -180,3 +180,8 @@ export function formatDate(dateString: string | null | undefined, fallback: stri
     return dateString;
   }
 }
+
+/** Extract the YYYY-MM-DD date part from an ISO datetime string. */
+export function extractDatePart(date: string | undefined | null): string {
+  return typeof date === 'string' ? date.split('T')[0] : '';
+}

@@ -33,7 +33,7 @@ import {
 import { ArrowLeft, Pencil, Trash2, Copy, Power, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { Enums } from '@/data/app-enums';
-import { actionLabel, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, resourceMessage, statusLabel, validationAttribute } from '@/utils/lang';
 import { formatDate } from '@/utils/format';
 
 function formatCurrency(amount?: number): string {
@@ -116,14 +116,12 @@ export default function PricingRuleDetailPage() {
               <span>v{rule.version}</span>
               {rule.status === Enums.PricingRuleStatus.ACTIVE ? (
                 <Badge variant="default" className="bg-green-600">
-                  {t('statuses:active', { defaultValue: 'Active' })}
+                  {statusLabel(Enums.PricingRuleStatus.ACTIVE)}
                 </Badge>
               ) : rule.status === Enums.PricingRuleStatus.DRAFT ? (
-                <Badge variant="outline">{t('statuses:draft', { defaultValue: 'Draft' })}</Badge>
+                <Badge variant="outline">{statusLabel(Enums.PricingRuleStatus.DRAFT)}</Badge>
               ) : (
-                <Badge variant="secondary">
-                  {t('statuses:archived', { defaultValue: 'Archived' })}
-                </Badge>
+                <Badge variant="secondary">{statusLabel(Enums.PricingRuleStatus.ARCHIVED)}</Badge>
               )}
             </div>
           </div>

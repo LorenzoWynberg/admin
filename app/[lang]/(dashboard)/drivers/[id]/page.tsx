@@ -5,6 +5,7 @@ import {
   capitalize,
   modelLabel,
   resourceMessage,
+  statusLabel,
   validationAttribute,
 } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
@@ -162,9 +163,7 @@ export default function DriverDetailPage() {
               disabled={updateDriver.isPending}
             />
             <Label className="text-sm font-medium">
-              {driver.active !== false
-                ? t('drivers:active', { defaultValue: 'Active' })
-                : t('drivers:inactive', { defaultValue: 'Inactive' })}
+              {driver.active !== false ? statusLabel('active') : statusLabel('inactive')}
             </Label>
           </div>
           <Button variant="destructive" onClick={handleDelete} disabled={deleteDriver.isPending}>
@@ -246,11 +245,7 @@ export default function DriverDetailPage() {
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{formatDate(driver.licenseExpirationDate)}</span>
-                    {expired && (
-                      <Badge variant="destructive">
-                        {t('drivers:detail.expired', { defaultValue: 'Expired' })}
-                      </Badge>
-                    )}
+                    {expired && <Badge variant="destructive">{statusLabel('expired')}</Badge>}
                   </div>
                 </div>
               </CardContent>

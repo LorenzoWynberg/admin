@@ -1,7 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { orderStatusLabel } from '@/utils/lang';
+import { statusLabel } from '@/utils/lang';
 
 type OrderStatus = App.Enums.OrderStatus;
 
@@ -31,7 +31,7 @@ interface OrderStatusBadgeProps {
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
   return (
     <Badge variant="outline" className={statusStyles[status]}>
-      {orderStatusLabel(status)}
+      {statusLabel(status)}
     </Badge>
   );
 }

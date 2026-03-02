@@ -5,6 +5,18 @@ export const Enums = {
     Saved: 'saved',
     Snapshot: 'snapshot',
   },
+  AttentionReason: {
+    AwaitingDispatch: 'awaiting_dispatch',
+    NoDriversAvailable: 'no_drivers_available',
+    ScheduleConflict: 'schedule_conflict',
+    WindowTooTight: 'window_too_tight',
+  },
+  AttentionUrgency: {
+    Critical: 'critical',
+    High: 'high',
+    Medium: 'medium',
+    Low: 'low',
+  },
   Attributes: {
     ID: 'id',
     NAME: 'name',
@@ -80,6 +92,8 @@ export const Enums = {
   ConflictReason: {
     WindowOverflow: 'window_overflow',
     TimeSensitiveViolation: 'time_sensitive_violation',
+    OutsideOperatingHours: 'outside_operating_hours',
+    OutsideDriverShift: 'outside_driver_shift',
   },
   CrudAction: {
     Retrieved: 'retrieved',

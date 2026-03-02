@@ -66,15 +66,6 @@ export const statusLabel = (status: string | undefined): string => {
 };
 
 /**
- * Get translated order status label.
- * @param status - The order status
- * @returns Translated status label
- */
-export const orderStatusLabel = (status: string | undefined): string => {
-  return statusLabel(status);
-};
-
-/**
  * Get translated action label (e.g., 'created', 'updated', 'deleted').
  * @param action - The action key
  * @returns Translated action label

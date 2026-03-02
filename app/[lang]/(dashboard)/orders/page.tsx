@@ -22,8 +22,10 @@ import {
   capitalize,
   modelLabel,
   resourceMessage,
+  statusLabel,
   validationAttribute,
 } from '@/utils/lang';
+import { Enums } from '@/data/app-enums';
 import { formatDate } from '@/utils/format';
 import { Input } from '@/components/ui/input';
 import { useOrderList } from '@/hooks/orders';
@@ -80,19 +82,16 @@ export default function OrdersPage() {
 
   const statusOptions = [
     { value: 'all', label: t('statuses:all', { defaultValue: 'All Statuses' }) },
-    { value: 'pending', label: t('statuses:pending', { defaultValue: 'Pending' }) },
-    { value: 'estimated', label: t('statuses:estimated', { defaultValue: 'Estimate Sent' }) },
-    { value: 'approved', label: t('statuses:approved', { defaultValue: 'Approved' }) },
-    { value: 'denied', label: t('statuses:denied', { defaultValue: 'Denied' }) },
-    { value: 'assigned', label: t('statuses:assigned', { defaultValue: 'Driver Assigned' }) },
-    { value: 'picking_up', label: t('statuses:picking_up', { defaultValue: 'Picking Up' }) },
-    { value: 'in_transit', label: t('statuses:in_transit', { defaultValue: 'In Transit' }) },
-    { value: 'completed', label: t('statuses:completed', { defaultValue: 'Completed' }) },
-    {
-      value: 'delivery_failed',
-      label: t('statuses:delivery_failed', { defaultValue: 'Failed' }),
-    },
-    { value: 'canceled', label: t('statuses:canceled', { defaultValue: 'Canceled' }) },
+    { value: Enums.OrderStatus.PENDING, label: statusLabel('pending') },
+    { value: Enums.OrderStatus.ESTIMATED, label: statusLabel('estimated') },
+    { value: Enums.OrderStatus.APPROVED, label: statusLabel('approved') },
+    { value: Enums.OrderStatus.DENIED, label: statusLabel('denied') },
+    { value: Enums.OrderStatus.ASSIGNED, label: statusLabel('assigned') },
+    { value: Enums.OrderStatus.PICKING_UP, label: statusLabel('picking_up') },
+    { value: Enums.OrderStatus.IN_TRANSIT, label: statusLabel('in_transit') },
+    { value: Enums.OrderStatus.COMPLETED, label: statusLabel('completed') },
+    { value: Enums.OrderStatus.DELIVERY_FAILED, label: statusLabel('delivery_failed') },
+    { value: Enums.OrderStatus.CANCELED, label: statusLabel('canceled') },
   ];
 
   return (
@@ -282,7 +281,7 @@ export default function OrdersPage() {
                     <TableCell className="text-center">
                       {
                         ((order.stops ?? []) as App.Data.Order.OrderStopData[]).filter(
-                          (s) => s.type !== 'dropoff'
+                          (s) => s.type !== Enums.OrderStopType.Dropoff
                         ).length
                       }
                     </TableCell>

@@ -15,6 +15,7 @@ import { ReasonBadge } from './ReasonBadge';
 import { CancelOrderDialog } from './CancelOrderDialog';
 import { useChangeTier, useOutsourceOrder } from '@/hooks/orders';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
+import { Enums } from '@/data/app-enums';
 import { actionLabel, capitalize } from '@/utils/lang';
 import { MessageSquare, FileText, Truck, Eye } from 'lucide-react';
 import type { NeedsAttentionOrder } from '@/services/orderService';
@@ -99,13 +100,13 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
               <SelectValue placeholder={t('tiers.title', { defaultValue: 'Delivery Speed' })} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="expedited">
+              <SelectItem value={Enums.DeliveryTier.Expedited}>
                 {t('tiers.expedited', { defaultValue: 'Expedited' })}
               </SelectItem>
-              <SelectItem value="regular">
+              <SelectItem value={Enums.DeliveryTier.Regular}>
                 {t('tiers.regular', { defaultValue: 'Regular' })}
               </SelectItem>
-              <SelectItem value="cheapest">
+              <SelectItem value={Enums.DeliveryTier.Cheapest}>
                 {t('tiers.cheapest', { defaultValue: 'Economy' })}
               </SelectItem>
             </SelectContent>

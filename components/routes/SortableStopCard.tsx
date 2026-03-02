@@ -16,7 +16,9 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Enums } from '@/data/app-enums';
 import { capitalize } from '@/utils/lang';
+import { resolveStopAddress } from '@/utils/routes';
 import { Button } from '@/components/ui/button';
 
 type RouteStopData = App.Data.Route.RouteStopData;
@@ -49,7 +51,7 @@ export function SortableStopCard({
     transition,
   };
 
-  const isPickup = stop.type === 'pickup';
+  const isPickup = stop.type === Enums.RouteStopType.PICKUP;
   const isDelayed = !!stop.delayFlaggedAt;
   const colorClass = isDelayed
     ? 'border-l-amber-500 bg-amber-50/50'
@@ -61,8 +63,7 @@ export function SortableStopCard({
   const order = stop.order;
   const orderStops = (order?.stops ?? []) as App.Data.Order.OrderStopData[];
   const matchingStop = orderStops.find((s) => (s.type as string) === stop.type);
-  const address =
-    matchingStop?.address ?? (stop.type === 'dropoff' ? order?.deliveryAddress : undefined);
+  const address = resolveStopAddress(stop.type, orderStops, order?.deliveryAddress);
   const contactName = matchingStop?.contactName ?? order?.contactName;
   const contactPhone = matchingStop?.contactPhone ?? order?.contactPhone;
   const businessName = order?.business?.name;

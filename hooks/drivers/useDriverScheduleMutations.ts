@@ -39,33 +39,7 @@ export function useSyncSchedules(driverId: string) {
 
   return useMutation({
     mutationFn: (schedules: App.Data.Driver.DriverScheduleData[]) =>
-      DriverService.syncSchedulesWithCascade(driverId, schedules),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['drivers', driverId, 'schedules'] });
-      toast.success(crudSuccessMessage('updated', 'driver'));
-
-      if (data.affectedOrders?.length) {
-        showAffectedOrdersToast(data.affectedOrders, t);
-        queryClient.invalidateQueries({ queryKey: ['orders'] });
-      }
-    },
-    onError: (error) => {
-      if (isApiError(error)) {
-        toast.error(error.message);
-      } else {
-        toast.error(crudErrorMessage('updating', 'driver'));
-      }
-    },
-  });
-}
-
-export function useSyncOverrides(driverId: string) {
-  const queryClient = useQueryClient();
-  const { t } = useTranslation();
-
-  return useMutation({
-    mutationFn: (overrides: App.Data.Driver.DriverScheduleOverrideData[]) =>
-      DriverService.syncOverrides(driverId, overrides),
+      DriverService.syncSchedules(driverId, schedules),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['drivers', driverId, 'schedules'] });
       toast.success(crudSuccessMessage('updated', 'driver'));

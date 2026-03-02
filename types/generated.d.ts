@@ -287,16 +287,9 @@ declare namespace App.Data.Driver {
   };
   export type DriverScheduleData = {
     id?: number;
-    dayOfWeek: number;
+    date: string;
     startTime: string;
     endTime: string;
-  };
-  export type DriverScheduleOverrideData = {
-    id?: number;
-    date: string;
-    available: boolean;
-    startTime?: string | null;
-    endTime?: string | null;
   };
   export type StoreDriverData = {
     user: App.Data.User.StoreUserData;
@@ -308,9 +301,6 @@ declare namespace App.Data.Driver {
   };
   export type SyncDriverScheduleData = {
     schedules: Array<App.Data.Driver.DriverScheduleData>;
-  };
-  export type SyncDriverScheduleOverridesData = {
-    overrides: Array<App.Data.Driver.DriverScheduleOverrideData>;
   };
   export type UpdateDriverData = {
     licenseNumber?: string;
@@ -362,6 +352,7 @@ declare namespace App.Data.Feasibility {
     windowEnd: string | null;
     timeSensitive: boolean;
     planningMode: boolean;
+    driversEvaluated: number;
   };
 }
 declare namespace App.Data.Location {
@@ -381,8 +372,8 @@ declare namespace App.Data.Location {
 declare namespace App.Data.Order {
   export type NeedsAttentionOrderData = {
     order: App.Data.Order.OrderData;
-    urgency: string;
-    reason: string;
+    urgency: App.Enums.AttentionUrgency;
+    reason: App.Enums.AttentionReason;
     outsourceEligible: boolean;
     hoursUntilWindowEnd: number | null;
   };
@@ -926,6 +917,18 @@ declare namespace App.Enums {
     Saved = 'saved',
     Snapshot = 'snapshot',
   }
+  export enum AttentionReason {
+    AwaitingDispatch = 'awaiting_dispatch',
+    NoDriversAvailable = 'no_drivers_available',
+    ScheduleConflict = 'schedule_conflict',
+    WindowTooTight = 'window_too_tight',
+  }
+  export enum AttentionUrgency {
+    Critical = 'critical',
+    High = 'high',
+    Medium = 'medium',
+    Low = 'low',
+  }
   export enum Attributes {
     ID = 'id',
     NAME = 'name',
@@ -1001,6 +1004,8 @@ declare namespace App.Enums {
   export enum ConflictReason {
     WindowOverflow = 'window_overflow',
     TimeSensitiveViolation = 'time_sensitive_violation',
+    OutsideOperatingHours = 'outside_operating_hours',
+    OutsideDriverShift = 'outside_driver_shift',
   }
   export enum CrudAction {
     Retrieved = 'retrieved',

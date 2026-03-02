@@ -51,7 +51,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { actionLabel, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, resourceMessage, statusLabel, validationAttribute } from '@/utils/lang';
 import {
   usePricingRuleList,
   useActivatePricingRule,
@@ -153,13 +153,13 @@ export default function PricingPage() {
                   {t('statuses:all', { defaultValue: 'All statuses' })}
                 </SelectItem>
                 <SelectItem value={Enums.PricingRuleStatus.DRAFT}>
-                  {t('statuses:draft', { defaultValue: 'Draft' })}
+                  {statusLabel(Enums.PricingRuleStatus.DRAFT)}
                 </SelectItem>
                 <SelectItem value={Enums.PricingRuleStatus.ACTIVE}>
-                  {t('statuses:active', { defaultValue: 'Active' })}
+                  {statusLabel(Enums.PricingRuleStatus.ACTIVE)}
                 </SelectItem>
                 <SelectItem value={Enums.PricingRuleStatus.ARCHIVED}>
-                  {t('statuses:archived', { defaultValue: 'Archived' })}
+                  {statusLabel(Enums.PricingRuleStatus.ARCHIVED)}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -211,15 +211,15 @@ export default function PricingPage() {
                     <TableCell>
                       {rule.status === Enums.PricingRuleStatus.ACTIVE ? (
                         <Badge variant="default" className="bg-green-600">
-                          {t('statuses:active', { defaultValue: 'Active' })}
+                          {statusLabel(Enums.PricingRuleStatus.ACTIVE)}
                         </Badge>
                       ) : rule.status === Enums.PricingRuleStatus.DRAFT ? (
                         <Badge variant="outline">
-                          {t('statuses:draft', { defaultValue: 'Draft' })}
+                          {statusLabel(Enums.PricingRuleStatus.DRAFT)}
                         </Badge>
                       ) : (
                         <Badge variant="secondary">
-                          {t('statuses:archived', { defaultValue: 'Archived' })}
+                          {statusLabel(Enums.PricingRuleStatus.ARCHIVED)}
                         </Badge>
                       )}
                     </TableCell>

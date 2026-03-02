@@ -4,7 +4,9 @@ import { useDraggable } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 import { Package, MapPin, Info, Phone, Building2 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Enums } from '@/data/app-enums';
 import { capitalize } from '@/utils/lang';
+import { resolveStopAddress } from '@/utils/routes';
 import { APP_TIMEZONE } from '@/utils/format';
 import type { UnassignedStop } from '@/services/routeService';
 
@@ -26,15 +28,14 @@ export function UnassignedStopContent({
 }) {
   const { t } = useTranslation();
 
-  const isPickup = stop.stopType === 'pickup';
+  const isPickup = stop.stopType === Enums.RouteStopType.PICKUP;
   const colorClass = isPickup
     ? 'border-l-sky-500 bg-sky-50/50'
     : 'border-l-violet-500 bg-violet-50/50';
   const iconColor = isPickup ? 'text-sky-600' : 'text-violet-600';
   const orderStops = (stop.order.stops ?? []) as App.Data.Order.OrderStopData[];
   const matchingStop = orderStops.find((s) => s.type === stop.stopType);
-  const address =
-    matchingStop?.address ?? (stop.stopType === 'dropoff' ? stop.order.deliveryAddress : undefined);
+  const address = resolveStopAddress(stop.stopType, orderStops, stop.order.deliveryAddress);
   const contactName = matchingStop?.contactName ?? stop.order.contactName;
   const contactPhone = matchingStop?.contactPhone ?? stop.order.contactPhone;
   const businessName = stop.order.business?.name;

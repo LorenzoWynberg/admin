@@ -7,7 +7,6 @@ import {
   crudSuccessMessage,
   crudErrorMessage,
   statusLabel,
-  orderStatusLabel,
 } from '../lang';
 import i18next from '@/config/i18next';
 
@@ -171,29 +170,5 @@ describe('statusLabel', () => {
     expect(statusLabel('completed')).toBe('Completed');
     expect(statusLabel('estimated')).toBe('Estimate Sent');
     expect(statusLabel('assigned')).toBe('Driver Assigned');
-  });
-});
-
-describe('orderStatusLabel', () => {
-  beforeEach(() => {
-    mockT.mockImplementation((key: string, options?: Record<string, unknown>) => {
-      const labels: Record<string, string> = {
-        'statuses:unknown': 'Unknown',
-        'statuses:pending': 'Pending',
-        'statuses:estimated': 'Estimate Sent',
-        'statuses:assigned': 'Driver Assigned',
-      };
-      return labels[key] ?? options?.defaultValue ?? key;
-    });
-  });
-
-  it('returns unknown for undefined status', () => {
-    expect(orderStatusLabel(undefined)).toBe('Unknown');
-  });
-
-  it('returns translated status labels', () => {
-    expect(orderStatusLabel('pending')).toBe('Pending');
-    expect(orderStatusLabel('estimated')).toBe('Estimate Sent');
-    expect(orderStatusLabel('assigned')).toBe('Driver Assigned');
   });
 });

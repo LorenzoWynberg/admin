@@ -247,7 +247,7 @@ function MapPickerContent({ initialCenter, onCoordsChange, markers }: MapAddress
               key={i}
               lat={marker.lat}
               lng={marker.lng}
-              type={marker.type === 'purchase' ? 'pickup' : marker.type}
+              type={marker.type}
               label={marker.label}
             />
           ))}

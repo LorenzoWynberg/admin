@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderPayments } from '@/hooks/payments';
 import { RefundDialog } from './RefundDialog';
 import { formatDate, formatCurrency } from '@/utils/format';
-import { capitalize } from '@/utils/lang';
+import { capitalize, statusLabel } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
 import type { TFunction } from 'i18next';
 
@@ -74,9 +74,7 @@ function PaymentCard({
           <div className="flex items-center gap-2">
             <span className="font-mono text-sm">{payment.publicId}</span>
             <Badge variant={getStatusBadgeVariant(payment.status)}>
-              {t(`statuses:${payment.status || 'pending'}`, {
-                defaultValue: capitalize(payment.status || 'pending'),
-              })}
+              {statusLabel(payment.status || Enums.TransactionStatus.Pending)}
             </Badge>
           </div>
           <p className="text-muted-foreground text-xs">
