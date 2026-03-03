@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import {
   capitalize,
+  getModelGender,
   validationAttribute,
   validationMessage,
   resourceMessage,
   crudSuccessMessage,
   crudErrorMessage,
   statusLabel,
+  actionLabel,
 } from '../lang';
 import i18next from '@/config/i18next';
 
@@ -170,5 +172,91 @@ describe('statusLabel', () => {
     expect(statusLabel('completed')).toBe('Completed');
     expect(statusLabel('estimated')).toBe('Estimate Sent');
     expect(statusLabel('assigned')).toBe('Driver Assigned');
+  });
+});
+
+describe('getModelGender', () => {
+  it('returns feminine for f gender', () => {
+    mockT.mockImplementation((key: string) => {
+      if (key === 'models:_gender.order') return 'f';
+      return '';
+    });
+    expect(getModelGender('order')).toBe('feminine');
+  });
+
+  it('returns undefined for m gender', () => {
+    mockT.mockImplementation((key: string) => {
+      if (key === 'models:_gender.catalog') return 'm';
+      return '';
+    });
+    expect(getModelGender('catalog')).toBeUndefined();
+  });
+
+  it('returns undefined when no gender map exists', () => {
+    mockT.mockImplementation(() => '');
+    expect(getModelGender('unknown_model')).toBeUndefined();
+  });
+});
+
+describe('actionLabel with gender', () => {
+  it('returns feminine action for feminine model', () => {
+    mockT.mockImplementation((key: string, options?: Record<string, unknown>) => {
+      if (key === 'models:_gender.order') return 'f';
+      if (key === 'common:actions.created' && options?.context === 'feminine') return 'creada';
+      if (key === 'common:actions.created') return 'creado';
+      return key;
+    });
+    expect(actionLabel('created', 'order')).toBe('Creada');
+  });
+
+  it('returns masculine action for masculine model', () => {
+    mockT.mockImplementation((key: string) => {
+      if (key === 'models:_gender.catalog') return 'm';
+      if (key === 'common:actions.created') return 'creado';
+      return key;
+    });
+    expect(actionLabel('created', 'catalog')).toBe('Creado');
+  });
+
+  it('works without model parameter (backward compat)', () => {
+    mockT.mockImplementation((key: string) => {
+      if (key === 'common:actions.created') return 'creado';
+      return key;
+    });
+    expect(actionLabel('created')).toBe('Creado');
+  });
+
+  it('returns lowercase when toUpper is false', () => {
+    mockT.mockImplementation((key: string, options?: Record<string, unknown>) => {
+      if (key === 'models:_gender.order') return 'f';
+      if (key === 'common:actions.created' && options?.context === 'feminine') return 'creada';
+      return key;
+    });
+    expect(actionLabel('created', 'order', false)).toBe('creada');
+  });
+});
+
+describe('resourceMessage with gender', () => {
+  it('passes feminine context for feminine model', () => {
+    mockT.mockImplementation((key: string, options?: Record<string, unknown>) => {
+      if (key === 'models:_gender.order') return 'f';
+      if (key === 'models:order') return 'orden';
+      if (key === 'resource:success.created' && options?.context === 'feminine')
+        return 'Orden creada con éxito.';
+      if (key === 'resource:success.created') return 'Orden creado con éxito.';
+      return key;
+    });
+    expect(resourceMessage('success.created', 'order')).toBe('Orden creada con éxito.');
+  });
+
+  it('uses default context for masculine model', () => {
+    mockT.mockImplementation((key: string, options?: Record<string, unknown>) => {
+      if (key === 'models:_gender.catalog') return 'm';
+      if (key === 'models:catalog') return 'catálogo';
+      if (key === 'resource:success.created' && !options?.context)
+        return 'Catálogo creado con éxito.';
+      return key;
+    });
+    expect(resourceMessage('success.created', 'catalog')).toBe('Catálogo creado con éxito.');
   });
 });

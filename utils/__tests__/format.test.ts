@@ -31,8 +31,8 @@ describe('formatCurrency', () => {
     expect(formatCurrency(-50.5, '$')).toBe('$-50.50');
   });
 
-  it('handles large amounts', () => {
-    expect(formatCurrency(1000000.99, '$')).toBe('$1000000.99');
+  it('handles large amounts with thousand separators', () => {
+    expect(formatCurrency(1000000.99, '$')).toBe('$1,000,000.99');
   });
 
   it('handles small decimal amounts', () => {

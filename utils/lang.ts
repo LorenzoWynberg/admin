@@ -1,5 +1,14 @@
 import i18next from '@/config/i18next';
 
+/**
+ * Get the grammatical gender context for a model in the current locale.
+ * Returns 'feminine' for feminine nouns, undefined for masculine (default).
+ */
+export const getModelGender = (model: string): string | undefined => {
+  const gender = i18next.t(`models:_gender.${model}`);
+  return gender === 'f' ? 'feminine' : undefined;
+};
+
 export const capitalize = (str: string) => {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -27,9 +36,11 @@ export const resourceMessage = (
   extra?: Record<string, unknown>
 ) => {
   const translatedResourceKey = i18next.t(`models:${resourceKey}`, { count });
+  const context = getModelGender(resourceKey);
 
   return i18next.t(`resource:${key}`, {
     count,
+    context,
     resource: translatedResourceKey,
     ...(extra ?? {}),
   });
@@ -70,8 +81,10 @@ export const statusLabel = (status: string | undefined): string => {
  * @param action - The action key
  * @returns Translated action label
  */
-export const actionLabel = (action: string): string => {
-  return capitalize(i18next.t(`common:actions.${action}`, { defaultValue: action }));
+export const actionLabel = (action: string, model?: string, toUpper = true): string => {
+  const context = model ? getModelGender(model) : undefined;
+  const label = i18next.t(`common:actions.${action}`, { context, defaultValue: action });
+  return toUpper ? capitalize(label) : label;
 };
 
 /**

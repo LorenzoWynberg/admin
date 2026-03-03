@@ -276,7 +276,7 @@ export function CreateQuoteDialog({
           {t('quotes:create.button', { defaultValue: 'Create Quote' })}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>
             {t('quotes:create.title', {

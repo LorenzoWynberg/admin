@@ -97,7 +97,11 @@ export function getDateLocale(lang: string): Locale {
  * Format a number as currency with symbol and precision.
  */
 export function formatCurrency(amount: number, symbol: string, precision: number = 2): string {
-  return `${symbol}${amount.toFixed(precision)}`;
+  const formatted = amount.toLocaleString('en-US', {
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision,
+  });
+  return `${symbol}${formatted}`;
 }
 
 /**

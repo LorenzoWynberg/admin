@@ -3,13 +3,78 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, FileText, Plus, X } from 'lucide-react';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/utils/format';
 import { capitalize } from '@/utils/lang';
+
+const formatWithCommas = (n: number, decimals?: number): string => {
+  const opts: Intl.NumberFormatOptions = decimals != null
+    ? { minimumFractionDigits: decimals, maximumFractionDigits: decimals }
+    : { maximumFractionDigits: 0 };
+  return n.toLocaleString('en-US', opts);
+};
+
+function NumericInput({
+  value,
+  onChange,
+  integer,
+  min,
+  decimals,
+  className,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  integer?: boolean;
+  min?: number;
+  decimals?: number;
+  className?: string;
+}) {
+  const [raw, setRaw] = useState(formatWithCommas(value, integer ? undefined : decimals));
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (!focused) {
+      setRaw(formatWithCommas(value, integer ? undefined : decimals));
+    }
+  }, [value, focused, integer, decimals]);
+
+  const pattern = integer
+    ? /^\d*$/
+    : decimals != null
+      ? new RegExp(`^\\d*\\.?\\d{0,${decimals}}$`)
+      : /^\d*\.?\d*$/;
+
+  return (
+    <Input
+      type="text"
+      inputMode={integer ? 'numeric' : 'decimal'}
+      value={raw}
+      onChange={(e) => {
+        const v = e.target.value.replace(/,/g, '');
+        if (v === '' || pattern.test(v)) {
+          setRaw(v);
+        }
+      }}
+      onFocus={(e) => {
+        setFocused(true);
+        const plain = String(value);
+        setRaw(plain);
+        requestAnimationFrame(() => e.target.select());
+      }}
+      onBlur={() => {
+        const parsed = integer ? parseInt(raw) : parseFloat(raw);
+        const clamped = isNaN(parsed) ? (min ?? 0) : Math.max(min ?? -Infinity, parsed);
+        onChange(clamped);
+        setFocused(false);
+      }}
+      className={className}
+    />
+  );
+}
 
 export interface QuoteLineItem {
   stopPublicId?: string | null;
@@ -33,8 +98,8 @@ export function QuoteLineItemsEditor({
 }: QuoteLineItemsEditorProps) {
   const { t } = useTranslation();
 
-  // Group items by stop
-  const stopGroups = stops.map((stop) => ({
+  // Group items by stop (exclude dropoff stops — items are only for purchase/pickup)
+  const stopGroups = stops.filter((s) => s.type !== 'dropoff').map((stop) => ({
     stop,
     items: items.filter((item) => item.stopPublicId === stop.publicId),
   }));
@@ -148,54 +213,59 @@ function ItemSection({
                 <span className="text-muted-foreground italic">{instructions}</span>
               </div>
             )}
-            {sectionItems.length > 0 && (
-              <div className="text-muted-foreground grid grid-cols-[1fr_60px_80px_70px_28px] items-center gap-2 text-xs">
-                <span>{t('quotes:items.label', { defaultValue: 'Label' })}</span>
-                <span>{t('quotes:items.quantity', { defaultValue: 'Quantity' })}</span>
-                <span>{t('quotes:items.unit_price', { defaultValue: 'Unit Price' })}</span>
-                <span>{t('quotes:items.total', { defaultValue: 'Total' })}</span>
-                <span />
-              </div>
-            )}
             {sectionItems.map((item, idx) => (
-              <div
-                key={idx}
-                className="grid grid-cols-[1fr_60px_80px_70px_28px] items-center gap-2"
-              >
-                <Input
-                  value={item.label}
-                  onChange={(e) => onUpdate(idx, 'label', e.target.value)}
-                  placeholder={t('quotes:items.label', { defaultValue: 'Label' })}
-                  className="h-8 text-sm"
-                />
-                <Input
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={item.quantity}
-                  onChange={(e) => onUpdate(idx, 'quantity', parseInt(e.target.value) || 1)}
-                  className="h-8 text-sm"
-                />
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={item.unitPrice}
-                  onChange={(e) => onUpdate(idx, 'unitPrice', parseFloat(e.target.value) || 0)}
-                  className="h-8 text-sm"
-                />
-                <span className="text-right text-sm">
-                  {formatCurrency(item.quantity * item.unitPrice, currencySymbol)}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => onRemove(idx)}
-                  title={t('quotes:items.remove', { defaultValue: 'Remove' })}
-                >
-                  <X className="h-3.5 w-3.5" />
-                </Button>
+              <div key={idx} className="border-muted space-y-1.5 rounded-md border p-2">
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={item.label}
+                    onChange={(e) => onUpdate(idx, 'label', e.target.value)}
+                    placeholder={t('quotes:items.label', { defaultValue: 'Label' })}
+                    className="h-8 text-sm"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 shrink-0"
+                    onClick={() => onRemove(idx)}
+                    title={t('quotes:items.remove', { defaultValue: 'Remove' })}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-[1fr_1fr_auto] items-center gap-2">
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      {t('quotes:items.quantity', { defaultValue: 'Qty' })}
+                    </span>
+                    <NumericInput
+                      value={item.quantity}
+                      onChange={(v) => onUpdate(idx, 'quantity', v)}
+                      integer
+                      min={1}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      {t('quotes:items.unit_price', { defaultValue: 'Unit Price' })}
+                    </span>
+                    <NumericInput
+                      value={item.unitPrice}
+                      onChange={(v) => onUpdate(idx, 'unitPrice', v)}
+                      min={0}
+                      decimals={2}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-0.5 text-right">
+                    <span className="text-muted-foreground text-xs">
+                      {t('quotes:items.total', { defaultValue: 'Total' })}
+                    </span>
+                    <p className="h-8 content-center text-sm font-medium">
+                      {formatCurrency(item.quantity * item.unitPrice, currencySymbol)}
+                    </p>
+                  </div>
+                </div>
               </div>
             ))}
             <Button variant="outline" size="sm" className="h-7 text-xs" onClick={onAdd}>
