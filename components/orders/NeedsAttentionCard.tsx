@@ -139,7 +139,7 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
             onClick={() => router.push(`/orders/${order.publicId}`)}
           >
             <Eye className="mr-1 h-4 w-4" />
-            {t('common:view', { defaultValue: 'View' })}
+            {actionLabel('view')}
           </Button>
         </div>
       </CardContent>
