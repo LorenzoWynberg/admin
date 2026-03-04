@@ -2,14 +2,19 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useOrderList } from '@/hooks/orders';
 import { useNeedsAttention } from '@/hooks/orders/useNeedsAttention';
 import { usePendingReconciliation } from '@/hooks/orders/usePendingReconciliation';
 import { NeedsAttentionCard } from '@/components/orders/NeedsAttentionCard';
 import { PendingReconciliationCard } from '@/components/orders/PendingReconciliationCard';
+import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
+import { PaymentStatusBadge } from '@/components/orders/PaymentStatusBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
+import { RefreshCw, AlertTriangle, Eye } from 'lucide-react';
 import { Enums } from '@/data/app-enums';
 import { actionLabel } from '@/utils/lang';
 
@@ -26,7 +31,21 @@ const summaryStyles: Record<string, string> = {
 
 export default function NeedsAttentionPage() {
   const { t } = useTranslation('orders');
+  const router = useLocalizedRouter();
+  const [activeTab, setActiveTab] = useState<string>('conflicts');
   const { data, isLoading, refetch, isRefetching } = useNeedsAttention();
+  const {
+    data: unquotedData,
+    isLoading: unquotedLoading,
+    refetch: refetchUnquoted,
+    isRefetching: isRefetchingUnquoted,
+  } = useOrderList({ page: 1, perPage: 100, hasQuote: false, excludeStatus: Enums.OrderStatus.CANCELED });
+  const {
+    data: unpaidData,
+    isLoading: unpaidLoading,
+    refetch: refetchUnpaid,
+    isRefetching: isRefetchingUnpaid,
+  } = useOrderList({ page: 1, perPage: 100, paymentStatus: Enums.PaymentStatus.UNPAID, excludeStatus: Enums.OrderStatus.CANCELED });
   const {
     data: reconciliationData,
     isLoading: reconciliationLoading,
@@ -41,15 +60,22 @@ export default function NeedsAttentionPage() {
   const filtered = filter === 'all' ? items : items.filter((i) => i.urgency === filter);
 
   const reconciliationOrders = reconciliationData?.data ?? [];
+  const unquotedOrders = unquotedData?.items ?? [];
+  const unpaidOrders = unpaidData?.items ?? [];
+  const unquotedCount = unquotedData?.meta?.total ?? unquotedOrders.length;
+  const unpaidCount = unpaidData?.meta?.total ?? unpaidOrders.length;
 
   const urgentCount = (summary.critical ?? 0) + (summary.high ?? 0);
 
   const handleRefreshAll = () => {
     refetch();
+    refetchUnquoted();
+    refetchUnpaid();
     refetchReconciliation();
   };
 
-  const anyRefetching = isRefetching || isRefetchingReconciliation;
+  const anyRefetching =
+    isRefetching || isRefetchingUnquoted || isRefetchingUnpaid || isRefetchingReconciliation;
 
   return (
     <div className="space-y-6">
@@ -66,7 +92,7 @@ export default function NeedsAttentionPage() {
         </Button>
       </div>
 
-      <Tabs defaultValue="conflicts">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="conflicts">
             {t('needs_attention.conflicts_tab', { defaultValue: 'Conflicts' })}
@@ -84,6 +110,22 @@ export default function NeedsAttentionPage() {
                 className="ml-1.5 bg-amber-100 px-1.5 py-0 text-xs text-amber-800"
               >
                 {reconciliationOrders.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="not-quoted">
+            {t('needs_attention.not_quoted_tab', { defaultValue: 'Not Yet Quoted' })}
+            {unquotedCount > 0 && (
+              <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-xs">
+                {unquotedCount}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="not-paid">
+            {t('needs_attention.not_paid_tab', { defaultValue: 'Not Yet Paid' })}
+            {unpaidCount > 0 && (
+              <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-xs">
+                {unpaidCount}
               </Badge>
             )}
           </TabsTrigger>
@@ -152,6 +194,98 @@ export default function NeedsAttentionPage() {
             <div className="space-y-4">
               {reconciliationOrders.map((order) => (
                 <PendingReconciliationCard key={order.publicId} order={order} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="not-quoted" className="space-y-4">
+          {unquotedLoading ? (
+            <div className="text-muted-foreground py-12 text-center">
+              {t('common:loading', { defaultValue: 'Loading...' })}
+            </div>
+          ) : unquotedOrders.length === 0 ? (
+            <div className="text-muted-foreground py-12 text-center">
+              {t('needs_attention.no_unquoted', {
+                defaultValue: 'No orders pending quote',
+              })}
+            </div>
+          ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {unquotedOrders.map((order) => (
+                <Card key={order.publicId}>
+                  <CardHeader className="pb-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono text-sm font-semibold">#{order.publicId}</span>
+                      <OrderStatusBadge
+                        status={(order.status ?? Enums.OrderStatus.PENDING) as App.Enums.OrderStatus}
+                      />
+                      <PaymentStatusBadge status={order.paymentStatus} />
+                    </div>
+                    <div className="text-muted-foreground flex flex-wrap gap-x-3 text-sm">
+                      {order.user && <span>{order.user.name}</span>}
+                      {order.business && <span>{order.business.name}</span>}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => router.push(`/orders/${order.publicId}`)}
+                      >
+                        <Eye className="mr-1 h-4 w-4" />
+                        {actionLabel('view')}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="not-paid" className="space-y-4">
+          {unpaidLoading ? (
+            <div className="text-muted-foreground py-12 text-center">
+              {t('common:loading', { defaultValue: 'Loading...' })}
+            </div>
+          ) : unpaidOrders.length === 0 ? (
+            <div className="text-muted-foreground py-12 text-center">
+              {t('needs_attention.no_unpaid', {
+                defaultValue: 'No unpaid orders pending payment',
+              })}
+            </div>
+          ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {unpaidOrders.map((order) => (
+                <Card key={order.publicId}>
+                  <CardHeader className="pb-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono text-sm font-semibold">#{order.publicId}</span>
+                      <OrderStatusBadge
+                        status={(order.status ?? Enums.OrderStatus.PENDING) as App.Enums.OrderStatus}
+                      />
+                      <PaymentStatusBadge status={order.paymentStatus} />
+                    </div>
+                    <div className="text-muted-foreground flex flex-wrap gap-x-3 text-sm">
+                      {order.user && <span>{order.user.name}</span>}
+                      {order.business && <span>{order.business.name}</span>}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => router.push(`/orders/${order.publicId}`)}
+                      >
+                        <Eye className="mr-1 h-4 w-4" />
+                        {actionLabel('view')}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
