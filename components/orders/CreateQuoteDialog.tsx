@@ -152,7 +152,13 @@ export function CreateQuoteDialog({
     ? currencies.find((c) => c.code === customerCurrencyCode)
     : null;
 
-  // Calculate totals with adjustments
+  // Calculate line items total
+  const itemsTotal = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
+    [items]
+  );
+
+  // Calculate totals with adjustments (includes line items)
   const calculation = useMemo(() => {
     if (!pricing) return null;
 
@@ -161,7 +167,7 @@ export function CreateQuoteDialog({
     const discountRate = (parseFloat(formData.discountRate) || 0) / 100;
 
     const subtotalBeforeAdjustments = pricing.subtotal;
-    const subtotalWithAdjustments = subtotalBeforeAdjustments + timeFee + surcharge;
+    const subtotalWithAdjustments = subtotalBeforeAdjustments + timeFee + surcharge + itemsTotal;
     const discountAmount = subtotalWithAdjustments * discountRate;
     const afterDiscount = subtotalWithAdjustments - discountAmount;
     const tax = afterDiscount * pricing.taxRate;
@@ -181,13 +187,7 @@ export function CreateQuoteDialog({
       tax,
       total,
     };
-  }, [pricing, formData.timeFee, formData.surcharge, formData.discountRate]);
-
-  // Calculate line items total
-  const itemsTotal = useMemo(
-    () => items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
-    [items]
-  );
+  }, [pricing, formData.timeFee, formData.surcharge, formData.discountRate, itemsTotal]);
 
   // Calculate customer currency conversion
   const customerConversion = (() => {
@@ -384,6 +384,7 @@ export function CreateQuoteDialog({
                   {/* Adjustments section */}
                   {(calculation.timeFee > 0 ||
                     calculation.surcharge > 0 ||
+                    itemsTotal > 0 ||
                     calculation.discountAmount > 0) && (
                     <>
                       <div className="border-border border-t" />
@@ -405,6 +406,16 @@ export function CreateQuoteDialog({
                             </span>
                             <span className="text-right">
                               {formatCurrency(calculation.surcharge, baseSymbol)}
+                            </span>
+                          </>
+                        )}
+                        {itemsTotal > 0 && (
+                          <>
+                            <span className="text-muted-foreground">
+                              + {t('quotes:items.items_total', { defaultValue: 'Items Total' })}:
+                            </span>
+                            <span className="text-right">
+                              {formatCurrency(itemsTotal, baseSymbol)}
                             </span>
                           </>
                         )}
