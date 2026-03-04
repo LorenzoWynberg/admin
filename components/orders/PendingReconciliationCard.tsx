@@ -32,7 +32,6 @@ export function PendingReconciliationCard({ order }: PendingReconciliationCardPr
     : null;
 
   const currencySymbol = useOrderCurrencySymbol(order.currencyCode);
-  const quoteTotal = Number(order.currentQuote?.total ?? 0);
   const orderStops = (order.stops ?? []) as App.Data.Order.OrderStopData[];
 
   return (
@@ -70,12 +69,22 @@ export function PendingReconciliationCard({ order }: PendingReconciliationCardPr
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <ReconciliationDialog
-            orderPublicId={order.publicId as string}
-            orderStops={orderStops}
-            originalQuoteTotal={quoteTotal}
-            currencySymbol={currencySymbol}
-          />
+          {order.currentQuote ? (
+            <ReconciliationDialog
+              orderPublicId={order.publicId as string}
+              orderStops={orderStops}
+              currencySymbol={currencySymbol}
+              currentQuote={order.currentQuote}
+            />
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push(`/orders/${order.publicId}`)}
+            >
+              {actionLabel('view')}
+            </Button>
+          )}
 
           <Button
             variant="ghost"

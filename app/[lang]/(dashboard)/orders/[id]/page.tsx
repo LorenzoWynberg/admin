@@ -38,6 +38,7 @@ import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge';
 import { QuoteDetailDialog } from '@/components/quotes/QuoteDetailDialog';
 import { PaymentSection } from '@/components/payments/PaymentSection';
 import { InvoiceSection } from '@/components/invoices/InvoiceSection';
+import { ReceiptSection } from '@/components/orders/ReceiptSection';
 import { EditStopAddressDialog } from '@/components/orders/EditStopAddressDialog';
 import { EditStopDetailsDialog } from '@/components/orders/EditStopDetailsDialog';
 import { AddStopDialog } from '@/components/orders/AddStopDialog';
@@ -198,12 +199,13 @@ export default function OrderDetailPage() {
           {order.status === Enums.OrderStatus.COMPLETED &&
             order.paymentStatus === Enums.PaymentStatus.PAID &&
             !order.reconciledAt &&
-            order.publicId && (
+            order.publicId &&
+            order.currentQuote && (
               <ReconciliationDialog
                 orderPublicId={order.publicId}
                 orderStops={orderStops}
-                originalQuoteTotal={order.currentQuote?.total || 0}
                 currencySymbol={currencySymbol}
+                currentQuote={order.currentQuote}
               />
             )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
@@ -676,6 +678,9 @@ export default function OrderDetailPage() {
         {order.publicId && (
           <InvoiceSection orderPublicId={order.publicId} currencySymbol={currencySymbol} />
         )}
+
+        {/* Stop Receipts Section */}
+        {order.publicId && <ReceiptSection orderPublicId={order.publicId} />}
 
         {/* Trip Schedule */}
         <Card>
