@@ -147,6 +147,7 @@ export const Enums = {
     UnprocessableEntity: 422,
     TooManyRequests: 429,
     InternalServerError: 500,
+    BadGateway: 502,
     NotImplemented: 501,
     ServiceUnavailable: 503,
   },
@@ -214,6 +215,11 @@ export const Enums = {
     RefundReceipt: "refund_receipt",
     SurchargeReceipt: "surcharge_receipt",
     FinalReceipt: "final_receipt",
+    ChatMessage: "chat_message",
+  },
+  NotificationStatus: {
+    Unread: "unread",
+    Read: "read",
   },
   OrderStatus: {
     PENDING_OWNER_APPROVAL: "pending_owner_approval",

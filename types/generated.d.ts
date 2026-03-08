@@ -303,6 +303,9 @@ declare namespace App.Data.Driver {
   export type FailStopData = {
     reason: string;
   };
+  export type ReassignItemsData = {
+    quoteItemIds: Array<any>;
+  };
   export type SplitStopData = {
     splits: Array<App.Data.Driver.SplitStopEntryData>;
   };
@@ -516,6 +519,7 @@ declare namespace App.Data.Order {
     updatedAt?: string;
     address?: App.Data.Address.AddressData;
     creator?: App.Data.User.UserData;
+    quoteItems?: Array<App.Data.Quote.QuoteItemData>;
   };
   export type OrderTrackingData = {
     publicId: string;
@@ -796,6 +800,7 @@ declare namespace App.Data.Route {
     id: number;
     routeId?: number;
     orderId?: number;
+    orderStopId?: number | null;
     type: App.Enums.RouteStopType;
     sequence: number;
     status: App.Enums.RouteStopStatus;
@@ -1124,6 +1129,7 @@ declare namespace App.Enums {
     UnprocessableEntity = 422,
     TooManyRequests = 429,
     InternalServerError = 500,
+    BadGateway = 502,
     NotImplemented = 501,
     ServiceUnavailable = 503,
   }
@@ -1191,6 +1197,11 @@ declare namespace App.Enums {
     RefundReceipt = 'refund_receipt',
     SurchargeReceipt = 'surcharge_receipt',
     FinalReceipt = 'final_receipt',
+    ChatMessage = 'chat_message',
+  }
+  export enum NotificationStatus {
+    Unread = 'unread',
+    Read = 'read',
   }
   export enum OrderStatus {
     PENDING_OWNER_APPROVAL = 'pending_owner_approval',
