@@ -206,6 +206,25 @@ export default function PricingRuleDetailPage() {
                 <p className="mt-1">{rule.notes}</p>
               </div>
             )}
+            <div className="border-t pt-4">
+              <p className="text-muted-foreground mb-2 text-sm font-medium">
+                {t('delivery_tier_multipliers')}
+              </p>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t('expedited_multiplier')}</span>
+                  <span className="font-medium">{rule.expeditedMultiplier}x</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t('regular_multiplier')}</span>
+                  <span className="font-medium">{rule.regularMultiplier}x</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t('cheapest_multiplier')}</span>
+                  <span className="font-medium">{rule.cheapestMultiplier}x</span>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

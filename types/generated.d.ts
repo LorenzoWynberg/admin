@@ -636,6 +636,9 @@ declare namespace App.Data.Pricing {
     version?: number;
     status?: App.Enums.PricingRuleStatus;
     calculationMode?: App.Enums.PricingCalculationMode;
+    expeditedMultiplier?: number;
+    regularMultiplier?: number;
+    cheapestMultiplier?: number;
     effectiveFrom?: string | null;
     notes?: string | null;
     createdAt?: string;
@@ -659,6 +662,9 @@ declare namespace App.Data.Pricing {
     serviceFee: number;
     taxRate: number;
     calculationMode: App.Enums.PricingCalculationMode;
+    expeditedMultiplier: number;
+    regularMultiplier: number;
+    cheapestMultiplier: number;
     notes: string | null;
     activate: boolean;
     tiers?: Array<App.Data.Pricing.StorePricingTierData>;
@@ -675,6 +681,9 @@ declare namespace App.Data.Pricing {
     serviceFee?: number;
     taxRate?: number;
     calculationMode?: App.Enums.PricingCalculationMode;
+    expeditedMultiplier?: number;
+    regularMultiplier?: number;
+    cheapestMultiplier?: number;
     notes?: string | null;
     tiers?: Array<App.Data.Pricing.StorePricingTierData>;
   };
