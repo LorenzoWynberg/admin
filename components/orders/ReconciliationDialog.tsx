@@ -47,7 +47,10 @@ interface ReconciliationDialogProps {
  *   taxTotal = subtotalAfterDiscount × taxRate
  *   total = subtotalAfterDiscount + taxTotal
  */
-function computeEstimatedTotal(quote: QuoteData, newItemsTotal: number): {
+function computeEstimatedTotal(
+  quote: QuoteData,
+  newItemsTotal: number
+): {
   serviceFees: number;
   newItemsTotal: number;
   newSubtotal: number;
@@ -71,7 +74,16 @@ function computeEstimatedTotal(quote: QuoteData, newItemsTotal: number): {
   const estimatedTotal = Math.round((newSubtotalAfterDiscount + taxTotal) * 100) / 100;
   const delta = Math.round((estimatedTotal - (quote.total ?? 0)) * 100) / 100;
 
-  return { serviceFees, newItemsTotal, newSubtotal, discountAmount, newSubtotalAfterDiscount, taxTotal, estimatedTotal, delta };
+  return {
+    serviceFees,
+    newItemsTotal,
+    newSubtotal,
+    discountAmount,
+    newSubtotalAfterDiscount,
+    taxTotal,
+    estimatedTotal,
+    delta,
+  };
 }
 
 function ReceiptThumbnail({
@@ -106,7 +118,7 @@ function ReceiptThumbnail({
       href={receipt.fileUrl ?? undefined}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex h-20 w-20 shrink-0 flex-col items-center justify-center gap-1 rounded-md border p-2 transition-colors hover:bg-muted"
+      className="hover:bg-muted flex h-20 w-20 shrink-0 flex-col items-center justify-center gap-1 rounded-md border p-2 transition-colors"
       title={receipt.originalName || receipt.publicId}
     >
       <FileText className="text-muted-foreground h-6 w-6" />
@@ -207,7 +219,7 @@ export function ReconciliationDialog({
             {t('orders:reconciliation.button', { defaultValue: 'Reconcile' })}
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-h-[95vh] sm:max-w-3xl overflow-y-auto">
+        <DialogContent className="max-h-[95vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>
               {t('orders:reconciliation.title', { defaultValue: 'Reconcile Order' })}
@@ -242,7 +254,9 @@ export function ReconciliationDialog({
             {/* Original Quote Total reference */}
             <div className="flex justify-between rounded-lg border p-3">
               <span className="text-muted-foreground">
-                {t('orders:reconciliation.original_total', { defaultValue: 'Original Quote Total' })}
+                {t('orders:reconciliation.original_total', {
+                  defaultValue: 'Original Quote Total',
+                })}
               </span>
               <span className="font-semibold">{formatCurrency(originalTotal, currencySymbol)}</span>
             </div>
@@ -260,7 +274,9 @@ export function ReconciliationDialog({
               <div className="space-y-1.5 rounded-lg border p-3 text-sm">
                 {est.serviceFees > 0 && (
                   <div className="text-muted-foreground flex justify-between">
-                    <span>{t('orders:reconciliation.service_fees', { defaultValue: 'Service fees' })}</span>
+                    <span>
+                      {t('orders:reconciliation.service_fees', { defaultValue: 'Service fees' })}
+                    </span>
                     <span>{formatCurrency(est.serviceFees, currencySymbol)}</span>
                   </div>
                 )}
@@ -272,7 +288,9 @@ export function ReconciliationDialog({
                   <div className="flex justify-between text-green-600 dark:text-green-400">
                     <span>
                       {t('orders:reconciliation.discount', { defaultValue: 'Discount' })}{' '}
-                      <span className="text-xs">({((currentQuote.discountRate ?? 0) * 100).toFixed(0)}%)</span>
+                      <span className="text-xs">
+                        ({((currentQuote.discountRate ?? 0) * 100).toFixed(0)}%)
+                      </span>
                     </span>
                     <span>−{formatCurrency(est.discountAmount, currencySymbol)}</span>
                   </div>
@@ -281,18 +299,28 @@ export function ReconciliationDialog({
                   <div className="text-muted-foreground flex justify-between">
                     <span>
                       {t('orders:reconciliation.tax', { defaultValue: 'Tax' })}{' '}
-                      <span className="text-xs">({((currentQuote.taxRate ?? 0) * 100).toFixed(0)}%)</span>
+                      <span className="text-xs">
+                        ({((currentQuote.taxRate ?? 0) * 100).toFixed(0)}%)
+                      </span>
                     </span>
                     <span>+{formatCurrency(est.taxTotal, currencySymbol)}</span>
                   </div>
                 )}
                 <div className="flex justify-between border-t pt-1.5 font-semibold">
-                  <span>{t('orders:reconciliation.estimated_total', { defaultValue: 'Estimated new total' })}</span>
+                  <span>
+                    {t('orders:reconciliation.estimated_total', {
+                      defaultValue: 'Estimated new total',
+                    })}
+                  </span>
                   <span>{formatCurrency(est.estimatedTotal, currencySymbol)}</span>
                 </div>
                 <div
                   className={`flex justify-between border-t pt-1.5 font-semibold ${
-                    est.delta > 0 ? 'text-red-600' : est.delta < 0 ? 'text-green-600' : 'text-muted-foreground'
+                    est.delta > 0
+                      ? 'text-red-600'
+                      : est.delta < 0
+                        ? 'text-green-600'
+                        : 'text-muted-foreground'
                   }`}
                 >
                   <span>{t('orders:reconciliation.delta', { defaultValue: 'Difference' })}</span>

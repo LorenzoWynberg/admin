@@ -302,7 +302,7 @@ export default function OrderDetailPage() {
                                   stop.type === Enums.OrderStopType.Dropoff
                                     ? 'border-red-300 text-red-700 dark:border-red-700 dark:text-red-400'
                                     : 'border-green-300 text-green-700 dark:border-green-700 dark:text-green-400'
-                                }${isEditable ? ' cursor-pointer transition-colors hover:bg-green-50 dark:hover:bg-green-950' : ''}`}
+                                }${isEditable ? 'cursor-pointer transition-colors hover:bg-green-50 dark:hover:bg-green-950' : ''}`}
                                 onClick={() => {
                                   if (!isEditable || !stop.id || !order.publicId || isLoading)
                                     return;

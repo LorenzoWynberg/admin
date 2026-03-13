@@ -809,6 +809,7 @@ declare namespace App.Data.Route {
     windowEnd?: string | null;
     delayFlaggedAt?: string | null;
     delayReason?: string | null;
+    arrivingAt?: string | null;
     notes?: string | null;
     podPhotoPath?: string | null;
     podSignaturePath?: string | null;
@@ -1211,9 +1212,11 @@ declare namespace App.Enums {
     DENIED = 'denied',
     ASSIGNED = 'assigned',
     PICKING_UP = 'picking_up',
+    ARRIVING_AT_PICKUP = 'arriving_at_pickup',
     ARRIVED_AT_PICKUP = 'arrived_at_pickup',
     PICKED_UP = 'picked_up',
     IN_TRANSIT = 'in_transit',
+    ARRIVING_AT_DROP_OFF = 'arriving_at_drop_off',
     ARRIVED_AT_DROP_OFF = 'arrived_at_drop_off',
     WAITING_CONFIRMATION = 'waiting_confirmation',
     COMPLETED = 'completed',
@@ -1224,6 +1227,7 @@ declare namespace App.Enums {
   export enum OrderStopStatus {
     Pending = 'pending',
     EnRoute = 'en_route',
+    Arriving = 'arriving',
     Arrived = 'arrived',
     Completed = 'completed',
     Skipped = 'skipped',
@@ -1296,6 +1300,7 @@ declare namespace App.Enums {
   export enum RouteStopStatus {
     PENDING = 'pending',
     EN_ROUTE = 'en_route',
+    ARRIVING = 'arriving',
     ARRIVED = 'arrived',
     COMPLETED = 'completed',
     SKIPPED = 'skipped',

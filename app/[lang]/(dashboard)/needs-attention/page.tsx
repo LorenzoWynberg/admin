@@ -39,13 +39,23 @@ export default function NeedsAttentionPage() {
     isLoading: unquotedLoading,
     refetch: refetchUnquoted,
     isRefetching: isRefetchingUnquoted,
-  } = useOrderList({ page: 1, perPage: 100, hasQuote: false, excludeStatus: Enums.OrderStatus.CANCELED });
+  } = useOrderList({
+    page: 1,
+    perPage: 100,
+    hasQuote: false,
+    excludeStatus: Enums.OrderStatus.CANCELED,
+  });
   const {
     data: unpaidData,
     isLoading: unpaidLoading,
     refetch: refetchUnpaid,
     isRefetching: isRefetchingUnpaid,
-  } = useOrderList({ page: 1, perPage: 100, paymentStatus: Enums.PaymentStatus.UNPAID, excludeStatus: Enums.OrderStatus.CANCELED });
+  } = useOrderList({
+    page: 1,
+    perPage: 100,
+    paymentStatus: Enums.PaymentStatus.UNPAID,
+    excludeStatus: Enums.OrderStatus.CANCELED,
+  });
   const {
     data: reconciliationData,
     isLoading: reconciliationLoading,
@@ -211,14 +221,16 @@ export default function NeedsAttentionPage() {
               })}
             </div>
           ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {unquotedOrders.map((order) => (
                 <Card key={order.publicId}>
                   <CardHeader className="pb-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-sm font-semibold">#{order.publicId}</span>
                       <OrderStatusBadge
-                        status={(order.status ?? Enums.OrderStatus.PENDING) as App.Enums.OrderStatus}
+                        status={
+                          (order.status ?? Enums.OrderStatus.PENDING) as App.Enums.OrderStatus
+                        }
                       />
                       <PaymentStatusBadge status={order.paymentStatus} />
                     </div>
@@ -257,14 +269,16 @@ export default function NeedsAttentionPage() {
               })}
             </div>
           ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {unpaidOrders.map((order) => (
                 <Card key={order.publicId}>
                   <CardHeader className="pb-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-sm font-semibold">#{order.publicId}</span>
                       <OrderStatusBadge
-                        status={(order.status ?? Enums.OrderStatus.PENDING) as App.Enums.OrderStatus}
+                        status={
+                          (order.status ?? Enums.OrderStatus.PENDING) as App.Enums.OrderStatus
+                        }
                       />
                       <PaymentStatusBadge status={order.paymentStatus} />
                     </div>

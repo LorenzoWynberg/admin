@@ -49,16 +49,14 @@ function ReceiptCard({
               </Badge>
             )}
           </div>
-          {receipt.notes && (
-            <p className="text-muted-foreground pl-6 text-xs">{receipt.notes}</p>
-          )}
+          {receipt.notes && <p className="text-muted-foreground pl-6 text-xs">{receipt.notes}</p>}
           <div className="text-muted-foreground flex items-center gap-3 pl-6 text-xs">
             {receipt.createdAt && <span>{formatDate(receipt.createdAt)}</span>}
             {receipt.sizeBytes != null && <span>{formatBytes(receipt.sizeBytes)}</span>}
           </div>
         </div>
-        {receipt.fileUrl && (
-          isImage ? (
+        {receipt.fileUrl &&
+          (isImage ? (
             <Button
               variant="outline"
               size="sm"
@@ -75,8 +73,7 @@ function ReceiptCard({
                 {t('common:view', { defaultValue: 'View' })}
               </a>
             </Button>
-          )
-        )}
+          ))}
       </div>
     </div>
   );

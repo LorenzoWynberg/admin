@@ -12,9 +12,10 @@ import { formatCurrency } from '@/utils/format';
 import { capitalize } from '@/utils/lang';
 
 const formatWithCommas = (n: number, decimals?: number): string => {
-  const opts: Intl.NumberFormatOptions = decimals != null
-    ? { minimumFractionDigits: decimals, maximumFractionDigits: decimals }
-    : { maximumFractionDigits: 0 };
+  const opts: Intl.NumberFormatOptions =
+    decimals != null
+      ? { minimumFractionDigits: decimals, maximumFractionDigits: decimals }
+      : { maximumFractionDigits: 0 };
   return n.toLocaleString('en-US', opts);
 };
 
@@ -99,10 +100,12 @@ export function QuoteLineItemsEditor({
   const { t } = useTranslation();
 
   // Group items by stop (exclude dropoff stops — items are only for purchase/pickup)
-  const stopGroups = stops.filter((s) => s.type !== 'dropoff').map((stop) => ({
-    stop,
-    items: items.filter((item) => item.stopPublicId === stop.publicId),
-  }));
+  const stopGroups = stops
+    .filter((s) => s.type !== 'dropoff')
+    .map((stop) => ({
+      stop,
+      items: items.filter((item) => item.stopPublicId === stop.publicId),
+    }));
 
   const addItem = (stopPublicId: string | null) => {
     onItemsChange([...items, { stopPublicId, label: '', quantity: 1, unitPrice: 0 }]);
