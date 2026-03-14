@@ -712,6 +712,9 @@ declare namespace App.Data.Quote {
     taxRate?: number | null;
     taxTotal?: number | null;
     total?: number | null;
+    currencyCode?: string | null;
+    fxRate?: number | null;
+    customerTotal?: number | null;
     notes?: string | null;
     rejectionReason?: string | null;
     createdAt?: string;

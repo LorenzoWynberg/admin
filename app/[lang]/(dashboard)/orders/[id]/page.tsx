@@ -603,9 +603,18 @@ export default function OrderDetailPage() {
                             v{quote.version || 1} &middot; {formatDate(quote.createdAt)}
                           </p>
                         </div>
-                        <p className="shrink-0 text-lg font-semibold">
-                          {formatCurrency(quote.total || 0, currencySymbol)}
-                        </p>
+                        <div className="shrink-0 text-right">
+                          <p className="text-lg font-semibold">
+                            {formatCurrency(quote.total || 0, currencySymbol)}
+                          </p>
+                          {quote.customerTotal != null &&
+                            quote.currencyCode &&
+                            quote.currencyCode !== 'CRC' && (
+                              <p className="text-muted-foreground text-xs">
+                                {formatCurrency(quote.customerTotal, quote.currencyCode === 'USD' ? '$' : quote.currencyCode)}
+                              </p>
+                            )}
+                        </div>
                       </div>
                       {quote.rejectionReason && (
                         <div className="mt-2 flex items-start gap-2 rounded border border-amber-200 bg-amber-50 p-2 dark:border-amber-900 dark:bg-amber-950">
