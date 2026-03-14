@@ -1279,10 +1279,6 @@ declare namespace App.Enums {
     ACTIVE = 'active',
     ARCHIVED = 'archived',
   }
-  export enum QuoteCurrency {
-    CRC = 'CRC',
-    USD = 'USD',
-  }
   export enum QuoteStatus {
     DRAFT = 'draft',
     SENT = 'sent',

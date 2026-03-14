@@ -611,7 +611,10 @@ export default function OrderDetailPage() {
                             quote.currencyCode &&
                             quote.currencyCode !== 'CRC' && (
                               <p className="text-muted-foreground text-xs">
-                                {formatCurrency(quote.customerTotal, quote.currencyCode === 'USD' ? '$' : quote.currencyCode)}
+                                {formatCurrency(
+                                  quote.customerTotal,
+                                  quote.currencyCode === 'USD' ? '$' : quote.currencyCode
+                                )}
                               </p>
                             )}
                         </div>
