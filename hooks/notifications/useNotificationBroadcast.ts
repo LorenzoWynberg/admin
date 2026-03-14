@@ -13,6 +13,8 @@ interface BroadcastNotification {
   modelId: number | null;
   modelName: string | null;
   catalogId?: number | null;
+  translationKey?: string;
+  translationParams?: Record<string, string>;
 }
 
 /**
@@ -43,6 +45,8 @@ export function useNotificationBroadcast() {
         modelId: notification.modelId,
         modelName: notification.modelName,
         catalogId: notification.catalogId,
+        translationKey: notification.translationKey,
+        translationParams: notification.translationParams,
       };
 
       // Show toast notification
