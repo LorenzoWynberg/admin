@@ -526,12 +526,12 @@ declare namespace App.Data.Order {
     status: App.Enums.OrderStatus;
     driverLatitude: number | null;
     driverLongitude: number | null;
-    pickupLatitude: number;
-    pickupLongitude: number;
-    pickupAddress: string;
-    dropoffLatitude: number;
-    dropoffLongitude: number;
-    dropoffAddress: string;
+    driverName: string | null;
+    driverLicensePlate: string | null;
+    encodedPolyline: string | null;
+    etaToNextStopMinutes: number | null;
+    etaToDropoffMinutes: number | null;
+    stops: Array<App.Data.Order.TrackingStopData>;
   };
   export type ReconcileOrderData = {
     items: Array<App.Data.Quote.StoreQuoteItemData>;
@@ -559,6 +559,14 @@ declare namespace App.Data.Order {
     contactName?: string | null;
     contactPhone?: string | null;
     instructions?: string | null;
+  };
+  export type TrackingStopData = {
+    sequence: number;
+    type: App.Enums.OrderStopType;
+    status: App.Enums.OrderStopStatus;
+    latitude: number;
+    longitude: number;
+    address: string;
   };
   export type UpdateOrderStopData = {
     addressId?: number | null;
