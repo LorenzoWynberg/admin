@@ -169,8 +169,15 @@ export const OrderService = {
   /**
    * Cancel an order with a reason (admin action — delegates to CancellationService)
    */
-  async cancelOrder(publicId: string, reason: string): Promise<SuccessBasic> {
-    return api.post<SuccessBasic>(`/orders/${publicId}/cancel`, { reason });
+  async cancelOrder(
+    publicId: string,
+    reason: string,
+    chargeCancellationFee: boolean = false
+  ): Promise<SuccessBasic> {
+    return api.post<SuccessBasic>(`/orders/${publicId}/cancel`, {
+      reason,
+      charge_cancellation_fee: chargeCancellationFee,
+    });
   },
 
   /**

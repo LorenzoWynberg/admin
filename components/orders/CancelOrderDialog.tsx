@@ -12,30 +12,40 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useCancelOrder } from '@/hooks/orders/useNeedsAttention';
+import { formatCurrency } from '@/utils/format';
 import { X } from 'lucide-react';
 import { actionLabel } from '@/utils/lang';
 
 interface CancelOrderDialogProps {
   publicId: string;
+  cancellationFee?: number | null;
+  currencySymbol?: string;
 }
 
-export function CancelOrderDialog({ publicId }: CancelOrderDialogProps) {
+export function CancelOrderDialog({
+  publicId,
+  cancellationFee,
+  currencySymbol = '₡',
+}: CancelOrderDialogProps) {
   const { t } = useTranslation('orders');
   const [reason, setReason] = useState('');
+  const [chargeFee, setChargeFee] = useState(false);
   const [open, setOpen] = useState(false);
   const cancelMutation = useCancelOrder();
 
   const handleConfirm = () => {
     if (!reason.trim()) return;
     cancelMutation.mutate(
-      { publicId, reason: reason.trim() },
+      { publicId, reason: reason.trim(), chargeCancellationFee: chargeFee },
       {
         onSuccess: () => {
           setOpen(false);
           setReason('');
+          setChargeFee(false);
         },
       }
     );
@@ -68,6 +78,21 @@ export function CancelOrderDialog({ publicId }: CancelOrderDialogProps) {
           onChange={(e) => setReason(e.target.value)}
           maxLength={500}
         />
+        {cancellationFee != null && cancellationFee > 0 && (
+          <div className="flex items-start gap-2">
+            <Checkbox
+              id="chargeFee"
+              checked={chargeFee}
+              onCheckedChange={(checked) => setChargeFee(checked === true)}
+            />
+            <label htmlFor="chargeFee" className="text-sm leading-tight">
+              {t('detail.charge_cancellation_fee', {
+                fee: formatCurrency(cancellationFee, currencySymbol),
+                defaultValue: `Charge cancellation fee (${formatCurrency(cancellationFee, currencySymbol)})`,
+              })}
+            </label>
+          </div>
+        )}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={cancelMutation.isPending}>
             {actionLabel('cancel')}

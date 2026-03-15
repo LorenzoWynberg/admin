@@ -715,6 +715,7 @@ declare namespace App.Data.Quote {
     currencyCode?: string | null;
     fxRate?: number | null;
     customerTotal?: number | null;
+    cancellationFee?: number | null;
     notes?: string | null;
     rejectionReason?: string | null;
     createdAt?: string;
@@ -747,6 +748,7 @@ declare namespace App.Data.Quote {
     discountRate: number | null;
     pickupProposedFor: string | null;
     deliveryProposedFor: string | null;
+    cancellationFee: number | null;
     notes?: string | null;
     items?: { [key: number]: any };
   };
@@ -1210,6 +1212,7 @@ declare namespace App.Enums {
     RefundReceipt = 'refund_receipt',
     SurchargeReceipt = 'surcharge_receipt',
     FinalReceipt = 'final_receipt',
+    QuoteExpired = 'quote_expired',
     ChatMessage = 'chat_message',
   }
   export enum NotificationStatus {

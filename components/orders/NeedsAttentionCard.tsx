@@ -131,7 +131,10 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
             {actionLabel('outsource')}
           </Button>
 
-          <CancelOrderDialog publicId={order.publicId as string} />
+          <CancelOrderDialog
+            publicId={order.publicId as string}
+            cancellationFee={order.currentQuote?.cancellationFee}
+          />
 
           <Button
             variant="ghost"

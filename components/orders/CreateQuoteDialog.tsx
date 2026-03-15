@@ -87,6 +87,7 @@ export function CreateQuoteDialog({
       timeFee: '',
       surcharge: '',
       discountRate: '',
+      cancellationFee: '',
       notes: '',
       pickupProposedFor: toDateTimeLocal(pickup),
       deliveryProposedFor: toDateTimeLocal(delivery),
@@ -189,6 +190,7 @@ export function CreateQuoteDialog({
     };
   }, [pricing, formData.timeFee, formData.surcharge, formData.discountRate, itemsTotal]);
 
+
   // Calculate customer currency conversion
   const customerConversion = (() => {
     if (!calculation) return null;
@@ -243,6 +245,7 @@ export function CreateQuoteDialog({
       timeFee: formData.timeFee ? parseFloat(formData.timeFee) : null,
       surcharge: formData.surcharge ? parseFloat(formData.surcharge) : null,
       discountRate: formData.discountRate ? parseFloat(formData.discountRate) / 100 : null,
+      cancellationFee: formData.cancellationFee ? parseFloat(formData.cancellationFee) : null,
       notes: formData.notes || undefined,
       pickupProposedFor: dateTimeLocalToISO(effectivePickup),
       deliveryProposedFor: dateTimeLocalToISO(effectiveDelivery),
@@ -449,6 +452,18 @@ export function CreateQuoteDialog({
                     </span>
                   </div>
 
+                  {/* Cancellation Fee Info */}
+                  {parseFloat(formData.cancellationFee || '0') > 0 && (
+                    <div className="grid grid-cols-2 gap-1 text-sm text-amber-700 dark:text-amber-400">
+                      <span>
+                        {t('quotes:cancellation_fee', { defaultValue: 'Cancellation Fee' })}:
+                      </span>
+                      <span className="text-right">
+                        {formatCurrency(parseFloat(formData.cancellationFee), baseSymbol)}
+                      </span>
+                    </div>
+                  )}
+
                   {/* Customer Currency Conversion */}
                   {customerConversion && (
                     <>
@@ -528,6 +543,29 @@ export function CreateQuoteDialog({
               value={formData.discountRate}
               onChange={(e) => handleChange('discountRate', e.target.value)}
             />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="cancellationFee">
+              {t('quotes:cancellation_fee', { defaultValue: 'Cancellation Fee' })} ({baseSymbol})
+            </Label>
+            <Input
+              id="cancellationFee"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder={calculation ? (calculation.total * 0.2).toFixed(2) : '0.00'}
+              value={formData.cancellationFee}
+              onChange={(e) => handleChange('cancellationFee', e.target.value)}
+            />
+            {calculation && parseFloat(formData.cancellationFee || '0') > 0 && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {t('quotes:cancellation_fee_info', {
+                  defaultValue:
+                    'This fee will be charged to the customer if they cancel after payment.',
+                })}
+              </p>
+            )}
           </div>
 
           <div className="grid gap-2">

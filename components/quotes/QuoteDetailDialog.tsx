@@ -115,6 +115,12 @@ export function QuoteDetailDialog({
               <span>{validationAttribute('total', true)}</span>
               <span>{formatCurrency(quote.total || 0, currencySymbol)}</span>
             </div>
+            {quote.cancellationFee != null && quote.cancellationFee > 0 && (
+              <div className="flex justify-between text-amber-600 dark:text-amber-400">
+                <span>{t('quotes:cancellation_fee', { defaultValue: 'Cancellation Fee' })}</span>
+                <span>{formatCurrency(quote.cancellationFee, currencySymbol)}</span>
+              </div>
+            )}
           </div>
         </div>
 
