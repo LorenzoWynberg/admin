@@ -287,7 +287,7 @@ export default function CreateDriverPage() {
                 name="user.langCode"
                 render={({ field }) => (
                   <FormItem className="max-w-xs">
-                    <FormLabel>{validationAttribute('language', true)}</FormLabel>
+                    <FormLabel>{validationAttribute('langCode', true)}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>

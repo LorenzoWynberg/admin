@@ -62,8 +62,15 @@ export function SortableStopCard({
 
   const order = stop.order;
   const orderStops = (order?.stops ?? []) as App.Data.Order.OrderStopData[];
-  const matchingStop = orderStops.find((s) => (s.type as string) === stop.type);
-  const address = resolveStopAddress(stop.type, orderStops, order?.deliveryAddress);
+  const matchingStop = stop.orderStopId
+    ? orderStops.find((s) => s.id === stop.orderStopId)
+    : orderStops.find((s) => (s.type as string) === stop.type);
+  const address = resolveStopAddress(
+    stop.type,
+    orderStops,
+    order?.deliveryAddress,
+    stop.orderStopId
+  );
   const contactName = matchingStop?.contactName ?? order?.contactName;
   const contactPhone = matchingStop?.contactPhone ?? order?.contactPhone;
   const businessName = order?.business?.name;

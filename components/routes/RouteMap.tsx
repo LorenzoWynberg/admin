@@ -107,7 +107,12 @@ function MapContent({
     return routeStops
       .map((stop) => {
         const orderStops = (stop.order?.stops ?? []) as App.Data.Order.OrderStopData[];
-        const addr = resolveStopAddress(stop.type, orderStops, stop.order?.deliveryAddress);
+        const addr = resolveStopAddress(
+          stop.type,
+          orderStops,
+          stop.order?.deliveryAddress,
+          stop.orderStopId
+        );
         return { stop, addr };
       })
       .filter(({ addr }) => addr?.latitude && addr?.longitude)
