@@ -439,6 +439,7 @@ declare namespace App.Data.Order {
     reason: App.Enums.AttentionReason;
     outsourceEligible: boolean;
     hoursUntilWindowEnd: number | null;
+    workingHoursUnassigned: number | null;
   };
   export type OrderData = {
     id?: number;
@@ -862,11 +863,15 @@ declare namespace App.Data.Setting {
     noServiceStart: string;
     noServiceEnd: string;
     serviceWindowEnabled: boolean;
+    unassignedEscalationHours: number;
+    unassignedAutoCancelEnabled: boolean;
   };
   export type UpdateSettingData = {
     noServiceStart?: string;
     noServiceEnd?: string;
     serviceWindowEnabled?: boolean;
+    unassignedEscalationHours?: number;
+    unassignedAutoCancelEnabled?: boolean;
   };
 }
 declare namespace App.Data.Shared {
@@ -1015,6 +1020,7 @@ declare namespace App.Enums {
     NoDriversAvailable = 'no_drivers_available',
     ScheduleConflict = 'schedule_conflict',
     WindowTooTight = 'window_too_tight',
+    UnassignedTooLong = 'unassigned_too_long',
   }
   export enum AttentionUrgency {
     Critical = 'critical',
@@ -1222,6 +1228,8 @@ declare namespace App.Enums {
     FinalReceipt = 'final_receipt',
     QuoteExpired = 'quote_expired',
     ChatMessage = 'chat_message',
+    UnassignedOrderEscalation = 'unassigned_order_escalation',
+    PaymentFailed = 'payment_failed',
   }
   export enum NotificationStatus {
     Unread = 'unread',
