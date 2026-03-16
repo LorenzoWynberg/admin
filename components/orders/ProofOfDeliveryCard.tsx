@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Camera, CheckCircle, PenLine } from 'lucide-react';
+import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,11 +47,15 @@ export function ProofOfDeliveryCard({ orderPublicId }: ProofOfDeliveryCardProps)
               <Camera className="h-4 w-4" />
               {t('routes:pod.photo_title', { defaultValue: 'Photo Proof' })}
             </div>
-            <img
-              src={pod.podPhotoUrl}
-              alt={t('routes:pod.photo_title', { defaultValue: 'Photo Proof' })}
-              className="h-48 w-full rounded-lg object-cover"
-            />
+            <div className="relative h-48 w-full overflow-hidden rounded-lg">
+              <Image
+                src={pod.podPhotoUrl}
+                alt={t('routes:pod.photo_title', { defaultValue: 'Photo Proof' })}
+                fill
+                className="object-cover"
+                unoptimized
+              />
+            </div>
           </div>
         )}
 
@@ -60,11 +65,15 @@ export function ProofOfDeliveryCard({ orderPublicId }: ProofOfDeliveryCardProps)
               <PenLine className="h-4 w-4" />
               {t('routes:pod.signature_title', { defaultValue: 'Signature' })}
             </div>
-            <img
-              src={pod.podSignatureUrl}
-              alt={t('routes:pod.signature_title', { defaultValue: 'Signature' })}
-              className="bg-muted h-32 w-full rounded-lg object-contain"
-            />
+            <div className="bg-muted relative h-32 w-full overflow-hidden rounded-lg">
+              <Image
+                src={pod.podSignatureUrl}
+                alt={t('routes:pod.signature_title', { defaultValue: 'Signature' })}
+                fill
+                className="object-contain"
+                unoptimized
+              />
+            </div>
           </div>
         )}
 

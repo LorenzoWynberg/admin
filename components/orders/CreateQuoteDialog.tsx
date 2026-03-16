@@ -190,7 +190,6 @@ export function CreateQuoteDialog({
     };
   }, [pricing, formData.timeFee, formData.surcharge, formData.discountRate, itemsTotal]);
 
-
   // Calculate customer currency conversion
   const customerConversion = (() => {
     if (!calculation) return null;

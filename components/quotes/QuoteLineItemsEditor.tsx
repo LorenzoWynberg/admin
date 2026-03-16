@@ -3,7 +3,7 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, FileText, Plus, X } from 'lucide-react';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -34,14 +34,10 @@ function NumericInput({
   decimals?: number;
   className?: string;
 }) {
-  const [raw, setRaw] = useState(formatWithCommas(value, integer ? undefined : decimals));
+  const [raw, setRaw] = useState('');
   const [focused, setFocused] = useState(false);
 
-  useEffect(() => {
-    if (!focused) {
-      setRaw(formatWithCommas(value, integer ? undefined : decimals));
-    }
-  }, [value, focused, integer, decimals]);
+  const displayValue = focused ? raw : formatWithCommas(value, integer ? undefined : decimals);
 
   const pattern = integer
     ? /^\d*$/
@@ -53,7 +49,7 @@ function NumericInput({
     <Input
       type="text"
       inputMode={integer ? 'numeric' : 'decimal'}
-      value={raw}
+      value={displayValue}
       onChange={(e) => {
         const v = e.target.value.replace(/,/g, '');
         if (v === '' || pattern.test(v)) {
