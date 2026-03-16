@@ -288,6 +288,12 @@ export const Enums = {
     ACTIVE: 'active',
     ARCHIVED: 'archived',
   },
+  QuoteItemStatus: {
+    Pending: 'pending',
+    Fulfilled: 'fulfilled',
+    Unfulfilled: 'unfulfilled',
+    Cancelled: 'cancelled',
+  },
   QuoteStatus: {
     DRAFT: 'draft',
     SENT: 'sent',
