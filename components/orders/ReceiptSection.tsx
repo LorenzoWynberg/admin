@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderReceipts } from '@/hooks/orders';
 import { formatDate } from '@/utils/format';
+import { capitalize } from '@/utils/lang';
 import { ImagePreviewDialog } from './ImagePreviewDialog';
 
 type OrderReceiptData = App.Data.Order.OrderReceiptData;
@@ -90,7 +91,7 @@ export function ReceiptSection({ orderPublicId }: ReceiptSectionProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Receipt className="h-5 w-5" />
-            {t('models:order_receipt', { count: 2, defaultValue: 'Receipts' })}
+            {capitalize(t('models:order_receipt', { count: 2, defaultValue: 'Receipts' }))}
           </CardTitle>
         </CardHeader>
         <CardContent>

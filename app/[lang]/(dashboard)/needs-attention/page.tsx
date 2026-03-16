@@ -43,7 +43,7 @@ export default function NeedsAttentionPage() {
     page: 1,
     perPage: 100,
     hasQuote: false,
-    excludeStatus: Enums.OrderStatus.CANCELED,
+    excludeTerminal: true,
   });
   const {
     data: unpaidData,
@@ -54,7 +54,7 @@ export default function NeedsAttentionPage() {
     page: 1,
     perPage: 100,
     paymentStatus: Enums.PaymentStatus.UNPAID,
-    excludeStatus: Enums.OrderStatus.CANCELED,
+    excludeTerminal: true,
   });
   const {
     data: reconciliationData,

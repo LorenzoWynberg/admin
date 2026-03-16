@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useUpdateStop } from '@/hooks/orders';
-import { actionLabel } from '@/utils/lang';
+import { actionLabel, validationAttribute } from '@/utils/lang';
 
 type OrderStopData = App.Data.Order.OrderStopData;
 
@@ -97,9 +97,7 @@ export function EditStopDetailsDialog({
               name="contactName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {t('validation:attributes.contactName', { defaultValue: 'Contact Name' })}
-                  </FormLabel>
+                  <FormLabel>{validationAttribute('contactName')}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -113,9 +111,7 @@ export function EditStopDetailsDialog({
               name="contactPhone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {t('validation:attributes.contactPhone', { defaultValue: 'Contact Phone' })}
-                  </FormLabel>
+                  <FormLabel>{validationAttribute('contactPhone')}</FormLabel>
                   <FormControl>
                     <Input {...field} type="tel" />
                   </FormControl>
@@ -129,9 +125,7 @@ export function EditStopDetailsDialog({
               name="instructions"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {t('validation:attributes.instructions', { defaultValue: 'Instructions' })}
-                  </FormLabel>
+                  <FormLabel>{validationAttribute('instructions')}</FormLabel>
                   <FormControl>
                     <Textarea {...field} rows={3} />
                   </FormControl>

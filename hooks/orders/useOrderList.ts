@@ -6,6 +6,7 @@ interface UseOrderListParams {
   perPage?: number;
   status?: string;
   excludeStatus?: string;
+  excludeTerminal?: boolean;
   paymentStatus?: string;
   hasQuote?: boolean;
   search?: string;

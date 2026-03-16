@@ -129,10 +129,10 @@ export function QuoteLineItemsEditor({
     return -1;
   };
 
-  const stopLabel = (stop: App.Data.Order.OrderStopData): string => {
-    const type = stop.type
-      ? t(`routes:stop_types.${stop.type}`, { defaultValue: capitalize(stop.type) })
-      : '';
+  const stopLabel = (stop: App.Data.Order.OrderStopData, hasItems: boolean): string => {
+    // Optimistic: stops with items are "purchase", without are "pickup"
+    const derivedType = hasItems ? 'purchase' : 'pickup';
+    const type = t(`routes:stop_types.${derivedType}`, { defaultValue: capitalize(derivedType) });
     const addr = stop.address?.humanReadableAddress || stop.address?.streetAddress || '';
     return addr ? `${type} — ${addr}` : type;
   };
@@ -146,7 +146,7 @@ export function QuoteLineItemsEditor({
       {stopGroups.map(({ stop, items: sectionItems }) => (
         <ItemSection
           key={stop.publicId}
-          title={stopLabel(stop)}
+          title={stopLabel(stop, sectionItems.length > 0)}
           instructions={stop.instructions}
           sectionItems={sectionItems}
           currencySymbol={currencySymbol}

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderInvoices } from '@/hooks/invoices';
 import { formatDate, formatCurrency } from '@/utils/format';
 import { Enums } from '@/data/app-enums';
+import { capitalize } from '@/utils/lang';
 
 type InvoiceData = App.Data.Invoice.InvoiceData;
 
@@ -102,7 +103,7 @@ export function InvoiceSection({ orderPublicId, currencySymbol = '$' }: InvoiceS
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-5 w-5" />
-          {t('models:invoice', { count: 2, defaultValue: 'Invoices' })}
+          {capitalize(t('models:invoice', { count: 2, defaultValue: 'Invoices' }))}
         </CardTitle>
       </CardHeader>
       <CardContent>

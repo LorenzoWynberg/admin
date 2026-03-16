@@ -549,7 +549,7 @@ export default function OrderDetailPage() {
               <div className="flex items-start gap-3">
                 <Calendar className="text-muted-foreground mt-0.5 h-4 w-4" />
                 <div>
-                  <p className="font-medium">{formatDate(order.desiredPickupAt)}</p>
+                  <p className="font-medium">{formatDateTime(order.desiredPickupAt)}</p>
                   <p className="text-muted-foreground text-sm">
                     {t('orders:detail.pick_up_by', { defaultValue: 'Pick Up By' })}
                   </p>
@@ -560,7 +560,7 @@ export default function OrderDetailPage() {
               <div className="flex items-start gap-3">
                 <Calendar className="text-muted-foreground mt-0.5 h-4 w-4" />
                 <div>
-                  <p className="font-medium">{formatDate(order.desiredDeliveryAt)}</p>
+                  <p className="font-medium">{formatDateTime(order.desiredDeliveryAt)}</p>
                   <p className="text-muted-foreground text-sm">
                     {t('orders:detail.deliver_by', { defaultValue: 'Deliver By' })}
                   </p>
@@ -708,7 +708,7 @@ export default function OrderDetailPage() {
                 <span className="text-muted-foreground">
                   {t('orders:detail.pick_up_by', { defaultValue: 'Pick Up By' })}
                 </span>
-                <span className="font-medium">{formatDate(order.desiredPickupAt)}</span>
+                <span className="font-medium">{formatDateTime(order.desiredPickupAt)}</span>
               </div>
             )}
             {order.desiredDeliveryAt && (
@@ -716,7 +716,7 @@ export default function OrderDetailPage() {
                 <span className="text-muted-foreground">
                   {t('orders:detail.deliver_by', { defaultValue: 'Deliver By' })}
                 </span>
-                <span className="font-medium">{formatDate(order.desiredDeliveryAt)}</span>
+                <span className="font-medium">{formatDateTime(order.desiredDeliveryAt)}</span>
               </div>
             )}
             {orderStops.some((s) => s.completedAt) && (

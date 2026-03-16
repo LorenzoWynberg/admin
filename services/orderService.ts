@@ -49,6 +49,7 @@ interface ListParams {
   perPage?: number;
   status?: string;
   excludeStatus?: string;
+  excludeTerminal?: boolean;
   paymentStatus?: string;
   hasQuote?: boolean;
   search?: string;
@@ -64,6 +65,7 @@ function buildQueryString(params: ListParams): string {
   if (params.perPage) query.set('perPage', String(params.perPage));
   if (params.status) query.set('filter[status]', params.status);
   if (params.excludeStatus) query.set('filter[exclude_status]', params.excludeStatus);
+  if (params.excludeTerminal) query.set('filter[exclude_terminal]', '1');
   if (params.paymentStatus) query.set('filter[payment_status]', params.paymentStatus);
   if (typeof params.hasQuote === 'boolean') query.set('filter[has_quote]', String(params.hasQuote));
   if (params.search) query.set('search', params.search);

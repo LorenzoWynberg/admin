@@ -50,7 +50,7 @@ export function NotificationItem({ notification, onMarkRead, onNavigate }: Notif
   return (
     <div
       className={cn(
-        'hover:bg-muted/50 cursor-pointer border-b p-4 transition-colors',
+        'hover:bg-muted/50 cursor-pointer border-b p-4 pr-5 transition-colors',
         isUnread && 'bg-blue-50 dark:bg-blue-950/20'
       )}
       onClick={handleClick}
