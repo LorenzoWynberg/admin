@@ -206,6 +206,7 @@ export default function OrderDetailPage() {
                 orderStops={orderStops}
                 currencySymbol={currencySymbol}
                 currentQuote={order.currentQuote}
+                totalPaid={order.totalPaid ?? 0}
               />
             )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>

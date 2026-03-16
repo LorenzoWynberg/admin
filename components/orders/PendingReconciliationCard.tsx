@@ -75,6 +75,7 @@ export function PendingReconciliationCard({ order }: PendingReconciliationCardPr
               orderStops={orderStops}
               currencySymbol={currencySymbol}
               currentQuote={order.currentQuote}
+              totalPaid={order.totalPaid ?? 0}
             />
           ) : (
             <Button

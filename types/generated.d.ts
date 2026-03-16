@@ -306,6 +306,13 @@ declare namespace App.Data.Driver {
   export type ReassignItemsData = {
     quoteItemIds: Array<any>;
   };
+  export type ResolveItemsData = {
+    quoteItemIds: Array<any>;
+    action: string;
+    latitude: number | null;
+    longitude: number | null;
+    placeId: string | null;
+  };
   export type SplitStopData = {
     splits: Array<App.Data.Driver.SplitStopEntryData>;
   };
@@ -476,6 +483,7 @@ declare namespace App.Data.Order {
     cancelledAt?: string | null;
     cancelReason?: string | null;
     cancelFee?: number | null;
+    totalPaid?: number;
     user?: App.Data.User.UserData;
     business?: App.Data.Business.BusinessData | null;
     driver?: App.Data.Driver.DriverData | null;
@@ -743,6 +751,7 @@ declare namespace App.Data.Quote {
     quantity?: number;
     unitPrice?: number;
     total?: number;
+    status?: App.Enums.QuoteItemStatus | string;
     sortOrder?: number;
     createdAt?: string;
     updatedAt?: string;
@@ -1297,6 +1306,12 @@ declare namespace App.Enums {
     DRAFT = 'draft',
     ACTIVE = 'active',
     ARCHIVED = 'archived',
+  }
+  export enum QuoteItemStatus {
+    Pending = 'pending',
+    Fulfilled = 'fulfilled',
+    Unfulfilled = 'unfulfilled',
+    Cancelled = 'cancelled',
   }
   export enum QuoteStatus {
     DRAFT = 'draft',
