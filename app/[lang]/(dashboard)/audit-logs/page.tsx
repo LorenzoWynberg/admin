@@ -288,6 +288,24 @@ export default function AuditLogsPage() {
                               IP: {log.ipAddress}
                             </p>
                           )}
+                          {log.latitude != null && log.longitude != null && (
+                            <p className="text-muted-foreground mt-1 text-xs">
+                              GPS:{' '}
+                              <a
+                                href={`https://www.google.com/maps?q=${log.latitude},${log.longitude}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline"
+                              >
+                                {log.latitude.toFixed(6)}, {log.longitude.toFixed(6)}
+                              </a>
+                              {log.locationUpdatedAt && (
+                                <span className="ml-2">
+                                  ({formatDateTime(log.locationUpdatedAt)})
+                                </span>
+                              )}
+                            </p>
+                          )}
                         </TableCell>
                       </TableRow>
                     )}

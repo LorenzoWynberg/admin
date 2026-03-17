@@ -126,6 +126,9 @@ declare namespace App.Data.AuditLog {
     data: { [key: string]: any };
     previousData: { [key: string]: any } | null;
     ipAddress: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    locationUpdatedAt: string | null;
     createdAt: string;
   };
 }
