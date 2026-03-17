@@ -124,7 +124,7 @@ function PaymentCard({
   );
 }
 
-export function PaymentSection({ orderPublicId, currencySymbol = '$' }: PaymentSectionProps) {
+export function PaymentSection({ orderPublicId, currencySymbol = '₡' }: PaymentSectionProps) {
   const { t } = useTranslation();
   const { data: payments, isLoading, error } = useOrderPayments({ orderPublicId });
 

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ReconciliationDialog } from './ReconciliationDialog';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
-import { useOrderCurrencySymbol } from '@/hooks/currencies/useOrderCurrencySymbol';
+import { useCurrencyList } from '@/hooks/currencies/useCurrencyList';
 import { capitalize, actionLabel } from '@/utils/lang';
 import { getDateLocale } from '@/utils/format';
 import { Eye, Clock } from 'lucide-react';
@@ -31,7 +31,8 @@ export function PendingReconciliationCard({ order }: PendingReconciliationCardPr
       })
     : null;
 
-  const currencySymbol = useOrderCurrencySymbol(order.currencyCode);
+  const { data: currencyListData } = useCurrencyList();
+  const currencySymbol = currencyListData?.items?.find((c) => c.isBase)?.symbol || '₡';
   const orderStops = (order.stops ?? []) as App.Data.Order.OrderStopData[];
 
   return (
@@ -75,7 +76,8 @@ export function PendingReconciliationCard({ order }: PendingReconciliationCardPr
               orderStops={orderStops}
               currencySymbol={currencySymbol}
               currentQuote={order.currentQuote}
-              totalPaid={order.totalPaid ?? 0}
+              customerPaid={order.totalPaid ?? undefined}
+              customerCurrencySymbol={currencyListData?.items?.find((c) => c.code === order.currencyCode)?.symbol}
             />
           ) : (
             <Button

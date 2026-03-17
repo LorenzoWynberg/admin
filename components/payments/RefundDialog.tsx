@@ -28,7 +28,7 @@ interface RefundDialogProps {
   currencySymbol?: string;
 }
 
-export function RefundDialog({ payment, currencySymbol = '$' }: RefundDialogProps) {
+export function RefundDialog({ payment, currencySymbol = '₡' }: RefundDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const processRefund = useProcessRefund();

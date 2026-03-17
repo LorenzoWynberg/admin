@@ -26,9 +26,10 @@ import {
   validationAttribute,
 } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatCurrency } from '@/utils/format';
 import { Input } from '@/components/ui/input';
 import { useOrderList } from '@/hooks/orders';
+import { useCurrencyList } from '@/hooks/currencies/useCurrencyList';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -74,6 +75,8 @@ export default function OrdersPage() {
   });
 
   const orders = data?.items || [];
+  const { data: currencyListData } = useCurrencyList();
+  const baseCurrencySymbol = currencyListData?.items?.find((c) => c.isBase)?.symbol || '₡';
   const meta = data?.meta;
 
   if (!ready) {
@@ -290,7 +293,7 @@ export default function OrdersPage() {
                     </TableCell>
                     <TableCell>
                       {order.currentQuote?.total
-                        ? `${order.currencyCode} ${order.currentQuote.total.toFixed(2)}`
+                        ? formatCurrency(order.currentQuote.total, baseCurrencySymbol)
                         : '-'}
                     </TableCell>
                     <TableCell>{formatDate(order.createdAt)}</TableCell>

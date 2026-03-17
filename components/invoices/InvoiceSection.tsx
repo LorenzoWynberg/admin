@@ -94,7 +94,7 @@ function InvoiceCard({
   );
 }
 
-export function InvoiceSection({ orderPublicId, currencySymbol = '$' }: InvoiceSectionProps) {
+export function InvoiceSection({ orderPublicId, currencySymbol = '₡' }: InvoiceSectionProps) {
   const { t } = useTranslation();
   const { data: invoices, isLoading, error } = useOrderInvoices({ orderPublicId });
 

@@ -38,7 +38,10 @@ interface ReconciliationDialogProps {
   orderStops: App.Data.Order.OrderStopData[];
   currencySymbol: string;
   currentQuote: QuoteData;
-  totalPaid: number;
+  /** Amount the customer paid (in their currency) — display-only reference */
+  customerPaid?: number;
+  /** Symbol for the customer's currency (e.g. '$') — used only for the paid reference */
+  customerCurrencySymbol?: string;
 }
 
 /**
@@ -48,11 +51,12 @@ interface ReconciliationDialogProps {
  *   subtotalAfterDiscount = subtotal - discount
  *   taxTotal = subtotalAfterDiscount × taxRate
  *   total = subtotalAfterDiscount + taxTotal
+ *
+ * All amounts are in base currency (CRC).
  */
 function computeEstimatedTotal(
   quote: QuoteData,
-  newItemsTotal: number,
-  totalPaid: number
+  newItemsTotal: number
 ): {
   serviceFees: number;
   newItemsTotal: number;
@@ -75,8 +79,9 @@ function computeEstimatedTotal(
   const taxRate = quote.taxRate ?? 0;
   const taxTotal = Math.round(newSubtotalAfterDiscount * taxRate * 100) / 100;
   const estimatedTotal = Math.round((newSubtotalAfterDiscount + taxTotal) * 100) / 100;
-  // Compare against what was actually paid, not the stored quote total
-  const delta = Math.round((estimatedTotal - totalPaid) * 100) / 100;
+  // Compare against the original quote total (base currency)
+  const originalQuoteTotal = quote.total ?? 0;
+  const delta = Math.round((estimatedTotal - originalQuoteTotal) * 100) / 100;
 
   return {
     serviceFees,
@@ -156,7 +161,8 @@ export function ReconciliationDialog({
   orderStops,
   currencySymbol,
   currentQuote,
-  totalPaid,
+  customerPaid,
+  customerCurrencySymbol,
 }: ReconciliationDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -167,8 +173,8 @@ export function ReconciliationDialog({
   const { data: receipts } = useOrderReceipts({ orderPublicId, enabled: open });
 
   const newItemsTotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-  const est = computeEstimatedTotal(currentQuote, newItemsTotal, totalPaid);
-  const originalTotal = totalPaid;
+  const est = computeEstimatedTotal(currentQuote, newItemsTotal);
+  const originalTotal = currentQuote.total ?? 0;
   const hasDiscount = (currentQuote.discountRate ?? 0) > 0;
   const hasTax = (currentQuote.taxRate ?? 0) > 0;
 
@@ -256,14 +262,26 @@ export function ReconciliationDialog({
               </div>
             )}
 
-            {/* Original Quote Total reference */}
-            <div className="flex justify-between rounded-lg border p-3">
-              <span className="text-muted-foreground">
-                {t('orders:reconciliation.original_total', {
-                  defaultValue: 'Amount Paid',
-                })}
-              </span>
-              <span className="font-semibold">{formatCurrency(originalTotal, currencySymbol)}</span>
+            {/* Original Quote Total + customer paid reference */}
+            <div className="rounded-lg border p-3 space-y-1">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {t('orders:reconciliation.original_total', {
+                    defaultValue: 'Original Quote Total',
+                  })}
+                </span>
+                <span className="font-semibold">{formatCurrency(originalTotal, currencySymbol)}</span>
+              </div>
+              {customerPaid != null && customerCurrencySymbol && (
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>
+                    {t('orders:reconciliation.customer_paid', {
+                      defaultValue: 'Customer paid',
+                    })}
+                  </span>
+                  <span>{formatCurrency(customerPaid, customerCurrencySymbol)}</span>
+                </div>
+              )}
             </div>
 
             {/* Line Items Editor */}

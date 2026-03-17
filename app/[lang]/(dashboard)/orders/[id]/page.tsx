@@ -209,7 +209,8 @@ export default function OrderDetailPage() {
                 orderStops={orderStops}
                 currencySymbol={currencySymbol}
                 currentQuote={order.currentQuote}
-                totalPaid={order.totalPaid ?? 0}
+                customerPaid={order.totalPaid ?? undefined}
+                customerCurrencySymbol={currencyListData?.items?.find((c) => c.code === order.currencyCode)?.symbol}
               />
             )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
@@ -617,7 +618,7 @@ export default function OrderDetailPage() {
                               <p className="text-muted-foreground text-xs">
                                 {formatCurrency(
                                   quote.customerTotal,
-                                  quote.currencyCode === 'USD' ? '$' : quote.currencyCode
+                                  currencyListData?.items?.find((c) => c.code === quote.currencyCode)?.symbol || quote.currencyCode || ''
                                 )}
                               </p>
                             )}
