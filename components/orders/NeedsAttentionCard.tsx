@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { UrgencyBadge } from './UrgencyBadge';
+import { PaymentStatusBadge } from './PaymentStatusBadge';
 import { ReasonBadge } from './ReasonBadge';
 import { CancelOrderDialog } from './CancelOrderDialog';
 import { useChangeTier, useOutsourceOrder } from '@/hooks/orders';
@@ -59,6 +60,7 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-mono text-sm font-semibold">#{order.publicId}</span>
           <UrgencyBadge urgency={urgency} />
+          <PaymentStatusBadge status={order.paymentStatus as App.Enums.PaymentStatus} />
           {windowLabel && <span className="text-muted-foreground text-xs">{windowLabel}</span>}
         </div>
         <div className="text-muted-foreground flex flex-wrap gap-x-3 text-sm">
