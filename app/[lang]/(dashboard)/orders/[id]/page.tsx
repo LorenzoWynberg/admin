@@ -60,7 +60,7 @@ import {
   useOutsourceOrder,
   useUpdateStop,
 } from '@/hooks/orders';
-import { useOrderCurrencySymbol } from '@/hooks/currencies';
+import { useCurrencyList } from '@/hooks/currencies';
 import { Enums } from '@/data/app-enums';
 
 type QuoteStatus = App.Enums.QuoteStatus;
@@ -78,7 +78,10 @@ export default function OrderDetailPage() {
   const calculateDistance = useCalculateDistance();
   const outsourceOrder = useOutsourceOrder();
   const updateStop = useUpdateStop();
-  const currencySymbol = useOrderCurrencySymbol(order?.currencyCode);
+  const { data: currencyListData } = useCurrencyList();
+  const baseCurrencySymbol =
+    currencyListData?.items?.find((c) => c.isBase)?.symbol || '₡';
+  const currencySymbol = baseCurrencySymbol;
   const [editingStop, setEditingStop] = useState<App.Data.Order.OrderStopData | null>(null);
   const [editingStopDetails, setEditingStopDetails] = useState<App.Data.Order.OrderStopData | null>(
     null
