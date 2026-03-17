@@ -133,7 +133,7 @@ export function ScheduleEventDialog({
                 onOpenChange(false);
               }}
             >
-              {t('common:delete', { defaultValue: 'Delete' })}
+              {actionLabel('delete')}
             </Button>
           )}
           <Button onClick={handleSave} disabled={isSaving || !isTimeValid}>

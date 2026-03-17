@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderReceipts } from '@/hooks/orders';
 import { formatDate } from '@/utils/format';
-import { capitalize } from '@/utils/lang';
+import { actionLabel, capitalize } from '@/utils/lang';
 import { ImagePreviewDialog } from './ImagePreviewDialog';
 
 type OrderReceiptData = App.Data.Order.OrderReceiptData;
@@ -65,13 +65,13 @@ function ReceiptCard({
               onClick={() => onPreview(receipt)}
             >
               <Receipt className="mr-2 h-4 w-4" />
-              {t('common:view', { defaultValue: 'View' })}
+              {actionLabel('view')}
             </Button>
           ) : (
             <Button variant="outline" size="sm" asChild className="shrink-0">
               <a href={receipt.fileUrl} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-2 h-4 w-4" />
-                {t('common:view', { defaultValue: 'View' })}
+                {actionLabel('view')}
               </a>
             </Button>
           ))}

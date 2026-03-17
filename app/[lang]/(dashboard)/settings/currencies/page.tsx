@@ -290,7 +290,7 @@ export default function CurrencySettingsPage() {
                         size="sm"
                         onClick={() => handleOpenEditDialog(currency)}
                       >
-                        {t('common:edit', { defaultValue: 'Edit' })}
+                        {actionLabel('edit')}
                       </Button>
                     </TableCell>
                   </TableRow>

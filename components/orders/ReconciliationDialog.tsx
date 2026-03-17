@@ -20,6 +20,7 @@ import { useOrderReceipts, useReconcileOrder } from '@/hooks/orders';
 import { QuoteLineItemsEditor } from '@/components/quotes/QuoteLineItemsEditor';
 import { ImagePreviewDialog } from '@/components/orders/ImagePreviewDialog';
 import { formatCurrency } from '@/utils/format';
+import { actionLabel } from '@/utils/lang';
 
 type OrderReceiptData = App.Data.Order.OrderReceiptData;
 type QuoteData = App.Data.Quote.QuoteData;
@@ -352,7 +353,7 @@ export function ReconciliationDialog({
             {/* Actions */}
             <div className="flex justify-end gap-3">
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                {t('common:cancel', { defaultValue: 'Cancel' })}
+                {actionLabel('cancel')}
               </Button>
               <Button onClick={handleSubmit} disabled={reconcile.isPending || items.length === 0}>
                 {reconcile.isPending

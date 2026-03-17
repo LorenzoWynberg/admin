@@ -118,7 +118,7 @@ export function CreateRouteWithStopsDialog({
             {actionLabel('cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={createRouteWithStops.isPending}>
-            {t('common:create', { defaultValue: 'Create' })}
+            {actionLabel('create')}
           </Button>
         </DialogFooter>
       </DialogContent>

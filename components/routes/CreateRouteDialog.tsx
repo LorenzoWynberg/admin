@@ -109,7 +109,7 @@ export function CreateRouteDialog({ date }: CreateRouteDialogProps) {
               {actionLabel('cancel')}
             </Button>
             <Button type="submit" disabled={createRoute.isPending}>
-              {t('common:create', { defaultValue: 'Create' })}
+              {actionLabel('create')}
             </Button>
           </DialogFooter>
         </form>
