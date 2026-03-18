@@ -30,6 +30,7 @@ function getStatusBadgeVariant(
     case Enums.TransactionStatus.Authorized:
       return 'secondary';
     case Enums.TransactionStatus.Failed:
+    case Enums.TransactionStatus.Voided:
       return 'destructive';
     default:
       return 'outline';
@@ -66,6 +67,7 @@ function PaymentCard({
 }) {
   const { t } = useTranslation();
   const canRefund = payment.status === Enums.TransactionStatus.Succeeded;
+  const isAuthorized = payment.status === Enums.TransactionStatus.Authorized;
 
   return (
     <div className="bg-muted/30 rounded-lg border p-4">
@@ -84,13 +86,37 @@ function PaymentCard({
           </p>
         </div>
         <div className="text-right">
-          <p className="text-lg font-semibold">
-            {formatCurrency(payment.amount || 0, currencySymbol)}
-          </p>
-          {payment.paidAt && (
-            <p className="text-muted-foreground text-xs">
-              {t('payments:paid_at', { defaultValue: 'Paid' })} {formatDate(payment.paidAt)}
-            </p>
+          {isAuthorized ? (
+            <>
+              <p className="text-lg font-semibold">
+                {t('payments:authorized_amount')}:{' '}
+                {formatCurrency(payment.amount || 0, currencySymbol)}
+              </p>
+              {payment.authExpiresAt && (
+                <p className="text-muted-foreground text-xs">
+                  {t('payments:auth_expires')}{' '}
+                  {formatDate(payment.authExpiresAt)}
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="text-lg font-semibold">
+                {payment.capturedAmount != null ? (
+                  <>
+                    {t('payments:captured_amount')}:{' '}
+                    {formatCurrency(payment.capturedAmount, currencySymbol)}
+                  </>
+                ) : (
+                  formatCurrency(payment.amount || 0, currencySymbol)
+                )}
+              </p>
+              {payment.paidAt && (
+                <p className="text-muted-foreground text-xs">
+                  {t('payments:paid_at', { defaultValue: 'Paid' })} {formatDate(payment.paidAt)}
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>

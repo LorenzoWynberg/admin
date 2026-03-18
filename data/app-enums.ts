@@ -276,11 +276,13 @@ export const Enums = {
   },
   PaymentStatus: {
     UNPAID: "unpaid",
+    AUTHORIZED: "authorized",
     PAID: "paid",
     REFUND_DUE: "refund_due",
     REFUNDED: "refunded",
     SURCHARGE_DUE: "surcharge_due",
     PAID_IN_FULL: "paid_in_full",
+    VOIDED: "voided",
     CHARGEBACK: "chargeback",
   },
   PricingCalculationMode: {
@@ -353,6 +355,7 @@ export const Enums = {
     Pending: "pending",
     Authorized: "authorized",
     Succeeded: "succeeded",
+    Voided: "voided",
     Failed: "failed",
   },
 } as const;

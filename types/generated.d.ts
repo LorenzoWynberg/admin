@@ -613,6 +613,10 @@ declare namespace App.Data.Payment {
     providerChargeId?: string | null;
     receiptUrl?: string | null;
     paidAt?: string | null;
+    authorizedAt?: string | null;
+    authExpiresAt?: string | null;
+    capturedAt?: string | null;
+    capturedAmount?: number | null;
     createdAt?: string;
     updatedAt?: string;
   };
@@ -1302,11 +1306,13 @@ declare namespace App.Enums {
   }
   export enum PaymentStatus {
     UNPAID = 'unpaid',
+    AUTHORIZED = 'authorized',
     PAID = 'paid',
     REFUND_DUE = 'refund_due',
     REFUNDED = 'refunded',
     SURCHARGE_DUE = 'surcharge_due',
     PAID_IN_FULL = 'paid_in_full',
+    VOIDED = 'voided',
     CHARGEBACK = 'chargeback',
   }
   export enum PricingCalculationMode {
@@ -1379,6 +1385,7 @@ declare namespace App.Enums {
     Pending = 'pending',
     Authorized = 'authorized',
     Succeeded = 'succeeded',
+    Voided = 'voided',
     Failed = 'failed',
   }
 }
