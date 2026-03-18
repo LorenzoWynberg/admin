@@ -146,10 +146,17 @@ function buildInitialItems(
   const stopIdMap = new Map(
     orderStops.filter((s) => s.id && s.publicId).map((s) => [s.id!, s.publicId!])
   );
+
+  // Fallback for items without orderStopId: assign to the first non-dropoff stop
+  const fallbackStopPublicId =
+    orderStops.find((s) => s.type !== 'dropoff')?.publicId ?? null;
+
   return [...quoteItems]
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
     .map((qi) => ({
-      stopPublicId: qi.orderStopId ? (stopIdMap.get(qi.orderStopId) ?? null) : null,
+      stopPublicId: qi.orderStopId
+        ? (stopIdMap.get(qi.orderStopId) ?? fallbackStopPublicId)
+        : fallbackStopPublicId,
       label: qi.label ?? '',
       quantity: qi.quantity ?? 1,
       unitPrice: qi.unitPrice ?? 0,
