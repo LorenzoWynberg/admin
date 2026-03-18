@@ -258,11 +258,13 @@ declare namespace App.Data.Currency {
     currentRate?: number | null;
     rateDate?: string | null;
     rateSource?: string | null;
+    manualRate?: number | null;
   };
   export type UpdateCurrencyData = {
     isEnabled?: boolean;
     roundingMode?: string;
     roundingIncrement?: number;
+    manualRate?: number | null;
   };
 }
 declare namespace App.Data.Driver {
@@ -877,6 +879,7 @@ declare namespace App.Data.Setting {
     serviceWindowEnabled: boolean;
     unassignedEscalationHours: number;
     unassignedAutoCancelEnabled: boolean;
+    exchangeRateMode: string;
   };
   export type UpdateSettingData = {
     noServiceStart?: string;
@@ -884,6 +887,7 @@ declare namespace App.Data.Setting {
     serviceWindowEnabled?: boolean;
     unassignedEscalationHours?: number;
     unassignedAutoCancelEnabled?: boolean;
+    exchangeRateMode?: string;
   };
 }
 declare namespace App.Data.Shared {
@@ -1151,6 +1155,10 @@ declare namespace App.Enums {
     Denying = 'denying',
     Sending = 'sending',
     Reconciling = 'reconciling',
+  }
+  export enum ExchangeRateMode {
+    Auto = 'auto',
+    Manual = 'manual',
   }
   export enum FeasibilityLevel {
     Green = 'green',

@@ -23,7 +23,7 @@ import {
   DialogTitle,
   Dialog,
 } from '@/components/ui/dialog';
-import { Coins, RefreshCw, ChevronLeft, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Coins, RefreshCw, ChevronLeft, CheckCircle2, AlertTriangle, Settings2 } from 'lucide-react';
 
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -41,9 +41,14 @@ import {
   statusLabel,
   validationAttribute,
 } from '@/utils/lang';
+import { Enums } from '@/data/app-enums';
 import { formatDate } from '@/utils/format';
 import { useCurrencyList, useUpdateCurrency } from '@/hooks/currencies';
 import { useSyncExchangeRates } from '@/hooks/exchange-rates';
+import {
+  useExchangeRateMode,
+  useUpdateExchangeRateMode,
+} from '@/hooks/settings/useExchangeRateMode';
 
 type CurrencyData = App.Data.Currency.CurrencyData;
 
@@ -61,11 +66,16 @@ export default function CurrencySettingsPage() {
   const [editForm, setEditForm] = useState({
     roundingMode: 'nearest',
     roundingIncrement: 0.01,
+    manualRate: '',
   });
 
   const { data, isLoading, error } = useCurrencyList();
   const updateMutation = useUpdateCurrency();
   const syncMutation = useSyncExchangeRates();
+  const { data: modeData } = useExchangeRateMode();
+  const modeMutation = useUpdateExchangeRateMode();
+
+  const isManualMode = modeData?.exchangeRateMode === Enums.ExchangeRateMode.Manual;
 
   const currencies = data?.items || [];
   const baseCurrency = currencies.find((c) => c.isBase);
@@ -87,19 +97,28 @@ export default function CurrencySettingsPage() {
     setEditForm({
       roundingMode: currency.roundingMode || 'nearest',
       roundingIncrement: currency.roundingIncrement || 0.01,
+      manualRate: currency.manualRate != null ? String(currency.manualRate) : '',
     });
     setEditDialogOpen(true);
   };
 
   const handleSaveRounding = () => {
     if (!selectedCurrency?.code) return;
+
+    const payload: Record<string, unknown> = {
+      roundingMode: editForm.roundingMode,
+      roundingIncrement: editForm.roundingIncrement,
+    };
+
+    if (isManualMode && !selectedCurrency.isBase) {
+      payload.manualRate =
+        editForm.manualRate !== '' ? parseFloat(editForm.manualRate) : null;
+    }
+
     updateMutation.mutate(
       {
         code: selectedCurrency.code,
-        data: {
-          roundingMode: editForm.roundingMode,
-          roundingIncrement: editForm.roundingIncrement,
-        },
+        data: payload,
       },
       {
         onSuccess: () => {
@@ -108,6 +127,10 @@ export default function CurrencySettingsPage() {
         },
       }
     );
+  };
+
+  const handleToggleMode = () => {
+    modeMutation.mutate(isManualMode ? Enums.ExchangeRateMode.Auto : Enums.ExchangeRateMode.Manual);
   };
 
   return (
@@ -131,11 +154,51 @@ export default function CurrencySettingsPage() {
             })}
           </p>
         </div>
-        <Button onClick={() => syncMutation.mutate(undefined)} disabled={syncMutation.isPending}>
-          <RefreshCw className={`mr-2 h-4 w-4 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
-          {t('common:sync_rates', { defaultValue: 'Sync Rates Now' })}
-        </Button>
+        {!isManualMode && (
+          <Button onClick={() => syncMutation.mutate(undefined)} disabled={syncMutation.isPending}>
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${syncMutation.isPending ? 'animate-spin' : ''}`}
+            />
+            {t('common:sync_rates', { defaultValue: 'Sync Rates Now' })}
+          </Button>
+        )}
       </div>
+
+      {/* Exchange Rate Mode Toggle */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings2 className="h-5 w-5" />
+            {t('currencies:exchange_rate_mode', { defaultValue: 'Exchange Rate Mode' })}
+          </CardTitle>
+          <CardDescription>
+            {isManualMode
+              ? t('currencies:mode_manual_description', {
+                  defaultValue: 'Set exchange rates manually for each currency.',
+                })
+              : t('currencies:mode_auto_description', {
+                  defaultValue: 'Rates fetched automatically from external providers.',
+                })}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <span className={`text-sm font-medium ${!isManualMode ? 'text-primary' : 'text-muted-foreground'}`}>
+                {t('currencies:mode_auto', { defaultValue: 'Automatic' })}
+              </span>
+              <Switch
+                checked={isManualMode}
+                onCheckedChange={handleToggleMode}
+                disabled={modeMutation.isPending}
+              />
+              <span className={`text-sm font-medium ${isManualMode ? 'text-primary' : 'text-muted-foreground'}`}>
+                {t('currencies:mode_manual', { defaultValue: 'Manual' })}
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Base Currency Info */}
       <Card>
@@ -229,6 +292,12 @@ export default function CurrencySettingsPage() {
                         <span className="text-muted-foreground">
                           1.000000 ({t('common:base', { defaultValue: 'base' })})
                         </span>
+                      ) : isManualMode ? (
+                        currency.manualRate != null && currency.manualRate > 0 ? (
+                          formatRate(1 / currency.manualRate)
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )
                       ) : currency.currentRate ? (
                         formatRate(currency.currentRate)
                       ) : (
@@ -238,6 +307,10 @@ export default function CurrencySettingsPage() {
                     <TableCell>
                       {currency.isBase ? (
                         <span className="text-muted-foreground">-</span>
+                      ) : isManualMode ? (
+                        <Badge variant="outline" className="text-xs">
+                          {t('currencies:mode_manual', { defaultValue: 'Manual' })}
+                        </Badge>
                       ) : currency.rateDate ? (
                         <div className="flex items-center gap-1">
                           {formatDate(currency.rateDate)}
@@ -316,6 +389,58 @@ export default function CurrencySettingsPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            {isManualMode && !selectedCurrency?.isBase && (
+              <div className="grid gap-2">
+                <Label htmlFor="manualRate">
+                  {t('currencies:manual_rate', { defaultValue: 'Manual Rate' })}
+                </Label>
+                <Input
+                  id="manualRate"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder={`${t('common:e_g', { defaultValue: 'e.g.' })} 490.00`}
+                  value={editForm.manualRate}
+                  onChange={(e) =>
+                    setEditForm((f) => ({ ...f, manualRate: e.target.value }))
+                  }
+                />
+                <p className="text-muted-foreground text-sm">
+                  {baseCurrency?.code} {t('currencies:per_one', { defaultValue: 'per 1' })}{' '}
+                  {selectedCurrency?.code}
+                </p>
+                {editForm.manualRate && parseFloat(editForm.manualRate) > 0 && (() => {
+                  const rate = parseFloat(editForm.manualRate);
+                  const inverse = 1 / rate;
+                  const isLikelyWrong = rate < 1;
+                  return (
+                    <div className={`rounded-md p-3 text-sm ${isLikelyWrong ? 'bg-amber-50 border border-amber-200' : 'bg-muted'}`}>
+                      <p className="font-medium">
+                        {t('currencies:conversion_preview', { defaultValue: 'Conversion preview' })}:
+                      </p>
+                      <p>
+                        1 {selectedCurrency?.code} = {rate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}{' '}
+                        {baseCurrency?.code}
+                      </p>
+                      <p className="text-muted-foreground">
+                        1 {baseCurrency?.code} ={' '}
+                        {inverse.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}{' '}
+                        {selectedCurrency?.code}
+                      </p>
+                      {isLikelyWrong && (
+                        <p className="mt-2 flex items-center gap-1 font-medium text-amber-700">
+                          <AlertTriangle className="h-3.5 w-3.5" />
+                          {t('currencies:rate_seems_low', {
+                            defaultValue: 'This value seems too low. Did you mean {{suggestion}}?',
+                            suggestion: inverse.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+                          })}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="roundingMode">
                 {t('common:rounding_mode', { defaultValue: 'Rounding Mode' })}

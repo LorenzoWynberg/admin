@@ -130,6 +130,10 @@ export const Enums = {
     Sending: "sending",
     Reconciling: "reconciling",
   },
+  ExchangeRateMode: {
+    Auto: "auto",
+    Manual: "manual",
+  },
   FeasibilityLevel: {
     Green: "green",
     Yellow: "yellow",
