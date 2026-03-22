@@ -28,8 +28,15 @@ export function useNeedsAttentionBroadcast() {
       });
     });
 
+    echo.private('admin').listen('.refund-request.created', () => {
+      queryClientRef.current.invalidateQueries({
+        queryKey: ['refund-requests', 'pending'],
+      });
+    });
+
     return () => {
       echo.private('admin').stopListening('.needs-attention.changed');
+      echo.private('admin').stopListening('.refund-request.created');
     };
   }, [echo]);
 }

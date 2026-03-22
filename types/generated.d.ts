@@ -786,6 +786,30 @@ declare namespace App.Data.Quote {
     unitPrice: number;
   };
 }
+declare namespace App.Data.RefundRequest {
+  export type RefundRequestData = {
+    id?: number;
+    publicId?: string;
+    orderId?: number;
+    userId?: number;
+    reason?: string;
+    status?: App.Enums.RefundRequestStatus;
+    adminNotes?: string | null;
+    resolvedAt?: string | null;
+    resolvedBy?: number | null;
+    refundId?: number | null;
+    createdAt?: string;
+    updatedAt?: string;
+    order?: App.Data.Order.OrderData | null;
+    user?: App.Data.User.UserData | null;
+  };
+  export type ResolveRefundRequestData = {
+    adminNotes: string | null;
+  };
+  export type StoreRefundRequestData = {
+    reason: string;
+  };
+}
 declare namespace App.Data.Route {
   export type AddStopData = {
     orderId: number;
@@ -1232,6 +1256,7 @@ declare namespace App.Enums {
     TaxProfile = 'tax_profile',
     Invoice = 'invoice',
     InvoiceItem = 'invoice_item',
+    RefundRequest = 'refund_request',
   }
   export enum NotificationAction {
     QuoteRequested = 'quote_requested',
@@ -1254,6 +1279,9 @@ declare namespace App.Enums {
     ChatMessage = 'chat_message',
     UnassignedOrderEscalation = 'unassigned_order_escalation',
     PaymentFailed = 'payment_failed',
+    RefundRequestCreated = 'refund_request_created',
+    RefundRequestApproved = 'refund_request_approved',
+    RefundRequestDenied = 'refund_request_denied',
   }
   export enum NotificationStatus {
     Unread = 'unread',
@@ -1341,6 +1369,11 @@ declare namespace App.Enums {
   export enum QuoteType {
     Standard = 'standard',
     Reconciliation = 'reconciliation',
+  }
+  export enum RefundRequestStatus {
+    Pending = 'pending',
+    Approved = 'approved',
+    Denied = 'denied',
   }
   export enum Role {
     BUSINESS_OWNER = 'business.owner',

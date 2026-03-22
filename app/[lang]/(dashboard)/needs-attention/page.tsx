@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { useOrderList } from '@/hooks/orders';
 import { useNeedsAttention } from '@/hooks/orders/useNeedsAttention';
 import { usePendingReconciliation } from '@/hooks/orders/usePendingReconciliation';
+import { usePendingRefundRequests } from '@/hooks/refundRequests';
 import { NeedsAttentionCard } from '@/components/orders/NeedsAttentionCard';
 import { PendingReconciliationCard } from '@/components/orders/PendingReconciliationCard';
+import { RefundRequestCard } from '@/components/orders/RefundRequestCard';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { PaymentStatusBadge } from '@/components/orders/PaymentStatusBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -62,6 +64,12 @@ export default function NeedsAttentionPage() {
     refetch: refetchReconciliation,
     isRefetching: isRefetchingReconciliation,
   } = usePendingReconciliation();
+  const {
+    data: refundRequestsData,
+    isLoading: refundRequestsLoading,
+    refetch: refetchRefundRequests,
+    isRefetching: isRefetchingRefundRequests,
+  } = usePendingRefundRequests();
   const [filter, setFilter] = useState<string>('all');
 
   const items = data?.data ?? [];
@@ -69,6 +77,7 @@ export default function NeedsAttentionPage() {
 
   const filtered = filter === 'all' ? items : items.filter((i) => i.urgency === filter);
 
+  const refundRequests = refundRequestsData?.items ?? [];
   const reconciliationOrders = reconciliationData?.data ?? [];
   const unquotedOrders = unquotedData?.items ?? [];
   const unpaidOrders = unpaidData?.items ?? [];
@@ -82,10 +91,15 @@ export default function NeedsAttentionPage() {
     refetchUnquoted();
     refetchUnpaid();
     refetchReconciliation();
+    refetchRefundRequests();
   };
 
   const anyRefetching =
-    isRefetching || isRefetchingUnquoted || isRefetchingUnpaid || isRefetchingReconciliation;
+    isRefetching ||
+    isRefetchingUnquoted ||
+    isRefetchingUnpaid ||
+    isRefetchingReconciliation ||
+    isRefetchingRefundRequests;
 
   return (
     <div className="space-y-6">
@@ -136,6 +150,17 @@ export default function NeedsAttentionPage() {
             {unpaidCount > 0 && (
               <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-xs">
                 {unpaidCount}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="refund-requests">
+            {t('needs_attention.refund_requests_tab', { defaultValue: 'Refund Requests' })}
+            {refundRequests.length > 0 && (
+              <Badge
+                variant="secondary"
+                className="ml-1.5 bg-orange-100 px-1.5 py-0 text-xs text-orange-800"
+              >
+                {refundRequests.length}
               </Badge>
             )}
           </TabsTrigger>
@@ -300,6 +325,26 @@ export default function NeedsAttentionPage() {
                     </div>
                   </CardContent>
                 </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="refund-requests" className="space-y-4">
+          {refundRequestsLoading ? (
+            <div className="text-muted-foreground py-12 text-center">
+              {t('common:loading', { defaultValue: 'Loading...' })}
+            </div>
+          ) : refundRequests.length === 0 ? (
+            <div className="text-muted-foreground py-12 text-center">
+              {t('needs_attention.no_refund_requests', {
+                defaultValue: 'No pending refund requests',
+              })}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {refundRequests.map((request) => (
+                <RefundRequestCard key={request.publicId} refundRequest={request} />
               ))}
             </div>
           )}

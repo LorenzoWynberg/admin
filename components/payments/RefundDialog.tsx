@@ -26,9 +26,10 @@ type PaymentData = App.Data.Payment.PaymentData;
 interface RefundDialogProps {
   payment: PaymentData;
   currencySymbol?: string;
+  onSuccess?: () => void;
 }
 
-export function RefundDialog({ payment, currencySymbol = '₡' }: RefundDialogProps) {
+export function RefundDialog({ payment, currencySymbol = '₡', onSuccess }: RefundDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const processRefund = useProcessRefund();
@@ -77,7 +78,10 @@ export function RefundDialog({ payment, currencySymbol = '₡' }: RefundDialogPr
         },
       },
       {
-        onSuccess: () => setOpen(false),
+        onSuccess: () => {
+          setOpen(false);
+          onSuccess?.();
+        },
       }
     );
   };
