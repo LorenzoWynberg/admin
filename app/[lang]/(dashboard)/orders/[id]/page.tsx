@@ -79,8 +79,7 @@ export default function OrderDetailPage() {
   const outsourceOrder = useOutsourceOrder();
   const updateStop = useUpdateStop();
   const { data: currencyListData } = useCurrencyList();
-  const baseCurrencySymbol =
-    currencyListData?.items?.find((c) => c.isBase)?.symbol || '₡';
+  const baseCurrencySymbol = currencyListData?.items?.find((c) => c.isBase)?.symbol || '₡';
   const currencySymbol = baseCurrencySymbol;
   const [editingStop, setEditingStop] = useState<App.Data.Order.OrderStopData | null>(null);
   const [editingStopDetails, setEditingStopDetails] = useState<App.Data.Order.OrderStopData | null>(
@@ -210,7 +209,9 @@ export default function OrderDetailPage() {
                 currencySymbol={currencySymbol}
                 currentQuote={order.currentQuote}
                 customerPaid={order.totalPaid ?? undefined}
-                customerCurrencySymbol={currencyListData?.items?.find((c) => c.code === order.currencyCode)?.symbol}
+                customerCurrencySymbol={
+                  currencyListData?.items?.find((c) => c.code === order.currencyCode)?.symbol
+                }
               />
             )}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
@@ -618,7 +619,11 @@ export default function OrderDetailPage() {
                               <p className="text-muted-foreground text-xs">
                                 {formatCurrency(
                                   quote.customerTotal,
-                                  currencyListData?.items?.find((c) => c.code === quote.currencyCode)?.symbol || quote.currencyCode || ''
+                                  currencyListData?.items?.find(
+                                    (c) => c.code === quote.currencyCode
+                                  )?.symbol ||
+                                    quote.currencyCode ||
+                                    ''
                                 )}
                               </p>
                             )}

@@ -23,7 +23,14 @@ import {
   DialogTitle,
   Dialog,
 } from '@/components/ui/dialog';
-import { Coins, RefreshCw, ChevronLeft, CheckCircle2, AlertTriangle, Settings2 } from 'lucide-react';
+import {
+  Coins,
+  RefreshCw,
+  ChevronLeft,
+  CheckCircle2,
+  AlertTriangle,
+  Settings2,
+} from 'lucide-react';
 
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -111,8 +118,7 @@ export default function CurrencySettingsPage() {
     };
 
     if (isManualMode && !selectedCurrency.isBase) {
-      payload.manualRate =
-        editForm.manualRate !== '' ? parseFloat(editForm.manualRate) : null;
+      payload.manualRate = editForm.manualRate !== '' ? parseFloat(editForm.manualRate) : null;
     }
 
     updateMutation.mutate(
@@ -156,9 +162,7 @@ export default function CurrencySettingsPage() {
         </div>
         {!isManualMode && (
           <Button onClick={() => syncMutation.mutate(undefined)} disabled={syncMutation.isPending}>
-            <RefreshCw
-              className={`mr-2 h-4 w-4 ${syncMutation.isPending ? 'animate-spin' : ''}`}
-            />
+            <RefreshCw className={`mr-2 h-4 w-4 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
             {t('common:sync_rates', { defaultValue: 'Sync Rates Now' })}
           </Button>
         )}
@@ -184,7 +188,9 @@ export default function CurrencySettingsPage() {
         <CardContent>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
-              <span className={`text-sm font-medium ${!isManualMode ? 'text-primary' : 'text-muted-foreground'}`}>
+              <span
+                className={`text-sm font-medium ${!isManualMode ? 'text-primary' : 'text-muted-foreground'}`}
+              >
                 {t('currencies:mode_auto', { defaultValue: 'Automatic' })}
               </span>
               <Switch
@@ -192,7 +198,9 @@ export default function CurrencySettingsPage() {
                 onCheckedChange={handleToggleMode}
                 disabled={modeMutation.isPending}
               />
-              <span className={`text-sm font-medium ${isManualMode ? 'text-primary' : 'text-muted-foreground'}`}>
+              <span
+                className={`text-sm font-medium ${isManualMode ? 'text-primary' : 'text-muted-foreground'}`}
+              >
                 {t('currencies:mode_manual', { defaultValue: 'Manual' })}
               </span>
             </div>
@@ -401,44 +409,59 @@ export default function CurrencySettingsPage() {
                   min="0"
                   placeholder={`${t('common:e_g', { defaultValue: 'e.g.' })} 490.00`}
                   value={editForm.manualRate}
-                  onChange={(e) =>
-                    setEditForm((f) => ({ ...f, manualRate: e.target.value }))
-                  }
+                  onChange={(e) => setEditForm((f) => ({ ...f, manualRate: e.target.value }))}
                 />
                 <p className="text-muted-foreground text-sm">
                   {baseCurrency?.code} {t('currencies:per_one', { defaultValue: 'per 1' })}{' '}
                   {selectedCurrency?.code}
                 </p>
-                {editForm.manualRate && parseFloat(editForm.manualRate) > 0 && (() => {
-                  const rate = parseFloat(editForm.manualRate);
-                  const inverse = 1 / rate;
-                  const isLikelyWrong = rate < 1;
-                  return (
-                    <div className={`rounded-md p-3 text-sm ${isLikelyWrong ? 'bg-amber-50 border border-amber-200' : 'bg-muted'}`}>
-                      <p className="font-medium">
-                        {t('currencies:conversion_preview', { defaultValue: 'Conversion preview' })}:
-                      </p>
-                      <p>
-                        1 {selectedCurrency?.code} = {rate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}{' '}
-                        {baseCurrency?.code}
-                      </p>
-                      <p className="text-muted-foreground">
-                        1 {baseCurrency?.code} ={' '}
-                        {inverse.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}{' '}
-                        {selectedCurrency?.code}
-                      </p>
-                      {isLikelyWrong && (
-                        <p className="mt-2 flex items-center gap-1 font-medium text-amber-700">
-                          <AlertTriangle className="h-3.5 w-3.5" />
-                          {t('currencies:rate_seems_low', {
-                            defaultValue: 'This value seems too low. Did you mean {{suggestion}}?',
-                            suggestion: inverse.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+                {editForm.manualRate &&
+                  parseFloat(editForm.manualRate) > 0 &&
+                  (() => {
+                    const rate = parseFloat(editForm.manualRate);
+                    const inverse = 1 / rate;
+                    const isLikelyWrong = rate < 1;
+                    return (
+                      <div
+                        className={`rounded-md p-3 text-sm ${isLikelyWrong ? 'border border-amber-200 bg-amber-50' : 'bg-muted'}`}
+                      >
+                        <p className="font-medium">
+                          {t('currencies:conversion_preview', {
+                            defaultValue: 'Conversion preview',
                           })}
+                          :
                         </p>
-                      )}
-                    </div>
-                  );
-                })()}
+                        <p>
+                          1 {selectedCurrency?.code} ={' '}
+                          {rate.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 4,
+                          })}{' '}
+                          {baseCurrency?.code}
+                        </p>
+                        <p className="text-muted-foreground">
+                          1 {baseCurrency?.code} ={' '}
+                          {inverse.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 6,
+                          })}{' '}
+                          {selectedCurrency?.code}
+                        </p>
+                        {isLikelyWrong && (
+                          <p className="mt-2 flex items-center gap-1 font-medium text-amber-700">
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                            {t('currencies:rate_seems_low', {
+                              defaultValue:
+                                'This value seems too low. Did you mean {{suggestion}}?',
+                              suggestion: inverse.toLocaleString(undefined, {
+                                maximumFractionDigits: 2,
+                              }),
+                            })}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })()}
               </div>
             )}
             <div className="grid gap-2">

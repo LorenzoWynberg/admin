@@ -94,8 +94,7 @@ function PaymentCard({
               </p>
               {payment.authExpiresAt && (
                 <p className="text-muted-foreground text-xs">
-                  {t('payments:auth_expires')}{' '}
-                  {formatDate(payment.authExpiresAt)}
+                  {t('payments:auth_expires')} {formatDate(payment.authExpiresAt)}
                 </p>
               )}
             </>

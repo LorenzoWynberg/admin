@@ -148,8 +148,7 @@ function buildInitialItems(
   );
 
   // Fallback for items without orderStopId: assign to the first non-dropoff stop
-  const fallbackStopPublicId =
-    orderStops.find((s) => s.type !== 'dropoff')?.publicId ?? null;
+  const fallbackStopPublicId = orderStops.find((s) => s.type !== 'dropoff')?.publicId ?? null;
 
   return [...quoteItems]
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
@@ -270,17 +269,19 @@ export function ReconciliationDialog({
             )}
 
             {/* Original Quote Total + customer paid reference */}
-            <div className="rounded-lg border p-3 space-y-1">
+            <div className="space-y-1 rounded-lg border p-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   {t('orders:reconciliation.original_total', {
                     defaultValue: 'Original Quote Total',
                   })}
                 </span>
-                <span className="font-semibold">{formatCurrency(originalTotal, currencySymbol)}</span>
+                <span className="font-semibold">
+                  {formatCurrency(originalTotal, currencySymbol)}
+                </span>
               </div>
               {customerPaid != null && customerCurrencySymbol && (
-                <div className="flex justify-between text-xs text-muted-foreground">
+                <div className="text-muted-foreground flex justify-between text-xs">
                   <span>
                     {t('orders:reconciliation.customer_paid', {
                       defaultValue: 'Customer paid',

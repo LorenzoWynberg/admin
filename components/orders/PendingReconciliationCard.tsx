@@ -77,7 +77,9 @@ export function PendingReconciliationCard({ order }: PendingReconciliationCardPr
               currencySymbol={currencySymbol}
               currentQuote={order.currentQuote}
               customerPaid={order.totalPaid ?? undefined}
-              customerCurrencySymbol={currencyListData?.items?.find((c) => c.code === order.currencyCode)?.symbol}
+              customerCurrencySymbol={
+                currencyListData?.items?.find((c) => c.code === order.currencyCode)?.symbol
+              }
             />
           ) : (
             <Button

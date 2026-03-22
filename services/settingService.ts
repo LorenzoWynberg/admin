@@ -36,9 +36,7 @@ export const SettingService = {
   /**
    * Update exchange rate mode (admin only)
    */
-  async updateExchangeRateMode(
-    exchangeRateMode: string
-  ): Promise<ExchangeRateModeResponse> {
+  async updateExchangeRateMode(exchangeRateMode: string): Promise<ExchangeRateModeResponse> {
     const response = await api.patch<ExchangeRateModeResponse & { message: string }>(
       '/settings/exchange-rate-mode',
       { exchangeRateMode }
