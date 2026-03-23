@@ -534,6 +534,7 @@ declare namespace App.Data.Order {
     address?: App.Data.Address.AddressData;
     creator?: App.Data.User.UserData;
     quoteItems?: Array<App.Data.Quote.QuoteItemData>;
+    routeStop?: App.Data.Route.RouteStopData;
   };
   export type OrderTrackingData = {
     publicId: string;
@@ -617,6 +618,8 @@ declare namespace App.Data.Payment {
     authExpiresAt?: string | null;
     capturedAt?: string | null;
     capturedAmount?: number | null;
+    totalRefunded?: number;
+    refunds?: Array<App.Data.Payment.RefundData>;
     createdAt?: string;
     updatedAt?: string;
   };
@@ -1340,6 +1343,7 @@ declare namespace App.Enums {
     REFUNDED = 'refunded',
     SURCHARGE_DUE = 'surcharge_due',
     PAID_IN_FULL = 'paid_in_full',
+    RECONCILED = 'reconciled',
     VOIDED = 'voided',
     CHARGEBACK = 'chargeback',
   }

@@ -5,6 +5,7 @@ interface UseAuditLogListParams {
   page?: number;
   perPage?: number;
   modelKey?: string;
+  modelId?: number;
   action?: string;
   search?: string;
   fromDate?: string;

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderPayments } from '@/hooks/payments';
+import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { RefundDialog } from './RefundDialog';
 import { formatDate, formatCurrency } from '@/utils/format';
 import { capitalize, statusLabel } from '@/utils/lang';
@@ -14,10 +15,10 @@ import { Enums } from '@/data/app-enums';
 import type { TFunction } from 'i18next';
 
 type PaymentData = App.Data.Payment.PaymentData;
+type RefundData = App.Data.Payment.RefundData;
 
 interface PaymentSectionProps {
   orderPublicId: string;
-  currencySymbol?: string;
 }
 
 function getStatusBadgeVariant(
@@ -58,15 +59,35 @@ function getPaymentMethodLabel(
   }
 }
 
-function PaymentCard({
-  payment,
-  currencySymbol,
-}: {
-  payment: PaymentData;
-  currencySymbol: string;
-}) {
+function RefundCard({ refund }: { refund: RefundData }) {
+  const currencySymbol = useOrderCurrencySymbol(refund.currencyCode);
+
+  return (
+    <div className="bg-destructive/5 flex items-center justify-between rounded-md border border-red-200 px-3 py-2">
+      <div className="space-y-0.5">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs">{refund.publicId}</span>
+          <Badge variant="outline">{statusLabel('refunded')}</Badge>
+        </div>
+        {refund.reason && <p className="text-muted-foreground text-xs">{refund.reason}</p>}
+      </div>
+      <div className="text-right">
+        <p className="text-destructive text-sm font-semibold">
+          -{formatCurrency(refund.amount || 0, currencySymbol)}
+        </p>
+        {refund.refundedAt && (
+          <p className="text-muted-foreground text-xs">{formatDate(refund.refundedAt)}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PaymentCard({ payment }: { payment: PaymentData }) {
   const { t } = useTranslation();
-  const canRefund = payment.status === Enums.TransactionStatus.Succeeded;
+  const currencySymbol = useOrderCurrencySymbol(payment.currencyCode);
+  const refundableAmount = (payment.amount || 0) - (payment.totalRefunded || 0);
+  const canRefund = payment.status === Enums.TransactionStatus.Succeeded && refundableAmount > 0;
   const isAuthorized = payment.status === Enums.TransactionStatus.Authorized;
 
   return (
@@ -142,16 +163,31 @@ function PaymentCard({
               </a>
             </Button>
           )}
-          {canRefund && <RefundDialog payment={payment} currencySymbol={currencySymbol} />}
+          {canRefund && <RefundDialog payment={payment} />}
         </div>
       </div>
+
+      {/* Refunds */}
+      {payment.refunds && payment.refunds.length > 0 && (
+        <div className="mt-3 border-t pt-3">
+          <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
+            {capitalize(t('models:refund', { count: 2, defaultValue: 'Refunds' }))}
+          </p>
+          <div className="space-y-2">
+            {payment.refunds.map((refund) => (
+              <RefundCard key={refund.publicId || refund.id} refund={refund} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export function PaymentSection({ orderPublicId, currencySymbol = '₡' }: PaymentSectionProps) {
+export function PaymentSection({ orderPublicId }: PaymentSectionProps) {
   const { t } = useTranslation();
   const { data: payments, isLoading, error } = useOrderPayments({ orderPublicId });
+  const summaryCurrencySymbol = useOrderCurrencySymbol(payments?.[0]?.currencyCode);
 
   return (
     <Card>
@@ -180,11 +216,7 @@ export function PaymentSection({ orderPublicId, currencySymbol = '₡' }: Paymen
         ) : (
           <div className="space-y-4">
             {payments.map((payment) => (
-              <PaymentCard
-                key={payment.publicId || payment.id}
-                payment={payment}
-                currencySymbol={currencySymbol}
-              />
+              <PaymentCard key={payment.publicId || payment.id} payment={payment} />
             ))}
 
             {/* Summary */}
@@ -197,7 +229,7 @@ export function PaymentSection({ orderPublicId, currencySymbol = '₡' }: Paymen
                       payments
                         .filter((p) => p.status === Enums.TransactionStatus.Succeeded)
                         .reduce((sum, p) => sum + (p.amount || 0), 0),
-                      currencySymbol
+                      summaryCurrencySymbol
                     )}
                   </span>
                 </div>

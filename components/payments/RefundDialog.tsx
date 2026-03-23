@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
 import { useProcessRefund } from '@/hooks/payments';
+import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { actionLabel, validationAttribute } from '@/utils/lang';
 import { formatCurrency } from '@/utils/format';
 
@@ -25,21 +26,21 @@ type PaymentData = App.Data.Payment.PaymentData;
 
 interface RefundDialogProps {
   payment: PaymentData;
-  currencySymbol?: string;
   onSuccess?: () => void;
 }
 
-export function RefundDialog({ payment, currencySymbol = '₡', onSuccess }: RefundDialogProps) {
+export function RefundDialog({ payment, onSuccess }: RefundDialogProps) {
   const { t } = useTranslation();
+  const currencySymbol = useOrderCurrencySymbol(payment.currencyCode);
   const [open, setOpen] = useState(false);
   const processRefund = useProcessRefund();
+
+  const maxAmount = (payment.amount || 0) - (payment.totalRefunded || 0);
 
   const [formData, setFormData] = useState({
     amount: '',
     reason: '',
   });
-
-  const maxAmount = payment.amount || 0;
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {

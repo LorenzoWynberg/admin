@@ -25,7 +25,7 @@ import {
   Loader2,
 } from 'lucide-react';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -39,6 +39,7 @@ import { QuoteDetailDialog } from '@/components/quotes/QuoteDetailDialog';
 import { PaymentSection } from '@/components/payments/PaymentSection';
 import { InvoiceSection } from '@/components/invoices/InvoiceSection';
 import { ReceiptSection } from '@/components/orders/ReceiptSection';
+import { OrderActivityCard } from '@/components/orders/OrderActivityCard';
 import { EditStopAddressDialog } from '@/components/orders/EditStopAddressDialog';
 import { EditStopDetailsDialog } from '@/components/orders/EditStopDetailsDialog';
 import { AddStopDialog } from '@/components/orders/AddStopDialog';
@@ -87,6 +88,36 @@ export default function OrderDetailPage() {
   );
   const [addStopOpen, setAddStopOpen] = useState(false);
   const [updatingStopTypeId, setUpdatingStopTypeId] = useState<number | null>(null);
+
+  // Group quote items by stop ID for display on purchase stops
+  const quoteItemsByStopId = useMemo(() => {
+    const quote = order?.currentQuote;
+    const stops = (order?.stops ?? []) as App.Data.Order.OrderStopData[];
+    if (
+      !quote?.items?.length ||
+      (quote.status !== Enums.QuoteStatus.ACCEPTED && quote.status !== Enums.QuoteStatus.FINALIZED)
+    )
+      return {};
+    const map: Record<number, App.Data.Quote.QuoteItemData[]> = {};
+    const unlinked: App.Data.Quote.QuoteItemData[] = [];
+    for (const item of quote.items) {
+      if (item.orderStopId != null) {
+        (map[item.orderStopId] ??= []).push(item);
+      } else {
+        unlinked.push(item);
+      }
+    }
+    // Assign unlinked items to the first purchase stop
+    if (unlinked.length > 0) {
+      const firstPurchaseStop = stops.find(
+        (s) => s.type === Enums.OrderStopType.Purchase && s.id != null
+      );
+      if (firstPurchaseStop?.id != null) {
+        (map[firstPurchaseStop.id] ??= []).push(...unlinked);
+      }
+    }
+    return map;
+  }, [order?.currentQuote, order?.stops]);
 
   const formatAddress = (address?: App.Data.Address.AddressData | null): string => {
     const notSpecified = t('orders:detail.not_specified', { defaultValue: 'Not specified' });
@@ -338,35 +369,45 @@ export default function OrderDetailPage() {
                             );
                           })()}
                         </div>
-                        {stop.status && (
-                          <Badge variant="secondary">{statusLabel(stop.status)}</Badge>
+                        {(stop.routeStop?.status || stop.status) && (
+                          <Badge variant="secondary">
+                            {statusLabel(stop.routeStop?.status || stop.status || '')}
+                          </Badge>
                         )}
                       </div>
                       <div className="mt-2 space-y-1 pl-6">
                         {stop.address ? (
                           <div className="flex items-start gap-2">
                             <span className="text-sm">{formatAddress(stop.address)}</span>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-5 w-5 shrink-0"
-                              onClick={() => setEditingStop(stop)}
-                            >
-                              <Pencil className="h-3 w-3" />
-                            </Button>
+                            {(order.status === Enums.OrderStatus.PENDING ||
+                              order.status === Enums.OrderStatus.ESTIMATED ||
+                              order.status === Enums.OrderStatus.APPROVED) && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-5 w-5 shrink-0"
+                                onClick={() => setEditingStop(stop)}
+                              >
+                                <Pencil className="h-3 w-3" />
+                              </Button>
+                            )}
                           </div>
                         ) : (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs"
-                            onClick={() => setEditingStop(stop)}
-                          >
-                            <Plus className="mr-1 h-3 w-3" />
-                            {t('orders:detail.add_address', {
-                              defaultValue: 'Add Address',
-                            })}
-                          </Button>
+                          (order.status === Enums.OrderStatus.PENDING ||
+                            order.status === Enums.OrderStatus.ESTIMATED ||
+                            order.status === Enums.OrderStatus.APPROVED) && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => setEditingStop(stop)}
+                            >
+                              <Plus className="mr-1 h-3 w-3" />
+                              {t('orders:detail.add_address', {
+                                defaultValue: 'Add Address',
+                              })}
+                            </Button>
+                          )
                         )}
                         <div className="flex items-start justify-between gap-2">
                           <div className="space-y-1">
@@ -386,6 +427,23 @@ export default function OrderDetailPage() {
                               <div className="flex items-start gap-2">
                                 <FileText className="text-muted-foreground mt-0.5 h-3.5 w-3.5" />
                                 <span className="text-sm">{stop.instructions}</span>
+                              </div>
+                            )}
+                            {stop.id != null && quoteItemsByStopId[stop.id]?.length > 0 && (
+                              <div className="mt-1 space-y-1">
+                                {quoteItemsByStopId[stop.id].map((item) => (
+                                  <div
+                                    key={item.id}
+                                    className="text-muted-foreground flex items-center justify-between text-xs"
+                                  >
+                                    <span>
+                                      {item.quantity}× {item.label}
+                                    </span>
+                                    <span className="font-medium">
+                                      {formatCurrency(item.total || 0, currencySymbol)}
+                                    </span>
+                                  </div>
+                                ))}
                               </div>
                             )}
                           </div>
@@ -692,75 +750,16 @@ export default function OrderDetailPage() {
         </Card>
 
         {/* Payments Section */}
-        {order.publicId && (
-          <PaymentSection orderPublicId={order.publicId} currencySymbol={currencySymbol} />
-        )}
+        {order.publicId && <PaymentSection orderPublicId={order.publicId} />}
 
         {/* Invoices Section */}
-        {order.publicId && (
-          <InvoiceSection orderPublicId={order.publicId} currencySymbol={currencySymbol} />
-        )}
+        {order.publicId && <InvoiceSection orderPublicId={order.publicId} />}
 
         {/* Stop Receipts Section */}
         {order.publicId && <ReceiptSection orderPublicId={order.publicId} />}
 
-        {/* Trip Schedule */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              {t('orders:detail.trip_schedule', { defaultValue: 'Trip Schedule' })}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {order.desiredPickupAt && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('orders:detail.pick_up_by', { defaultValue: 'Pick Up By' })}
-                </span>
-                <span className="font-medium">{formatDateTime(order.desiredPickupAt)}</span>
-              </div>
-            )}
-            {order.desiredDeliveryAt && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t('orders:detail.deliver_by', { defaultValue: 'Deliver By' })}
-                </span>
-                <span className="font-medium">{formatDateTime(order.desiredDeliveryAt)}</span>
-              </div>
-            )}
-            {orderStops.some((s) => s.completedAt) && (
-              <div className="space-y-2 border-t pt-3">
-                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                  {t('orders:detail.stop_completions', { defaultValue: 'Stop Completions' })}
-                </p>
-                {orderStops
-                  .filter((s) => s.completedAt)
-                  .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0))
-                  .map((stop, idx) => (
-                    <div key={stop.publicId || idx} className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        {stop.instructions ||
-                          t(`orders:stop_types.${stop.type}`, {
-                            defaultValue: capitalize(stop.type || 'stop'),
-                          })}
-                      </span>
-                      <span className="font-medium text-green-600">
-                        {formatDateTime(stop.completedAt!)}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            )}
-            {!order.desiredDeliveryAt &&
-              !order.desiredPickupAt &&
-              !orderStops.some((s) => s.completedAt) && (
-                <p className="text-muted-foreground text-center">
-                  {t('orders:detail.no_schedule', { defaultValue: 'No schedule set' })}
-                </p>
-              )}
-          </CardContent>
-        </Card>
+        {/* Order Activity */}
+        <OrderActivityCard order={order} />
 
         {/* Proof of Delivery */}
         {order.status === Enums.OrderStatus.COMPLETED && order.publicId && (

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderInvoices } from '@/hooks/invoices';
+import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { formatDate, formatCurrency } from '@/utils/format';
 import { Enums } from '@/data/app-enums';
 import { capitalize } from '@/utils/lang';
@@ -17,7 +18,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.mandados.test:60'
 
 interface InvoiceSectionProps {
   orderPublicId: string;
-  currencySymbol?: string;
 }
 
 function getTypeBadgeVariant(type?: string): 'default' | 'secondary' | 'destructive' | 'outline' {
@@ -42,14 +42,9 @@ const TYPE_LABEL_KEYS: Record<string, string> = {
   [Enums.InvoiceType.FinalReceipt]: 'statuses:final_receipt',
 };
 
-function InvoiceCard({
-  invoice,
-  currencySymbol,
-}: {
-  invoice: InvoiceData;
-  currencySymbol: string;
-}) {
+function InvoiceCard({ invoice }: { invoice: InvoiceData }) {
   const { t } = useTranslation();
+  const currencySymbol = useOrderCurrencySymbol(invoice.currencyCode);
   const docNumber =
     invoice.documentNumber ||
     `REC-${invoice.sequenceYear}-${String(invoice.sequenceNumber).padStart(4, '0')}`;
@@ -94,7 +89,7 @@ function InvoiceCard({
   );
 }
 
-export function InvoiceSection({ orderPublicId, currencySymbol = '₡' }: InvoiceSectionProps) {
+export function InvoiceSection({ orderPublicId }: InvoiceSectionProps) {
   const { t } = useTranslation();
   const { data: invoices, isLoading, error } = useOrderInvoices({ orderPublicId });
 
@@ -128,11 +123,7 @@ export function InvoiceSection({ orderPublicId, currencySymbol = '₡' }: Invoic
         ) : (
           <div className="space-y-4">
             {invoices.map((invoice) => (
-              <InvoiceCard
-                key={invoice.publicId || invoice.id}
-                invoice={invoice}
-                currencySymbol={currencySymbol}
-              />
+              <InvoiceCard key={invoice.publicId || invoice.id} invoice={invoice} />
             ))}
           </div>
         )}
