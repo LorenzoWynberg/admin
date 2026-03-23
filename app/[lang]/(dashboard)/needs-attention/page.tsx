@@ -56,6 +56,7 @@ export default function NeedsAttentionPage() {
     page: 1,
     perPage: 100,
     paymentStatus: Enums.PaymentStatus.UNPAID,
+    hasQuote: true,
     excludeTerminal: true,
   });
   const {
