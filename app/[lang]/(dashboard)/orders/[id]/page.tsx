@@ -230,7 +230,7 @@ export default function OrderDetailPage() {
               </Button>
             )}
           {order.status === Enums.OrderStatus.COMPLETED &&
-            order.paymentStatus === Enums.PaymentStatus.PAID &&
+            order.paymentStatus === Enums.PaymentStatus.AUTHORIZED &&
             !order.reconciledAt &&
             order.publicId &&
             order.currentQuote && (
@@ -741,7 +741,7 @@ export default function OrderDetailPage() {
                 {t('orders:detail.payment_status', { defaultValue: 'Payment Status' })}
               </span>
               <Badge
-                variant={order.paymentStatus === Enums.PaymentStatus.PAID ? 'default' : 'secondary'}
+                variant={order.paymentStatus === Enums.PaymentStatus.PAID || order.paymentStatus === Enums.PaymentStatus.AUTHORIZED ? 'default' : 'secondary'}
               >
                 {statusLabel(order.paymentStatus || Enums.PaymentStatus.UNPAID)}
               </Badge>

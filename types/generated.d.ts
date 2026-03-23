@@ -1340,11 +1340,8 @@ declare namespace App.Enums {
     UNPAID = 'unpaid',
     AUTHORIZED = 'authorized',
     PAID = 'paid',
-    REFUND_DUE = 'refund_due',
-    REFUNDED = 'refunded',
     SURCHARGE_DUE = 'surcharge_due',
-    PAID_IN_FULL = 'paid_in_full',
-    RECONCILED = 'reconciled',
+    REFUNDED = 'refunded',
     VOIDED = 'voided',
     CHARGEBACK = 'chargeback',
   }
