@@ -489,6 +489,7 @@ declare namespace App.Data.Order {
     cancelReason?: string | null;
     cancelFee?: number | null;
     totalPaid?: number;
+    hasFailedPayment?: boolean;
     user?: App.Data.User.UserData;
     business?: App.Data.Business.BusinessData | null;
     driver?: App.Data.Driver.DriverData | null;
