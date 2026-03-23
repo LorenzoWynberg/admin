@@ -56,15 +56,15 @@ function subscribeToEcho(callback: () => void) {
 }
 
 function updateEchoInstance(token: string | null) {
-  if (echoStore.token === token && echoStore.instance) {
+  if (echoStore.token === token && (echoStore.instance || !token)) {
     return; // No change needed
   }
 
   // Disconnect old instance
   echoStore.instance?.disconnect();
 
-  // Create new instance
-  echoStore.instance = createEcho(token);
+  // Only create Echo when authenticated — avoids 404 on /broadcasting/auth
+  echoStore.instance = token ? createEcho(token) : null;
   echoStore.token = token;
 
   // Snapshot listeners before notifying — prevents issues if Set is mutated during iteration
