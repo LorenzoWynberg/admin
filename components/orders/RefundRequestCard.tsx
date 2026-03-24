@@ -10,7 +10,9 @@ import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { PaymentStatusBadge } from './PaymentStatusBadge';
 import { getDateLocale } from '@/utils/format';
 import { actionLabel } from '@/utils/lang';
-import { Eye, Clock, Check } from 'lucide-react';
+import { formatCurrency } from '@/utils/format';
+import { useCurrencyList } from '@/hooks/currencies/useCurrencyList';
+import { Eye, Clock, Check, Building2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 type RefundRequestData = App.Data.RefundRequest.RefundRequestData;
@@ -26,8 +28,15 @@ export function RefundRequestCard({ refundRequest }: RefundRequestCardProps) {
 
   const order = refundRequest.order;
   const user = refundRequest.user;
+  const business = order?.business;
   const orderPublicId = order?.publicId ?? '';
   const reason = refundRequest.reason ?? '';
+  const { data: currencyListData } = useCurrencyList();
+  const currencySymbol =
+    currencyListData?.items?.find((c) => c.code === order?.currencyCode)?.symbol ||
+    currencyListData?.items?.find((c) => c.isBase)?.symbol ||
+    '₡';
+  const totalPaid = order?.totalPaid;
 
   const createdAgo = refundRequest.createdAt
     ? formatDistanceToNow(new Date(refundRequest.createdAt as string), {
@@ -54,6 +63,17 @@ export function RefundRequestCard({ refundRequest }: RefundRequestCardProps) {
         </div>
         <div className="text-muted-foreground flex flex-wrap gap-x-3 text-sm">
           {user && <span>{user.name}</span>}
+          {business && (
+            <span className="flex items-center gap-1">
+              <Building2 className="h-3.5 w-3.5" />
+              {business.name}
+            </span>
+          )}
+          {totalPaid != null && totalPaid > 0 && (
+            <span className="font-medium text-red-600">
+              {formatCurrency(totalPaid, currencySymbol)}
+            </span>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-3">

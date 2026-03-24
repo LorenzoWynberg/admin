@@ -16,7 +16,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
-import { RefreshCw, AlertTriangle, Eye } from 'lucide-react';
+import { RefreshCw, AlertTriangle, Eye, Clock, User, Building2 } from 'lucide-react';
+import { formatDateTime } from '@/utils/format';
 import { Enums } from '@/data/app-enums';
 import { actionLabel } from '@/utils/lang';
 
@@ -260,9 +261,23 @@ export default function NeedsAttentionPage() {
                       />
                       <PaymentStatusBadge status={order.paymentStatus} />
                     </div>
-                    <div className="text-muted-foreground flex flex-wrap gap-x-3 text-sm">
-                      {order.user && <span>{order.user.name}</span>}
-                      {order.business && <span>{order.business.name}</span>}
+                    <div className="text-muted-foreground mt-1 flex flex-col gap-1 text-sm">
+                      {order.user && (
+                        <span className="flex items-center gap-1">
+                          <User className="h-3.5 w-3.5" />
+                          {order.user.name}
+                        </span>
+                      )}
+                      {order.business && (
+                        <span className="flex items-center gap-1">
+                          <Building2 className="h-3.5 w-3.5" />
+                          {order.business.name}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5" />
+                        {formatDateTime(order.createdAt)}
+                      </span>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -308,9 +323,23 @@ export default function NeedsAttentionPage() {
                       />
                       <PaymentStatusBadge status={order.paymentStatus} />
                     </div>
-                    <div className="text-muted-foreground flex flex-wrap gap-x-3 text-sm">
-                      {order.user && <span>{order.user.name}</span>}
-                      {order.business && <span>{order.business.name}</span>}
+                    <div className="text-muted-foreground mt-1 flex flex-col gap-1 text-sm">
+                      {order.user && (
+                        <span className="flex items-center gap-1">
+                          <User className="h-3.5 w-3.5" />
+                          {order.user.name}
+                        </span>
+                      )}
+                      {order.business && (
+                        <span className="flex items-center gap-1">
+                          <Building2 className="h-3.5 w-3.5" />
+                          {order.business.name}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5" />
+                        {formatDateTime(order.createdAt)}
+                      </span>
                     </div>
                   </CardHeader>
                   <CardContent>
