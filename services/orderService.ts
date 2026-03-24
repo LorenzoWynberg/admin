@@ -145,6 +145,14 @@ export const OrderService = {
   },
 
   /**
+   * Retry auto-dispatch for an unassigned order (admin only)
+   */
+  async retryDispatch(publicId: string): Promise<OrderData> {
+    const response = await api.post<Single<OrderData>>(`/orders/${publicId}/dispatch`);
+    return response.item;
+  },
+
+  /**
    * Get orders needing admin attention (admin only)
    */
   async getNeedsAttention(): Promise<NeedsAttentionResponse> {

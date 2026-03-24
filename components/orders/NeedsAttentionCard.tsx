@@ -14,11 +14,11 @@ import { UrgencyBadge } from './UrgencyBadge';
 import { PaymentStatusBadge } from './PaymentStatusBadge';
 import { ReasonBadge } from './ReasonBadge';
 import { CancelOrderDialog } from './CancelOrderDialog';
-import { useChangeTier, useOutsourceOrder } from '@/hooks/orders';
+import { useChangeTier, useOutsourceOrder, useRetryDispatch } from '@/hooks/orders';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Enums } from '@/data/app-enums';
 import { actionLabel, capitalize } from '@/utils/lang';
-import { MessageSquare, FileText, Truck, Eye } from 'lucide-react';
+import { MessageSquare, FileText, Truck, Eye, RefreshCw } from 'lucide-react';
 import type { NeedsAttentionOrder } from '@/services/orderService';
 
 interface NeedsAttentionCardProps {
@@ -30,6 +30,7 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
   const router = useLocalizedRouter();
   const changeTier = useChangeTier();
   const outsource = useOutsourceOrder();
+  const retryDispatch = useRetryDispatch();
 
   const { order, urgency, reason, outsourceEligible, hoursUntilWindowEnd } = item;
 
@@ -121,6 +122,16 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
           >
             <FileText className="mr-1 h-4 w-4" />
             {t('detail.view_quote', { defaultValue: 'New Quote' })}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={retryDispatch.isPending}
+            onClick={() => retryDispatch.mutate(order.publicId as string)}
+          >
+            <RefreshCw className={`mr-1 h-4 w-4 ${retryDispatch.isPending ? 'animate-spin' : ''}`} />
+            {t('needs_attention.retry_dispatch', { defaultValue: 'Retry' })}
           </Button>
 
           <Button

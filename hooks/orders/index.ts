@@ -6,6 +6,7 @@ export { useUpdateStop } from './useUpdateStop';
 export { useCreateStop } from './useCreateStop';
 export { useChangeTier } from './useChangeTier';
 export { useOutsourceOrder } from './useOutsourceOrder';
+export { useRetryDispatch } from './useRetryDispatch';
 export { useNeedsAttention, useCancelOrder } from './useNeedsAttention';
 export { useNeedsAttentionBroadcast } from './useNeedsAttentionBroadcast';
 export { useReconcileOrder } from './useReconcileOrder';
