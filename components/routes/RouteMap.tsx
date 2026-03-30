@@ -3,6 +3,7 @@
 import { useMemo, useCallback, useEffect, useRef } from 'react';
 import { APIProvider, Map, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import { StopMarker } from './StopMarker';
+import { resolveStopAddress } from '@/utils/routes';
 import type { UnassignedStop } from '@/services/routeService';
 
 type RouteStopData = App.Data.Route.RouteStopData;
@@ -104,12 +105,18 @@ function MapContent({
 
   const routeMarkers = useMemo(() => {
     return routeStops
-      .filter((stop) => {
-        const addr = stop.type === 'pickup' ? stop.order?.fromAddress : stop.order?.toAddress;
-        return addr?.latitude && addr?.longitude;
-      })
       .map((stop) => {
-        const addr = stop.type === 'pickup' ? stop.order?.fromAddress : stop.order?.toAddress;
+        const orderStops = (stop.order?.stops ?? []) as App.Data.Order.OrderStopData[];
+        const addr = resolveStopAddress(
+          stop.type,
+          orderStops,
+          stop.order?.deliveryAddress,
+          stop.orderStopId
+        );
+        return { stop, addr };
+      })
+      .filter(({ addr }) => addr?.latitude && addr?.longitude)
+      .map(({ stop, addr }) => {
         return {
           id: stop.id,
           lat: addr!.latitude,
@@ -130,12 +137,13 @@ function MapContent({
 
   const unassignedMarkers = useMemo(() => {
     return unassignedStops
-      .filter((stop) => {
-        const addr = stop.stopType === 'pickup' ? stop.order.fromAddress : stop.order.toAddress;
-        return addr?.latitude && addr?.longitude;
-      })
       .map((stop) => {
-        const addr = stop.stopType === 'pickup' ? stop.order.fromAddress : stop.order.toAddress;
+        const orderStops = (stop.order.stops ?? []) as App.Data.Order.OrderStopData[];
+        const addr = resolveStopAddress(stop.stopType, orderStops, stop.order.deliveryAddress);
+        return { stop, addr };
+      })
+      .filter(({ addr }) => addr?.latitude && addr?.longitude)
+      .map(({ stop, addr }) => {
         const key = `${stop.order.publicId}-${stop.stopType}`;
         return {
           key,

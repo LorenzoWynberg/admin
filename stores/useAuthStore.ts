@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { Enums } from '@/data/app-enums';
 
 type UserData = App.Data.User.UserData;
 
@@ -68,7 +69,7 @@ export const useAuthStore = create<AuthStore>()(
 
         isAuthenticated: () => !!get().token,
 
-        isAdmin: () => get().user?.role === 'admin',
+        isAdmin: () => get().user?.role === Enums.Role.ADMIN,
       }),
       {
         name: 'admin-auth-storage',

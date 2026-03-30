@@ -7,6 +7,7 @@ import {
   resourceMessage,
   validationAttribute,
 } from '@/utils/lang';
+import { Enums } from '@/data/app-enums';
 import { formatDate } from '@/utils/format';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -91,7 +92,7 @@ export default function QuoteDetailPage() {
     );
   }
 
-  const isDraft = quote.status === 'draft';
+  const isDraft = quote.status === Enums.QuoteStatus.DRAFT;
   const canSend = isDraft;
   const canDelete = isDraft;
   const baseCurrency = currencies?.items?.find((c) => c.isBase);

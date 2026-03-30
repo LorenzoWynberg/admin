@@ -12,7 +12,8 @@ import {
 import { FileText, Send, Loader2, Pencil, Clock, AlertTriangle } from 'lucide-react';
 
 import { FeasibilityBadge } from './FeasibilityBadge';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { QuoteLineItemsEditor, type QuoteLineItem } from '@/components/quotes/QuoteLineItemsEditor';
 import { useFeasibilityCheck } from '@/hooks/feasibility';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrencyList } from '@/hooks/currencies';
 import { useCalculatePricing } from '@/hooks/pricing';
 import { useCreateQuote, useSendQuote } from '@/hooks/quotes';
+import { useCalculateDistance, useChangeTier } from '@/hooks/orders';
 import { actionLabel, validationAttribute } from '@/utils/lang';
 import {
   formatCurrency,
@@ -31,6 +33,7 @@ import {
   formatDateTime,
 } from '@/utils/format';
 import { formatRateDisplay } from '@/utils/currency';
+import { Enums } from '@/data/app-enums';
 
 interface CreateQuoteDialogProps {
   orderId: number;
@@ -43,6 +46,8 @@ interface CreateQuoteDialogProps {
   windowStart?: string | null;
   windowEnd?: string | null;
   timeSensitive?: boolean;
+  deliveryTier?: string;
+  orderStops?: App.Data.Order.OrderStopData[];
 }
 
 export function CreateQuoteDialog({
@@ -56,12 +61,15 @@ export function CreateQuoteDialog({
   windowStart,
   windowEnd,
   timeSensitive = false,
+  deliveryTier,
+  orderStops = [],
 }: CreateQuoteDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [editingTimes, setEditingTimes] = useState(false);
   const createQuote = useCreateQuote();
   const sendQuote = useSendQuote();
+  const calculateDistance = useCalculateDistance();
 
   // Fetch feasibility when dialog is open
   const { data: feasibility, isLoading: feasibilityLoading } = useFeasibilityCheck({
@@ -79,6 +87,7 @@ export function CreateQuoteDialog({
       timeFee: '',
       surcharge: '',
       discountRate: '',
+      cancellationFee: '',
       notes: '',
       pickupProposedFor: toDateTimeLocal(pickup),
       deliveryProposedFor: toDateTimeLocal(delivery),
@@ -86,6 +95,7 @@ export function CreateQuoteDialog({
   };
 
   const [formData, setFormData] = useState(getDefaultFormData);
+  const [items, setItems] = useState<QuoteLineItem[]>([]);
 
   // Compute effective proposed times: feasibility suggestions override defaults when not editing
   const effectivePickup =
@@ -98,11 +108,30 @@ export function CreateQuoteDialog({
       ? toDateTimeLocal(new Date(feasibility.suggestedDelivery))
       : formData.deliveryProposedFor;
 
+  // Auto-calculate distance when dialog opens if not yet calculated
+  useEffect(() => {
+    if (open && !orderDistanceKm && !calculateDistance.isPending) {
+      calculateDistance.mutate(orderPublicId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  // Update form distance when calculation completes
+  useEffect(() => {
+    if (calculateDistance.data?.totalDistanceKm) {
+      setFormData((prev) => ({
+        ...prev,
+        distanceKm: calculateDistance.data!.totalDistanceKm!.toString(),
+      }));
+    }
+  }, [calculateDistance.data]);
+
   // Reset form with fresh defaults when dialog opens
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
       setFormData(getDefaultFormData());
       setEditingTimes(false);
+      setItems([]);
     }
     setOpen(isOpen);
   };
@@ -124,7 +153,13 @@ export function CreateQuoteDialog({
     ? currencies.find((c) => c.code === customerCurrencyCode)
     : null;
 
-  // Calculate totals with adjustments
+  // Calculate line items total
+  const itemsTotal = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
+    [items]
+  );
+
+  // Calculate totals with adjustments (includes line items)
   const calculation = useMemo(() => {
     if (!pricing) return null;
 
@@ -133,7 +168,7 @@ export function CreateQuoteDialog({
     const discountRate = (parseFloat(formData.discountRate) || 0) / 100;
 
     const subtotalBeforeAdjustments = pricing.subtotal;
-    const subtotalWithAdjustments = subtotalBeforeAdjustments + timeFee + surcharge;
+    const subtotalWithAdjustments = subtotalBeforeAdjustments + timeFee + surcharge + itemsTotal;
     const discountAmount = subtotalWithAdjustments * discountRate;
     const afterDiscount = subtotalWithAdjustments - discountAmount;
     const tax = afterDiscount * pricing.taxRate;
@@ -153,7 +188,7 @@ export function CreateQuoteDialog({
       tax,
       total,
     };
-  }, [pricing, formData.timeFee, formData.surcharge, formData.discountRate]);
+  }, [pricing, formData.timeFee, formData.surcharge, formData.discountRate, itemsTotal]);
 
   // Calculate customer currency conversion
   const customerConversion = (() => {
@@ -189,15 +224,33 @@ export function CreateQuoteDialog({
       return;
     }
 
-    const data = {
+    // Map stopPublicId to orderStopId (numeric)
+    const stopIdMap = new Map(
+      orderStops.filter((s) => s.publicId && s.id).map((s) => [s.publicId!, s.id!])
+    );
+
+    const mappedItems = items
+      .filter((item) => item.label.trim())
+      .map((item) => ({
+        orderStopId: item.stopPublicId ? (stopIdMap.get(item.stopPublicId) ?? null) : null,
+        label: item.label.trim(),
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      }));
+
+    const data: App.Data.Quote.StoreQuoteData = {
       orderId,
       distanceKm,
       timeFee: formData.timeFee ? parseFloat(formData.timeFee) : null,
       surcharge: formData.surcharge ? parseFloat(formData.surcharge) : null,
       discountRate: formData.discountRate ? parseFloat(formData.discountRate) / 100 : null,
+      cancellationFee: formData.cancellationFee ? parseFloat(formData.cancellationFee) : null,
       notes: formData.notes || undefined,
       pickupProposedFor: dateTimeLocalToISO(effectivePickup),
       deliveryProposedFor: dateTimeLocalToISO(effectiveDelivery),
+      ...(mappedItems.length > 0 && {
+        items: Object.fromEntries(mappedItems.map((item, idx) => [idx, item])),
+      }),
     };
 
     createQuote.mutate(data, {
@@ -225,7 +278,7 @@ export function CreateQuoteDialog({
           {t('quotes:create.button', { defaultValue: 'Create Quote' })}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>
             {t('quotes:create.title', {
@@ -253,6 +306,11 @@ export function CreateQuoteDialog({
                 level={feasibility.level}
                 candidateCount={feasibility.candidates?.length || 0}
               />
+              {feasibility.level === Enums.FeasibilityLevel.Red &&
+                deliveryTier &&
+                deliveryTier !== Enums.DeliveryTier.Cheapest && (
+                  <TierAdjustmentCallout currentTier={deliveryTier} orderPublicId={orderPublicId} />
+                )}
             </div>
           ) : null}
         </DialogHeader>
@@ -328,6 +386,7 @@ export function CreateQuoteDialog({
                   {/* Adjustments section */}
                   {(calculation.timeFee > 0 ||
                     calculation.surcharge > 0 ||
+                    itemsTotal > 0 ||
                     calculation.discountAmount > 0) && (
                     <>
                       <div className="border-border border-t" />
@@ -349,6 +408,16 @@ export function CreateQuoteDialog({
                             </span>
                             <span className="text-right">
                               {formatCurrency(calculation.surcharge, baseSymbol)}
+                            </span>
+                          </>
+                        )}
+                        {itemsTotal > 0 && (
+                          <>
+                            <span className="text-muted-foreground">
+                              + {t('quotes:items.items_total', { defaultValue: 'Items Total' })}:
+                            </span>
+                            <span className="text-right">
+                              {formatCurrency(itemsTotal, baseSymbol)}
                             </span>
                           </>
                         )}
@@ -381,6 +450,18 @@ export function CreateQuoteDialog({
                       {formatCurrency(calculation.total, baseSymbol)}
                     </span>
                   </div>
+
+                  {/* Cancellation Fee Info */}
+                  {parseFloat(formData.cancellationFee || '0') > 0 && (
+                    <div className="grid grid-cols-2 gap-1 text-sm text-amber-700 dark:text-amber-400">
+                      <span>
+                        {t('quotes:cancellation_fee', { defaultValue: 'Cancellation Fee' })}:
+                      </span>
+                      <span className="text-right">
+                        {formatCurrency(parseFloat(formData.cancellationFee), baseSymbol)}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Customer Currency Conversion */}
                   {customerConversion && (
@@ -464,6 +545,29 @@ export function CreateQuoteDialog({
           </div>
 
           <div className="grid gap-2">
+            <Label htmlFor="cancellationFee">
+              {t('quotes:cancellation_fee', { defaultValue: 'Cancellation Fee' })} ({baseSymbol})
+            </Label>
+            <Input
+              id="cancellationFee"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder={calculation ? (calculation.total * 0.2).toFixed(2) : '0.00'}
+              value={formData.cancellationFee}
+              onChange={(e) => handleChange('cancellationFee', e.target.value)}
+            />
+            {calculation && parseFloat(formData.cancellationFee || '0') > 0 && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {t('quotes:cancellation_fee_info', {
+                  defaultValue:
+                    'This fee will be charged to the customer if they cancel after payment.',
+                })}
+              </p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
             <Label htmlFor="notes">{validationAttribute('notes', true)}</Label>
             <Textarea
               id="notes"
@@ -474,6 +578,24 @@ export function CreateQuoteDialog({
               onChange={(e) => handleChange('notes', e.target.value)}
             />
           </div>
+
+          {/* Line Items Editor */}
+          <QuoteLineItemsEditor
+            stops={orderStops}
+            items={items}
+            onItemsChange={setItems}
+            currencySymbol={baseSymbol}
+          />
+
+          {/* Items Total Preview */}
+          {itemsTotal > 0 && (
+            <div className="flex justify-between rounded-lg border px-3 py-2 text-sm">
+              <span className="text-muted-foreground">
+                {t('quotes:items.items_total', { defaultValue: 'Items Total' })}
+              </span>
+              <span className="font-medium">{formatCurrency(itemsTotal, baseSymbol)}</span>
+            </div>
+          )}
 
           {/* Delivery Window or Time-Sensitive Constraints */}
           {timeSensitive && customerDesiredPickup ? (
@@ -652,5 +774,71 @@ export function CreateQuoteDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function TierAdjustmentCallout({
+  currentTier,
+  orderPublicId,
+}: {
+  currentTier: string;
+  orderPublicId: string;
+}) {
+  const { t } = useTranslation();
+  const changeTier = useChangeTier();
+
+  const tierLabel = (tier: string) => t(`orders:tiers.${tier}`, { defaultValue: tier });
+
+  const tierOptions: { value: string; hours: number }[] = [];
+  if (currentTier === Enums.DeliveryTier.Expedited) {
+    tierOptions.push(
+      { value: Enums.DeliveryTier.Regular, hours: 24 },
+      { value: Enums.DeliveryTier.Cheapest, hours: 72 }
+    );
+  } else if (currentTier === Enums.DeliveryTier.Regular) {
+    tierOptions.push({ value: Enums.DeliveryTier.Cheapest, hours: 72 });
+  }
+
+  if (tierOptions.length === 0) return null;
+
+  return (
+    <div className="mt-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950">
+      <div className="flex items-start gap-2">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+        <div className="space-y-2">
+          <p className="text-sm text-amber-800 dark:text-amber-300">
+            {t('quotes:feasibility.no_drivers_for_tier', {
+              tier: tierLabel(currentTier),
+              defaultValue: `No drivers available for ${tierLabel(currentTier)}`,
+            })}
+          </p>
+          <p className="text-muted-foreground text-xs">
+            {t('quotes:feasibility.try_longer_window', {
+              defaultValue: 'Try a longer window:',
+            })}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {tierOptions.map((opt) => (
+              <Button
+                key={opt.value}
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs"
+                disabled={changeTier.isPending}
+                onClick={() =>
+                  changeTier.mutate({ publicId: orderPublicId, deliveryTier: opt.value })
+                }
+              >
+                {t('quotes:feasibility.change_to_tier', {
+                  tier: tierLabel(opt.value),
+                  hours: `${opt.hours}h`,
+                  defaultValue: `Change to ${tierLabel(opt.value)} (${opt.hours}h)`,
+                })}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

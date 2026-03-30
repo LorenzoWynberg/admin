@@ -5,16 +5,6 @@ import { useEcho } from '@/providers/EchoProvider';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useNotificationHelpers, type NotifData } from './useNotificationHelpers';
 
-interface BroadcastNotification {
-  id: string;
-  type: string;
-  action: string;
-  model: string;
-  modelId: number | null;
-  modelName: string | null;
-  catalogId?: number | null;
-}
-
 /**
  * Listen for notification broadcasts and show toast + refresh notifications.
  * Uses the private 'notifications' channel for all authenticated users.
@@ -36,13 +26,16 @@ export function useNotificationBroadcast() {
 
     const channel = echo.private('notifications');
 
-    channel.notification((notification: BroadcastNotification) => {
+    channel.notification((notification: Api.Broadcast.AnyNotification) => {
       const data: NotifData = {
         action: notification.action,
         model: notification.model,
-        modelId: notification.modelId,
-        modelName: notification.modelName,
-        catalogId: notification.catalogId,
+        modelId: 'modelId' in notification ? notification.modelId : undefined,
+        modelName: 'modelName' in notification ? notification.modelName : undefined,
+        modelPublicId: 'modelPublicId' in notification ? notification.modelPublicId : undefined,
+        catalogId: 'catalogId' in notification ? notification.catalogId : undefined,
+        translationKey: notification.translationKey,
+        translationParams: notification.translationParams,
       };
 
       // Show toast notification

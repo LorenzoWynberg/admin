@@ -29,11 +29,11 @@ const ADMIN_SETTABLE_STATUSES = [
 ];
 
 const statusStyles: Record<string, string> = {
-  draft: 'text-gray-700',
-  scheduled: 'text-blue-700',
-  in_progress: 'text-orange-700',
-  completed: 'text-green-700',
-  cancelled: 'text-red-700',
+  [Enums.RouteStatus.DRAFT]: 'text-gray-700',
+  [Enums.RouteStatus.SCHEDULED]: 'text-blue-700',
+  [Enums.RouteStatus.IN_PROGRESS]: 'text-orange-700',
+  [Enums.RouteStatus.COMPLETED]: 'text-green-700',
+  [Enums.RouteStatus.CANCELLED]: 'text-red-700',
 };
 
 const LOCKED_STOP_STATUSES = new Set<string>([

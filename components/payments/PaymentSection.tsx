@@ -7,17 +7,18 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderPayments } from '@/hooks/payments';
+import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { RefundDialog } from './RefundDialog';
 import { formatDate, formatCurrency } from '@/utils/format';
-import { capitalize } from '@/utils/lang';
+import { capitalize, statusLabel } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
 import type { TFunction } from 'i18next';
 
 type PaymentData = App.Data.Payment.PaymentData;
+type RefundData = App.Data.Payment.RefundData;
 
 interface PaymentSectionProps {
   orderPublicId: string;
-  currencySymbol?: string;
 }
 
 function getStatusBadgeVariant(
@@ -30,6 +31,7 @@ function getStatusBadgeVariant(
     case Enums.TransactionStatus.Authorized:
       return 'secondary';
     case Enums.TransactionStatus.Failed:
+    case Enums.TransactionStatus.Voided:
       return 'destructive';
     default:
       return 'outline';
@@ -57,15 +59,36 @@ function getPaymentMethodLabel(
   }
 }
 
-function PaymentCard({
-  payment,
-  currencySymbol,
-}: {
-  payment: PaymentData;
-  currencySymbol: string;
-}) {
+function RefundCard({ refund }: { refund: RefundData }) {
+  const currencySymbol = useOrderCurrencySymbol(refund.currencyCode);
+
+  return (
+    <div className="bg-destructive/5 flex items-center justify-between rounded-md border border-red-200 px-3 py-2">
+      <div className="space-y-0.5">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs">{refund.publicId}</span>
+          <Badge variant="outline">{statusLabel('refunded')}</Badge>
+        </div>
+        {refund.reason && <p className="text-muted-foreground text-xs">{refund.reason}</p>}
+      </div>
+      <div className="text-right">
+        <p className="text-destructive text-sm font-semibold">
+          -{formatCurrency(refund.amount || 0, currencySymbol)}
+        </p>
+        {refund.refundedAt && (
+          <p className="text-muted-foreground text-xs">{formatDate(refund.refundedAt)}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PaymentCard({ payment }: { payment: PaymentData }) {
   const { t } = useTranslation();
-  const canRefund = payment.status === Enums.TransactionStatus.Succeeded;
+  const currencySymbol = useOrderCurrencySymbol(payment.currencyCode);
+  const refundableAmount = (payment.amount || 0) - (payment.totalRefunded || 0);
+  const canRefund = payment.status === Enums.TransactionStatus.Succeeded && refundableAmount > 0;
+  const isAuthorized = payment.status === Enums.TransactionStatus.Authorized;
 
   return (
     <div className="bg-muted/30 rounded-lg border p-4">
@@ -74,9 +97,7 @@ function PaymentCard({
           <div className="flex items-center gap-2">
             <span className="font-mono text-sm">{payment.publicId}</span>
             <Badge variant={getStatusBadgeVariant(payment.status)}>
-              {t(`statuses:${payment.status || 'pending'}`, {
-                defaultValue: capitalize(payment.status || 'pending'),
-              })}
+              {statusLabel(payment.status || Enums.TransactionStatus.Pending)}
             </Badge>
           </div>
           <p className="text-muted-foreground text-xs">
@@ -86,13 +107,36 @@ function PaymentCard({
           </p>
         </div>
         <div className="text-right">
-          <p className="text-lg font-semibold">
-            {formatCurrency(payment.amount || 0, currencySymbol)}
-          </p>
-          {payment.paidAt && (
-            <p className="text-muted-foreground text-xs">
-              {t('payments:paid_at', { defaultValue: 'Paid' })} {formatDate(payment.paidAt)}
-            </p>
+          {isAuthorized ? (
+            <>
+              <p className="text-lg font-semibold">
+                {t('payments:authorized_amount')}:{' '}
+                {formatCurrency(payment.amount || 0, currencySymbol)}
+              </p>
+              {payment.authExpiresAt && (
+                <p className="text-muted-foreground text-xs">
+                  {t('payments:auth_expires')} {formatDate(payment.authExpiresAt)}
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="text-lg font-semibold">
+                {payment.capturedAmount != null ? (
+                  <>
+                    {t('payments:captured_amount')}:{' '}
+                    {formatCurrency(payment.capturedAmount, currencySymbol)}
+                  </>
+                ) : (
+                  formatCurrency(payment.amount || 0, currencySymbol)
+                )}
+              </p>
+              {payment.paidAt && (
+                <p className="text-muted-foreground text-xs">
+                  {t('payments:paid_at', { defaultValue: 'Paid' })} {formatDate(payment.paidAt)}
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -119,16 +163,31 @@ function PaymentCard({
               </a>
             </Button>
           )}
-          {canRefund && <RefundDialog payment={payment} currencySymbol={currencySymbol} />}
+          {canRefund && <RefundDialog payment={payment} />}
         </div>
       </div>
+
+      {/* Refunds */}
+      {payment.refunds && payment.refunds.length > 0 && (
+        <div className="mt-3 border-t pt-3">
+          <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
+            {capitalize(t('models:refund', { count: 2, defaultValue: 'Refunds' }))}
+          </p>
+          <div className="space-y-2">
+            {payment.refunds.map((refund) => (
+              <RefundCard key={refund.publicId || refund.id} refund={refund} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export function PaymentSection({ orderPublicId, currencySymbol = '$' }: PaymentSectionProps) {
+export function PaymentSection({ orderPublicId }: PaymentSectionProps) {
   const { t } = useTranslation();
   const { data: payments, isLoading, error } = useOrderPayments({ orderPublicId });
+  const summaryCurrencySymbol = useOrderCurrencySymbol(payments?.[0]?.currencyCode);
 
   return (
     <Card>
@@ -157,11 +216,7 @@ export function PaymentSection({ orderPublicId, currencySymbol = '$' }: PaymentS
         ) : (
           <div className="space-y-4">
             {payments.map((payment) => (
-              <PaymentCard
-                key={payment.publicId || payment.id}
-                payment={payment}
-                currencySymbol={currencySymbol}
-              />
+              <PaymentCard key={payment.publicId || payment.id} payment={payment} />
             ))}
 
             {/* Summary */}
@@ -174,7 +229,7 @@ export function PaymentSection({ orderPublicId, currencySymbol = '$' }: PaymentS
                       payments
                         .filter((p) => p.status === Enums.TransactionStatus.Succeeded)
                         .reduce((sum, p) => sum + (p.amount || 0), 0),
-                      currencySymbol
+                      summaryCurrencySymbol
                     )}
                   </span>
                 </div>

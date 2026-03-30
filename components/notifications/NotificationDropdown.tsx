@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { capitalize, modelLabel } from '@/utils/lang';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useNotifications, useNotificationMutations } from '@/hooks/notifications';
 import { NotificationItem } from './NotificationItem';
@@ -52,7 +51,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
         )}
       </div>
 
-      <ScrollArea className="h-80">
+      <div className="max-h-80 overflow-y-auto">
         {isLoading ? (
           <div className="flex items-center justify-center p-8">
             <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
@@ -71,7 +70,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
             />
           ))
         )}
-      </ScrollArea>
+      </div>
 
       <div className="border-t p-2">
         <Button

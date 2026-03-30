@@ -1,7 +1,7 @@
 'use client';
 
-import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
+import { statusLabel } from '@/utils/lang';
 
 type QuoteStatus = App.Enums.QuoteStatus;
 
@@ -19,10 +19,8 @@ interface QuoteStatusBadgeProps {
 }
 
 export function QuoteStatusBadge({ status }: QuoteStatusBadgeProps) {
-  const { t } = useTranslation();
-
   const variant = statusVariants[status] || 'outline';
-  const label = t(`statuses:${status}`, { defaultValue: status });
+  const label = statusLabel(status);
 
   return <Badge variant={variant}>{label}</Badge>;
 }

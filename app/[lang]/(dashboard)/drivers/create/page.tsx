@@ -12,7 +12,7 @@ import { useCreateDriver } from '@/hooks/drivers';
 import { CatalogService } from '@/services/catalogService';
 import { UploadService } from '@/services/uploadService';
 import { applyApiErrorsToForm } from '@/utils/form';
-import { validationAttribute, capitalize, modelLabel, actionLabel } from '@/utils/lang';
+import { actionLabel, validationAttribute, capitalize, modelLabel } from '@/utils/lang';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -265,9 +265,7 @@ export default function CreateDriverPage() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue
-                              placeholder={t('common:select', { defaultValue: 'Select...' })}
-                            />
+                            <SelectValue placeholder={actionLabel('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -289,13 +287,11 @@ export default function CreateDriverPage() {
                 name="user.langCode"
                 render={({ field }) => (
                   <FormItem className="max-w-xs">
-                    <FormLabel>{validationAttribute('language', true)}</FormLabel>
+                    <FormLabel>{validationAttribute('langCode', true)}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue
-                            placeholder={t('common:select', { defaultValue: 'Select...' })}
-                          />
+                          <SelectValue placeholder={actionLabel('select')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -470,7 +466,7 @@ export default function CreateDriverPage() {
           {/* Actions */}
           <div className="flex justify-end gap-4">
             <Button type="button" variant="outline" onClick={() => router.back()}>
-              {t('common:cancel', { defaultValue: 'Cancel' })}
+              {actionLabel('cancel')}
             </Button>
             <Button type="submit" disabled={createMutation.isPending || isUploading}>
               {createMutation.isPending

@@ -7,6 +7,9 @@
  * - Live rate for pending records
  */
 
+import { extractDatePart } from '@/utils/format';
+import { Enums } from '@/data/app-enums';
+
 export interface ConversionResult {
   /** Converted amount in target currency */
   amount: number;
@@ -49,7 +52,7 @@ export function getConversionRate(options: {
 
   // For finalized records, try to use historical rate
   if (isFinalized && createdAt && ratesMap) {
-    const date = createdAt.split('T')[0];
+    const date = extractDatePart(createdAt);
     const historicalRate = ratesMap[date];
     if (historicalRate && historicalRate > 0) {
       return { rate: historicalRate, isHistorical: true, rateDate: date };
@@ -92,7 +95,7 @@ export function convertToCustomerCurrency(options: ConversionOptions): Conversio
  * Unpaid records show the current live rate.
  */
 export function shouldUseHistoricalRate(record: { paymentStatus?: string }): boolean {
-  return record.paymentStatus === 'paid';
+  return record.paymentStatus === Enums.PaymentStatus.PAID;
 }
 
 /**

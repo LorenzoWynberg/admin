@@ -30,7 +30,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { applyApiErrorsToForm } from '@/utils/form';
-import { resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
 
 const tierSchema = z.object({
@@ -49,6 +49,9 @@ const formSchema = z.object({
     Enums.PricingCalculationMode.DISCRETE,
     Enums.PricingCalculationMode.CUMULATIVE,
   ]),
+  expeditedMultiplier: z.number().min(0.01),
+  regularMultiplier: z.number().min(0.01),
+  cheapestMultiplier: z.number().min(0.01),
   notes: z.string().nullable(),
   tiers: z.array(tierSchema),
 });
@@ -71,6 +74,9 @@ export default function EditPricingRulePage() {
       serviceFee: 0,
       taxRate: 0,
       calculationMode: Enums.PricingCalculationMode.DISCRETE,
+      expeditedMultiplier: 1.5,
+      regularMultiplier: 1.0,
+      cheapestMultiplier: 0.7,
       notes: null,
       tiers: [],
     },
@@ -89,6 +95,9 @@ export default function EditPricingRulePage() {
         serviceFee: rule.serviceFee || 0,
         taxRate: rule.taxRate || 0,
         calculationMode: rule.calculationMode || Enums.PricingCalculationMode.DISCRETE,
+        expeditedMultiplier: rule.expeditedMultiplier ?? 1.5,
+        regularMultiplier: rule.regularMultiplier ?? 1.0,
+        cheapestMultiplier: rule.cheapestMultiplier ?? 0.7,
         notes: rule.notes || null,
         tiers:
           rule.tiers?.map((tier, index) => ({
@@ -111,6 +120,9 @@ export default function EditPricingRulePage() {
           serviceFee: values.serviceFee,
           taxRate: values.taxRate,
           calculationMode: values.calculationMode as App.Enums.PricingCalculationMode,
+          expeditedMultiplier: values.expeditedMultiplier,
+          regularMultiplier: values.regularMultiplier,
+          cheapestMultiplier: values.cheapestMultiplier,
           notes: values.notes,
           tiers: values.tiers.map((tier, index) => ({
             minKm: tier.minKm,
@@ -127,6 +139,9 @@ export default function EditPricingRulePage() {
         service_fee: 'serviceFee',
         tax_rate: 'taxRate',
         calculation_mode: 'calculationMode',
+        expedited_multiplier: 'expeditedMultiplier',
+        regular_multiplier: 'regularMultiplier',
+        cheapest_multiplier: 'cheapestMultiplier',
       });
     }
   };
@@ -279,6 +294,59 @@ export default function EditPricingRulePage() {
             </CardContent>
           </Card>
 
+          {/* Delivery Tier Multipliers */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('delivery_tier_multipliers')}</CardTitle>
+              <p className="text-muted-foreground text-sm">{t('delivery_tier_multipliers_help')}</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <FormField
+                  control={form.control}
+                  name="expeditedMultiplier"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('expedited_multiplier')}</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" min="0.01" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="regularMultiplier"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('regular_multiplier')}</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" min="0.01" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="cheapestMultiplier"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('cheapest_multiplier')}</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" min="0.01" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Tiers */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -414,12 +482,12 @@ export default function EditPricingRulePage() {
           {/* Actions */}
           <div className="flex justify-end gap-4">
             <Button type="button" variant="outline" onClick={() => router.back()}>
-              {t('common:cancel', { defaultValue: 'Cancel' })}
+              {actionLabel('cancel')}
             </Button>
             <Button type="submit" disabled={updateMutation.isPending}>
               {updateMutation.isPending
                 ? t('common:saving', { defaultValue: 'Saving...' })
-                : t('common:save', { defaultValue: 'Save' })}
+                : actionLabel('save')}
             </Button>
           </div>
         </form>

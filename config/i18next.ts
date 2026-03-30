@@ -15,6 +15,7 @@ const namespaces = [
   'catalogs',
   'chat',
   'common',
+  'currencies',
   'drivers',
   'errors',
   'http',

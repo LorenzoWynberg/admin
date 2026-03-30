@@ -1,7 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { orderStatusLabel } from '@/utils/lang';
+import { statusLabel } from '@/utils/lang';
 
 type OrderStatus = App.Enums.OrderStatus;
 
@@ -13,9 +13,11 @@ const statusStyles: Record<OrderStatus, string> = {
   canceled: 'bg-gray-100 text-gray-600 border-gray-200',
   assigned: 'bg-violet-100 text-violet-800 border-violet-200',
   picking_up: 'bg-orange-100 text-orange-800 border-orange-200',
+  arriving_at_pickup: 'bg-orange-100 text-orange-800 border-orange-200',
   arrived_at_pickup: 'bg-orange-100 text-orange-800 border-orange-200',
   picked_up: 'bg-amber-100 text-amber-800 border-amber-200',
   in_transit: 'bg-sky-100 text-sky-800 border-sky-200',
+  arriving_at_drop_off: 'bg-sky-100 text-sky-800 border-sky-200',
   arrived_at_drop_off: 'bg-sky-100 text-sky-800 border-sky-200',
   waiting_confirmation: 'bg-purple-100 text-purple-800 border-purple-200',
   completed: 'bg-green-100 text-green-800 border-green-200',
@@ -31,7 +33,7 @@ interface OrderStatusBadgeProps {
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
   return (
     <Badge variant="outline" className={statusStyles[status]}>
-      {orderStatusLabel(status)}
+      {statusLabel(status)}
     </Badge>
   );
 }

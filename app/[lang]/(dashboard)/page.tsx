@@ -15,8 +15,10 @@ import {
   DollarSign,
   Bell,
   Settings,
+  AlertTriangle,
 } from 'lucide-react';
 import { capitalize, resourceMessage } from '@/utils/lang';
+import { useNeedsAttention } from '@/hooks/orders/useNeedsAttention';
 
 const navItems = [
   {
@@ -114,6 +116,9 @@ const navItems = [
 export default function DashboardPage() {
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
+  const { data: needsAttentionData } = useNeedsAttention();
+  const totalNeedsAttention = needsAttentionData?.data?.length ?? 0;
+  const criticalCount = needsAttentionData?.summary?.critical ?? 0;
 
   if (!ready) {
     return null;
@@ -147,6 +152,35 @@ export default function DashboardPage() {
           })}
         </p>
       </div>
+
+      {totalNeedsAttention > 0 && (
+        <Card
+          className="cursor-pointer border-amber-200 bg-amber-50 transition-shadow hover:shadow-md"
+          onClick={() => router.push('/needs-attention')}
+        >
+          <CardHeader className="flex flex-row items-center gap-4">
+            <div className="rounded-lg bg-amber-100 p-3">
+              <AlertTriangle className="h-6 w-6 text-amber-600" />
+            </div>
+            <div>
+              <CardTitle className="text-lg text-amber-900">
+                {t('orders:needs_attention.dashboard_alert', {
+                  count: totalNeedsAttention,
+                  defaultValue: `${totalNeedsAttention} order(s) need attention`,
+                })}
+              </CardTitle>
+              {criticalCount > 0 && (
+                <CardDescription className="text-amber-700">
+                  {t('orders:needs_attention.n_critical', {
+                    count: criticalCount,
+                    defaultValue: `${criticalCount} critical`,
+                  })}
+                </CardDescription>
+              )}
+            </div>
+          </CardHeader>
+        </Card>
+      )}
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
