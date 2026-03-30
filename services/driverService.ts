@@ -1,5 +1,12 @@
 import { api } from '@/lib/api/client';
 
+export interface AffectedOrder {
+  publicId: string;
+  status: 'reassigned' | 'unassigned';
+  newDriverId: number | null;
+  dispatchSuccess: boolean;
+}
+
 type DriverData = App.Data.Driver.DriverData;
 type StoreDriverData = App.Data.Driver.StoreDriverData;
 type UpdateDriverData = App.Data.Driver.UpdateDriverData;
@@ -45,5 +52,35 @@ export const DriverService = {
 
   async destroy(id: string): Promise<SuccessBasic> {
     return api.destroy<SuccessBasic>(`/drivers/${id}`);
+  },
+
+  async getSchedules(driverId: string): Promise<{
+    schedules: App.Data.Driver.DriverScheduleData[];
+  }> {
+    const response = await api.get<
+      Api.Response.SuccessBasic & {
+        schedules: App.Data.Driver.DriverScheduleData[];
+      }
+    >(`/drivers/${driverId}/schedules`);
+    return { schedules: response.schedules };
+  },
+
+  async syncSchedules(
+    driverId: string,
+    schedules: App.Data.Driver.DriverScheduleData[]
+  ): Promise<{
+    schedules: App.Data.Driver.DriverScheduleData[];
+    affectedOrders?: AffectedOrder[];
+  }> {
+    const response = await api.put<
+      Api.Response.SuccessBasic & {
+        schedules: App.Data.Driver.DriverScheduleData[];
+        affectedOrders?: AffectedOrder[];
+      }
+    >(`/drivers/${driverId}/schedules`, { schedules });
+    return {
+      schedules: response.schedules,
+      affectedOrders: response.affectedOrders,
+    };
   },
 };

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   formatCurrency,
   applyRounding,
@@ -6,6 +6,10 @@ import {
   dateTimeLocalToISO,
   formatDateTime,
   formatDate,
+  APP_TIMEZONE,
+  APP_UTC_OFFSET,
+  toAppTzComponents,
+  getTodayAppTz,
 } from '../format';
 
 describe('formatCurrency', () => {
@@ -27,8 +31,8 @@ describe('formatCurrency', () => {
     expect(formatCurrency(-50.5, '$')).toBe('$-50.50');
   });
 
-  it('handles large amounts', () => {
-    expect(formatCurrency(1000000.99, '$')).toBe('$1000000.99');
+  it('handles large amounts with thousand separators', () => {
+    expect(formatCurrency(1000000.99, '$')).toBe('$1,000,000.99');
   });
 
   it('handles small decimal amounts', () => {
@@ -122,27 +126,35 @@ describe('applyRounding', () => {
 });
 
 describe('toDateTimeLocal', () => {
-  it('formats date for datetime-local input', () => {
-    const date = new Date(2026, 0, 18, 14, 30); // Jan 18, 2026 14:30
+  it('formats date in app timezone for datetime-local input', () => {
+    // 2026-01-18T20:30:00Z = 14:30 in CR (UTC-6)
+    const date = new Date('2026-01-18T20:30:00Z');
     expect(toDateTimeLocal(date)).toBe('2026-01-18T14:30');
   });
 
   it('pads single digit months and days', () => {
-    const date = new Date(2026, 0, 5, 9, 5); // Jan 5, 2026 09:05
+    // 2026-01-05T15:05:00Z = 09:05 in CR
+    const date = new Date('2026-01-05T15:05:00Z');
     expect(toDateTimeLocal(date)).toBe('2026-01-05T09:05');
   });
 
-  it('handles midnight', () => {
-    const date = new Date(2026, 11, 31, 0, 0); // Dec 31, 2026 00:00
+  it('handles midnight in app timezone', () => {
+    // 2026-12-31T06:00:00Z = 00:00 in CR
+    const date = new Date('2026-12-31T06:00:00Z');
     expect(toDateTimeLocal(date)).toBe('2026-12-31T00:00');
+  });
+
+  it('handles date boundary crossing', () => {
+    // 2026-01-19T03:00:00Z = 2026-01-18T21:00 in CR
+    const date = new Date('2026-01-19T03:00:00Z');
+    expect(toDateTimeLocal(date)).toBe('2026-01-18T21:00');
   });
 });
 
 describe('dateTimeLocalToISO', () => {
-  it('converts datetime-local to Laravel/Carbon compatible format', () => {
+  it('appends app timezone offset to datetime-local value', () => {
     const result = dateTimeLocalToISO('2026-01-18T14:30');
-    // Should output without milliseconds and with +00:00 timezone for Carbon
-    expect(result).toMatch(/2026-01-18T\d{2}:30:00\+00:00/);
+    expect(result).toBe('2026-01-18T14:30:00-06:00');
   });
 
   it('returns empty string for empty input', () => {
@@ -151,8 +163,9 @@ describe('dateTimeLocalToISO', () => {
 });
 
 describe('formatDateTime', () => {
-  it('formats ISO string for display', () => {
+  it('formats ISO string for display in app timezone', () => {
     const result = formatDateTime('2026-01-18T14:30:00.000Z');
+    // 14:30 UTC = 08:30 CR, still Jan 18
     expect(result).toMatch(/Jan 18/);
   });
 
@@ -171,8 +184,14 @@ describe('formatDateTime', () => {
 });
 
 describe('formatDate', () => {
-  it('formats ISO string for display', () => {
+  it('formats ISO string for display in app timezone', () => {
     const result = formatDate('2026-01-18T14:30:00.000Z');
+    expect(result).toMatch(/Jan 18.*2026/);
+  });
+
+  it('handles date boundary — UTC next day is still previous day in CR', () => {
+    // 2026-01-19T03:00:00Z = Jan 18 in CR (UTC-6)
+    const result = formatDate('2026-01-19T03:00:00.000Z');
     expect(result).toMatch(/Jan 18.*2026/);
   });
 
@@ -187,5 +206,67 @@ describe('formatDate', () => {
 
   it('returns original string for invalid date', () => {
     expect(formatDate('not-a-date')).toBe('not-a-date');
+  });
+});
+
+describe('APP_TIMEZONE', () => {
+  it('exports the app timezone constant', () => {
+    expect(APP_TIMEZONE).toBe('America/Costa_Rica');
+  });
+
+  it('exports the app UTC offset constant', () => {
+    expect(APP_UTC_OFFSET).toBe('-06:00');
+  });
+});
+
+describe('toAppTzComponents', () => {
+  it('extracts components in app timezone (UTC-6)', () => {
+    // 2026-01-15T18:30:00Z = 2026-01-15T12:30:00 in CR
+    const date = new Date('2026-01-15T18:30:00Z');
+    const c = toAppTzComponents(date);
+    expect(c.year).toBe(2026);
+    expect(c.month).toBe(1);
+    expect(c.day).toBe(15);
+    expect(c.hour).toBe(12);
+    expect(c.minute).toBe(30);
+    expect(c.second).toBe(0);
+  });
+
+  it('handles date boundary crossing', () => {
+    // 2026-01-16T03:00:00Z = 2026-01-15T21:00:00 in CR
+    const date = new Date('2026-01-16T03:00:00Z');
+    const c = toAppTzComponents(date);
+    expect(c.day).toBe(15);
+    expect(c.hour).toBe(21);
+  });
+
+  it('handles midnight in app timezone', () => {
+    // 2026-01-16T06:00:00Z = 2026-01-16T00:00:00 in CR
+    const date = new Date('2026-01-16T06:00:00Z');
+    const c = toAppTzComponents(date);
+    expect(c.day).toBe(16);
+    expect(c.hour).toBe(0);
+  });
+});
+
+describe('getTodayAppTz', () => {
+  it('returns midnight of today in app timezone', () => {
+    vi.useFakeTimers();
+    // 2026-01-15T18:30:00Z = 12:30 CR on Jan 15
+    vi.setSystemTime(new Date('2026-01-15T18:30:00Z'));
+    const today = getTodayAppTz();
+    // Should be 2026-01-15T00:00:00-06:00 = 2026-01-15T06:00:00Z
+    expect(today.toISOString()).toBe('2026-01-15T06:00:00.000Z');
+    vi.useRealTimers();
+  });
+
+  it('handles date boundary — early UTC is still previous day in CR', () => {
+    vi.useFakeTimers();
+    // 2026-01-16T03:00:00Z = 21:00 CR on Jan 15
+    vi.setSystemTime(new Date('2026-01-16T03:00:00Z'));
+    const today = getTodayAppTz();
+    // Should be 2026-01-15T00:00:00-06:00 = 2026-01-15T06:00:00Z
+    expect(today.toISOString()).toBe('2026-01-15T06:00:00.000Z');
+    vi.useRealTimers();
   });
 });

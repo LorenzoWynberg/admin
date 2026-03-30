@@ -13,6 +13,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Package, MapPin, Plus } from 'lucide-react';
+import { Enums } from '@/data/app-enums';
+import { resolveStopAddress } from '@/utils/routes';
 import type { UnassignedStop } from '@/services/routeService';
 
 interface AddOrderDialogProps {
@@ -63,10 +65,15 @@ export function AddOrderDialog({ routeId, unassignedStops }: AddOrderDialogProps
             </p>
           ) : (
             unassignedStops.map((stop) => {
-              const isPickup = stop.stopType === 'pickup';
+              const isPickup = stop.stopType === Enums.RouteStopType.PICKUP;
               const key = `${stop.order.publicId}-${stop.stopType}`;
               const iconColor = isPickup ? 'text-sky-600' : 'text-violet-600';
-              const address = isPickup ? stop.order.fromAddress : stop.order.toAddress;
+              const orderStops = (stop.order.stops ?? []) as App.Data.Order.OrderStopData[];
+              const address = resolveStopAddress(
+                stop.stopType,
+                orderStops,
+                stop.order.deliveryAddress
+              );
 
               return (
                 <div

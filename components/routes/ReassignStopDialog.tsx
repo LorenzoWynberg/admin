@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useTranslation } from 'react-i18next';
+import { actionLabel } from '@/utils/lang';
 
 interface ReassignStopDialogProps {
   stopId: number;
@@ -152,7 +153,7 @@ export function ReassignStopDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t('common:cancel', { defaultValue: 'Cancel' })}
+            {actionLabel('cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={!canSubmit || reassign.isPending}>
             {t('routes:reassign.title', { defaultValue: 'Reassign Stop' })}

@@ -22,11 +22,14 @@ import {
   capitalize,
   modelLabel,
   resourceMessage,
+  statusLabel,
   validationAttribute,
 } from '@/utils/lang';
-import { formatDate } from '@/utils/format';
+import { Enums } from '@/data/app-enums';
+import { formatDate, formatCurrency } from '@/utils/format';
 import { Input } from '@/components/ui/input';
 import { useOrderList } from '@/hooks/orders';
+import { useCurrencyList } from '@/hooks/currencies/useCurrencyList';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -72,6 +75,8 @@ export default function OrdersPage() {
   });
 
   const orders = data?.items || [];
+  const { data: currencyListData } = useCurrencyList();
+  const baseCurrencySymbol = currencyListData?.items?.find((c) => c.isBase)?.symbol || '₡';
   const meta = data?.meta;
 
   if (!ready) {
@@ -80,19 +85,16 @@ export default function OrdersPage() {
 
   const statusOptions = [
     { value: 'all', label: t('statuses:all', { defaultValue: 'All Statuses' }) },
-    { value: 'pending', label: t('statuses:pending', { defaultValue: 'Pending' }) },
-    { value: 'estimated', label: t('statuses:estimated', { defaultValue: 'Estimate Sent' }) },
-    { value: 'approved', label: t('statuses:approved', { defaultValue: 'Approved' }) },
-    { value: 'denied', label: t('statuses:denied', { defaultValue: 'Denied' }) },
-    { value: 'assigned', label: t('statuses:assigned', { defaultValue: 'Driver Assigned' }) },
-    { value: 'picking_up', label: t('statuses:picking_up', { defaultValue: 'Picking Up' }) },
-    { value: 'in_transit', label: t('statuses:in_transit', { defaultValue: 'In Transit' }) },
-    { value: 'completed', label: t('statuses:completed', { defaultValue: 'Completed' }) },
-    {
-      value: 'delivery_failed',
-      label: t('statuses:delivery_failed', { defaultValue: 'Failed' }),
-    },
-    { value: 'canceled', label: t('statuses:canceled', { defaultValue: 'Canceled' }) },
+    { value: Enums.OrderStatus.PENDING, label: statusLabel('pending') },
+    { value: Enums.OrderStatus.ESTIMATED, label: statusLabel('estimated') },
+    { value: Enums.OrderStatus.APPROVED, label: statusLabel('approved') },
+    { value: Enums.OrderStatus.DENIED, label: statusLabel('denied') },
+    { value: Enums.OrderStatus.ASSIGNED, label: statusLabel('assigned') },
+    { value: Enums.OrderStatus.PICKING_UP, label: statusLabel('picking_up') },
+    { value: Enums.OrderStatus.IN_TRANSIT, label: statusLabel('in_transit') },
+    { value: Enums.OrderStatus.COMPLETED, label: statusLabel('completed') },
+    { value: Enums.OrderStatus.DELIVERY_FAILED, label: statusLabel('delivery_failed') },
+    { value: Enums.OrderStatus.CANCELED, label: statusLabel('canceled') },
   ];
 
   return (
@@ -259,7 +261,7 @@ export default function OrdersPage() {
                   <TableHead>
                     {t('orders:detail.payment_status', { defaultValue: 'Payment' })}
                   </TableHead>
-                  <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
+                  <TableHead>{t('orders:detail.stops', { defaultValue: 'Stops' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
                   <TableHead>{capitalize(modelLabel('quote'))}</TableHead>
                   <TableHead>{actionLabel('created')}</TableHead>
@@ -279,15 +281,19 @@ export default function OrdersPage() {
                     <TableCell>
                       <PaymentStatusBadge status={order.paymentStatus} />
                     </TableCell>
-                    <TableCell className="max-w-[200px] truncate">
-                      {formatAddress(order.fromAddress)}
+                    <TableCell className="text-center">
+                      {
+                        ((order.stops ?? []) as App.Data.Order.OrderStopData[]).filter(
+                          (s) => s.type !== Enums.OrderStopType.Dropoff
+                        ).length
+                      }
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">
-                      {formatAddress(order.toAddress)}
+                      {formatAddress(order.deliveryAddress)}
                     </TableCell>
                     <TableCell>
                       {order.currentQuote?.total
-                        ? `${order.currencyCode} ${order.currentQuote.total.toFixed(2)}`
+                        ? formatCurrency(order.currentQuote.total, baseCurrencySymbol)
                         : '-'}
                     </TableCell>
                     <TableCell>{formatDate(order.createdAt)}</TableCell>

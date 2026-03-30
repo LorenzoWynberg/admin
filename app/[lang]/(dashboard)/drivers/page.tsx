@@ -15,6 +15,7 @@ import {
   capitalize,
   modelLabel,
   resourceMessage,
+  statusLabel,
   validationAttribute,
 } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
@@ -141,9 +142,7 @@ export default function DriversPage() {
                     </TableCell>
                     <TableCell>
                       <Badge variant={driver.active !== false ? 'default' : 'secondary'}>
-                        {driver.active !== false
-                          ? t('drivers:active', { defaultValue: 'Active' })
-                          : t('drivers:inactive', { defaultValue: 'Inactive' })}
+                        {driver.active !== false ? statusLabel('active') : statusLabel('inactive')}
                       </Badge>
                     </TableCell>
                     <TableCell>{driver.licenseNumber || '-'}</TableCell>

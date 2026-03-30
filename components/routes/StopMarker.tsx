@@ -1,15 +1,25 @@
 'use client';
 
 import { AdvancedMarker } from '@vis.gl/react-google-maps';
+import { Enums } from '@/data/app-enums';
 
 interface StopMarkerProps {
   lat: number;
   lng: number;
-  type: 'pickup' | 'dropoff';
+  type: string;
   isUnassigned?: boolean;
   isSelected?: boolean;
   label?: string;
   onClick?: () => void;
+}
+
+/** Normalize stop types to pickup/dropoff for display purposes (e.g. Purchase → pickup) */
+function isPickupType(type: string): boolean {
+  return (
+    type === Enums.RouteStopType.PICKUP ||
+    type === Enums.OrderStopType.Purchase ||
+    type === 'pickup'
+  );
 }
 
 export function StopMarker({
@@ -21,11 +31,8 @@ export function StopMarker({
   label,
   onClick,
 }: StopMarkerProps) {
-  const bgColor = isUnassigned
-    ? 'bg-gray-400'
-    : type === 'pickup'
-      ? 'bg-emerald-500'
-      : 'bg-red-500';
+  const isPickup = isPickupType(type);
+  const bgColor = isUnassigned ? 'bg-gray-400' : isPickup ? 'bg-emerald-500' : 'bg-red-500';
 
   const ringClass = isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : '';
 
@@ -36,7 +43,7 @@ export function StopMarker({
       >
         {label ? (
           <span className="truncate px-0.5 text-[10px]">{label}</span>
-        ) : type === 'pickup' ? (
+        ) : isPickup ? (
           'P'
         ) : (
           'D'

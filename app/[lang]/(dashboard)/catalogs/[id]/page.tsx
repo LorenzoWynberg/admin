@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ArrowLeft, Database, List, Calendar, Pencil } from 'lucide-react';
+import { ArrowLeft, Database, List, Calendar, Pencil, Plus } from 'lucide-react';
 import {
   actionLabel,
   capitalize,
@@ -25,6 +25,7 @@ import {
   validationAttribute,
 } from '@/utils/lang';
 import { ElementEditDialog } from '@/components/catalogs/ElementEditDialog';
+import { ElementCreateDialog } from '@/components/catalogs/ElementCreateDialog';
 import { formatDate } from '@/utils/format';
 
 type CatalogElementData = App.Data.CatalogElement.CatalogElementData;
@@ -37,6 +38,7 @@ export default function CatalogDetailPage() {
   const catalogId = Number(params.id);
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState<CatalogElementData | null>(null);
 
   const { data: catalog, isLoading, error } = useCatalog(catalogId);
@@ -154,7 +156,7 @@ export default function CatalogDetailPage() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <List className="h-5 w-5" />
             {t('catalogs:detail.elements_count', {
@@ -162,6 +164,10 @@ export default function CatalogDetailPage() {
               defaultValue: `Elements (${elements.length})`,
             })}
           </CardTitle>
+          <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
+            <Plus className="mr-1 h-4 w-4" />
+            {t('catalogs:create_element', { defaultValue: 'Add Element' })}
+          </Button>
         </CardHeader>
         <CardContent className="p-0">
           {elementsLoading ? (
@@ -183,7 +189,7 @@ export default function CatalogDetailPage() {
                   <TableHead>{validationAttribute('name', true)}</TableHead>
                   <TableHead>{validationAttribute('order', true)}</TableHead>
                   <TableHead className="w-20">
-                    {t('common:actions', { defaultValue: 'Actions' })}
+                    {t('common:actions_label', { defaultValue: 'Actions' })}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -216,6 +222,13 @@ export default function CatalogDetailPage() {
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
         element={selectedElement}
+        catalogId={catalogId}
+        catalogCode={catalog?.code || ''}
+      />
+
+      <ElementCreateDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
         catalogId={catalogId}
         catalogCode={catalog?.code || ''}
       />

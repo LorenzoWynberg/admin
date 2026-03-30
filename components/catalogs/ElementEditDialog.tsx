@@ -30,7 +30,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useUpdateCatalogElement } from '@/hooks/catalogs';
 import { applyApiErrorsToForm } from '@/utils/form';
-import { validationAttribute } from '@/utils/lang';
+import { actionLabel, validationAttribute } from '@/utils/lang';
 
 type CatalogElementData = App.Data.CatalogElement.CatalogElementData;
 type PartialLangData = App.Data.Shared.PartialLangData;
@@ -214,12 +214,12 @@ export function ElementEditDialog({
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                {t('common:cancel', { defaultValue: 'Cancel' })}
+                {actionLabel('cancel')}
               </Button>
               <Button type="submit" disabled={updateElement.isPending}>
                 {updateElement.isPending
                   ? t('common:saving', { defaultValue: 'Saving...' })
-                  : t('common:save', { defaultValue: 'Save' })}
+                  : actionLabel('save')}
               </Button>
             </DialogFooter>
           </form>

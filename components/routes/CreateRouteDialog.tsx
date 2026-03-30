@@ -25,6 +25,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
+import { actionLabel } from '@/utils/lang';
 
 interface CreateRouteDialogProps {
   date: string;
@@ -105,10 +106,10 @@ export function CreateRouteDialog({ date }: CreateRouteDialogProps) {
 
           <DialogFooter className="mt-6">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              {t('common:cancel', { defaultValue: 'Cancel' })}
+              {actionLabel('cancel')}
             </Button>
             <Button type="submit" disabled={createRoute.isPending}>
-              {t('common:create', { defaultValue: 'Create' })}
+              {actionLabel('create')}
             </Button>
           </DialogFooter>
         </form>

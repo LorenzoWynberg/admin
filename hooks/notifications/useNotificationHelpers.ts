@@ -72,10 +72,12 @@ export function useNotificationHelpers() {
     // CRUD pattern: "Catalog was updated"
     const model = data.model || 'catalog';
     const action = data.action || 'updated';
+    const resource = modelLabel(model);
+    const actionText = actionLabel(action, model, false);
     return t('resource:success.was_actioned', {
-      resource: modelLabel(model),
-      action: actionLabel(action),
-      defaultValue: `${modelLabel(model)} was ${actionLabel(action)}`,
+      resource,
+      action: actionText,
+      defaultValue: `${resource} was ${actionText}`,
     });
   };
 
@@ -96,8 +98,9 @@ export function useNotificationHelpers() {
 
     // CRUD pattern: "My Catalog was updated"
     const action = data.action || 'updated';
+    const model = data.model || 'catalog';
     const resource = data.modelName || t('common:unknown', { defaultValue: 'Unknown' });
-    const actionText = actionLabel(action).toLowerCase();
+    const actionText = actionLabel(action, model, false);
     return t('resource:success.was_actioned', {
       resource,
       action: actionText,

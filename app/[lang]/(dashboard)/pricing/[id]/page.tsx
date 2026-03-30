@@ -33,7 +33,7 @@ import {
 import { ArrowLeft, Pencil, Trash2, Copy, Power, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { Enums } from '@/data/app-enums';
-import { actionLabel, resourceMessage, validationAttribute } from '@/utils/lang';
+import { actionLabel, resourceMessage, statusLabel, validationAttribute } from '@/utils/lang';
 import { formatDate } from '@/utils/format';
 
 function formatCurrency(amount?: number): string {
@@ -116,14 +116,12 @@ export default function PricingRuleDetailPage() {
               <span>v{rule.version}</span>
               {rule.status === Enums.PricingRuleStatus.ACTIVE ? (
                 <Badge variant="default" className="bg-green-600">
-                  {t('statuses:active', { defaultValue: 'Active' })}
+                  {statusLabel(Enums.PricingRuleStatus.ACTIVE)}
                 </Badge>
               ) : rule.status === Enums.PricingRuleStatus.DRAFT ? (
-                <Badge variant="outline">{t('statuses:draft', { defaultValue: 'Draft' })}</Badge>
+                <Badge variant="outline">{statusLabel(Enums.PricingRuleStatus.DRAFT)}</Badge>
               ) : (
-                <Badge variant="secondary">
-                  {t('statuses:archived', { defaultValue: 'Archived' })}
-                </Badge>
+                <Badge variant="secondary">{statusLabel(Enums.PricingRuleStatus.ARCHIVED)}</Badge>
               )}
             </div>
           </div>
@@ -208,6 +206,25 @@ export default function PricingRuleDetailPage() {
                 <p className="mt-1">{rule.notes}</p>
               </div>
             )}
+            <div className="border-t pt-4">
+              <p className="text-muted-foreground mb-2 text-sm font-medium">
+                {t('delivery_tier_multipliers')}
+              </p>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t('expedited_multiplier')}</span>
+                  <span className="font-medium">{rule.expeditedMultiplier}x</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t('regular_multiplier')}</span>
+                  <span className="font-medium">{rule.regularMultiplier}x</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t('cheapest_multiplier')}</span>
+                  <span className="font-medium">{rule.cheapestMultiplier}x</span>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -257,7 +274,7 @@ export default function PricingRuleDetailPage() {
             <AlertDialogDescription>{t('confirm_activate')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
+            <AlertDialogCancel>{actionLabel('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleActivate}>
               {actionLabel('activate')}
             </AlertDialogAction>
@@ -273,7 +290,7 @@ export default function PricingRuleDetailPage() {
             <AlertDialogDescription>{t('confirm_delete')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
+            <AlertDialogCancel>{actionLabel('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"

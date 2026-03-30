@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, DollarSign, MessageSquare } from 'lucide-react';
+import { Calendar, DollarSign, List, MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { QuoteStatusBadge } from './QuoteStatusBadge';
 import { formatDate, formatDateTime, formatCurrency } from '@/utils/format';
-import { validationAttribute } from '@/utils/lang';
+import { actionLabel, capitalize, validationAttribute } from '@/utils/lang';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dialog';
 
 type QuoteData = App.Data.Quote.QuoteData;
+type QuoteItemData = App.Data.Quote.QuoteItemData;
 type QuoteStatus = App.Enums.QuoteStatus;
 
 interface QuoteDetailDialogProps {
@@ -114,8 +115,19 @@ export function QuoteDetailDialog({
               <span>{validationAttribute('total', true)}</span>
               <span>{formatCurrency(quote.total || 0, currencySymbol)}</span>
             </div>
+            {quote.cancellationFee != null && quote.cancellationFee > 0 && (
+              <div className="flex justify-between text-amber-600 dark:text-amber-400">
+                <span>{t('quotes:cancellation_fee', { defaultValue: 'Cancellation Fee' })}</span>
+                <span>{formatCurrency(quote.cancellationFee, currencySymbol)}</span>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Line Items */}
+        {quote.items && quote.items.length > 0 && (
+          <QuoteLineItemsSection items={quote.items} currencySymbol={currencySymbol} t={t} />
+        )}
 
         {/* Schedule */}
         {(quote.pickupProposedFor || quote.deliveryProposedFor || quote.validUntil) && (
@@ -178,10 +190,80 @@ export function QuoteDetailDialog({
 
         <div className="flex justify-end">
           <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
-            {t('common:close', { defaultValue: 'Close' })}
+            {actionLabel('close')}
           </Button>
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function QuoteLineItemsSection({
+  items,
+  currencySymbol,
+  t,
+}: {
+  items: QuoteItemData[];
+  currencySymbol: string;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  // Group items by stop
+  const stopGroups = new Map<
+    number,
+    { stop: QuoteItemData['orderStop']; items: QuoteItemData[] }
+  >();
+
+  for (const item of items) {
+    const stopId = item.orderStopId;
+    if (stopId) {
+      if (!stopGroups.has(stopId)) {
+        stopGroups.set(stopId, { stop: item.orderStop, items: [] });
+      }
+      stopGroups.get(stopId)!.items.push(item);
+    }
+  }
+
+  const itemsTotal = items.reduce((sum, item) => sum + (item.total || 0), 0);
+
+  const renderItemRow = (item: QuoteItemData) => (
+    <div key={item.id || item.publicId} className="flex items-center justify-between text-sm">
+      <div className="flex items-center gap-2">
+        <span>{item.label}</span>
+        <span className="text-muted-foreground text-xs">
+          {item.quantity} x {formatCurrency(item.unitPrice || 0, currencySymbol)}
+        </span>
+      </div>
+      <span>{formatCurrency(item.total || 0, currencySymbol)}</span>
+    </div>
+  );
+
+  const stopLabel = (stop?: QuoteItemData['orderStop']) => {
+    if (!stop) return '';
+    const type = stop.type
+      ? t(`routes:stop_types.${stop.type}`, { defaultValue: capitalize(stop.type) })
+      : '';
+    const addr = stop.address?.humanReadableAddress || stop.address?.streetAddress || '';
+    return addr ? `${type} — ${addr}` : type;
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <List className="h-4 w-4" />
+        {t('quotes:items.title', { defaultValue: 'Line Items' })}
+      </div>
+      <div className="space-y-3">
+        {Array.from(stopGroups.entries()).map(([stopId, { stop, items: stopItems }]) => (
+          <div key={stopId} className="space-y-1">
+            <p className="text-muted-foreground truncate text-xs font-medium">{stopLabel(stop)}</p>
+            {stopItems.map(renderItemRow)}
+          </div>
+        ))}
+        <div className="flex justify-between border-t pt-1.5 text-sm font-semibold">
+          <span>{t('quotes:items.items_total', { defaultValue: 'Items Total' })}</span>
+          <span>{formatCurrency(itemsTotal, currencySymbol)}</span>
+        </div>
+      </div>
+    </div>
   );
 }

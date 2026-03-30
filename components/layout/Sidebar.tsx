@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { actionLabel, capitalize } from '@/utils/lang';
+import { capitalize } from '@/utils/lang';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import {
@@ -21,10 +21,21 @@ import {
   Settings,
   ScrollText,
   Route,
+  AlertTriangle,
 } from 'lucide-react';
+import { useNeedsAttention } from '@/hooks/orders/useNeedsAttention';
+import { usePendingReconciliation } from '@/hooks/orders/usePendingReconciliation';
 
 const navigation = [
   { modelKey: 'dashboard', href: '/', icon: LayoutDashboard, isModel: false },
+  {
+    modelKey: 'needs_attention',
+    href: '/needs-attention',
+    icon: AlertTriangle,
+    isModel: false,
+    translationKey: 'orders:needs_attention.title',
+    hasBadge: true,
+  },
   { modelKey: 'route', href: '/routes', icon: Route, isModel: true },
   { modelKey: 'order', href: '/orders', icon: Package, isModel: true },
   { modelKey: 'quote', href: '/quotes', icon: FileText, isModel: true },
@@ -49,6 +60,11 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const params = useParams();
   const lang = (params?.lang as string) || 'en';
+  const { data: needsAttentionData } = useNeedsAttention();
+  const { data: pendingReconciliationData } = usePendingReconciliation();
+  const urgentCount =
+    (needsAttentionData?.summary?.critical ?? 0) + (needsAttentionData?.summary?.high ?? 0);
+  const reconciliationCount = pendingReconciliationData?.summary?.count ?? 0;
 
   const withLang = (href: string) => `/${lang}${href === '/' ? '' : href}`;
   const pathWithoutLang = pathname.replace(new RegExp(`^/${lang}`), '') || '/';
@@ -97,6 +113,16 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             >
               <item.icon className="h-5 w-5" />
               {getNavLabel(item)}
+              {'hasBadge' in item && item.hasBadge && urgentCount + reconciliationCount > 0 && (
+                <span
+                  className={cn(
+                    'ml-auto rounded-full px-1.5 py-0.5 text-xs font-medium text-white',
+                    urgentCount > 0 ? 'bg-red-500' : 'bg-amber-500'
+                  )}
+                >
+                  {urgentCount + reconciliationCount}
+                </span>
+              )}
             </Link>
           );
         })}
@@ -115,7 +141,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           )}
         >
           <Settings className="h-5 w-5" />
-          {ready ? actionLabel('settings_other') : ''}
+          {ready ? capitalize(t('common:settings', { count: 2 })) : ''}
         </Link>
       </div>
     </div>

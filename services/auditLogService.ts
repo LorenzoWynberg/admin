@@ -7,6 +7,7 @@ interface ListParams {
   page?: number;
   perPage?: number;
   modelKey?: string;
+  modelId?: number;
   action?: string;
   search?: string;
   fromDate?: string;
@@ -18,6 +19,7 @@ function buildQueryString(params: ListParams): string {
   if (params.page) query.set('page', String(params.page));
   if (params.perPage) query.set('perPage', String(params.perPage));
   if (params.modelKey) query.set('model_key', params.modelKey);
+  if (params.modelId) query.set('model_id', String(params.modelId));
   if (params.action) query.set('action', params.action);
   if (params.search) query.set('search', params.search);
   if (params.fromDate) query.set('from_date', params.fromDate);

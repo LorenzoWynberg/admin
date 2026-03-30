@@ -13,6 +13,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { createEcho } from '@/lib/echo';
 import { useCatalogBroadcast } from '@/hooks/catalogs';
 import { useNotificationBroadcast } from '@/hooks/notifications';
+import { useNeedsAttentionBroadcast } from '@/hooks/orders';
 
 const EchoContext = createContext<Echo<'reverb'> | null>(null);
 
@@ -28,6 +29,7 @@ interface EchoProviderProps {
 function EchoBroadcasts({ children }: { children: ReactNode }) {
   useCatalogBroadcast();
   useNotificationBroadcast();
+  useNeedsAttentionBroadcast();
   return <>{children}</>;
 }
 
@@ -54,15 +56,15 @@ function subscribeToEcho(callback: () => void) {
 }
 
 function updateEchoInstance(token: string | null) {
-  if (echoStore.token === token && echoStore.instance) {
+  if (echoStore.token === token && (echoStore.instance || !token)) {
     return; // No change needed
   }
 
   // Disconnect old instance
   echoStore.instance?.disconnect();
 
-  // Create new instance
-  echoStore.instance = createEcho(token);
+  // Only create Echo when authenticated — avoids 404 on /broadcasting/auth
+  echoStore.instance = token ? createEcho(token) : null;
   echoStore.token = token;
 
   // Snapshot listeners before notifying — prevents issues if Set is mutated during iteration

@@ -22,8 +22,10 @@ import {
   capitalize,
   modelLabel,
   resourceMessage,
+  statusLabel,
   validationAttribute,
 } from '@/utils/lang';
+import { Enums } from '@/data/app-enums';
 import { formatDate } from '@/utils/format';
 import { Input } from '@/components/ui/input';
 import { useQuoteList } from '@/hooks/quotes';
@@ -74,12 +76,12 @@ export default function QuotesPage() {
 
   const statusOptions = [
     { value: 'all', label: t('statuses:all', { defaultValue: 'All Statuses' }) },
-    { value: 'draft', label: t('statuses:draft', { defaultValue: 'Draft' }) },
-    { value: 'sent', label: t('statuses:sent', { defaultValue: 'Sent' }) },
-    { value: 'accepted', label: t('statuses:accepted', { defaultValue: 'Accepted' }) },
-    { value: 'rejected', label: t('statuses:rejected', { defaultValue: 'Rejected' }) },
-    { value: 'expired', label: t('statuses:expired', { defaultValue: 'Expired' }) },
-    { value: 'finalized', label: t('statuses:finalized', { defaultValue: 'Finalized' }) },
+    { value: Enums.QuoteStatus.DRAFT, label: statusLabel('draft') },
+    { value: Enums.QuoteStatus.SENT, label: statusLabel('sent') },
+    { value: Enums.QuoteStatus.ACCEPTED, label: statusLabel('accepted') },
+    { value: Enums.QuoteStatus.REJECTED, label: statusLabel('rejected') },
+    { value: Enums.QuoteStatus.EXPIRED, label: statusLabel('expired') },
+    { value: Enums.QuoteStatus.FINALIZED, label: statusLabel('finalized') },
   ];
 
   return (

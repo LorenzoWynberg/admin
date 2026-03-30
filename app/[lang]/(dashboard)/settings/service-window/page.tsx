@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { actionLabel } from '@/utils/lang';
 import { useServiceWindow, useUpdateServiceWindow } from '@/hooks/settings';
 
 type SettingData = App.Data.Setting.SettingData;
@@ -29,7 +30,7 @@ export default function ServiceWindowPage() {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" onClick={() => router.push('/settings')}>
           <ChevronLeft className="mr-1 h-4 w-4" />
-          {t('common:back', { defaultValue: 'Back' })}
+          {actionLabel('back')}
         </Button>
       </div>
 
@@ -62,12 +63,23 @@ function ServiceWindowForm({ data }: { data: SettingData }) {
   const [enabled, setEnabled] = useState(data.serviceWindowEnabled);
   const [noServiceStart, setNoServiceStart] = useState(data.noServiceStart.slice(0, 5));
   const [noServiceEnd, setNoServiceEnd] = useState(data.noServiceEnd.slice(0, 5));
+  const [autoCancelEnabled, setAutoCancelEnabled] = useState(data.unassignedAutoCancelEnabled);
+  const [escalationHours, setEscalationHours] = useState(data.unassignedEscalationHours);
+
+  const isDirty =
+    enabled !== data.serviceWindowEnabled ||
+    noServiceStart !== data.noServiceStart.slice(0, 5) ||
+    noServiceEnd !== data.noServiceEnd.slice(0, 5) ||
+    autoCancelEnabled !== data.unassignedAutoCancelEnabled ||
+    escalationHours !== data.unassignedEscalationHours;
 
   const handleSave = () => {
     updateMutation.mutate({
       noServiceStart,
       noServiceEnd,
       serviceWindowEnabled: enabled,
+      unassignedAutoCancelEnabled: autoCancelEnabled,
+      unassignedEscalationHours: escalationHours,
     });
   };
 
@@ -167,12 +179,52 @@ function ServiceWindowForm({ data }: { data: SettingData }) {
         </CardContent>
       </Card>
 
+      {/* Unassigned Order Escalation */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('common:unassigned_escalation')}</CardTitle>
+          <CardDescription>{t('common:unassigned_escalation_description')}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>{t('common:unassigned_auto_cancel_enabled')}</Label>
+              <p className="text-muted-foreground text-sm">
+                {t('common:unassigned_auto_cancel_enabled_description')}
+              </p>
+            </div>
+            <Switch checked={autoCancelEnabled} onCheckedChange={setAutoCancelEnabled} />
+          </div>
+
+          <div className={!autoCancelEnabled ? 'opacity-50' : ''}>
+            <div className="grid gap-2">
+              <Label htmlFor="escalationHours">{t('common:unassigned_escalation_hours')}</Label>
+              <p className="text-muted-foreground text-sm">
+                {t('common:unassigned_escalation_hours_description')}
+              </p>
+              <Input
+                id="escalationHours"
+                type="number"
+                min={1}
+                max={24}
+                value={escalationHours}
+                onChange={(e) =>
+                  setEscalationHours(Math.max(1, Math.min(24, Number(e.target.value))))
+                }
+                disabled={!autoCancelEnabled}
+                className="w-24"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={updateMutation.isPending}>
+        <Button onClick={handleSave} disabled={!isDirty || updateMutation.isPending}>
           {updateMutation.isPending
             ? t('common:loading', { defaultValue: 'Loading...' })
-            : t('common:save', { defaultValue: 'Save' })}
+            : actionLabel('save')}
         </Button>
       </div>
     </>
