@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UserService } from '@/services/userService';
 import { toast } from 'sonner';
 import { isApiError } from '@/lib/api/error';
+import { crudErrorMessage, crudSuccessMessage } from '@/utils/lang';
 
 type UpdateUserData = App.Data.User.UpdateUserData;
 
@@ -9,17 +10,17 @@ export function useUpdateUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateUserData }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateUserData }) =>
       UserService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success('User updated');
+      toast.success(crudSuccessMessage('updated', 'user'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error('Failed to update user');
+        toast.error(crudErrorMessage('updating', 'user'));
       }
     },
   });
@@ -29,16 +30,16 @@ export function useDeleteUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => UserService.destroy(id),
+    mutationFn: (id: string) => UserService.destroy(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success(data.message || 'User deleted');
+      toast.success(data.message || crudSuccessMessage('deleted', 'user'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error('Failed to delete user');
+        toast.error(crudErrorMessage('deleting', 'user'));
       }
     },
   });

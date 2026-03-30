@@ -9,23 +9,31 @@ const defaultLocale = 'en';
 const supportedLngs = ['en', 'es', 'fr'] as const;
 const namespaces = [
   'addresses',
+  'audit_logs',
   'auth',
   'businesses',
   'catalogs',
+  'chat',
   'common',
   'drivers',
+  'errors',
   'http',
   'languages',
   'models',
+  'notifications',
   'orders',
   'pagination',
   'passwords',
+  'payments',
+  'pricing',
   'quotes',
   'resource',
+  'routes',
+  'statuses',
+  'tax',
   'users',
   'validation',
 ] as const;
-const defaultNS = 'common';
 
 let initialized = false;
 
@@ -54,7 +62,15 @@ export async function ensureI18nInitialized(pathname?: string) {
       ns: Array.from(namespaces),
       defaultNS: 'common',
       preload: [lng],
-      interpolation: { escapeValue: false },
+      interpolation: {
+        escapeValue: false,
+        format: (value, format) => {
+          if (format === 'capitalize' && typeof value === 'string') {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+          }
+          return value;
+        },
+      },
       detection: {
         order: ['path', 'cookie', 'navigator'],
         lookupFromPathIndex: 0,
@@ -62,6 +78,9 @@ export async function ensureI18nInitialized(pathname?: string) {
       } as DetectorOptions,
       backend: {
         loadPath: '/locales/{{lng}}/{{ns}}.json',
+        requestOptions: {
+          cache: 'no-store',
+        },
       },
       react: {
         useSuspense: false,

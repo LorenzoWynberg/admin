@@ -6,11 +6,11 @@ const roleConfig: Record<
   Role,
   { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
 > = {
-  'admin': { label: 'Admin', variant: 'destructive' },
+  admin: { label: 'Admin', variant: 'destructive' },
   'business.owner': { label: 'Business Owner', variant: 'default' },
   'business.user': { label: 'Business User', variant: 'secondary' },
-  'client': { label: 'Client', variant: 'outline' },
-  'driver': { label: 'Driver', variant: 'default' },
+  client: { label: 'Client', variant: 'outline' },
+  driver: { label: 'Driver', variant: 'default' },
 };
 
 interface RoleBadgeProps {

@@ -1,12 +1,32 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, FileText, Users, Truck, Building2, MapPin } from 'lucide-react';
-import { capitalize } from '@/utils/lang';
+import {
+  Package,
+  FileText,
+  Users,
+  Truck,
+  Building2,
+  MapPin,
+  Route,
+  Database,
+  DollarSign,
+  Bell,
+  Settings,
+} from 'lucide-react';
+import { capitalize, resourceMessage } from '@/utils/lang';
 
 const navItems = [
+  {
+    key: 'routes',
+    modelKey: 'route',
+    icon: Route,
+    href: '/routes',
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-100',
+  },
   {
     key: 'orders',
     modelKey: 'order',
@@ -55,31 +75,76 @@ const navItems = [
     color: 'text-red-600',
     bgColor: 'bg-red-100',
   },
+  {
+    key: 'catalogs',
+    modelKey: 'catalog',
+    icon: Database,
+    href: '/catalogs',
+    color: 'text-teal-600',
+    bgColor: 'bg-teal-100',
+  },
+  {
+    key: 'pricing',
+    modelKey: 'pricing',
+    icon: DollarSign,
+    href: '/pricing',
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-100',
+    descriptionKey: 'pricing:manage_description',
+  },
+  {
+    key: 'notifications',
+    modelKey: 'notification',
+    icon: Bell,
+    href: '/notifications',
+    color: 'text-pink-600',
+    bgColor: 'bg-pink-100',
+  },
+  {
+    key: 'settings',
+    modelKey: 'settings',
+    icon: Settings,
+    href: '/settings',
+    color: 'text-gray-600',
+    bgColor: 'bg-gray-100',
+    descriptionKey: 'common:settings_description',
+  },
 ];
 
 export default function DashboardPage() {
   const { t, ready } = useTranslation();
-  const router = useRouter();
+  const router = useLocalizedRouter();
 
   if (!ready) {
     return null;
   }
 
   const stats = navItems.map((item) => {
-    const name = t(`models:${item.modelKey}_other`, { defaultValue: item.key });
+    const name =
+      'descriptionKey' in item
+        ? t(`${item.key}:title`, { defaultValue: item.key })
+        : t(`models:${item.modelKey}_other`, { defaultValue: item.key });
+    const descKey =
+      'descriptionKey' in item && item.descriptionKey
+        ? item.descriptionKey
+        : `${item.key}:manage_description`;
     return {
       ...item,
       name: capitalize(name),
-      description: t(`${item.key}:manage_description`, { defaultValue: `Manage ${item.key}` }),
+      description: t(descKey, { defaultValue: `Manage ${item.key}` }),
     };
   });
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{t('common:dashboard', { defaultValue: 'Dashboard' })}</h1>
+        <h1 className="text-3xl font-bold">
+          {t('common:dashboard', { defaultValue: 'Dashboard' })}
+        </h1>
         <p className="text-muted-foreground">
-          {t('common:dashboard_welcome', { defaultValue: 'Welcome to the Mandados admin dashboard' })}
+          {t('common:dashboard_welcome', {
+            defaultValue: 'Welcome to the Mandados admin dashboard',
+          })}
         </p>
       </div>
 
@@ -100,8 +165,8 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                {t('common:click_to_manage', { resource: stat.name, defaultValue: `Click to manage ${stat.name}` })}
+              <p className="text-muted-foreground text-sm">
+                {resourceMessage('click_to_manage', stat.modelKey, 2)}
               </p>
             </CardContent>
           </Card>

@@ -77,5 +77,6 @@ declare namespace Api.Response {
 
   export interface Login extends SuccessBasic {
     token: string;
+    mustChangePassword: boolean;
   }
 }

@@ -1,0 +1,91 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
+import { capitalize, modelLabel } from '@/utils/lang';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
+import { useNotifications, useNotificationMutations } from '@/hooks/notifications';
+import { NotificationItem } from './NotificationItem';
+
+interface NotificationDropdownProps {
+  onClose: () => void;
+}
+
+export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
+  const { t } = useTranslation();
+  const router = useLocalizedRouter();
+  const { data, isLoading, isFetching } = useNotifications({ perPage: 20, unreadOnly: true });
+  const { markAsRead, markAllAsRead } = useNotificationMutations();
+
+  const notifications = data?.items ?? [];
+  const hasUnread = (data?.extra?.unread_count ?? 0) > 0;
+
+  const handleMarkAsRead = (id: string) => {
+    markAsRead.mutate(id);
+  };
+
+  const handleMarkAllAsRead = () => {
+    markAllAsRead.mutate(undefined);
+    onClose();
+  };
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between border-b p-4">
+        <div className="flex items-center gap-2">
+          <h4 className="font-semibold">{capitalize(modelLabel('notification', 2))}</h4>
+          {isFetching && !isLoading && (
+            <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+          )}
+        </div>
+        {hasUnread && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleMarkAllAsRead}
+            disabled={markAllAsRead.isPending}
+          >
+            {t('common:markAllRead', { defaultValue: 'Mark all read' })}
+          </Button>
+        )}
+      </div>
+
+      <ScrollArea className="h-80">
+        {isLoading ? (
+          <div className="flex items-center justify-center p-8">
+            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+          </div>
+        ) : notifications.length === 0 ? (
+          <div className="text-muted-foreground p-8 text-center text-sm">
+            {t('common:noNotifications', { defaultValue: 'No notifications' })}
+          </div>
+        ) : (
+          notifications.map((notification) => (
+            <NotificationItem
+              key={notification.id}
+              notification={notification}
+              onMarkRead={() => handleMarkAsRead(notification.id)}
+              onNavigate={onClose}
+            />
+          ))
+        )}
+      </ScrollArea>
+
+      <div className="border-t p-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full"
+          onClick={() => {
+            router.push('/notifications');
+            onClose();
+          }}
+        >
+          {t('common:viewAll', { defaultValue: 'View all notifications' })}
+        </Button>
+      </div>
+    </div>
+  );
+}

@@ -20,15 +20,9 @@ export function useLocalizedRouter() {
     [lang]
   );
 
-  const push = useCallback(
-    (href: string) => router.push(withLang(href)),
-    [router, withLang]
-  );
+  const push = useCallback((href: string) => router.push(withLang(href)), [router, withLang]);
 
-  const replace = useCallback(
-    (href: string) => router.replace(withLang(href)),
-    [router, withLang]
-  );
+  const replace = useCallback((href: string) => router.replace(withLang(href)), [router, withLang]);
 
   return useMemo(
     () => ({

@@ -1,46 +1,41 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
-import { useUserList } from '@/hooks/users';
-import { RoleBadge } from '@/components/users/RoleBadge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { capitalize } from '@/utils/lang';
 import {
-  Table,
+  TableHeader,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableRow,
+  Table,
 } from '@/components/ui/table';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
+  SelectContent,
   SelectValue,
+  SelectItem,
+  Select,
 } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { useState } from 'react';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
+import { formatDate } from '@/utils/format';
+import { useUserList } from '@/hooks/users';
+import { Input } from '@/components/ui/input';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { RoleBadge } from '@/components/users/RoleBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 
 type Role = App.Enums.Role;
-
-function formatDate(dateString?: string): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
 
 function getInitials(name?: string): string {
   if (!name) return '?';
@@ -76,8 +71,14 @@ export default function UsersPage() {
   const roleOptions = [
     { value: 'all', label: t('users:role.all', { defaultValue: 'All Roles' }) },
     { value: 'admin', label: t('users:role.admin', { defaultValue: 'Admin' }) },
-    { value: 'business.owner', label: t('users:role.business_owner', { defaultValue: 'Business Owner' }) },
-    { value: 'business.user', label: t('users:role.business_user', { defaultValue: 'Business User' }) },
+    {
+      value: 'business.owner',
+      label: t('users:role.business_owner', { defaultValue: 'Business Owner' }),
+    },
+    {
+      value: 'business.user',
+      label: t('users:role.business_user', { defaultValue: 'Business User' }),
+    },
     { value: 'client', label: t('users:role.client', { defaultValue: 'Client' }) },
     { value: 'driver', label: t('users:role.driver', { defaultValue: 'Driver' }) },
   ];
@@ -87,20 +88,24 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(t('models:user_other', { defaultValue: 'Users' }))}</h1>
-          <p className="text-muted-foreground">{t('users:manage_description', { defaultValue: 'Manage user accounts' })}</p>
+          <h1 className="text-3xl font-bold">{capitalize(modelLabel('user', 2))}</h1>
+          <p className="text-muted-foreground">
+            {t('users:manage_description', { defaultValue: 'Manage user accounts' })}
+          </p>
         </div>
       </div>
 
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
+          <CardTitle className="text-lg">
+            {t('common:filters', { defaultValue: 'Filters' })}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative min-w-[200px] flex-1">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
                 placeholder={t('users:search_placeholder', { defaultValue: 'Search users...' })}
                 value={search}
@@ -119,7 +124,9 @@ export default function UsersPage() {
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t('users:filter_by_role', { defaultValue: 'Filter by role' })} />
+                <SelectValue
+                  placeholder={t('users:filter_by_role', { defaultValue: 'Filter by role' })}
+                />
               </SelectTrigger>
               <SelectContent>
                 {roleOptions.map((option) => (
@@ -138,14 +145,14 @@ export default function UsersPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
             </div>
           ) : error ? (
-            <div className="py-12 text-center text-destructive">
-              {t('users:failed_to_load', { defaultValue: 'Failed to load users' })}
+            <div className="text-destructive py-12 text-center">
+              {resourceMessage('failed_to_load', 'user', 2)}
             </div>
           ) : users.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <Users className="mb-4 h-12 w-12" />
               <p>{t('users:no_users', { defaultValue: 'No users found' })}</p>
             </div>
@@ -153,19 +160,19 @@ export default function UsersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('models:user_one', { defaultValue: 'User' })}</TableHead>
-                  <TableHead>{t('common:email', { defaultValue: 'Email' })}</TableHead>
-                  <TableHead>{t('common:role', { defaultValue: 'Role' })}</TableHead>
-                  <TableHead>{t('common:phone', { defaultValue: 'Phone' })}</TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>{capitalize(modelLabel('user'))}</TableHead>
+                  <TableHead>{validationAttribute('email', true)}</TableHead>
+                  <TableHead>{validationAttribute('role', true)}</TableHead>
+                  <TableHead>{validationAttribute('phone', true)}</TableHead>
+                  <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {users.map((user) => (
                   <TableRow
                     key={user.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => router.push(`/users/${user.id}`)}
+                    className="hover:bg-muted/50 cursor-pointer"
+                    onClick={() => router.push(`/users/${user.publicId}`)}
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -192,8 +199,13 @@ export default function UsersPage() {
         {/* Pagination */}
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
-              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} users)` })}
+            <p className="text-muted-foreground text-sm">
+              {t('pagination:page_info', {
+                current: meta.currentPage,
+                last: meta.lastPage,
+                total: meta.total,
+                defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} users)`,
+              })}
             </p>
             <div className="flex gap-2">
               <Button

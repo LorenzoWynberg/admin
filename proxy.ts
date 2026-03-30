@@ -44,10 +44,7 @@ export default function proxy(req: Request) {
   // Handle paths that incorrectly have locale prefix before _next
   const pathSegments = pathname.split('/').filter(Boolean);
   const maybeLocale = pathSegments[0];
-  if (
-    (locales as readonly string[]).includes(maybeLocale) &&
-    pathSegments[1] === '_next'
-  ) {
+  if ((locales as readonly string[]).includes(maybeLocale) && pathSegments[1] === '_next') {
     url.pathname = '/' + pathSegments.slice(1).join('/');
     return NextResponse.rewrite(url);
   }

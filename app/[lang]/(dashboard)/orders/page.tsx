@@ -1,47 +1,42 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
-import { useOrderList } from '@/hooks/orders';
-import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { capitalize } from '@/utils/lang';
 import {
-  Table,
+  TableHeader,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableRow,
+  Table,
 } from '@/components/ui/table';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
+  SelectContent,
   SelectValue,
+  SelectItem,
+  Select,
 } from '@/components/ui/select';
+
+import { useState, useCallback } from 'react';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
+import { formatDate } from '@/utils/format';
+import { Input } from '@/components/ui/input';
+import { useOrderList } from '@/hooks/orders';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Search, Package } from 'lucide-react';
+import { PaymentStatusBadge } from '@/components/orders/PaymentStatusBadge';
+import { ChevronLeft, ChevronRight, Search, Package, X } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 type OrderStatus = App.Enums.OrderStatus;
-
-function formatDate(dateString?: string): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  } catch {
-    return dateString;
-  }
-}
 
 function formatAddress(address?: App.Data.Address.AddressData | null): string {
   if (!address) return '-';
@@ -58,12 +53,22 @@ export default function OrdersPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [pickupFrom, setPickupFrom] = useState('');
+  const [pickupTo, setPickupTo] = useState('');
+  const [deliveryFrom, setDeliveryFrom] = useState('');
+  const [deliveryTo, setDeliveryTo] = useState('');
+
+  const resetPage = useCallback(() => setPage(1), []);
 
   const { data, isLoading, error } = useOrderList({
     page,
     perPage: 15,
     status: status === 'all' ? undefined : status,
     search: search || undefined,
+    pickupFrom: pickupFrom || undefined,
+    pickupTo: pickupTo || undefined,
+    deliveryFrom: deliveryFrom || undefined,
+    deliveryTo: deliveryTo || undefined,
   });
 
   const orders = data?.items || [];
@@ -74,17 +79,20 @@ export default function OrdersPage() {
   }
 
   const statusOptions = [
-    { value: 'all', label: t('orders:status.all', { defaultValue: 'All Statuses' }) },
-    { value: 'pending', label: t('orders:status.pending', { defaultValue: 'Pending' }) },
-    { value: 'estimated', label: t('orders:status.estimated', { defaultValue: 'Quote Ready' }) },
-    { value: 'approved', label: t('orders:status.approved', { defaultValue: 'Approved' }) },
-    { value: 'denied', label: t('orders:status.denied', { defaultValue: 'Denied' }) },
-    { value: 'assigned', label: t('orders:status.assigned', { defaultValue: 'Assigned' }) },
-    { value: 'picking_up', label: t('orders:status.picking_up', { defaultValue: 'Picking Up' }) },
-    { value: 'in_transit', label: t('orders:status.in_transit', { defaultValue: 'In Transit' }) },
-    { value: 'completed', label: t('orders:status.completed', { defaultValue: 'Completed' }) },
-    { value: 'delivery_failed', label: t('orders:status.delivery_failed', { defaultValue: 'Failed' }) },
-    { value: 'canceled', label: t('orders:status.canceled', { defaultValue: 'Canceled' }) },
+    { value: 'all', label: t('statuses:all', { defaultValue: 'All Statuses' }) },
+    { value: 'pending', label: t('statuses:pending', { defaultValue: 'Pending' }) },
+    { value: 'estimated', label: t('statuses:estimated', { defaultValue: 'Estimate Sent' }) },
+    { value: 'approved', label: t('statuses:approved', { defaultValue: 'Approved' }) },
+    { value: 'denied', label: t('statuses:denied', { defaultValue: 'Denied' }) },
+    { value: 'assigned', label: t('statuses:assigned', { defaultValue: 'Driver Assigned' }) },
+    { value: 'picking_up', label: t('statuses:picking_up', { defaultValue: 'Picking Up' }) },
+    { value: 'in_transit', label: t('statuses:in_transit', { defaultValue: 'In Transit' }) },
+    { value: 'completed', label: t('statuses:completed', { defaultValue: 'Completed' }) },
+    {
+      value: 'delivery_failed',
+      label: t('statuses:delivery_failed', { defaultValue: 'Failed' }),
+    },
+    { value: 'canceled', label: t('statuses:canceled', { defaultValue: 'Canceled' }) },
   ];
 
   return (
@@ -92,7 +100,7 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(t('models:order_other', { defaultValue: 'Orders' }))}</h1>
+          <h1 className="text-3xl font-bold">{capitalize(modelLabel('order', 2))}</h1>
           <p className="text-muted-foreground">
             {t('orders:manage_description', { defaultValue: 'Manage delivery orders and quotes' })}
           </p>
@@ -102,18 +110,20 @@ export default function OrdersPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
+          <CardTitle className="text-lg">
+            {t('common:filters', { defaultValue: 'Filters' })}
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-4">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative min-w-[200px] flex-1">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
                 placeholder={t('orders:search_placeholder', { defaultValue: 'Search orders...' })}
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
-                  setPage(1);
+                  resetPage();
                 }}
                 className="pl-9"
               />
@@ -122,11 +132,13 @@ export default function OrdersPage() {
               value={status}
               onValueChange={(value) => {
                 setStatus(value);
-                setPage(1);
+                resetPage();
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t('orders:filter_by_status', { defaultValue: 'Filter by status' })} />
+                <SelectValue
+                  placeholder={t('orders:filter_by_status', { defaultValue: 'Filter by status' })}
+                />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
@@ -137,6 +149,88 @@ export default function OrdersPage() {
               </SelectContent>
             </Select>
           </div>
+          <div className="flex flex-wrap gap-4">
+            <div className="grid gap-1">
+              <Label className="text-muted-foreground text-xs">
+                {t('orders:detail.pickup_scheduled', { defaultValue: 'Pickup Scheduled' })}
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={pickupFrom}
+                  onChange={(e) => {
+                    setPickupFrom(e.target.value);
+                    resetPage();
+                  }}
+                  className="w-[150px]"
+                />
+                <span className="text-muted-foreground text-sm">–</span>
+                <Input
+                  type="date"
+                  value={pickupTo}
+                  onChange={(e) => {
+                    setPickupTo(e.target.value);
+                    resetPage();
+                  }}
+                  className="w-[150px]"
+                />
+                {(pickupFrom || pickupTo) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => {
+                      setPickupFrom('');
+                      setPickupTo('');
+                      resetPage();
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div className="grid gap-1">
+              <Label className="text-muted-foreground text-xs">
+                {t('orders:detail.delivery_scheduled', { defaultValue: 'Delivery Scheduled' })}
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={deliveryFrom}
+                  onChange={(e) => {
+                    setDeliveryFrom(e.target.value);
+                    resetPage();
+                  }}
+                  className="w-[150px]"
+                />
+                <span className="text-muted-foreground text-sm">–</span>
+                <Input
+                  type="date"
+                  value={deliveryTo}
+                  onChange={(e) => {
+                    setDeliveryTo(e.target.value);
+                    resetPage();
+                  }}
+                  className="w-[150px]"
+                />
+                {(deliveryFrom || deliveryTo) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => {
+                      setDeliveryFrom('');
+                      setDeliveryTo('');
+                      resetPage();
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -145,14 +239,14 @@ export default function OrdersPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
             </div>
           ) : error ? (
-            <div className="py-12 text-center text-destructive">
-              {t('orders:failed_to_load', { defaultValue: 'Failed to load orders' })}
+            <div className="text-destructive py-12 text-center">
+              {resourceMessage('failed_to_load', 'order', 2)}
             </div>
           ) : orders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <Package className="mb-4 h-12 w-12" />
               <p>{t('orders:no_orders', { defaultValue: 'No orders found' })}</p>
             </div>
@@ -160,24 +254,30 @@ export default function OrdersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('common:id', { defaultValue: 'ID' })}</TableHead>
-                  <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
+                  <TableHead>{validationAttribute('id', true)}</TableHead>
+                  <TableHead>{validationAttribute('status', true)}</TableHead>
+                  <TableHead>
+                    {t('orders:detail.payment_status', { defaultValue: 'Payment' })}
+                  </TableHead>
                   <TableHead>{t('orders:from', { defaultValue: 'From' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
-                  <TableHead>{t('models:quote_one', { defaultValue: 'Quote' })}</TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>{capitalize(modelLabel('quote'))}</TableHead>
+                  <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {orders.map((order) => (
                   <TableRow
                     key={order.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => router.push(`/orders/${order.id}`)}
+                    className="hover:bg-muted/50 cursor-pointer"
+                    onClick={() => router.push(`/orders/${order.publicId}`)}
                   >
-                    <TableCell className="font-medium">#{order.id}</TableCell>
+                    <TableCell className="font-medium">{order.publicId}</TableCell>
                     <TableCell>
                       <OrderStatusBadge status={order.status as OrderStatus} />
+                    </TableCell>
+                    <TableCell>
+                      <PaymentStatusBadge status={order.paymentStatus} />
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">
                       {formatAddress(order.fromAddress)}
@@ -201,8 +301,13 @@ export default function OrdersPage() {
         {/* Pagination */}
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
-              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} orders)` })}
+            <p className="text-muted-foreground text-sm">
+              {t('pagination:page_info', {
+                current: meta.currentPage,
+                last: meta.lastPage,
+                total: meta.total,
+                defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} orders)`,
+              })}
             </p>
             <div className="flex gap-2">
               <Button

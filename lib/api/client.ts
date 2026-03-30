@@ -1,6 +1,9 @@
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useLangStore } from '@/stores/useLangStore';
+
 import { ApiError, parseErrorResponse } from './error';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.mandados.test:60';
 
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -27,6 +30,13 @@ function getToken(): string | null {
 }
 
 /**
+ * Get current language from store
+ */
+function getLang(): string {
+  return useLangStore.getState().lang ?? 'en';
+}
+
+/**
  * Build request options with auth headers
  */
 function buildRequestOptions(
@@ -35,9 +45,11 @@ function buildRequestOptions(
   options: FetchOptions = {}
 ): RequestInit {
   const token = getToken();
+  const lang = getLang();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
+    'Accept-Language': lang,
     ...options.headers,
   };
 
@@ -70,6 +82,17 @@ async function handleResponse<T>(response: Response): Promise<T> {
   const isJson = contentType?.includes('application/json');
 
   if (!response.ok) {
+    // Clear auth state on 401 Unauthorized
+    if (response.status === 401) {
+      useAuthStore.getState().logout();
+      // Clear auth cookie
+      if (typeof document !== 'undefined') {
+        document.cookie = 'auth-token=; path=/; max-age=0';
+        // Redirect to login
+        window.location.href = '/login';
+      }
+    }
+
     let errorData: unknown = null;
     if (isJson) {
       try {

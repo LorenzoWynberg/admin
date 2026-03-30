@@ -1,36 +1,32 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
-import { useDriverList } from '@/hooks/drivers';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { capitalize } from '@/utils/lang';
 import {
-  Table,
+  TableHeader,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableRow,
+  Table,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ChevronLeft, ChevronRight, Search, Truck } from 'lucide-react';
 
-function formatDate(dateString?: string): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
+import { useState } from 'react';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
+import { Input } from '@/components/ui/input';
+import { useDriverList } from '@/hooks/drivers';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ChevronLeft, ChevronRight, Plus, Search, Truck } from 'lucide-react';
+import { formatDate } from '@/utils/format';
 
 function getInitials(name?: string): string {
   if (!name) return '?';
@@ -44,7 +40,7 @@ function getInitials(name?: string): string {
 
 export default function DriversPage() {
   const { t, ready } = useTranslation();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
@@ -65,18 +61,26 @@ export default function DriversPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(t('models:driver_other', { defaultValue: 'Drivers' }))}</h1>
-          <p className="text-muted-foreground">{t('drivers:manage_description', { defaultValue: 'Manage driver accounts' })}</p>
+          <h1 className="text-3xl font-bold">{capitalize(modelLabel('driver', 2))}</h1>
+          <p className="text-muted-foreground">
+            {t('drivers:manage_description', { defaultValue: 'Manage driver accounts' })}
+          </p>
         </div>
+        <Button onClick={() => router.push('/drivers/create')}>
+          <Plus className="mr-2 h-4 w-4" />
+          {resourceMessage('create_one', 'driver')}
+        </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
+          <CardTitle className="text-lg">
+            {t('common:filters', { defaultValue: 'Filters' })}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder={t('drivers:search_placeholder', { defaultValue: 'Search drivers...' })}
               value={search}
@@ -94,14 +98,14 @@ export default function DriversPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
             </div>
           ) : error ? (
-            <div className="py-12 text-center text-destructive">
-              {t('drivers:failed_to_load', { defaultValue: 'Failed to load drivers' })}
+            <div className="text-destructive py-12 text-center">
+              {resourceMessage('failed_to_load', 'driver', 2)}
             </div>
           ) : drivers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <Truck className="mb-4 h-12 w-12" />
               <p>{t('drivers:no_drivers', { defaultValue: 'No drivers found' })}</p>
             </div>
@@ -110,31 +114,37 @@ export default function DriversPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('models:driver_one', { defaultValue: 'Driver' })}</TableHead>
-                  <TableHead>{t('drivers:license_number', { defaultValue: 'License Number' })}</TableHead>
-                  <TableHead>{t('drivers:license_plate', { defaultValue: 'License Plate' })}</TableHead>
-                  <TableHead>{t('drivers:license_expires', { defaultValue: 'License Expires' })}</TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
+                  <TableHead>{validationAttribute('licenseNumber', true)}</TableHead>
+                  <TableHead>{validationAttribute('licensePlate', true)}</TableHead>
+                  <TableHead>{validationAttribute('licenseExpires', true)}</TableHead>
+                  <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {drivers.map((driver) => (
                   <TableRow
                     key={driver.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => router.push(`/drivers/${driver.id}`)}
+                    className="hover:bg-muted/50 cursor-pointer"
+                    onClick={() => router.push(`/drivers/${driver.publicId}`)}
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={driver.user?.avatar} />
-                          <AvatarFallback>
-                            {getInitials(driver.user?.name)}
-                          </AvatarFallback>
+                          <AvatarFallback>{getInitials(driver.user?.name)}</AvatarFallback>
                         </Avatar>
                         <span className="font-medium">
                           {driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}
                         </span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={driver.active !== false ? 'default' : 'secondary'}>
+                        {driver.active !== false
+                          ? t('drivers:active', { defaultValue: 'Active' })
+                          : t('drivers:inactive', { defaultValue: 'Inactive' })}
+                      </Badge>
                     </TableCell>
                     <TableCell>{driver.licenseNumber || '-'}</TableCell>
                     <TableCell>{driver.licensePlateNumber || '-'}</TableCell>
@@ -149,8 +159,13 @@ export default function DriversPage() {
 
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
-              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} drivers)` })}
+            <p className="text-muted-foreground text-sm">
+              {t('pagination:page_info', {
+                current: meta.currentPage,
+                last: meta.lastPage,
+                total: meta.total,
+                defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} drivers)`,
+              })}
             </p>
             <div className="flex gap-2">
               <Button

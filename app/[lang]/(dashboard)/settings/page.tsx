@@ -1,28 +1,28 @@
 'use client';
 
-import { useTranslation } from 'react-i18next';
-import { useParams, useRouter, usePathname } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
+  SelectContent,
   SelectValue,
+  SelectItem,
+  Select,
 } from '@/components/ui/select';
-import { Globe } from 'lucide-react';
+import { Globe, Coins, Clock, ChevronRight } from 'lucide-react';
+
+import { Label } from '@/components/ui/label';
+import { useTranslation } from 'react-i18next';
 import { Lang } from '@/services/langService';
 import type { LangCode } from '@/stores/useLangStore';
+import { usePathname } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 
 const languageCodes = ['en', 'es', 'fr'] as const;
 
 export default function SettingsPage() {
   const { t, ready } = useTranslation();
-  const params = useParams();
-  const router = useRouter();
+  const router = useLocalizedRouter();
   const pathname = usePathname();
-  const currentLang = (params?.lang as string) || 'en';
 
   // Wait for translations to load
   if (!ready) {
@@ -35,15 +35,17 @@ export default function SettingsPage() {
     const rest = segments.slice(1).join('/');
     const nextPath = `/${nextLang}${rest ? '/' + rest : ''}`;
 
-    // Change language via service and navigate
+    // Change language via service and navigate (use raw Next.js push to avoid double-prefix)
     await Lang.setActive(nextLang as LangCode);
-    router.push(nextPath);
+    window.location.href = nextPath;
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{t('common:settings_other', { defaultValue: 'Settings' })}</h1>
+        <h1 className="text-3xl font-bold">
+          {t('common:settings_other', { defaultValue: 'Settings' })}
+        </h1>
         <p className="text-muted-foreground">
           {t('common:settings_description', { defaultValue: 'Manage your admin preferences' })}
         </p>
@@ -61,8 +63,10 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-2">
-            <Label htmlFor="language">{t('common:language_one', { defaultValue: 'Language' })}</Label>
-            <Select value={currentLang} onValueChange={handleLanguageChange}>
+            <Label htmlFor="language">
+              {t('common:language_one', { defaultValue: 'Language' })}
+            </Label>
+            <Select value={router.lang} onValueChange={handleLanguageChange}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue />
               </SelectTrigger>
@@ -76,6 +80,49 @@ export default function SettingsPage() {
             </Select>
           </div>
         </CardContent>
+      </Card>
+
+      <Card
+        className="hover:bg-muted/50 cursor-pointer transition-colors"
+        onClick={() => router.push('/settings/currencies')}
+      >
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Coins className="h-5 w-5" />
+              <CardTitle>
+                {t('common:currency_settings', { defaultValue: 'Currency Settings' })}
+              </CardTitle>
+            </div>
+            <ChevronRight className="text-muted-foreground h-5 w-5" />
+          </div>
+          <CardDescription>
+            {t('common:currency_settings_description', {
+              defaultValue: 'Manage currencies and exchange rates',
+            })}
+          </CardDescription>
+        </CardHeader>
+      </Card>
+      <Card
+        className="hover:bg-muted/50 cursor-pointer transition-colors"
+        onClick={() => router.push('/settings/service-window')}
+      >
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              <CardTitle>
+                {t('common:service_window', { defaultValue: 'Service Window' })}
+              </CardTitle>
+            </div>
+            <ChevronRight className="text-muted-foreground h-5 w-5" />
+          </div>
+          <CardDescription>
+            {t('common:service_window_description', {
+              defaultValue: 'Configure operating hours for the delivery service',
+            })}
+          </CardDescription>
+        </CardHeader>
       </Card>
     </div>
   );

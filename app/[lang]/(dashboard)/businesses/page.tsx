@@ -1,35 +1,30 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
-import { useBusinessList } from '@/hooks/businesses';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { capitalize } from '@/utils/lang';
 import {
-  Table,
+  TableHeader,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableRow,
+  Table,
 } from '@/components/ui/table';
+
+import { useState } from 'react';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
+import { Input } from '@/components/ui/input';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { useBusinessList } from '@/hooks/businesses';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, Building2 } from 'lucide-react';
-
-function formatDate(dateString?: string): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
+import { formatDate } from '@/utils/format';
 
 export default function BusinessesPage() {
   const { t, ready } = useTranslation();
@@ -54,20 +49,26 @@ export default function BusinessesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(t('models:business_other', { defaultValue: 'Businesses' }))}</h1>
-          <p className="text-muted-foreground">{t('businesses:manage_description', { defaultValue: 'Manage business accounts' })}</p>
+          <h1 className="text-3xl font-bold">{capitalize(modelLabel('business', 2))}</h1>
+          <p className="text-muted-foreground">
+            {t('businesses:manage_description', { defaultValue: 'Manage business accounts' })}
+          </p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t('common:filters', { defaultValue: 'Filters' })}</CardTitle>
+          <CardTitle className="text-lg">
+            {t('common:filters', { defaultValue: 'Filters' })}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
-              placeholder={t('businesses:search_placeholder', { defaultValue: 'Search businesses...' })}
+              placeholder={t('businesses:search_placeholder', {
+                defaultValue: 'Search businesses...',
+              })}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -83,14 +84,14 @@ export default function BusinessesPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
             </div>
           ) : error ? (
-            <div className="py-12 text-center text-destructive">
-              {t('businesses:failed_to_load', { defaultValue: 'Failed to load businesses' })}
+            <div className="text-destructive py-12 text-center">
+              {resourceMessage('failed_to_load', 'business', 2)}
             </div>
           ) : businesses.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <Building2 className="mb-4 h-12 w-12" />
               <p>{t('businesses:no_businesses', { defaultValue: 'No businesses found' })}</p>
             </div>
@@ -98,18 +99,18 @@ export default function BusinessesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('common:name', { defaultValue: 'Name' })}</TableHead>
-                  <TableHead>{t('common:type', { defaultValue: 'Type' })}</TableHead>
-                  <TableHead>{t('businesses:owner', { defaultValue: 'Owner' })}</TableHead>
-                  <TableHead>{t('common:created', { defaultValue: 'Created' })}</TableHead>
+                  <TableHead>{validationAttribute('name', true)}</TableHead>
+                  <TableHead>{validationAttribute('type', true)}</TableHead>
+                  <TableHead>{validationAttribute('owner', true)}</TableHead>
+                  <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {businesses.map((business) => (
                   <TableRow
                     key={business.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => router.push(`/businesses/${business.id}`)}
+                    className="hover:bg-muted/50 cursor-pointer"
+                    onClick={() => router.push(`/businesses/${business.publicId}`)}
                   >
                     <TableCell className="font-medium">{business.name}</TableCell>
                     <TableCell>{business.typeName || '-'}</TableCell>
@@ -124,8 +125,13 @@ export default function BusinessesPage() {
 
         {meta && meta.lastPage > 1 && (
           <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
-              {t('pagination:page_info', { current: meta.currentPage, last: meta.lastPage, total: meta.total, defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} businesses)` })}
+            <p className="text-muted-foreground text-sm">
+              {t('pagination:page_info', {
+                current: meta.currentPage,
+                last: meta.lastPage,
+                total: meta.total,
+                defaultValue: `Page ${meta.currentPage} of ${meta.lastPage} (${meta.total} businesses)`,
+              })}
             </p>
             <div className="flex gap-2">
               <Button

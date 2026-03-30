@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useState, useEffect, useMemo } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useCatalog, useCatalogElements } from '@/hooks/catalogs';
@@ -17,26 +17,21 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ArrowLeft, Database, List, Calendar, Pencil } from 'lucide-react';
-import { capitalize } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
 import { ElementEditDialog } from '@/components/catalogs/ElementEditDialog';
+import { formatDate } from '@/utils/format';
 
 type CatalogElementData = App.Data.CatalogElement.CatalogElementData;
 
-function formatDate(dateString?: string | null): string {
-  if (!dateString) return '-';
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
-}
-
 export default function CatalogDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
   const catalogId = Number(params.id);
@@ -47,8 +42,27 @@ export default function CatalogDetailPage() {
   const { data: catalog, isLoading, error } = useCatalog(catalogId);
   const { data: elementsData, isLoading: elementsLoading } = useCatalogElements(
     catalog?.code || '',
-    { enabled: !!catalog?.code }
+    {
+      enabled: !!catalog?.code,
+    }
   );
+
+  const elements = useMemo(() => elementsData?.items || [], [elementsData?.items]);
+
+  // Open element modal if ?element= param is present
+  useEffect(() => {
+    const elementId = searchParams.get('element');
+    if (elementId && elements.length > 0) {
+      const element = elements.find((e) => e.id === Number(elementId));
+      if (element) {
+        queueMicrotask(() => {
+          setSelectedElement(element);
+          setEditDialogOpen(true);
+        });
+        router.replace(`/catalogs/${catalogId}`);
+      }
+    }
+  }, [searchParams, elements, catalogId, router]);
 
   const handleEditElement = (element: CatalogElementData) => {
     setSelectedElement(element);
@@ -58,7 +72,7 @@ export default function CatalogDetailPage() {
   if (!ready || isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
       </div>
     );
   }
@@ -66,15 +80,13 @@ export default function CatalogDetailPage() {
   if (error || !catalog) {
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">{t('catalogs:failed_to_load', { defaultValue: 'Failed to load catalog' })}</p>
+        <p className="text-destructive">{resourceMessage('failed_to_load', 'catalog')}</p>
         <Button variant="outline" className="mt-4" onClick={() => router.back()}>
           {t('common:go_back', { defaultValue: 'Go Back' })}
         </Button>
       </div>
     );
   }
-
-  const elements = elementsData?.items || [];
 
   return (
     <div className="space-y-6">
@@ -87,7 +99,9 @@ export default function CatalogDetailPage() {
             <h1 className="text-3xl font-bold">{catalog.name}</h1>
             <Badge variant="outline">{catalog.code}</Badge>
           </div>
-          <p className="text-muted-foreground">{capitalize(t('models:catalog_one', { defaultValue: 'Catalog' }))} #{catalog.id}</p>
+          <p className="text-muted-foreground">
+            {capitalize(modelLabel('catalog'))} #{catalog.id}
+          </p>
         </div>
       </div>
 
@@ -101,16 +115,18 @@ export default function CatalogDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('catalogs:code', { defaultValue: 'Code' })}</span>
+              <span className="text-muted-foreground">{validationAttribute('code', true)}</span>
               <Badge variant="outline">{catalog.code}</Badge>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('common:name', { defaultValue: 'Name' })}</span>
+              <span className="text-muted-foreground">{validationAttribute('name', true)}</span>
               <span className="font-medium">{catalog.name}</span>
             </div>
             {catalog.description && (
               <div>
-                <p className="text-sm text-muted-foreground">{t('catalogs:detail.description', { defaultValue: 'Description' })}</p>
+                <p className="text-muted-foreground text-sm">
+                  {validationAttribute('description', true)}
+                </p>
                 <p className="mt-1">{catalog.description}</p>
               </div>
             )}
@@ -121,16 +137,16 @@ export default function CatalogDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              {t('catalogs:detail.timestamps', { defaultValue: 'Timestamps' })}
+              {validationAttribute('timestamps', true)}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('common:created', { defaultValue: 'Created' })}</span>
+              <span className="text-muted-foreground">{actionLabel('created')}</span>
               <span className="font-medium">{formatDate(catalog.createdAt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('common:updated', { defaultValue: 'Updated' })}</span>
+              <span className="text-muted-foreground">{actionLabel('updated')}</span>
               <span className="font-medium">{formatDate(catalog.updatedAt)}</span>
             </div>
           </CardContent>
@@ -141,23 +157,34 @@ export default function CatalogDetailPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <List className="h-5 w-5" />
-            {t('catalogs:detail.elements_count', { count: elements.length, defaultValue: `Elements (${elements.length})` })}
+            {t('catalogs:detail.elements_count', {
+              count: elements.length,
+              defaultValue: `Elements (${elements.length})`,
+            })}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {elements.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+          {elementsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="border-primary h-6 w-6 animate-spin rounded-full border-4 border-t-transparent" />
+            </div>
+          ) : elements.length === 0 ? (
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <List className="mb-4 h-12 w-12" />
-              <p>{t('catalogs:detail.no_elements', { defaultValue: 'No elements in this catalog' })}</p>
+              <p>
+                {t('catalogs:detail.no_elements', { defaultValue: 'No elements in this catalog' })}
+              </p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('catalogs:code', { defaultValue: 'Code' })}</TableHead>
-                  <TableHead>{t('common:name', { defaultValue: 'Name' })}</TableHead>
-                  <TableHead>{t('catalogs:detail.order', { defaultValue: 'Order' })}</TableHead>
-                  <TableHead className="w-20">{t('common:actions', { defaultValue: 'Actions' })}</TableHead>
+                  <TableHead>{validationAttribute('code', true)}</TableHead>
+                  <TableHead>{validationAttribute('name', true)}</TableHead>
+                  <TableHead>{validationAttribute('order', true)}</TableHead>
+                  <TableHead className="w-20">
+                    {t('common:actions', { defaultValue: 'Actions' })}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

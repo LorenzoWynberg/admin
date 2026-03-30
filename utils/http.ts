@@ -39,9 +39,7 @@ export const hasItems = <T>(
 /**
  * Check if response has pagination metadata
  */
-export const hasPagination = <T>(
-  response: unknown
-): response is Api.Response.Paginated<T> => {
+export const hasPagination = <T>(response: unknown): response is Api.Response.Paginated<T> => {
   const res = response as Api.Response.Paginated<T>;
   return (
     res?.meta !== undefined &&
@@ -77,3 +75,21 @@ export const toBasicSuccess = <T>(
   status: response.status,
   extra: response.extra,
 });
+
+/**
+ * Build a URL with optional query params.
+ * Null/undefined values are omitted.
+ */
+export function buildUrl(
+  path: string,
+  params?: Record<string, string | number | null | undefined>
+): string {
+  if (!params) return path;
+
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value != null) searchParams.set(key, String(value));
+  }
+  const qs = searchParams.toString();
+  return qs ? `${path}?${qs}` : path;
+}

@@ -5,12 +5,12 @@ interface UseUserParams {
   enabled?: boolean;
 }
 
-export function useUser(id: number, params: UseUserParams = {}) {
+export function useUser(id: string, params: UseUserParams = {}) {
   const { enabled = true } = params;
 
   return useQuery({
     queryKey: ['users', 'detail', id],
     queryFn: () => UserService.getById(id),
-    enabled: enabled && id > 0,
+    enabled: enabled && !!id,
   });
 }

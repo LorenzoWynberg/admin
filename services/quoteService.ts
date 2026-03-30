@@ -12,6 +12,8 @@ interface ListParams {
   status?: string;
   orderId?: number;
   search?: string;
+  fromDate?: string;
+  toDate?: string;
 }
 
 function buildQueryString(params: ListParams): string {
@@ -21,6 +23,8 @@ function buildQueryString(params: ListParams): string {
   if (params.status) query.set('filter[status]', params.status);
   if (params.orderId) query.set('filter[orderId]', String(params.orderId));
   if (params.search) query.set('search', params.search);
+  if (params.fromDate) query.set('fromDate', params.fromDate);
+  if (params.toDate) query.set('toDate', params.toDate);
   return query.toString();
 }
 
@@ -35,9 +39,9 @@ export const QuoteService = {
   },
 
   /**
-   * Get a single quote by ID
+   * Get a single quote by publicId
    */
-  async getById(id: number): Promise<QuoteData> {
+  async getById(id: string): Promise<QuoteData> {
     const response = await api.get<Single<QuoteData>>(`/quotes/${id}`);
     return response.item;
   },
@@ -46,29 +50,29 @@ export const QuoteService = {
    * Create a new quote for an order
    */
   async create(data: StoreQuoteData): Promise<QuoteData> {
-    const response = await api.post<Single<QuoteData>>('/quotes', { body: data });
+    const response = await api.post<Single<QuoteData>>('/quotes', data);
     return response.item;
   },
 
   /**
    * Update a quote (only draft quotes can be updated)
    */
-  async update(id: number, data: Partial<StoreQuoteData>): Promise<QuoteData> {
-    const response = await api.patch<Single<QuoteData>>(`/quotes/${id}`, { body: data });
+  async update(id: string, data: Partial<StoreQuoteData>): Promise<QuoteData> {
+    const response = await api.patch<Single<QuoteData>>(`/quotes/${id}`, data);
     return response.item;
   },
 
   /**
    * Send a quote to the customer
    */
-  async send(id: number): Promise<SuccessBasic> {
+  async send(id: string): Promise<SuccessBasic> {
     return api.post<SuccessBasic>(`/quotes/${id}/send`);
   },
 
   /**
    * Delete a quote (draft quotes only)
    */
-  async destroy(id: number): Promise<SuccessBasic> {
+  async destroy(id: string): Promise<SuccessBasic> {
     return api.destroy<SuccessBasic>(`/quotes/${id}`);
   },
 };

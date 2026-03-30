@@ -22,6 +22,11 @@ function buildQueryString(params: ListParams): string {
 }
 
 export const CatalogService = {
+  async all(): Promise<CatalogData[]> {
+    const response = await api.get<Api.Response.Multiple<CatalogData>>('/catalogs/all');
+    return response.items;
+  },
+
   async list(params: ListParams = {}): Promise<Paginated<CatalogData>> {
     const query = buildQueryString(params);
     const url = `/catalogs${query ? `?${query}` : ''}`;
@@ -38,13 +43,26 @@ export const CatalogService = {
   },
 
   // Element CRUD
-  async createElement(catalogId: number, data: Omit<StoreCatalogElementData, 'catalogId'>): Promise<CatalogElementData> {
-    const response = await api.post<Single<CatalogElementData>>(`/catalogs/${catalogId}/elements`, data);
+  async createElement(
+    catalogId: number,
+    data: Omit<StoreCatalogElementData, 'catalogId'>
+  ): Promise<CatalogElementData> {
+    const response = await api.post<Single<CatalogElementData>>(
+      `/catalogs/${catalogId}/elements`,
+      data
+    );
     return response.item;
   },
 
-  async updateElement(catalogId: number, elementId: number, data: Omit<UpdateCatalogElementData, 'catalogId'>): Promise<CatalogElementData> {
-    const response = await api.patch<Single<CatalogElementData>>(`/catalogs/${catalogId}/elements/${elementId}`, data);
+  async updateElement(
+    catalogId: number,
+    elementId: number,
+    data: Omit<UpdateCatalogElementData, 'catalogId'>
+  ): Promise<CatalogElementData> {
+    const response = await api.patch<Single<CatalogElementData>>(
+      `/catalogs/${catalogId}/elements/${elementId}`,
+      data
+    );
     return response.item;
   },
 

@@ -1,87 +1,209 @@
 'use client';
 
-import { useState } from 'react';
-import { useCreateQuote, useSendQuote } from '@/hooks/quotes';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
-  Dialog,
-  DialogContent,
   DialogDescription,
+  DialogTrigger,
+  DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  Dialog,
 } from '@/components/ui/dialog';
+import { FileText, Send, Loader2, Pencil, Clock, AlertTriangle } from 'lucide-react';
+
+import { FeasibilityBadge } from './FeasibilityBadge';
+import { useMemo, useState } from 'react';
+import { useFeasibilityCheck } from '@/hooks/feasibility';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from 'react-i18next';
+import { useCurrencyList } from '@/hooks/currencies';
+import { useCalculatePricing } from '@/hooks/pricing';
+import { useCreateQuote, useSendQuote } from '@/hooks/quotes';
+import { actionLabel, validationAttribute } from '@/utils/lang';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { FileText, Send } from 'lucide-react';
+  formatCurrency,
+  applyRounding,
+  toDateTimeLocal,
+  dateTimeLocalToISO,
+  formatDateTime,
+} from '@/utils/format';
+import { formatRateDisplay } from '@/utils/currency';
 
 interface CreateQuoteDialogProps {
   orderId: number;
-  defaultCurrency?: string;
+  orderPublicId: string;
   orderDistanceKm?: number | null;
   orderEstimatedMinutes?: number | null;
+  customerCurrencyCode?: string | null;
+  customerDesiredDelivery?: string | null;
+  customerDesiredPickup?: string | null;
+  windowStart?: string | null;
+  windowEnd?: string | null;
+  timeSensitive?: boolean;
 }
 
 export function CreateQuoteDialog({
   orderId,
-  defaultCurrency = 'CRC',
+  orderPublicId,
   orderDistanceKm,
   orderEstimatedMinutes,
+  customerCurrencyCode,
+  customerDesiredDelivery,
+  customerDesiredPickup,
+  windowStart,
+  windowEnd,
+  timeSensitive = false,
 }: CreateQuoteDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [editingTimes, setEditingTimes] = useState(false);
   const createQuote = useCreateQuote();
   const sendQuote = useSendQuote();
 
-  const [formData, setFormData] = useState({
-    currencyCode: defaultCurrency,
-    distanceKm: orderDistanceKm?.toString() || '',
-    distanceFee: '',
-    timeFee: '',
-    surcharge: '',
-    discountRate: '',
-    notes: '',
-    pickupProposedFor: '',
-    deliveryProposedFor: '',
-    validUntil: '',
+  // Fetch feasibility when dialog is open
+  const { data: feasibility, isLoading: feasibilityLoading } = useFeasibilityCheck({
+    orderPublicId,
+    enabled: open,
   });
+
+  const getDefaultFormData = () => {
+    const now = new Date();
+    const pickup = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    const delivery = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+
+    return {
+      distanceKm: orderDistanceKm?.toString() || '',
+      timeFee: '',
+      surcharge: '',
+      discountRate: '',
+      notes: '',
+      pickupProposedFor: toDateTimeLocal(pickup),
+      deliveryProposedFor: toDateTimeLocal(delivery),
+    };
+  };
+
+  const [formData, setFormData] = useState(getDefaultFormData);
+
+  // Compute effective proposed times: feasibility suggestions override defaults when not editing
+  const effectivePickup =
+    !editingTimes && feasibility?.suggestedPickup
+      ? toDateTimeLocal(new Date(feasibility.suggestedPickup))
+      : formData.pickupProposedFor;
+
+  const effectiveDelivery =
+    !editingTimes && feasibility?.suggestedDelivery
+      ? toDateTimeLocal(new Date(feasibility.suggestedDelivery))
+      : formData.deliveryProposedFor;
+
+  // Reset form with fresh defaults when dialog opens
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isOpen) {
+      setFormData(getDefaultFormData());
+      setEditingTimes(false);
+    }
+    setOpen(isOpen);
+  };
+
+  // Parse distance for calculation
+  const distanceKm = useMemo(() => {
+    const parsed = parseFloat(formData.distanceKm);
+    return !isNaN(parsed) && parsed > 0 ? parsed : null;
+  }, [formData.distanceKm]);
+
+  // Fetch pricing calculation
+  const { data: pricing, isLoading: pricingLoading } = useCalculatePricing(distanceKm);
+
+  // Fetch currencies for base currency info and customer conversion
+  const { data: currencyData } = useCurrencyList();
+  const currencies = currencyData?.items || [];
+  const baseCurrency = currencies.find((c) => c.isBase);
+  const customerCurrency = customerCurrencyCode
+    ? currencies.find((c) => c.code === customerCurrencyCode)
+    : null;
+
+  // Calculate totals with adjustments
+  const calculation = useMemo(() => {
+    if (!pricing) return null;
+
+    const timeFee = parseFloat(formData.timeFee) || 0;
+    const surcharge = parseFloat(formData.surcharge) || 0;
+    const discountRate = (parseFloat(formData.discountRate) || 0) / 100;
+
+    const subtotalBeforeAdjustments = pricing.subtotal;
+    const subtotalWithAdjustments = subtotalBeforeAdjustments + timeFee + surcharge;
+    const discountAmount = subtotalWithAdjustments * discountRate;
+    const afterDiscount = subtotalWithAdjustments - discountAmount;
+    const tax = afterDiscount * pricing.taxRate;
+    const total = afterDiscount + tax;
+
+    return {
+      serviceFee: pricing.serviceFee,
+      distanceFee: pricing.distanceFee,
+      subtotal: subtotalBeforeAdjustments,
+      timeFee,
+      surcharge,
+      subtotalWithAdjustments,
+      discountRate,
+      discountAmount,
+      afterDiscount,
+      taxRate: pricing.taxRate,
+      tax,
+      total,
+    };
+  }, [pricing, formData.timeFee, formData.surcharge, formData.discountRate]);
+
+  // Calculate customer currency conversion
+  const customerConversion = (() => {
+    if (!calculation) return null;
+    if (!customerCurrency) return null;
+    if (customerCurrency.isBase) return null;
+
+    const rate = customerCurrency.currentRate;
+    if (!rate || rate <= 0) return null;
+
+    const convertedTotal = calculation.total * rate;
+    const roundedTotal = applyRounding(
+      convertedTotal,
+      customerCurrency.roundingMode || 'nearest',
+      customerCurrency.roundingIncrement || 0.01
+    );
+
+    return {
+      rate,
+      convertedTotal,
+      roundedTotal,
+      symbol: customerCurrency.symbol || customerCurrency.code || '',
+      code: customerCurrency.code || '',
+    };
+  })();
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (andSend: boolean) => {
-    const now = new Date();
-    const defaultPickup = new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString();
-    const defaultDelivery = new Date(now.getTime() + 4 * 60 * 60 * 1000).toISOString();
-    const defaultValid = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+    if (!distanceKm || distanceKm <= 0) {
+      return;
+    }
 
     const data = {
       orderId,
-      currencyCode: formData.currencyCode,
-      distanceKm: formData.distanceKm ? parseFloat(formData.distanceKm) : null,
-      distanceFee: formData.distanceFee ? parseFloat(formData.distanceFee) : null,
+      distanceKm,
       timeFee: formData.timeFee ? parseFloat(formData.timeFee) : null,
       surcharge: formData.surcharge ? parseFloat(formData.surcharge) : null,
-      discountRate: formData.discountRate ? parseFloat(formData.discountRate) : null,
+      discountRate: formData.discountRate ? parseFloat(formData.discountRate) / 100 : null,
       notes: formData.notes || undefined,
-      pickupProposedFor: formData.pickupProposedFor || defaultPickup,
-      deliveryProposedFor: formData.deliveryProposedFor || defaultDelivery,
-      validUntil: formData.validUntil || defaultValid,
+      pickupProposedFor: dateTimeLocalToISO(effectivePickup),
+      deliveryProposedFor: dateTimeLocalToISO(effectiveDelivery),
     };
 
     createQuote.mutate(data, {
       onSuccess: (quote) => {
-        if (andSend && quote.id) {
-          sendQuote.mutate(quote.id, {
+        if (andSend && quote.publicId) {
+          sendQuote.mutate(quote.publicId, {
             onSuccess: () => setOpen(false),
           });
         } else {
@@ -92,42 +214,53 @@ export function CreateQuoteDialog({
   };
 
   const isPending = createQuote.isPending || sendQuote.isPending;
+  const baseSymbol = baseCurrency?.symbol || '₡';
+  const baseCurrencyCode = baseCurrency?.code || 'CRC';
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <FileText className="mr-2 h-4 w-4" />
-          Create Quote
+          {t('quotes:create.button', { defaultValue: 'Create Quote' })}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create Quote for Order #{orderId}</DialogTitle>
+          <DialogTitle>
+            {t('quotes:create.title', {
+              orderId,
+              defaultValue: `Create Quote for Order #${orderId}`,
+            })}
+          </DialogTitle>
           <DialogDescription>
-            Fill in the pricing details for this delivery quote.
+            {t('quotes:create.description', {
+              defaultValue: 'Enter distance to calculate pricing from the active pricing rule.',
+            })}
           </DialogDescription>
+          {feasibilityLoading ? (
+            <div className="flex items-center gap-2 pt-2">
+              <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+              <span className="text-muted-foreground text-sm">
+                {t('quotes:feasibility.checking', {
+                  defaultValue: 'Checking driver availability...',
+                })}
+              </span>
+            </div>
+          ) : feasibility ? (
+            <div className="pt-2">
+              <FeasibilityBadge
+                level={feasibility.level}
+                candidateCount={feasibility.candidates?.length || 0}
+              />
+            </div>
+          ) : null}
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
+          {/* Distance Input */}
           <div className="grid gap-2">
-            <Label htmlFor="currencyCode">Currency</Label>
-            <Select
-              value={formData.currencyCode}
-              onValueChange={(v) => handleChange('currencyCode', v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="CRC">CRC (Colones)</SelectItem>
-                <SelectItem value="USD">USD (Dollars)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="distanceKm">Distance (km)</Label>
+            <Label htmlFor="distanceKm">{validationAttribute('distance', true)} (km) *</Label>
             <Input
               id="distanceKm"
               type="number"
@@ -135,28 +268,162 @@ export function CreateQuoteDialog({
               placeholder="0.0"
               value={formData.distanceKm}
               onChange={(e) => handleChange('distanceKm', e.target.value)}
+              readOnly={!!orderDistanceKm}
+              autoFocus={!orderDistanceKm}
+              className={orderDistanceKm ? 'bg-muted cursor-not-allowed' : ''}
             />
             {orderEstimatedMinutes && (
-              <p className="text-xs text-muted-foreground">
-                Estimated driving time: {orderEstimatedMinutes} min
+              <p className="text-muted-foreground text-xs">
+                {t('quotes:create.estimated_time', {
+                  minutes: orderEstimatedMinutes,
+                  defaultValue: `Estimated driving time: ${orderEstimatedMinutes} min`,
+                })}
               </p>
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="distanceFee">Distance Fee ({formData.currencyCode})</Label>
-              <Input
-                id="distanceFee"
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                value={formData.distanceFee}
-                onChange={(e) => handleChange('distanceFee', e.target.value)}
-              />
+          {/* Pricing Calculation Preview */}
+          {distanceKm && distanceKm > 0 && (
+            <div className="bg-muted/50 rounded-lg p-4">
+              {pricingLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
+                  <span className="text-muted-foreground ml-2 text-sm">
+                    {t('common:calculating', { defaultValue: 'Calculating...' })}
+                  </span>
+                </div>
+              ) : calculation ? (
+                <div className="space-y-3">
+                  <div className="text-sm font-medium">
+                    {t('quotes:create.calculated_pricing', {
+                      currency: baseCurrencyCode,
+                      defaultValue: `Calculated Pricing (${baseCurrencyCode})`,
+                    })}
+                  </div>
+                  <div className="grid grid-cols-2 gap-1 text-sm">
+                    {calculation.serviceFee > 0 && (
+                      <>
+                        <span className="text-muted-foreground">
+                          {validationAttribute('serviceFee', true)}:
+                        </span>
+                        <span className="text-right">
+                          {formatCurrency(calculation.serviceFee, baseSymbol)}
+                        </span>
+                      </>
+                    )}
+                    <span className="text-muted-foreground">
+                      {validationAttribute('distanceFee', true)}:
+                    </span>
+                    <span className="text-right">
+                      {formatCurrency(calculation.distanceFee, baseSymbol)}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {validationAttribute('subtotal', true)}:
+                    </span>
+                    <span className="text-right font-medium">
+                      {formatCurrency(calculation.subtotal, baseSymbol)}
+                    </span>
+                  </div>
+
+                  {/* Adjustments section */}
+                  {(calculation.timeFee > 0 ||
+                    calculation.surcharge > 0 ||
+                    calculation.discountAmount > 0) && (
+                    <>
+                      <div className="border-border border-t" />
+                      <div className="grid grid-cols-2 gap-1 text-sm">
+                        {calculation.timeFee > 0 && (
+                          <>
+                            <span className="text-muted-foreground">
+                              + {validationAttribute('timeFee', true)}:
+                            </span>
+                            <span className="text-right">
+                              {formatCurrency(calculation.timeFee, baseSymbol)}
+                            </span>
+                          </>
+                        )}
+                        {calculation.surcharge > 0 && (
+                          <>
+                            <span className="text-muted-foreground">
+                              + {validationAttribute('surcharge', true)}:
+                            </span>
+                            <span className="text-right">
+                              {formatCurrency(calculation.surcharge, baseSymbol)}
+                            </span>
+                          </>
+                        )}
+                        {calculation.discountAmount > 0 && (
+                          <>
+                            <span className="text-muted-foreground">
+                              - {validationAttribute('discount', true)} (
+                              {(calculation.discountRate * 100).toFixed(0)}%):
+                            </span>
+                            <span className="text-right text-red-600">
+                              -{formatCurrency(calculation.discountAmount, baseSymbol)}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  <div className="border-border border-t" />
+                  <div className="grid grid-cols-2 gap-1 text-sm">
+                    <span className="text-muted-foreground">
+                      {validationAttribute('tax', true)} ({(calculation.taxRate * 100).toFixed(0)}
+                      %):
+                    </span>
+                    <span className="text-right">
+                      {formatCurrency(calculation.tax, baseSymbol)}
+                    </span>
+                    <span className="font-semibold">{validationAttribute('total', true)}:</span>
+                    <span className="text-right font-semibold">
+                      {formatCurrency(calculation.total, baseSymbol)}
+                    </span>
+                  </div>
+
+                  {/* Customer Currency Conversion */}
+                  {customerConversion && (
+                    <>
+                      <div className="border-border border-t" />
+                      <div className="rounded bg-blue-50 p-2 dark:bg-blue-950">
+                        <div className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                          {t('quotes:create.customer_will_see', {
+                            currency: customerConversion.code,
+                            rate: formatRateDisplay(
+                              customerConversion.rate,
+                              customerConversion.code,
+                              baseCurrencyCode
+                            ),
+                            defaultValue: `Customer Will See (${customerConversion.code}):`,
+                          })}
+                        </div>
+                        <div className="mt-1 text-lg font-bold text-blue-900 dark:text-blue-100">
+                          {formatCurrency(
+                            customerConversion.roundedTotal,
+                            customerConversion.symbol
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-center text-sm">
+                  {t('quotes:create.no_pricing_rule', {
+                    defaultValue: 'No active pricing rule found',
+                  })}
+                </p>
+              )}
             </div>
+          )}
+
+          {/* Adjustment Inputs */}
+          <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="timeFee">Time Fee ({formData.currencyCode})</Label>
+              <Label htmlFor="timeFee">
+                {validationAttribute('timeFee', true)} ({baseSymbol})
+              </Label>
               <Input
                 id="timeFee"
                 type="number"
@@ -164,10 +431,13 @@ export function CreateQuoteDialog({
                 placeholder="0.00"
                 value={formData.timeFee}
                 onChange={(e) => handleChange('timeFee', e.target.value)}
+                autoFocus={!!orderDistanceKm}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="surcharge">Surcharge ({formData.currencyCode})</Label>
+              <Label htmlFor="surcharge">
+                {validationAttribute('surcharge', true)} ({baseSymbol})
+              </Label>
               <Input
                 id="surcharge"
                 type="number"
@@ -180,11 +450,13 @@ export function CreateQuoteDialog({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="discountRate">Discount (%)</Label>
+            <Label htmlFor="discountRate">{validationAttribute('discount', true)} (%)</Label>
             <Input
               id="discountRate"
               type="number"
               step="1"
+              min="0"
+              max="100"
               placeholder="0"
               value={formData.discountRate}
               onChange={(e) => handleChange('discountRate', e.target.value)}
@@ -192,27 +464,190 @@ export function CreateQuoteDialog({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">{validationAttribute('notes', true)}</Label>
             <Textarea
               id="notes"
-              placeholder="Optional notes for the customer..."
+              placeholder={t('quotes:create.notes_placeholder', {
+                defaultValue: 'Optional notes for the customer...',
+              })}
               value={formData.notes}
               onChange={(e) => handleChange('notes', e.target.value)}
             />
           </div>
+
+          {/* Delivery Window or Time-Sensitive Constraints */}
+          {timeSensitive && customerDesiredPickup ? (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                  {t('quotes:detail.time_sensitive_label', {
+                    defaultValue: 'Time-Sensitive Constraints',
+                  })}
+                </span>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-4">
+                {customerDesiredPickup && (
+                  <div>
+                    <p className="text-muted-foreground text-xs">
+                      {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })} ±15
+                      min
+                    </p>
+                    <p className="text-sm font-semibold">{formatDateTime(customerDesiredPickup)}</p>
+                  </div>
+                )}
+                {customerDesiredDelivery && (
+                  <div>
+                    <p className="text-muted-foreground text-xs">
+                      {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}{' '}
+                      ±15 min
+                    </p>
+                    <p className="text-sm font-semibold">
+                      {formatDateTime(customerDesiredDelivery)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : windowStart && windowEnd ? (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  {t('quotes:detail.window_label', { defaultValue: 'Delivery Window' })}
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                {formatDateTime(windowStart)} — {formatDateTime(windowEnd)}
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Fallback: show individual requested times */}
+              {customerDesiredPickup && (
+                <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
+                  <div>
+                    <p className="text-muted-foreground text-sm font-medium">
+                      {t('quotes:create.customer_requested_pickup', {
+                        defaultValue: 'Customer Requested Pickup',
+                      })}
+                    </p>
+                  </div>
+                  <p className="text-lg font-semibold">{formatDateTime(customerDesiredPickup)}</p>
+                </div>
+              )}
+              {customerDesiredDelivery && (
+                <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
+                  <div>
+                    <p className="text-muted-foreground text-sm font-medium">
+                      {t('quotes:create.customer_requested_delivery', {
+                        defaultValue: 'Customer Requested Delivery',
+                      })}
+                    </p>
+                  </div>
+                  <p className="text-lg font-semibold">{formatDateTime(customerDesiredDelivery)}</p>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Proposed Pickup/Delivery — smart display with edit */}
+          {editingTimes ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="pickupProposedFor">
+                  {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })}
+                </Label>
+                <Input
+                  id="pickupProposedFor"
+                  type="datetime-local"
+                  value={formData.pickupProposedFor}
+                  onChange={(e) => handleChange('pickupProposedFor', e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="deliveryProposedFor">
+                  {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}
+                </Label>
+                <Input
+                  id="deliveryProposedFor"
+                  type="datetime-local"
+                  value={formData.deliveryProposedFor}
+                  onChange={(e) => handleChange('deliveryProposedFor', e.target.value)}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="bg-muted/50 rounded-lg border p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">
+                  {t('quotes:create.proposed_times', { defaultValue: 'Proposed Times' })}
+                  {!timeSensitive && (
+                    <span className="text-muted-foreground ml-2 text-xs font-normal">
+                      {t('quotes:detail.approximate_times', {
+                        defaultValue: 'Approximate (system-optimized)',
+                      })}
+                    </span>
+                  )}
+                  {feasibility && !feasibility.outsourceRequired && timeSensitive && (
+                    <span className="text-muted-foreground ml-2 text-xs font-normal">
+                      {t('quotes:feasibility.suggested', { defaultValue: '(suggested by system)' })}
+                    </span>
+                  )}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      pickupProposedFor: effectivePickup,
+                      deliveryProposedFor: effectiveDelivery,
+                    }));
+                    setEditingTimes(true);
+                  }}
+                >
+                  <Pencil className="mr-1 h-3 w-3" />
+                  {actionLabel('edit')}
+                </Button>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t('quotes:create.proposed_pickup', { defaultValue: 'Proposed Pickup' })}
+                  </p>
+                  <p className="text-sm font-semibold">
+                    {effectivePickup
+                      ? formatDateTime(new Date(effectivePickup).toISOString())
+                      : '—'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t('quotes:create.proposed_delivery', { defaultValue: 'Proposed Delivery' })}
+                  </p>
+                  <p className="text-sm font-semibold">
+                    {effectiveDelivery
+                      ? formatDateTime(new Date(effectiveDelivery).toISOString())
+                      : '—'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="flex gap-2">
           <Button
             variant="outline"
             onClick={() => handleSubmit(false)}
-            disabled={isPending}
+            disabled={isPending || !distanceKm}
           >
-            Save as Draft
+            {t('quotes:create.save_draft', { defaultValue: 'Save as Draft' })}
           </Button>
-          <Button onClick={() => handleSubmit(true)} disabled={isPending}>
+          <Button onClick={() => handleSubmit(true)} disabled={isPending || !distanceKm}>
             <Send className="mr-2 h-4 w-4" />
-            Create & Send
+            {t('quotes:create.create_send', { defaultValue: 'Create & Send' })}
           </Button>
         </DialogFooter>
       </DialogContent>

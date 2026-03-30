@@ -4,6 +4,7 @@ import { ReactNode, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { I18nProvider } from '@/providers/I18nProvider';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { EchoProvider } from '@/providers/EchoProvider';
 
 const supportedLangs = ['en', 'es', 'fr'];
 
@@ -21,7 +22,9 @@ export default function LangLayout({ children }: Readonly<{ children: ReactNode 
 
   return (
     <I18nProvider>
-      <AuthProvider>{children}</AuthProvider>
+      <EchoProvider>
+        <AuthProvider>{children}</AuthProvider>
+      </EchoProvider>
     </I18nProvider>
   );
 }
