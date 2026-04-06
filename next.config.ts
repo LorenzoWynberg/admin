@@ -10,8 +10,8 @@ const nextConfig: NextConfig = {
     },
   },
   async rewrites() {
-    // Use local API for locales (HTTP to avoid SSL cert issues)
-    const localesUrl = process.env.LOCALES_URL || 'http://api.mandados.test:60';
+    const localesUrl =
+      process.env.LOCALES_URL || process.env.NEXT_PUBLIC_API_URL || 'http://api.mandados.test:60';
 
     return [
       {
