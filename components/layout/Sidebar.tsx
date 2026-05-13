@@ -22,6 +22,7 @@ import {
   ScrollText,
   Route,
   AlertTriangle,
+  BookOpen,
 } from 'lucide-react';
 import { useNeedsAttention } from '@/hooks/orders/useNeedsAttention';
 import { usePendingReconciliation } from '@/hooks/orders/usePendingReconciliation';
@@ -53,6 +54,7 @@ const navigation = [
   },
   { modelKey: 'notification', href: '/notifications', icon: Bell, isModel: true },
   { modelKey: 'audit_log', href: '/audit-logs', icon: ScrollText, isModel: true },
+  { modelKey: 'guide', href: '/guide', icon: BookOpen, isModel: false },
 ];
 
 function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
