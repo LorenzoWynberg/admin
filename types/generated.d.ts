@@ -147,6 +147,7 @@ declare namespace App.Data.Business {
     id: number;
     publicId: string;
     name: string;
+    typeId: number;
     typeName?: string;
     usersCanApproveOwnOrders?: boolean;
     createdAt?: string;
@@ -911,7 +912,7 @@ declare namespace App.Data.Setting {
     serviceWindowEnabled: boolean;
     unassignedEscalationHours: number;
     unassignedAutoCancelEnabled: boolean;
-    exchangeRateMode: string;
+    exchangeRateMode: App.Enums.ExchangeRateMode;
   };
   export type UpdateSettingData = {
     noServiceStart?: string;
