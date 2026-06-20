@@ -8,7 +8,7 @@ These rules MUST be followed at all times.
 - **Atomic commits** - One logical change per commit, small and focused
 - **Conventional commits** - Use prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`
 - **Protected branches** - By default, push to `feature/*` or `hotfix/*`. NEVER push to `main` or `dev`. Pushing to `release/*` is allowed when the user explicitly authorizes it.
-- **PR target** - All pull requests must target `release/1.0` (the default branch across all repos)
+- **PR target** - All pull requests must target `release/0.1.0` (the default branch across all repos)
 - **Push constantly** - Don't accumulate local commits
 
 ## AI Attribution
