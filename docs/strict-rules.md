@@ -37,12 +37,6 @@ npm run lint && npm run typecheck && npm run format
 - **Always fix type errors** - Type safety is critical
 - **Never edit `types/generated.d.ts`** - It's auto-generated from backend DTOs
 
-## Activity Logs
-
-- **Update on EVERY commit** - Add entry to `logs/activity/YYYY-MM-DD.md`
-- **Use Costa Rica time (UTC-6)** - Always
-- **Newest first** - Add entries at the TOP of the file
-
 ## Cross-Project Sync
 
 When modifying DTOs/Enums in API:
