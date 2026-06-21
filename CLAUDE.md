@@ -14,7 +14,7 @@ npm run typecheck  # 2. Fix type errors
 npm run format     # 3. Format (LAST step)
 ```
 
-Then push immediately. See `docs/strict-rules.md` for all rules.
+Then commit **only when the user asks** — run `/simplify` first, and never auto-push. See `docs/strict-rules.md` for all rules.
 
 ---
 
@@ -118,6 +118,8 @@ To sync types from backend:
 
 ```bash
 cp ../api/resources/types/generated.d.ts types/generated.d.ts
+cp ../api/resources/types/response.d.ts types/response.d.ts
+cp ../api/resources/types/notifications.d.ts types/notifications.d.ts
 npm run gen:enums
 ```
 

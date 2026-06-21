@@ -9,7 +9,7 @@ These rules MUST be followed at all times.
 - **Conventional commits** - Use prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`
 - **Protected branches** - By default, push to `feature/*` or `hotfix/*`. NEVER push to `main` or `dev`. Pushing to `release/*` is allowed when the user explicitly authorizes it.
 - **PR target** - All pull requests must target `release/0.1.0` (the default branch across all repos)
-- **Push constantly** - Don't accumulate local commits
+- **No auto-push** - Don't commit or push unless the user explicitly asks; run `/simplify` before committing
 
 ## AI Attribution
 
