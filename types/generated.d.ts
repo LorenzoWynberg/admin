@@ -526,6 +526,7 @@ declare namespace App.Data.Order {
     contactName?: string | null;
     contactPhone?: string | null;
     instructions?: string | null;
+    serviceDurationMinutes?: number | null;
     createdBy?: number;
     completedAt?: string | null;
     skippedAt?: string | null;
@@ -783,12 +784,17 @@ declare namespace App.Data.Quote {
     cancellationFee: number | null;
     notes?: string | null;
     items?: { [key: number]: any };
+    stopDurations?: { [key: number]: any };
   };
   export type StoreQuoteItemData = {
     orderStopId: number | null;
     label: string;
     quantity: number;
     unitPrice: number;
+  };
+  export type StoreQuoteStopDurationData = {
+    orderStopId: number;
+    serviceDurationMinutes: number;
   };
 }
 declare namespace App.Data.RefundRequest {

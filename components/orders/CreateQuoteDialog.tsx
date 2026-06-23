@@ -14,6 +14,7 @@ import { FileText, Send, Loader2, Pencil, Clock, AlertTriangle } from 'lucide-re
 import { FeasibilityBadge } from './FeasibilityBadge';
 import { useEffect, useMemo, useState } from 'react';
 import { QuoteLineItemsEditor, type QuoteLineItem } from '@/components/quotes/QuoteLineItemsEditor';
+import { QuoteStopDurationsEditor } from '@/components/quotes/QuoteStopDurationsEditor';
 import { useFeasibilityCheck } from '@/hooks/feasibility';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -96,6 +97,9 @@ export function CreateQuoteDialog({
 
   const [formData, setFormData] = useState(getDefaultFormData);
   const [items, setItems] = useState<QuoteLineItem[]>([]);
+  // stopPublicId → minutes the driver is occupied at that stop. Only holds
+  // admin overrides; the editor falls back to the default for absent stops.
+  const [stopDurations, setStopDurations] = useState<Record<string, number>>({});
 
   // Compute effective proposed times: feasibility suggestions override defaults when not editing
   const effectivePickup =
@@ -132,6 +136,7 @@ export function CreateQuoteDialog({
       setFormData(getDefaultFormData());
       setEditingTimes(false);
       setItems([]);
+      setStopDurations({});
     }
     setOpen(isOpen);
   };
@@ -238,6 +243,15 @@ export function CreateQuoteDialog({
         unitPrice: item.unitPrice,
       }));
 
+    const mappedStopDurations = Object.entries(stopDurations)
+      .map(([publicId, minutes]) => ({
+        orderStopId: stopIdMap.get(publicId) ?? null,
+        serviceDurationMinutes: minutes,
+      }))
+      .filter(
+        (d): d is { orderStopId: number; serviceDurationMinutes: number } => d.orderStopId !== null
+      );
+
     const data: App.Data.Quote.StoreQuoteData = {
       orderId,
       distanceKm,
@@ -250,6 +264,9 @@ export function CreateQuoteDialog({
       deliveryProposedFor: dateTimeLocalToISO(effectiveDelivery),
       ...(mappedItems.length > 0 && {
         items: Object.fromEntries(mappedItems.map((item, idx) => [idx, item])),
+      }),
+      ...(mappedStopDurations.length > 0 && {
+        stopDurations: Object.fromEntries(mappedStopDurations.map((d, idx) => [idx, d])),
       }),
     };
 
@@ -585,6 +602,13 @@ export function CreateQuoteDialog({
             items={items}
             onItemsChange={setItems}
             currencySymbol={baseSymbol}
+          />
+
+          {/* Per-stop service (dwell) time */}
+          <QuoteStopDurationsEditor
+            stops={orderStops}
+            durations={stopDurations}
+            onChange={setStopDurations}
           />
 
           {/* Items Total Preview */}
