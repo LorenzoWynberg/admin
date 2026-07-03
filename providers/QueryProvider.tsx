@@ -1,8 +1,19 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
+import { useAuthStore } from '@/stores/useAuthStore';
+
+const ONE_DAY = 1000 * 60 * 60 * 24;
+
+// Noop on the server (no localStorage); real persistence in the browser. This
+// makes the last-seen data render instantly and stay available offline (PWA).
+const persister = createSyncStoragePersister({
+  storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+});
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -11,6 +22,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             staleTime: 60 * 1000, // 1 minute
+            gcTime: ONE_DAY, // keep entries long enough to persist for offline
             refetchOnWindowFocus: false,
             retry: (failureCount, error: unknown) => {
               // Don't retry on auth errors
@@ -29,10 +41,17 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       })
   );
 
+  // Bust the persisted cache when the auth token changes, so one account never
+  // sees another's cached data on a shared browser (and logout clears it).
+  const token = useAuthStore((state) => state.token);
+
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister, maxAge: ONE_DAY, buster: token ?? 'anon' }}
+    >
       {children}
       <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
