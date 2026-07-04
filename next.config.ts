@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     const localesUrl =
-      process.env.LOCALES_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.mandados.cr';
+      process.env.NEXT_PUBLIC_API_URL || 'https://api.mandados.cr';
 
     return [
       {
