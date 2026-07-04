@@ -9,17 +9,6 @@ const nextConfig: NextConfig = {
       util: 'node:util',
     },
   },
-  async rewrites() {
-    const localesUrl =
-      process.env.NEXT_PUBLIC_API_URL || 'https://api.mandados.cr';
-
-    return [
-      {
-        source: '/locales/:path*',
-        destination: `${localesUrl}/locales/:path*`,
-      },
-    ];
-  },
 };
 
 export default nextConfig;
