@@ -1,4 +1,5 @@
 import { api } from '@/lib/api/client';
+import { PushService } from '@/services/pushService';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 type UserData = App.Data.User.UserData;
@@ -52,6 +53,8 @@ export const Auth = {
     const store = useAuthStore.getState();
 
     try {
+      // Remove the FCM push token before dropping the auth token.
+      await PushService.unregisterToken();
       // Call API to delete token
       await api.destroy('/auth/token');
     } catch {

@@ -1,9 +1,11 @@
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
+import { PushRegister } from '@/components/PushRegister';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden">
+      <PushRegister />
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />

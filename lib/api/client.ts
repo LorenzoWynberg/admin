@@ -146,9 +146,9 @@ export const api = {
     return handleResponse<T>(response);
   },
 
-  async destroy<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
+  async destroy<T>(endpoint: string, body?: unknown, options: FetchOptions = {}): Promise<T> {
     const url = `${API_URL}${endpoint}`;
-    const response = await fetch(url, buildRequestOptions('DELETE', undefined, options));
+    const response = await fetch(url, buildRequestOptions('DELETE', body, options));
     return handleResponse<T>(response);
   },
 };
