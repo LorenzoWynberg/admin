@@ -23,6 +23,12 @@ export const metadata: Metadata = {
     title: 'Mandados Admin',
     statusBarStyle: 'default',
   },
+  // Standards-based counterpart to appleWebApp.capable; silences Chrome's
+  // "apple-mobile-web-app-capable is deprecated" warning. No first-class
+  // Metadata field exists for it, so it's set via `other`.
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
 };
 
 export const viewport: Viewport = {
