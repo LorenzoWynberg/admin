@@ -69,12 +69,6 @@ export async function ensureI18nInitialized(pathname?: string) {
       preload: [lng],
       interpolation: {
         escapeValue: false,
-        format: (value, format) => {
-          if (format === 'capitalize' && typeof value === 'string') {
-            return value.charAt(0).toUpperCase() + value.slice(1);
-          }
-          return value;
-        },
       },
       detection: {
         order: ['path', 'cookie', 'navigator'],
@@ -91,6 +85,12 @@ export async function ensureI18nInitialized(pathname?: string) {
         useSuspense: false,
       },
     });
+
+  // i18next 26 removed interpolation.format; register the named formatter via the
+  // formatter API instead (matches laravel-to-i18next output, e.g. {{x, capitalize}}).
+  i18n.services.formatter?.add('capitalize', (value) =>
+    typeof value === 'string' ? value.charAt(0).toUpperCase() + value.slice(1) : String(value),
+  );
 
   initialized = true;
   return i18n;
