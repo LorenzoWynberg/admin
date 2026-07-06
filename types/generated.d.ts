@@ -991,6 +991,10 @@ declare namespace App.Data.TaxProfile {
   };
 }
 declare namespace App.Data.User {
+  export type ChangeEmailData = {
+    email: string;
+    currentPassword: string;
+  };
   export type LoginData = {
     email: string;
     password: string;
