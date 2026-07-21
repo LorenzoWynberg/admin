@@ -12,7 +12,15 @@ import { useCreateDriver } from '@/hooks/drivers';
 import { CatalogService } from '@/services/catalogService';
 import { UploadService } from '@/services/uploadService';
 import { applyApiErrorsToForm } from '@/utils/form';
-import { actionLabel, validationAttribute, capitalize, modelLabel } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  validationAttribute,
+  vehicleTypeLabel,
+  dispatchPolicyLabel,
+} from '@/utils/lang';
+import { Enums } from '@/data/app-enums';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -60,6 +68,17 @@ const formSchema = z.object({
     .refine((val) => new Date(val) > today, { message: 'Must be a future date' }),
   licensePhotoFront: z.string().min(1),
   licensePhotoBack: z.string().min(1),
+  defaultVehicleType: z.enum([
+    Enums.VehicleType.Motorcycle,
+    Enums.VehicleType.Car,
+    Enums.VehicleType.PickupVan,
+    Enums.VehicleType.Truck,
+  ]),
+  dispatchPolicy: z.enum([
+    Enums.DispatchPolicy.Auto,
+    Enums.DispatchPolicy.CatchAll,
+    Enums.DispatchPolicy.ManualOnly,
+  ]),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -101,6 +120,8 @@ export default function CreateDriverPage() {
       licenseExpirationDate: '',
       licensePhotoFront: '',
       licensePhotoBack: '',
+      defaultVehicleType: Enums.VehicleType.Car,
+      dispatchPolicy: Enums.DispatchPolicy.Auto,
     },
   });
 
@@ -132,6 +153,8 @@ export default function CreateDriverPage() {
         licenseExpirationDate: values.licenseExpirationDate,
         licensePhotoFront: values.licensePhotoFront,
         licensePhotoBack: values.licensePhotoBack,
+        defaultVehicleType: values.defaultVehicleType as App.Enums.VehicleType,
+        dispatchPolicy: values.dispatchPolicy as App.Enums.DispatchPolicy,
       });
       router.push('/drivers');
     } catch (error) {
@@ -149,6 +172,8 @@ export default function CreateDriverPage() {
         license_expiration_date: 'licenseExpirationDate',
         license_photo_front: 'licensePhotoFront',
         license_photo_back: 'licensePhotoBack',
+        default_vehicle_type: 'defaultVehicleType',
+        dispatch_policy: 'dispatchPolicy',
       });
     }
   };
@@ -455,6 +480,72 @@ export default function CreateDriverPage() {
                           )}
                         </div>
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Vehicle & Dispatch */}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {t('drivers:vehicle_dispatch_info', { defaultValue: 'Vehicle & Dispatch' })}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="defaultVehicleType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t('drivers:default_vehicle_type', { defaultValue: 'Default Vehicle' })}
+                      </FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.values(Enums.VehicleType).map((vt) => (
+                            <SelectItem key={vt} value={vt}>
+                              {capitalize(vehicleTypeLabel(vt))}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="dispatchPolicy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t('drivers:dispatch_policy', { defaultValue: 'Dispatch Policy' })}
+                      </FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.values(Enums.DispatchPolicy).map((policy) => (
+                            <SelectItem key={policy} value={policy}>
+                              {capitalize(dispatchPolicyLabel(policy))}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -7,10 +7,20 @@ import {
   resourceMessage,
   statusLabel,
   validationAttribute,
+  vehicleTypeLabel,
+  dispatchPolicyLabel,
 } from '@/utils/lang';
+import { Enums } from '@/data/app-enums';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useCallback, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -128,6 +138,9 @@ export default function DriverDetailPage() {
   }
 
   const expired = isLicenseExpired(driver.licenseExpirationDate);
+  // `isOutsourced` was replaced by `dispatchPolicy`: catch-all drivers are the outsourced ones
+  // (see api/database/migrations/2026_07_21_095445_add_vehicle_and_dispatch_policy_to_drivers_table.php).
+  const isOutsourced = driver.dispatchPolicy === Enums.DispatchPolicy.CatchAll;
   const baseCenter =
     driver.baseLatitude != null && driver.baseLongitude != null
       ? { lat: driver.baseLatitude, lng: driver.baseLongitude }
@@ -178,7 +191,7 @@ export default function DriverDetailPage() {
           <TabsTrigger value="details">
             {t('drivers:tabs.details', { defaultValue: 'Details' })}
           </TabsTrigger>
-          {!driver.isOutsourced && (
+          {!isOutsourced && (
             <TabsTrigger value="schedule">
               {t('drivers:tabs.schedule', { defaultValue: 'Schedule' })}
             </TabsTrigger>
@@ -253,17 +266,77 @@ export default function DriverDetailPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Car className="h-5 w-5" />
-                  {t('drivers:detail.vehicle_info', { defaultValue: 'Vehicle Information' })}
+                <CardTitle className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2">
+                    <Car className="h-5 w-5" />
+                    {t('drivers:detail.vehicle_info', { defaultValue: 'Vehicle Information' })}
+                  </span>
+                  <Badge variant="outline">
+                    {capitalize(vehicleTypeLabel(driver.defaultVehicleType))} ·{' '}
+                    {capitalize(dispatchPolicyLabel(driver.dispatchPolicy))}
+                  </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
                     {validationAttribute('licensePlate', true)}
                   </span>
                   <span className="font-medium">{driver.licensePlateNumber || '-'}</span>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label className="text-muted-foreground text-sm">
+                    {t('drivers:default_vehicle_type', { defaultValue: 'Default Vehicle' })}
+                  </Label>
+                  <Select
+                    value={driver.defaultVehicleType}
+                    onValueChange={(value) =>
+                      updateDriver.mutate({
+                        id: driverId,
+                        data: { defaultVehicleType: value as App.Enums.VehicleType },
+                      })
+                    }
+                    disabled={updateDriver.isPending}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(Enums.VehicleType).map((vt) => (
+                        <SelectItem key={vt} value={vt}>
+                          {capitalize(vehicleTypeLabel(vt))}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label className="text-muted-foreground text-sm">
+                    {t('drivers:dispatch_policy', { defaultValue: 'Dispatch Policy' })}
+                  </Label>
+                  <Select
+                    value={driver.dispatchPolicy}
+                    onValueChange={(value) =>
+                      updateDriver.mutate({
+                        id: driverId,
+                        data: { dispatchPolicy: value as App.Enums.DispatchPolicy },
+                      })
+                    }
+                    disabled={updateDriver.isPending}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(Enums.DispatchPolicy).map((policy) => (
+                        <SelectItem key={policy} value={policy}>
+                          {capitalize(dispatchPolicyLabel(policy))}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>
@@ -288,7 +361,7 @@ export default function DriverDetailPage() {
             </Card>
 
             {/* Base Location — internal drivers only */}
-            {!driver.isOutsourced && (
+            {!isOutsourced && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -349,7 +422,7 @@ export default function DriverDetailPage() {
           </div>
         </TabsContent>
 
-        {!driver.isOutsourced && (
+        {!isOutsourced && (
           <TabsContent value="schedule">
             <DriverScheduleTab driverId={driverId} />
           </TabsContent>

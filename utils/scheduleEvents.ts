@@ -1,5 +1,6 @@
 import type { EventInput } from '@fullcalendar/core';
 import { extractDatePart, getTodayAppTz } from '@/utils/format';
+import { capitalize, vehicleTypeLabel } from '@/utils/lang';
 
 type ScheduleEntry = App.Data.Driver.DriverScheduleData;
 
@@ -16,6 +17,7 @@ const COLORS = {
 export interface CalendarEventProps {
   _date: string;
   _startTime: string;
+  _vehicleType: App.Enums.VehicleType | null;
 }
 
 /**
@@ -39,10 +41,13 @@ export function buildCalendarEvents(schedules: ScheduleEntry[], title = 'Schedul
     const isPast = new Date(dateStr + 'T00:00:00') < today;
     const color = isPast ? COLORS.past : COLORS.scheduled;
     const normalizedStart = normalizeTime(schedule.startTime);
+    const eventTitle = schedule.vehicleType
+      ? `${title} · ${capitalize(vehicleTypeLabel(schedule.vehicleType))}`
+      : title;
 
     events.push({
       id: `schedule-${dateStr}-${index}`,
-      title,
+      title: eventTitle,
       start: `${dateStr}T${normalizedStart}`,
       end: `${dateStr}T${normalizeTime(schedule.endTime)}`,
       backgroundColor: color,
@@ -50,6 +55,7 @@ export function buildCalendarEvents(schedules: ScheduleEntry[], title = 'Schedul
       extendedProps: {
         _date: dateStr,
         _startTime: schedule.startTime,
+        _vehicleType: schedule.vehicleType,
       } satisfies CalendarEventProps,
     });
   }

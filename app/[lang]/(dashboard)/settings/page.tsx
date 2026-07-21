@@ -7,15 +7,21 @@ import {
   SelectItem,
   Select,
 } from '@/components/ui/select';
-import { Globe, Coins, Clock, ChevronRight } from 'lucide-react';
+import { Globe, Coins, Clock, Truck, ChevronRight } from 'lucide-react';
 
+import { useState } from 'react';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
 import { Lang } from '@/services/langService';
 import type { LangCode } from '@/stores/useLangStore';
 import { usePathname } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
+import { useSupportedVehicleTypes, useUpdateSupportedVehicleTypes } from '@/hooks/settings';
+import { Enums } from '@/data/app-enums';
+import { actionLabel, capitalize, vehicleTypeLabel } from '@/utils/lang';
 
 const languageCodes = ['en', 'es', 'fr'] as const;
 
@@ -23,6 +29,28 @@ export default function SettingsPage() {
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
   const pathname = usePathname();
+
+  const { data: vehicleTypesData, isLoading: vehicleTypesLoading } = useSupportedVehicleTypes();
+  const updateVehicleTypes = useUpdateSupportedVehicleTypes();
+
+  const [supportedVehicleTypes, setSupportedVehicleTypes] = useState<string[]>([]);
+  const [vehicleTypesInitialized, setVehicleTypesInitialized] = useState(false);
+
+  // Initialize local state from fetched data
+  if (vehicleTypesData && !vehicleTypesInitialized) {
+    setSupportedVehicleTypes(vehicleTypesData.supportedVehicleTypes);
+    setVehicleTypesInitialized(true);
+  }
+
+  const toggleVehicleType = (value: string) => {
+    setSupportedVehicleTypes((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
+  };
+
+  const handleSaveVehicleTypes = () => {
+    updateVehicleTypes.mutate(supportedVehicleTypes);
+  };
 
   // Wait for translations to load
   if (!ready) {
@@ -79,6 +107,53 @@ export default function SettingsPage() {
               </SelectContent>
             </Select>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Truck className="h-5 w-5" />
+            {t('common:supported_vehicle_types', { defaultValue: 'Supported Vehicle Types' })}
+          </CardTitle>
+          <CardDescription>
+            {t('common:supported_vehicle_types_description', {
+              defaultValue: 'Choose which vehicle types drivers can be assigned in this fleet',
+            })}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {vehicleTypesLoading ? (
+            <div className="flex items-center justify-center py-6">
+              <div className="border-primary h-6 w-6 animate-spin rounded-full border-4 border-t-transparent" />
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {Object.values(Enums.VehicleType).map((vt) => (
+                  <div key={vt} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`vehicle-type-${vt}`}
+                      checked={supportedVehicleTypes.includes(vt)}
+                      onCheckedChange={() => toggleVehicleType(vt)}
+                    />
+                    <Label htmlFor={`vehicle-type-${vt}`} className="font-normal">
+                      {capitalize(vehicleTypeLabel(vt))}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              <Button
+                onClick={handleSaveVehicleTypes}
+                disabled={updateVehicleTypes.isPending}
+                size="sm"
+              >
+                {updateVehicleTypes.isPending
+                  ? t('common:saving', { defaultValue: 'Saving...' })
+                  : actionLabel('save')}
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
 

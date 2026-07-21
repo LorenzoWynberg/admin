@@ -116,6 +116,17 @@ export const Enums = {
     Cheapest: "cheapest",
     Custom: "custom",
   },
+  DispatchEligibilityReason: {
+    UnsupportedTier: "unsupported_tier",
+    ManualOnlyPolicy: "manual_only_policy",
+    CatchAllPolicy: "catch_all_policy",
+    InsufficientVehicle: "insufficient_vehicle",
+  },
+  DispatchPolicy: {
+    Auto: "auto",
+    CatchAll: "catch_all",
+    ManualOnly: "manual_only",
+  },
   ErrorAction: {
     Retrieving: "retrieving",
     Creating: "creating",
@@ -364,6 +375,12 @@ export const Enums = {
     Succeeded: "succeeded",
     Voided: "voided",
     Failed: "failed",
+  },
+  VehicleType: {
+    Motorcycle: "motorcycle",
+    Car: "car",
+    PickupVan: "pickup_van",
+    Truck: "truck",
   },
 } as const;
 export type Enums = typeof Enums;

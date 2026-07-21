@@ -14,6 +14,7 @@ import { UrgencyBadge } from './UrgencyBadge';
 import { PaymentStatusBadge } from './PaymentStatusBadge';
 import { ReasonBadge } from './ReasonBadge';
 import { CancelOrderDialog } from './CancelOrderDialog';
+import { AssignDriverModal } from './AssignDriverModal';
 import { useChangeTier, useOutsourceOrder, useRetryDispatch } from '@/hooks/orders';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Enums } from '@/data/app-enums';
@@ -133,6 +134,15 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
             <RefreshCw className={`mr-1 h-4 w-4 ${retryDispatch.isPending ? 'animate-spin' : ''}`} />
             {t('needs_attention.retry_dispatch', { defaultValue: 'Retry' })}
           </Button>
+
+          {!order.driverId && (
+            <AssignDriverModal
+              order={{
+                publicId: order.publicId as string,
+                finalVehicleType: order.finalVehicleType,
+              }}
+            />
+          )}
 
           <Button
             variant="outline"

@@ -96,3 +96,23 @@ export const actionLabel = (action: string, model?: string, toUpper = true): str
 export const modelLabel = (model: string, count = 1): string => {
   return i18next.t(`models:${model}`, { count, defaultValue: model });
 };
+
+/**
+ * Get translated vehicle type label (e.g., 'motorcycle', 'pickup_van').
+ * @param vehicleType - The vehicle type key
+ * @returns Translated vehicle type label
+ */
+export const vehicleTypeLabel = (vehicleType: string | null | undefined): string => {
+  if (!vehicleType) return i18next.t('common:none', { defaultValue: 'None' });
+  return i18next.t(`orders:vehicle_types.${vehicleType}`, { defaultValue: vehicleType });
+};
+
+/**
+ * Get translated dispatch policy label (e.g., 'auto', 'manual_only').
+ * @param dispatchPolicy - The dispatch policy key
+ * @returns Translated dispatch policy label
+ */
+export const dispatchPolicyLabel = (dispatchPolicy: string | null | undefined): string => {
+  if (!dispatchPolicy) return i18next.t('common:none', { defaultValue: 'None' });
+  return i18next.t(`drivers:dispatch_policies.${dispatchPolicy}`, { defaultValue: dispatchPolicy });
+};

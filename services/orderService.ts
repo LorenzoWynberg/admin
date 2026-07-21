@@ -3,10 +3,16 @@ import { api } from '@/lib/api/client';
 type OrderData = App.Data.Order.OrderData;
 type QuoteData = App.Data.Quote.QuoteData;
 type RouteStopData = App.Data.Route.RouteStopData;
+type DispatchEligibility = App.Data.Dispatch.DispatchEligibility;
 type Single<T> = Api.Response.Single<T>;
 type Multiple<T> = Api.Response.Multiple<T>;
 type Paginated<T> = Api.Response.Paginated<T>;
 type SuccessBasic = Api.Response.SuccessBasic;
+
+export interface AssignOrderResult {
+  order: OrderData;
+  eligibility: DispatchEligibility;
+}
 
 export interface NeedsAttentionOrder {
   order: OrderData;
@@ -150,6 +156,19 @@ export const OrderService = {
   async retryDispatch(publicId: string): Promise<OrderData> {
     const response = await api.post<Single<OrderData>>(`/orders/${publicId}/dispatch`);
     return response.item;
+  },
+
+  /**
+   * Assign a driver to an order (admin only, human-in-the-loop assignment)
+   * Returns the updated order + dispatch eligibility feedback (still succeeds even when ineligible)
+   */
+  async assign(publicId: string, driverId: number): Promise<AssignOrderResult> {
+    const response = await api.post<Single<OrderData>>(`/orders/${publicId}/assign`, { driverId });
+    const extra = response.extra as { eligibility: DispatchEligibility };
+    return {
+      order: response.item,
+      eligibility: extra.eligibility,
+    };
   },
 
   /**

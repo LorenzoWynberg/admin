@@ -7,14 +7,25 @@ import {
   DialogTitle,
   Dialog,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { actionLabel } from '@/utils/lang';
+import { Enums } from '@/data/app-enums';
+import { actionLabel, capitalize, vehicleTypeLabel } from '@/utils/lang';
 
 type ScheduleEntry = App.Data.Driver.DriverScheduleData;
+type VehicleType = App.Enums.VehicleType;
+
+const USE_DEFAULT_VEHICLE = '__use_default__';
 
 interface ScheduleEventDialogProps {
   open: boolean;
@@ -23,6 +34,7 @@ interface ScheduleEventDialogProps {
   date: string;
   startTime?: string;
   endTime?: string;
+  vehicleType?: VehicleType | null;
   isSaving?: boolean;
   onSave: (entry: ScheduleEntry) => void;
   onDelete?: () => void;
@@ -35,20 +47,23 @@ export function ScheduleEventDialog({
   date,
   startTime: initialStartTime,
   endTime: initialEndTime,
+  vehicleType: initialVehicleType,
   isSaving,
   onSave,
   onDelete,
 }: ScheduleEventDialogProps) {
   const { t } = useTranslation();
-  const resetKey = `${date}-${initialStartTime}-${initialEndTime}`;
+  const resetKey = `${date}-${initialStartTime}-${initialEndTime}-${initialVehicleType}`;
   const [prevResetKey, setPrevResetKey] = useState(resetKey);
   const [startTime, setStartTime] = useState(initialStartTime ?? '08:00');
   const [endTime, setEndTime] = useState(initialEndTime ?? '17:00');
+  const [vehicleType, setVehicleType] = useState<VehicleType | null>(initialVehicleType ?? null);
 
   if (resetKey !== prevResetKey) {
     setPrevResetKey(resetKey);
     setStartTime(initialStartTime ?? '08:00');
     setEndTime(initialEndTime ?? '17:00');
+    setVehicleType(initialVehicleType ?? null);
   }
 
   const isTimeValid = startTime < endTime;
@@ -60,6 +75,7 @@ export function ScheduleEventDialog({
       date,
       startTime,
       endTime,
+      vehicleType,
     };
 
     onSave(entry);
@@ -120,6 +136,34 @@ export function ScheduleEventDialog({
                 })}
               </p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm">
+              {t('drivers:schedule.vehicle_override', { defaultValue: 'Vehicle Override' })}
+            </Label>
+            <Select
+              value={vehicleType ?? USE_DEFAULT_VEHICLE}
+              onValueChange={(value) =>
+                setVehicleType(value === USE_DEFAULT_VEHICLE ? null : (value as VehicleType))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={USE_DEFAULT_VEHICLE}>
+                  {t('drivers:schedule.use_default_vehicle', {
+                    defaultValue: 'Use default vehicle',
+                  })}
+                </SelectItem>
+                {Object.values(Enums.VehicleType).map((vt) => (
+                  <SelectItem key={vt} value={vt}>
+                    {capitalize(vehicleTypeLabel(vt))}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
