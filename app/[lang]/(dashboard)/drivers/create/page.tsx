@@ -93,13 +93,13 @@ export default function CreateDriverPage() {
   const [uploadingBack, setUploadingBack] = useState(false);
 
   const { data: sexOptions } = useQuery({
-    queryKey: ['catalogs', 'SEX', 'elements'],
-    queryFn: () => CatalogService.getElementsByCode('SEX'),
+    queryKey: ['catalogs', 'sex', 'elements'],
+    queryFn: () => CatalogService.getElementsByCode('sex'),
   });
 
   const { data: langOptions } = useQuery({
-    queryKey: ['catalogs', 'LANGUAGE', 'elements'],
-    queryFn: () => CatalogService.getElementsByCode('LANGUAGE'),
+    queryKey: ['catalogs', 'language', 'elements'],
+    queryFn: () => CatalogService.getElementsByCode('language'),
   });
 
   const form = useForm<FormValues>({
