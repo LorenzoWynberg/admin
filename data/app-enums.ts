@@ -118,6 +118,7 @@ export const Enums = {
     Custom: "custom",
   },
   DispatchEligibilityReason: {
+    Inactive: "inactive",
     UnsupportedTier: "unsupported_tier",
     ManualOnlyPolicy: "manual_only_policy",
     CatchAllPolicy: "catch_all_policy",

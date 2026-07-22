@@ -55,7 +55,9 @@ export function AssignDriverModal({ order }: AssignDriverModalProps) {
   const assignOrder = useAssignOrder();
 
   const candidates = feasibility?.candidates ?? [];
-  const drivers = driversData?.items ?? [];
+  // Inactive drivers can never be assigned (the API blocks it), so keep them out
+  // of the override list — ranked candidates are already active.
+  const drivers = (driversData?.items ?? []).filter((d) => d.active);
 
   const handleOpenChange = (val: boolean) => {
     if (!val) {

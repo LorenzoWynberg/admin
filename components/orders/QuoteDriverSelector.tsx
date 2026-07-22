@@ -71,8 +71,10 @@ export function QuoteDriverSelector({
   const effectiveId = value === undefined ? suggestedDriverId : value;
 
   // Ranked candidate ids first, then any other active driver as override options.
+  // Inactive drivers are off the roster and can never be assigned, so they are
+  // excluded from the override options (ranked candidates are already active).
   const otherDrivers = useMemo(
-    () => drivers.filter((d) => !candidates.some((c) => c.driverId === d.id)),
+    () => drivers.filter((d) => d.active && !candidates.some((c) => c.driverId === d.id)),
     [drivers, candidates]
   );
 
