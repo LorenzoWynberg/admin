@@ -162,7 +162,7 @@ export default function DriverDetailPage() {
               {driver.user?.name || t('common:unknown', { defaultValue: 'Unknown' })}
             </h1>
             <p className="text-muted-foreground">
-              {capitalize(modelLabel('driver'))} {driver.publicId}
+              {modelLabel('driver')} {driver.publicId}
             </p>
           </div>
         </div>

@@ -189,7 +189,7 @@ export default function CreateDriverPage() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-3xl font-bold">
-          {t('resource:create_one', { resource: capitalize(modelLabel('driver')) })}
+          {t('resource:create_one', { resource: modelLabel('driver') })}
         </h1>
       </div>
 

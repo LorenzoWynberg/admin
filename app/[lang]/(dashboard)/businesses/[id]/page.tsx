@@ -2,7 +2,6 @@
 
 import {
   actionLabel,
-  capitalize,
   modelLabel,
   resourceMessage,
   validationAttribute,
@@ -82,7 +81,7 @@ export default function BusinessDetailPage() {
           <div>
             <h1 className="text-3xl font-bold">{business.name}</h1>
             <p className="text-muted-foreground">
-              {capitalize(modelLabel('business'))} {business.publicId}
+              {modelLabel('business')} {business.publicId}
             </p>
           </div>
         </div>

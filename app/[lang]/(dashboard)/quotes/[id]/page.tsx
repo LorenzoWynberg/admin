@@ -2,7 +2,6 @@
 
 import {
   actionLabel,
-  capitalize,
   modelLabel,
   resourceMessage,
   validationAttribute,
@@ -109,7 +108,7 @@ export default function QuoteDetailPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold">
-                {capitalize(modelLabel('quote'))} {quote.publicId}
+                {modelLabel('quote')} {quote.publicId}
               </h1>
               <QuoteStatusBadge status={quote.status as QuoteStatus} />
             </div>
@@ -150,7 +149,7 @@ export default function QuoteDetailPage() {
             </div>
             {quote.orderId && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{capitalize(modelLabel('order'))}</span>
+                <span className="text-muted-foreground">{modelLabel('order')}</span>
                 <Button
                   variant="link"
                   className="h-auto p-0"

@@ -64,7 +64,7 @@ export default function DriversPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(modelLabel('driver', 2))}</h1>
+          <h1 className="text-3xl font-bold">{modelLabel('driver', 2)}</h1>
           <p className="text-muted-foreground">
             {t('drivers:manage_description', { defaultValue: 'Manage driver accounts' })}
           </p>
@@ -116,7 +116,7 @@ export default function DriversPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('models:driver_one', { defaultValue: 'Driver' })}</TableHead>
+                  <TableHead>{modelLabel('driver')}</TableHead>
                   <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
                   <TableHead>
                     {t('drivers:vehicle_dispatch_info', { defaultValue: 'Vehicle & Dispatch' })}

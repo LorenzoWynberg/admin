@@ -2,7 +2,6 @@
 
 import {
   actionLabel,
-  capitalize,
   modelLabel,
   resourceMessage,
   validationAttribute,
@@ -107,7 +106,7 @@ export default function UserDetailPage() {
               <RoleBadge role={user.role as Role} />
             </div>
             <p className="text-muted-foreground">
-              {capitalize(modelLabel('user'))} {user.publicId}
+              {modelLabel('user')} {user.publicId}
             </p>
           </div>
         </div>

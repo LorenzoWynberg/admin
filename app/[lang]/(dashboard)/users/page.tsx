@@ -19,7 +19,6 @@ import {
 import { useState } from 'react';
 import {
   actionLabel,
-  capitalize,
   modelLabel,
   resourceMessage,
   validationAttribute,
@@ -88,7 +87,7 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(modelLabel('user', 2))}</h1>
+          <h1 className="text-3xl font-bold">{modelLabel('user', 2)}</h1>
           <p className="text-muted-foreground">
             {t('users:manage_description', { defaultValue: 'Manage user accounts' })}
           </p>
@@ -160,7 +159,7 @@ export default function UsersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{capitalize(modelLabel('user'))}</TableHead>
+                  <TableHead>{modelLabel('user')}</TableHead>
                   <TableHead>{validationAttribute('email', true)}</TableHead>
                   <TableHead>{validationAttribute('role', true)}</TableHead>
                   <TableHead>{validationAttribute('phone', true)}</TableHead>

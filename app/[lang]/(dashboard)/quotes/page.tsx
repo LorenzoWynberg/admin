@@ -19,7 +19,6 @@ import {
 import { useState } from 'react';
 import {
   actionLabel,
-  capitalize,
   modelLabel,
   resourceMessage,
   statusLabel,
@@ -89,7 +88,7 @@ export default function QuotesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(modelLabel('quote', 2))}</h1>
+          <h1 className="text-3xl font-bold">{modelLabel('quote', 2)}</h1>
           <p className="text-muted-foreground">
             {t('quotes:manage_description', { defaultValue: 'Create and manage delivery quotes' })}
           </p>
@@ -220,7 +219,7 @@ export default function QuotesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{validationAttribute('id', true)}</TableHead>
-                  <TableHead>{capitalize(modelLabel('order'))}</TableHead>
+                  <TableHead>{modelLabel('order')}</TableHead>
                   <TableHead>{validationAttribute('status', true)}</TableHead>
                   <TableHead>{validationAttribute('total', true)}</TableHead>
                   <TableHead>{t('quotes:valid_until', { defaultValue: 'Valid Until' })}</TableHead>
