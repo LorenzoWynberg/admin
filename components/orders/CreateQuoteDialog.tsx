@@ -21,6 +21,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
+import { QuoteDriverSelector } from './QuoteDriverSelector';
 import { useCurrencyList } from '@/hooks/currencies';
 import { useCalculatePricing } from '@/hooks/pricing';
 import { useCreateQuote, useSendQuote } from '@/hooks/quotes';
@@ -32,6 +33,7 @@ import {
   toDateTimeLocal,
   dateTimeLocalToISO,
   formatDateTime,
+  extractDatePart,
 } from '@/utils/format';
 import { formatRateDisplay } from '@/utils/currency';
 import { Enums } from '@/data/app-enums';
@@ -97,6 +99,8 @@ export function CreateQuoteDialog({
 
   const [formData, setFormData] = useState(getDefaultFormData);
   const [items, setItems] = useState<QuoteLineItem[]>([]);
+  // Preferred driver chosen by the admin (null = use system suggestion / leave to admin).
+  const [preferredDriverId, setPreferredDriverId] = useState<number | null>(null);
   // stopPublicId → minutes the driver is occupied at that stop. Only holds
   // admin overrides; the editor falls back to the default for absent stops.
   const [stopDurations, setStopDurations] = useState<Record<string, number>>({});
@@ -111,6 +115,10 @@ export function CreateQuoteDialog({
     !editingTimes && feasibility?.suggestedDelivery
       ? toDateTimeLocal(new Date(feasibility.suggestedDelivery))
       : formData.deliveryProposedFor;
+
+  // Top-ranked candidate is the system suggestion; explicit choice overrides it.
+  const suggestedDriverId = feasibility?.candidates?.[0]?.driverId ?? null;
+  const effectivePreferredDriverId = preferredDriverId ?? suggestedDriverId;
 
   // Auto-calculate distance when dialog opens if not yet calculated
   useEffect(() => {
@@ -137,6 +145,7 @@ export function CreateQuoteDialog({
       setEditingTimes(false);
       setItems([]);
       setStopDurations({});
+      setPreferredDriverId(null);
     }
     setOpen(isOpen);
   };
@@ -259,6 +268,7 @@ export function CreateQuoteDialog({
       surcharge: formData.surcharge ? parseFloat(formData.surcharge) : null,
       discountRate: formData.discountRate ? parseFloat(formData.discountRate) / 100 : null,
       cancellationFee: formData.cancellationFee ? parseFloat(formData.cancellationFee) : null,
+      preferredDriverId: effectivePreferredDriverId,
       notes: formData.notes || undefined,
       pickupProposedFor: dateTimeLocalToISO(effectivePickup),
       deliveryProposedFor: dateTimeLocalToISO(effectiveDelivery),
@@ -695,6 +705,24 @@ export function CreateQuoteDialog({
                 </div>
               )}
             </>
+          )}
+
+          {/* Driver selection — system suggests, admin can override.
+              Sits with the scheduling info so who + when read together. */}
+          {feasibility && (
+            <QuoteDriverSelector
+              candidates={feasibility.candidates ?? []}
+              suggestedDriverId={suggestedDriverId}
+              value={preferredDriverId}
+              onChange={setPreferredDriverId}
+              initialDate={
+                feasibility.suggestedPickup
+                  ? extractDatePart(feasibility.suggestedPickup)
+                  : windowStart
+                    ? extractDatePart(windowStart)
+                    : undefined
+              }
+            />
           )}
 
           {/* Proposed Pickup/Delivery — smart display with edit */}

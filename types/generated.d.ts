@@ -478,6 +478,7 @@ declare namespace App.Data.Order {
     userId?: number;
     businessId?: number | null;
     driverId?: number | null;
+    preferredDriverId?: number | null;
     deliveryAddressId?: number | null;
     contactName?: string | null;
     contactPhone?: string | null;
@@ -808,6 +809,7 @@ declare namespace App.Data.Quote {
     pickupProposedFor: string | null;
     deliveryProposedFor: string | null;
     cancellationFee: number | null;
+    preferredDriverId: number | null;
     notes?: string | null;
     items?: { [key: number]: any };
     stopDurations?: { [key: number]: any };

@@ -1,4 +1,5 @@
 import { api } from '@/lib/api/client';
+import { buildUrl } from '@/utils/http';
 
 export interface AffectedOrder {
   publicId: string;
@@ -54,14 +55,21 @@ export const DriverService = {
     return api.destroy<SuccessBasic>(`/drivers/${id}`);
   },
 
-  async getSchedules(driverId: string): Promise<{
+  async getSchedules(
+    driverId: string,
+    range: { from?: string; to?: string } = {}
+  ): Promise<{
     schedules: App.Data.Driver.DriverScheduleData[];
   }> {
+    const url = buildUrl(`/drivers/${driverId}/schedules`, {
+      from: range.from,
+      to: range.to,
+    });
     const response = await api.get<
       Api.Response.SuccessBasic & {
         schedules: App.Data.Driver.DriverScheduleData[];
       }
-    >(`/drivers/${driverId}/schedules`);
+    >(url);
     return { schedules: response.schedules };
   },
 
