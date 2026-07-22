@@ -20,6 +20,8 @@ export interface NeedsAttentionOrder {
   reason: string;
   outsourceEligible: boolean;
   hoursUntilWindowEnd: number | null;
+  preferredDriverName?: string | null;
+  preferredDriverIssue?: string | null;
 }
 
 export interface NeedsAttentionSummary {

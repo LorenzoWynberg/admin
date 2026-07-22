@@ -89,6 +89,15 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
           )}
         </div>
 
+        {item.preferredDriverName && (
+          <p className="text-muted-foreground text-xs">
+            {t(`needs_attention.preferred_issue.${item.preferredDriverIssue ?? 'unavailable'}`, {
+              name: item.preferredDriverName,
+              defaultValue: `${item.preferredDriverName} is no longer available`,
+            })}
+          </p>
+        )}
+
         <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"

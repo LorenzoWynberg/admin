@@ -11,6 +11,7 @@ export const Enums = {
     ScheduleConflict: "schedule_conflict",
     WindowTooTight: "window_too_tight",
     UnassignedTooLong: "unassigned_too_long",
+    PreferredDriverUnavailable: "preferred_driver_unavailable",
   },
   AttentionUrgency: {
     Critical: "critical",

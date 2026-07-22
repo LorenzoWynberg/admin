@@ -471,6 +471,8 @@ declare namespace App.Data.Order {
     outsourceEligible: boolean;
     hoursUntilWindowEnd: number | null;
     workingHoursUnassigned: number | null;
+    preferredDriverName: string | null;
+    preferredDriverIssue: string | null;
   };
   export type OrderData = {
     id?: number;
@@ -809,7 +811,7 @@ declare namespace App.Data.Quote {
     pickupProposedFor: string | null;
     deliveryProposedFor: string | null;
     cancellationFee: number | null;
-    preferredDriverId: number | null;
+    preferredDriverId?: number | null;
     notes?: string | null;
     items?: { [key: number]: any };
     stopDurations?: { [key: number]: any };
@@ -1109,6 +1111,7 @@ declare namespace App.Enums {
     ScheduleConflict = 'schedule_conflict',
     WindowTooTight = 'window_too_tight',
     UnassignedTooLong = 'unassigned_too_long',
+    PreferredDriverUnavailable = 'preferred_driver_unavailable',
   }
   export enum AttentionUrgency {
     Critical = 'critical',

@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Enums } from '@/data/app-enums';
 import { useTranslation } from 'react-i18next';
-import { Users, Clock, CalendarX, Loader } from 'lucide-react';
+import { Users, Clock, CalendarX, Loader, UserX } from 'lucide-react';
 
 const reasonConfig: Record<string, { icon: typeof Users; className: string }> = {
   [Enums.AttentionReason.NoDriversAvailable]: {
@@ -19,6 +19,10 @@ const reasonConfig: Record<string, { icon: typeof Users; className: string }> = 
   [Enums.AttentionReason.AwaitingDispatch]: {
     icon: Loader,
     className: 'bg-blue-50 text-blue-700 border-blue-200',
+  },
+  [Enums.AttentionReason.PreferredDriverUnavailable]: {
+    icon: UserX,
+    className: 'bg-purple-50 text-purple-700 border-purple-200',
   },
 };
 

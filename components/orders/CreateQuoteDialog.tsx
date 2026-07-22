@@ -99,8 +99,11 @@ export function CreateQuoteDialog({
 
   const [formData, setFormData] = useState(getDefaultFormData);
   const [items, setItems] = useState<QuoteLineItem[]>([]);
-  // Preferred driver chosen by the admin (null = use system suggestion / leave to admin).
-  const [preferredDriverId, setPreferredDriverId] = useState<number | null>(null);
+  // Preferred driver selection, tri-state:
+  //   undefined = untouched → accept the system suggestion
+  //   number    = explicit override
+  //   null      = explicit "none" → leave for manual assignment
+  const [preferredDriverId, setPreferredDriverId] = useState<number | null | undefined>(undefined);
   // stopPublicId → minutes the driver is occupied at that stop. Only holds
   // admin overrides; the editor falls back to the default for absent stops.
   const [stopDurations, setStopDurations] = useState<Record<string, number>>({});
@@ -116,9 +119,12 @@ export function CreateQuoteDialog({
       ? toDateTimeLocal(new Date(feasibility.suggestedDelivery))
       : formData.deliveryProposedFor;
 
-  // Top-ranked candidate is the system suggestion; explicit choice overrides it.
+  // Top-ranked candidate is the system suggestion; an explicit choice (a driver
+  // id, or null for "none") overrides it. An untouched selector accepts the
+  // suggestion.
   const suggestedDriverId = feasibility?.candidates?.[0]?.driverId ?? null;
-  const effectivePreferredDriverId = preferredDriverId ?? suggestedDriverId;
+  const effectivePreferredDriverId =
+    preferredDriverId === undefined ? suggestedDriverId : preferredDriverId;
 
   // Auto-calculate distance when dialog opens if not yet calculated
   useEffect(() => {
@@ -145,7 +151,8 @@ export function CreateQuoteDialog({
       setEditingTimes(false);
       setItems([]);
       setStopDurations({});
-      setPreferredDriverId(null);
+      // undefined = untouched, so an unedited quote accepts the suggestion.
+      setPreferredDriverId(undefined);
     }
     setOpen(isOpen);
   };

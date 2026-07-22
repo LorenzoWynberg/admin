@@ -41,8 +41,11 @@ interface QuoteDriverSelectorProps {
   candidates: DriverCandidate[];
   /** Top-ranked candidate id — the system suggestion. */
   suggestedDriverId: number | null;
-  /** Currently chosen preferred driver (null = use suggestion / leave to admin). */
-  value: number | null;
+  /**
+   * Current selection: `undefined` = untouched (accept the suggestion),
+   * a driver id = explicit override, `null` = explicit "none".
+   */
+  value: number | null | undefined;
   onChange: (driverId: number | null) => void;
   /** Date the schedule/routes tabs open on (YYYY-MM-DD). Defaults to today. */
   initialDate?: string | null;
@@ -63,7 +66,9 @@ export function QuoteDriverSelector({
   const { data: driversData } = useDriverList({ perPage: 200, enabled: open });
   const drivers = useMemo(() => driversData?.items ?? [], [driversData]);
 
-  const effectiveId = value ?? suggestedDriverId;
+  // Untouched (undefined) falls back to the suggestion; an explicit choice
+  // (a driver id, or null for "none") is honored as-is.
+  const effectiveId = value === undefined ? suggestedDriverId : value;
 
   // Ranked candidate ids first, then any other active driver as override options.
   const otherDrivers = useMemo(
@@ -85,7 +90,7 @@ export function QuoteDriverSelector({
   // The schedules endpoint binds Driver by public_id, but candidates only carry the numeric id.
   const effectiveDriverPublicId = effectiveDriver?.publicId ?? null;
 
-  const isSuggested = value == null && suggestedDriverId != null;
+  const isSuggested = value === undefined && suggestedDriverId != null;
   const today = toDateString(getTodayAppTz());
 
   return (
@@ -285,7 +290,7 @@ export function QuoteDriverSelector({
                 variant="ghost"
                 size="sm"
                 onClick={() => onChange(null)}
-                disabled={value == null}
+                disabled={effectiveId == null}
               >
                 {t('driver_select.clear', { defaultValue: 'Clear override' })}
               </Button>
