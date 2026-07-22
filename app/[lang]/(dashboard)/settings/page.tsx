@@ -38,7 +38,7 @@ export default function SettingsPage() {
 
   // Initialize local state from fetched data
   if (vehicleTypesData && !vehicleTypesInitialized) {
-    setSupportedVehicleTypes(vehicleTypesData.supportedVehicleTypes);
+    setSupportedVehicleTypes(vehicleTypesData.supportedVehicleTypes ?? []);
     setVehicleTypesInitialized(true);
   }
 
