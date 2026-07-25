@@ -77,6 +77,29 @@ export function getTodayAppTz(): Date {
   return new Date(`${c.year}-${padNumber(c.month)}-${padNumber(c.day)}T00:00:00${APP_UTC_OFFSET}`);
 }
 
+/**
+ * Add (or subtract) whole days to a bare `YYYY-MM-DD` string, returning `YYYY-MM-DD`.
+ * Parses at local midnight so day arithmetic never crosses a DST/UTC boundary.
+ */
+export function addDays(dateString: string, delta: number): string {
+  const d = new Date(`${dateString}T00:00:00`);
+  d.setDate(d.getDate() + delta);
+  return toDateString(d);
+}
+
+/**
+ * Format a bare `YYYY-MM-DD` as a localized `d MMM yyyy` label. Parses at local
+ * midnight, so — unlike {@link formatDate} — it never shifts a day in a
+ * negative-offset timezone.
+ */
+export function formatDateOnly(dateString: string, locale?: string): string {
+  return new Date(`${dateString}T00:00:00`).toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 const getLocale = (): string => i18n.language || 'en';
 
 /**

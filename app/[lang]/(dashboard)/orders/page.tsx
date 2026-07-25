@@ -19,7 +19,6 @@ import {
 import { useState, useCallback } from 'react';
 import {
   actionLabel,
-  capitalize,
   modelLabel,
   resourceMessage,
   statusLabel,
@@ -102,7 +101,7 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(modelLabel('order', 2))}</h1>
+          <h1 className="text-3xl font-bold">{modelLabel('order', 2)}</h1>
           <p className="text-muted-foreground">
             {t('orders:manage_description', { defaultValue: 'Manage delivery orders and quotes' })}
           </p>
@@ -263,7 +262,7 @@ export default function OrdersPage() {
                   </TableHead>
                   <TableHead>{t('orders:detail.stops', { defaultValue: 'Stops' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
-                  <TableHead>{capitalize(modelLabel('quote'))}</TableHead>
+                  <TableHead>{modelLabel('quote')}</TableHead>
                   <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>

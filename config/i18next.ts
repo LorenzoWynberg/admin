@@ -8,9 +8,9 @@ import HttpBackend from 'i18next-http-backend';
 const defaultLocale = 'en';
 const supportedLngs = ['en', 'es', 'fr'] as const;
 
-// Locales are static files served by the API (nginx) with CORS enabled, so we
-// fetch them directly cross-origin — no Next.js rewrite proxy needed.
-const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://api.mandados.test:60';
+// Locale JSON are static files served by nginx, which emits no CORS headers,
+// so we fetch them same-origin (`/locales/...`) and let the Next.js rewrite in
+// next.config.ts forward them to the API server-side. See next.config.ts.
 const namespaces = [
   'addresses',
   'audit_logs',
@@ -76,7 +76,7 @@ export async function ensureI18nInitialized(pathname?: string) {
         cookieName: 'lang',
       } as DetectorOptions,
       backend: {
-        loadPath: `${apiBase}/locales/{{lng}}/{{ns}}.json`,
+        loadPath: '/locales/{{lng}}/{{ns}}.json',
         requestOptions: {
           cache: 'no-store',
         },

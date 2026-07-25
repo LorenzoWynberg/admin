@@ -12,7 +12,6 @@ import {
 import { useState } from 'react';
 import {
   actionLabel,
-  capitalize,
   modelLabel,
   resourceMessage,
   validationAttribute,
@@ -49,7 +48,7 @@ export default function BusinessesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(modelLabel('business', 2))}</h1>
+          <h1 className="text-3xl font-bold">{modelLabel('business', 2)}</h1>
           <p className="text-muted-foreground">
             {t('businesses:manage_description', { defaultValue: 'Manage business accounts' })}
           </p>

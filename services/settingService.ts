@@ -5,6 +5,7 @@ type UpdateSettingData = App.Data.Setting.UpdateSettingData;
 type Single<T> = Api.Response.Single<T>;
 
 type ExchangeRateModeResponse = { exchangeRateMode: string };
+type SupportedVehicleTypesResponse = { supportedVehicleTypes: string[] };
 
 export const SettingService = {
   /**
@@ -42,5 +43,28 @@ export const SettingService = {
       { exchangeRateMode }
     );
     return { exchangeRateMode: response.exchangeRateMode };
+  },
+
+  /**
+   * Get supported vehicle types
+   */
+  async getSupportedVehicleTypes(): Promise<SupportedVehicleTypesResponse> {
+    const response = await api.get<SupportedVehicleTypesResponse & { message: string }>(
+      '/settings/supported-vehicle-types'
+    );
+    return { supportedVehicleTypes: response.supportedVehicleTypes };
+  },
+
+  /**
+   * Update supported vehicle types (admin only)
+   */
+  async updateSupportedVehicleTypes(
+    supportedVehicleTypes: string[]
+  ): Promise<SupportedVehicleTypesResponse> {
+    const response = await api.patch<SupportedVehicleTypesResponse & { message: string }>(
+      '/settings/supported-vehicle-types',
+      { supportedVehicleTypes }
+    );
+    return { supportedVehicleTypes: response.supportedVehicleTypes };
   },
 };

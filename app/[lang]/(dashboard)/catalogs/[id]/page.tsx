@@ -19,7 +19,6 @@ import {
 import { ArrowLeft, Database, List, Calendar, Pencil, Plus } from 'lucide-react';
 import {
   actionLabel,
-  capitalize,
   modelLabel,
   resourceMessage,
   validationAttribute,
@@ -102,7 +101,7 @@ export default function CatalogDetailPage() {
             <Badge variant="outline">{catalog.code}</Badge>
           </div>
           <p className="text-muted-foreground">
-            {capitalize(modelLabel('catalog'))} #{catalog.id}
+            {modelLabel('catalog')} #{catalog.id}
           </p>
         </div>
       </div>

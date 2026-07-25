@@ -268,6 +268,12 @@ declare namespace App.Data.Currency {
     manualRate?: number | null;
   };
 }
+declare namespace App.Data.Dispatch {
+  export type DispatchEligibility = {
+    eligible: boolean;
+    reason: App.Enums.DispatchEligibilityReason | null;
+  };
+}
 declare namespace App.Data.Driver {
   export type DriverAddStopData = {
     orderId: number;
@@ -288,7 +294,8 @@ declare namespace App.Data.Driver {
     licensePhotoBack?: string;
     licenseExpirationDate?: string;
     active?: boolean;
-    isOutsourced?: boolean;
+    defaultVehicleType?: App.Enums.VehicleType;
+    dispatchPolicy?: App.Enums.DispatchPolicy;
     currentLatitude?: number | null;
     currentLongitude?: number | null;
     locationUpdatedAt?: string | null;
@@ -305,6 +312,7 @@ declare namespace App.Data.Driver {
     date: string;
     startTime: string;
     endTime: string;
+    vehicleType: App.Enums.VehicleType | null;
   };
   export type FailStopData = {
     reason: string;
@@ -336,6 +344,8 @@ declare namespace App.Data.Driver {
     licensePhotoFront: string;
     licensePhotoBack: string;
     licenseExpirationDate: string;
+    defaultVehicleType: App.Enums.VehicleType;
+    dispatchPolicy: App.Enums.DispatchPolicy;
   };
   export type SyncDriverScheduleData = {
     schedules: Array<App.Data.Driver.DriverScheduleData>;
@@ -350,6 +360,8 @@ declare namespace App.Data.Driver {
     baseLatitude?: number | null;
     baseLongitude?: number | null;
     baseAddress?: string | null;
+    defaultVehicleType?: App.Enums.VehicleType;
+    dispatchPolicy?: App.Enums.DispatchPolicy;
   };
   export type UpdateLocationData = {
     latitude: number;
@@ -379,6 +391,9 @@ declare namespace App.Data.Feasibility {
     suggestedDelivery: string | null;
     score: number;
     travelTimeMinutes: number | null;
+    vehicleType: App.Enums.VehicleType | null;
+    dispatchPolicy: App.Enums.DispatchPolicy | null;
+    onboardLoad: number;
   };
   export type FeasibilityResult = {
     level: App.Enums.FeasibilityLevel;
@@ -446,6 +461,9 @@ declare namespace App.Data.Location {
   };
 }
 declare namespace App.Data.Order {
+  export type AssignOrderData = {
+    driverId: number;
+  };
   export type NeedsAttentionOrderData = {
     order: App.Data.Order.OrderData;
     urgency: App.Enums.AttentionUrgency;
@@ -453,6 +471,8 @@ declare namespace App.Data.Order {
     outsourceEligible: boolean;
     hoursUntilWindowEnd: number | null;
     workingHoursUnassigned: number | null;
+    preferredDriverName: string | null;
+    preferredDriverIssue: string | null;
   };
   export type OrderData = {
     id?: number;
@@ -460,6 +480,7 @@ declare namespace App.Data.Order {
     userId?: number;
     businessId?: number | null;
     driverId?: number | null;
+    preferredDriverId?: number | null;
     deliveryAddressId?: number | null;
     contactName?: string | null;
     contactPhone?: string | null;
@@ -474,6 +495,9 @@ declare namespace App.Data.Order {
     timeSensitive?: boolean;
     totalDistanceKm?: number | null;
     totalEstimatedMinutes?: number | null;
+    requestedVehicleType?: App.Enums.VehicleType | null;
+    finalVehicleType?: App.Enums.VehicleType;
+    isExclusive?: boolean;
     status?: App.Enums.OrderStatus;
     paymentStatus?: App.Enums.PaymentStatus;
     createdAt?: string;
@@ -568,6 +592,7 @@ declare namespace App.Data.Order {
     isContactless: boolean;
     deliveryTier: App.Enums.DeliveryTier;
     timeSensitive: boolean;
+    requestedVehicleType: App.Enums.VehicleType | null;
     stops: Array<App.Data.Order.StoreOrderStopData>;
   };
   export type StoreOrderStopData = {
@@ -594,6 +619,10 @@ declare namespace App.Data.Order {
     instructions?: string | null;
     sequence?: number;
     type?: App.Enums.OrderStopType;
+  };
+  export type UpdateOrderVehicleData = {
+    finalVehicleType?: App.Enums.VehicleType;
+    isExclusive?: boolean;
   };
 }
 declare namespace App.Data.Payment {
@@ -782,6 +811,7 @@ declare namespace App.Data.Quote {
     pickupProposedFor: string | null;
     deliveryProposedFor: string | null;
     cancellationFee: number | null;
+    preferredDriverId?: number | null;
     notes?: string | null;
     items?: { [key: number]: any };
     stopDurations?: { [key: number]: any };
@@ -927,6 +957,7 @@ declare namespace App.Data.Setting {
     unassignedEscalationHours?: number;
     unassignedAutoCancelEnabled?: boolean;
     exchangeRateMode?: string;
+    supportedVehicleTypes?: Array<any>;
   };
 }
 declare namespace App.Data.Shared {
@@ -1080,6 +1111,7 @@ declare namespace App.Enums {
     ScheduleConflict = 'schedule_conflict',
     WindowTooTight = 'window_too_tight',
     UnassignedTooLong = 'unassigned_too_long',
+    PreferredDriverUnavailable = 'preferred_driver_unavailable',
   }
   export enum AttentionUrgency {
     Critical = 'critical',
@@ -1184,6 +1216,18 @@ declare namespace App.Enums {
     Regular = 'regular',
     Cheapest = 'cheapest',
     Custom = 'custom',
+  }
+  export enum DispatchEligibilityReason {
+    Inactive = 'inactive',
+    UnsupportedTier = 'unsupported_tier',
+    ManualOnlyPolicy = 'manual_only_policy',
+    CatchAllPolicy = 'catch_all_policy',
+    InsufficientVehicle = 'insufficient_vehicle',
+  }
+  export enum DispatchPolicy {
+    Auto = 'auto',
+    CatchAll = 'catch_all',
+    ManualOnly = 'manual_only',
   }
   export enum ErrorAction {
     Retrieving = 'retrieving',
@@ -1433,5 +1477,11 @@ declare namespace App.Enums {
     Succeeded = 'succeeded',
     Voided = 'voided',
     Failed = 'failed',
+  }
+  export enum VehicleType {
+    Motorcycle = 'motorcycle',
+    Car = 'car',
+    PickupVan = 'pickup_van',
+    Truck = 'truck',
   }
 }

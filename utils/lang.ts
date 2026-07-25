@@ -91,8 +91,30 @@ export const actionLabel = (action: string, model?: string, toUpper = true): str
  * Get translated model label (e.g., 'catalog', 'catalog_element').
  * @param model - The model key
  * @param count - For pluralization (1 = singular, >1 = plural)
+ * @param toUpper - Capitalize the first letter (default true, matching actionLabel)
  * @returns Translated model label
  */
-export const modelLabel = (model: string, count = 1): string => {
-  return i18next.t(`models:${model}`, { count, defaultValue: model });
+export const modelLabel = (model: string, count = 1, toUpper = true): string => {
+  const label = i18next.t(`models:${model}`, { count, defaultValue: model });
+  return toUpper ? capitalize(label) : label;
+};
+
+/**
+ * Get translated vehicle type label (e.g., 'motorcycle', 'pickup_van').
+ * @param vehicleType - The vehicle type key
+ * @returns Translated vehicle type label
+ */
+export const vehicleTypeLabel = (vehicleType: string | null | undefined): string => {
+  if (!vehicleType) return i18next.t('common:none', { defaultValue: 'None' });
+  return i18next.t(`orders:vehicle_types.${vehicleType}`, { defaultValue: vehicleType });
+};
+
+/**
+ * Get translated dispatch policy label (e.g., 'auto', 'manual_only').
+ * @param dispatchPolicy - The dispatch policy key
+ * @returns Translated dispatch policy label
+ */
+export const dispatchPolicyLabel = (dispatchPolicy: string | null | undefined): string => {
+  if (!dispatchPolicy) return i18next.t('common:none', { defaultValue: 'None' });
+  return i18next.t(`drivers:dispatch_policies.${dispatchPolicy}`, { defaultValue: dispatchPolicy });
 };

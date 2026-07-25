@@ -12,7 +12,6 @@ import {
 import { useState } from 'react';
 import {
   actionLabel,
-  capitalize,
   modelLabel,
   resourceMessage,
   validationAttribute,
@@ -48,7 +47,7 @@ export default function AddressesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(modelLabel('address', 2))}</h1>
+          <h1 className="text-3xl font-bold">{modelLabel('address', 2)}</h1>
           <p className="text-muted-foreground">
             {t('addresses:manage_description', {
               defaultValue: 'View saved addresses',
@@ -105,7 +104,7 @@ export default function AddressesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{validationAttribute('label', true)}</TableHead>
-                  <TableHead>{capitalize(modelLabel('address'))}</TableHead>
+                  <TableHead>{modelLabel('address')}</TableHead>
                   <TableHead>{validationAttribute('city', true)}</TableHead>
                   <TableHead>{validationAttribute('type', true)}</TableHead>
                   <TableHead>{actionLabel('created')}</TableHead>

@@ -12,7 +12,6 @@ import {
 import { useState } from 'react';
 import {
   actionLabel,
-  capitalize,
   modelLabel,
   resourceMessage,
   validationAttribute,
@@ -50,7 +49,7 @@ export default function CatalogsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(modelLabel('catalog', 2))}</h1>
+          <h1 className="text-3xl font-bold">{modelLabel('catalog', 2)}</h1>
           <p className="text-muted-foreground">
             {t('catalogs:manage_description', { defaultValue: 'Manage catalog data' })}
           </p>

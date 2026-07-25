@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import { capitalize, modelLabel } from '@/utils/lang';
+import { modelLabel } from '@/utils/lang';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
@@ -34,7 +34,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
     <div className="flex flex-col">
       <div className="flex items-center justify-between border-b p-4">
         <div className="flex items-center gap-2">
-          <h4 className="font-semibold">{capitalize(modelLabel('notification', 2))}</h4>
+          <h4 className="font-semibold">{modelLabel('notification', 2)}</h4>
           {isFetching && !isLoading && (
             <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
           )}

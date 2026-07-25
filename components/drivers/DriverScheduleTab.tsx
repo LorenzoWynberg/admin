@@ -59,6 +59,7 @@ export function DriverScheduleTab({ driverId }: Props) {
   const [dialogDate, setDialogDate] = useState('');
   const [dialogStartTime, setDialogStartTime] = useState<string | undefined>();
   const [dialogEndTime, setDialogEndTime] = useState<string | undefined>();
+  const [dialogVehicleType, setDialogVehicleType] = useState<App.Enums.VehicleType | null>(null);
   // Track original startTime when editing, so we can identify which block to replace
   const [editOriginalStartTime, setEditOriginalStartTime] = useState<string | undefined>();
 
@@ -102,6 +103,7 @@ export function DriverScheduleTab({ driverId }: Props) {
       setDialogDate(dateStr);
       setDialogStartTime(timeStr);
       setDialogEndTime(undefined);
+      setDialogVehicleType(null);
       setDialogOpen(true);
     },
     [isPastDate]
@@ -116,6 +118,7 @@ export function DriverScheduleTab({ driverId }: Props) {
       setDialogMode('edit');
       setDialogDate(dateStr);
       setEditOriginalStartTime(props._startTime);
+      setDialogVehicleType(props._vehicleType ?? null);
 
       if (arg.event.start) {
         setDialogStartTime(formatTimeHHMM(arg.event.start));
@@ -217,6 +220,7 @@ export function DriverScheduleTab({ driverId }: Props) {
         date={dialogDate}
         startTime={dialogStartTime}
         endTime={dialogEndTime}
+        vehicleType={dialogVehicleType}
         isSaving={syncSchedules.isPending}
         onSave={handleSaveEntry}
         onDelete={handleDeleteEntry}

@@ -17,6 +17,8 @@ import {
   resourceMessage,
   statusLabel,
   validationAttribute,
+  vehicleTypeLabel,
+  dispatchPolicyLabel,
 } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useDriverList } from '@/hooks/drivers';
@@ -62,7 +64,7 @@ export default function DriversPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{capitalize(modelLabel('driver', 2))}</h1>
+          <h1 className="text-3xl font-bold">{modelLabel('driver', 2)}</h1>
           <p className="text-muted-foreground">
             {t('drivers:manage_description', { defaultValue: 'Manage driver accounts' })}
           </p>
@@ -114,8 +116,11 @@ export default function DriversPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('models:driver_one', { defaultValue: 'Driver' })}</TableHead>
+                  <TableHead>{modelLabel('driver')}</TableHead>
                   <TableHead>{t('common:status', { defaultValue: 'Status' })}</TableHead>
+                  <TableHead>
+                    {t('drivers:vehicle_dispatch_info', { defaultValue: 'Vehicle & Dispatch' })}
+                  </TableHead>
                   <TableHead>{validationAttribute('licenseNumber', true)}</TableHead>
                   <TableHead>{validationAttribute('licensePlate', true)}</TableHead>
                   <TableHead>{validationAttribute('licenseExpires', true)}</TableHead>
@@ -143,6 +148,12 @@ export default function DriversPage() {
                     <TableCell>
                       <Badge variant={driver.active !== false ? 'default' : 'secondary'}>
                         {driver.active !== false ? statusLabel('active') : statusLabel('inactive')}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {capitalize(vehicleTypeLabel(driver.defaultVehicleType))} ·{' '}
+                        {capitalize(dispatchPolicyLabel(driver.dispatchPolicy))}
                       </Badge>
                     </TableCell>
                     <TableCell>{driver.licenseNumber || '-'}</TableCell>

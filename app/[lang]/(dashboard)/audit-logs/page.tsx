@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 
 import { useState, useCallback, Fragment } from 'react';
-import { actionLabel, capitalize, modelLabel } from '@/utils/lang';
+import { actionLabel, modelLabel } from '@/utils/lang';
 import { formatDateTime } from '@/utils/format';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -91,7 +91,7 @@ export default function AuditLogsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">{capitalize(modelLabel('audit_log', 2))}</h1>
+        <h1 className="text-3xl font-bold">{modelLabel('audit_log', 2)}</h1>
         <p className="text-muted-foreground">
           {t('audit_logs:description', {
             defaultValue: 'Track all changes to orders, payments, settings, and more',
@@ -139,7 +139,7 @@ export default function AuditLogsPage() {
                   <SelectItem key={key} value={key}>
                     {key === 'all'
                       ? t('statuses:all', { defaultValue: 'All' })
-                      : capitalize(modelLabel(key))}
+                      : modelLabel(key)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -231,7 +231,7 @@ export default function AuditLogsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('common:date', { defaultValue: 'Date' })}</TableHead>
-                  <TableHead>{capitalize(modelLabel('user'))}</TableHead>
+                  <TableHead>{modelLabel('user')}</TableHead>
                   <TableHead>{t('common:action', { defaultValue: 'Action' })}</TableHead>
                   <TableHead>{t('common:model', { defaultValue: 'Model' })}</TableHead>
                   <TableHead>ID</TableHead>
