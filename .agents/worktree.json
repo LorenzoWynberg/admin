@@ -1,0 +1,6 @@
+{
+  "install": "npm ci",
+  "gate": "npm run build",
+  "scopedCheck": "npm run build",
+  "envFiles": []
+}
