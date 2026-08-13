@@ -36,6 +36,7 @@ import {
   extractDatePart,
 } from '@/utils/format';
 import { formatRateDisplay } from '@/utils/currency';
+import { partitionQuoteItems } from '@/utils/quoteItems';
 import { Enums } from '@/data/app-enums';
 
 interface CreateQuoteDialogProps {
@@ -99,6 +100,7 @@ export function CreateQuoteDialog({
 
   const [formData, setFormData] = useState(getDefaultFormData);
   const [items, setItems] = useState<QuoteLineItem[]>([]);
+  const [itemsError, setItemsError] = useState<string | null>(null);
   // Preferred driver selection, tri-state:
   //   undefined = untouched → accept the system suggestion
   //   number    = explicit override
@@ -250,14 +252,25 @@ export function CreateQuoteDialog({
       orderStops.filter((s) => s.publicId && s.id).map((s) => [s.publicId!, s.id!])
     );
 
-    const mappedItems = items
-      .filter((item) => item.label.trim())
-      .map((item) => ({
-        orderStopId: item.stopPublicId ? (stopIdMap.get(item.stopPublicId) ?? null) : null,
-        label: item.label.trim(),
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-      }));
+    const { payloadItems, incompleteIndexes } = partitionQuoteItems(items);
+
+    if (incompleteIndexes.length > 0) {
+      setItemsError(
+        t('quotes:items.label_required', {
+          defaultValue: 'Add a label to every priced item, or remove it.',
+        })
+      );
+      return;
+    }
+
+    setItemsError(null);
+
+    const mappedItems = payloadItems.map((item) => ({
+      orderStopId: item.stopPublicId ? (stopIdMap.get(item.stopPublicId) ?? null) : null,
+      label: item.label,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+    }));
 
     const mappedStopDurations = Object.entries(stopDurations)
       .map(([publicId, minutes]) => ({
@@ -617,9 +630,18 @@ export function CreateQuoteDialog({
           <QuoteLineItemsEditor
             stops={orderStops}
             items={items}
-            onItemsChange={setItems}
+            onItemsChange={(next) => {
+              setItemsError(null);
+              setItems(next);
+            }}
             currencySymbol={baseSymbol}
           />
+          {itemsError && (
+            <p className="text-destructive flex items-center gap-2 text-sm">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              {itemsError}
+            </p>
+          )}
 
           {/* Per-stop service (dwell) time */}
           <QuoteStopDurationsEditor
