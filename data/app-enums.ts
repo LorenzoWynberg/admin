@@ -339,6 +339,12 @@ export const Enums = {
     DRIVER: "driver",
     ADMIN: "admin",
   },
+  RouteDateMode: {
+    TODAY: "today",
+    CLOSE_OUT: "close_out",
+    READ_ONLY: "read_only",
+    FUTURE: "future",
+  },
   RouteStatus: {
     DRAFT: "draft",
     SCHEDULED: "scheduled",

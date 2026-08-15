@@ -307,6 +307,9 @@ declare namespace App.Data.Driver {
     deletedAt?: string | null;
     user?: App.Data.User.UserData;
   };
+  export type DriverRoutesQueryData = {
+    date?: string | null;
+  };
   export type DriverScheduleData = {
     id?: number;
     date: string;
@@ -1438,6 +1441,12 @@ declare namespace App.Enums {
     CLIENT = 'client',
     DRIVER = 'driver',
     ADMIN = 'admin',
+  }
+  export enum RouteDateMode {
+    TODAY = 'today',
+    CLOSE_OUT = 'close_out',
+    READ_ONLY = 'read_only',
+    FUTURE = 'future',
   }
   export enum RouteStatus {
     DRAFT = 'draft',
