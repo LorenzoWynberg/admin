@@ -7,11 +7,13 @@ import { useNotificationHelpers, type NotifData } from './useNotificationHelpers
 
 /**
  * Listen for notification broadcasts and show toast + refresh notifications.
- * Uses the private 'notifications' channel for all authenticated users.
+ * Subscribes to the recipient's own `App.Models.User.{id}` channel — the same
+ * channel the client and driver apps use — so each admin receives exactly the
+ * notifications addressed to them, once each.
  */
 export function useNotificationBroadcast() {
   const echo = useEcho();
-  const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
   const { getTitle, getMessage } = useNotificationHelpers();
 
@@ -22,9 +24,10 @@ export function useNotificationBroadcast() {
   });
 
   useEffect(() => {
-    if (!echo || !token) return;
+    if (!echo || !user?.id) return;
 
-    const channel = echo.private('notifications');
+    const channelName = `App.Models.User.${user.id}`;
+    const channel = echo.private(channelName);
 
     channel.notification((notification: Api.Broadcast.AnyNotification) => {
       const data: NotifData = {
@@ -47,10 +50,16 @@ export function useNotificationBroadcast() {
       helpersRef.current.queryClient.invalidateQueries({
         queryKey: ['notifications'],
       });
+
+      if (notification.type === 'refund-request.created') {
+        helpersRef.current.queryClient.invalidateQueries({
+          queryKey: ['refund-requests', 'pending'],
+        });
+      }
     });
 
     return () => {
-      echo.leaveChannel('private-notifications');
+      echo.leaveChannel(`private-${channelName}`);
     };
-  }, [echo, token]);
+  }, [echo, user?.id]);
 }

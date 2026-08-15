@@ -2,6 +2,7 @@ import { api } from '@/lib/api/client';
 
 type OrderMessageData = App.Data.Chat.OrderMessageData;
 type SuccessBasic = Api.Response.SuccessBasic;
+type ChatUnreadCounts = Record<string, number>;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.mandados.test:60';
 
@@ -53,11 +54,8 @@ export const ChatService = {
     });
   },
 
-  async getUnreadCounts(orderPublicId: string): Promise<{ support: number; delivery: number }> {
-    const response = await api.get<{ support: number; delivery: number }>(
-      `/orders/${orderPublicId}/chat-unread`
-    );
-    return { support: response.support, delivery: response.delivery };
+  async getUnreadCounts(orderPublicId: string): Promise<ChatUnreadCounts> {
+    return api.get<ChatUnreadCounts>(`/orders/${orderPublicId}/chat-unread`);
   },
 };
 

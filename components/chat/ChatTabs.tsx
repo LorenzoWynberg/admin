@@ -5,10 +5,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ChatPanel } from './ChatPanel';
 import { useChatUnread } from '@/hooks/chat/useChatUnread';
+import { Enums } from '@/data/app-enums';
 
 interface ChatTabsProps {
   orderPublicId: string;
   orderId: number;
+  /** Delivery and dispatch only exist once the order has a driver assigned. */
   showDelivery?: boolean;
 }
 
@@ -16,41 +18,53 @@ export function ChatTabs({ orderPublicId, orderId, showDelivery }: ChatTabsProps
   const { t } = useTranslation();
   const { data: unread } = useChatUnread(orderPublicId);
 
+  const channels = [
+    {
+      value: Enums.ChatChannel.Support,
+      label: t('chat:support', { defaultValue: 'Support' }),
+      isReadOnly: false,
+      show: true,
+    },
+    {
+      value: Enums.ChatChannel.Dispatch,
+      label: t('chat:dispatch', { defaultValue: 'Dispatch' }),
+      isReadOnly: false,
+      show: !!showDelivery,
+    },
+    {
+      // The customer's conversation with their driver: admins observe it but
+      // reply to the driver on the dispatch channel instead.
+      value: Enums.ChatChannel.Delivery,
+      label: t('chat:delivery', { defaultValue: 'Delivery' }),
+      isReadOnly: true,
+      show: !!showDelivery,
+    },
+  ].filter((channel) => channel.show);
+
   return (
-    <Tabs defaultValue="support">
+    <Tabs defaultValue={Enums.ChatChannel.Support}>
       <TabsList className="w-full">
-        <TabsTrigger value="support" className="flex-1 gap-2">
-          {t('chat:support', { defaultValue: 'Support' })}
-          {(unread?.support ?? 0) > 0 && (
-            <Badge variant="destructive" className="h-5 min-w-5 px-1 text-xs">
-              {unread?.support}
-            </Badge>
-          )}
-        </TabsTrigger>
-        {showDelivery && (
-          <TabsTrigger value="delivery" className="flex-1 gap-2">
-            {t('chat:delivery', { defaultValue: 'Delivery' })}
-            {(unread?.delivery ?? 0) > 0 && (
+        {channels.map((channel) => (
+          <TabsTrigger key={channel.value} value={channel.value} className="flex-1 gap-2">
+            {channel.label}
+            {(unread?.[channel.value] ?? 0) > 0 && (
               <Badge variant="destructive" className="h-5 min-w-5 px-1 text-xs">
-                {unread?.delivery}
+                {unread?.[channel.value]}
               </Badge>
             )}
           </TabsTrigger>
-        )}
+        ))}
       </TabsList>
-      <TabsContent value="support">
-        <ChatPanel orderPublicId={orderPublicId} orderId={orderId} channel="support" />
-      </TabsContent>
-      {showDelivery && (
-        <TabsContent value="delivery">
+      {channels.map((channel) => (
+        <TabsContent key={channel.value} value={channel.value}>
           <ChatPanel
             orderPublicId={orderPublicId}
             orderId={orderId}
-            channel="delivery"
-            isReadOnly
+            channel={channel.value}
+            isReadOnly={channel.isReadOnly}
           />
         </TabsContent>
-      )}
+      ))}
     </Tabs>
   );
 }

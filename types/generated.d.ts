@@ -1193,6 +1193,7 @@ declare namespace App.Enums {
   export enum ChatChannel {
     Support = 'support',
     Delivery = 'delivery',
+    Dispatch = 'dispatch',
   }
   export enum ConflictReason {
     WindowOverflow = 'window_overflow',
