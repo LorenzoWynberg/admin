@@ -137,9 +137,7 @@ export default function AuditLogsPage() {
               <SelectContent>
                 {MODEL_KEY_OPTIONS.map((key) => (
                   <SelectItem key={key} value={key}>
-                    {key === 'all'
-                      ? t('statuses:all', { defaultValue: 'All' })
-                      : modelLabel(key)}
+                    {key === 'all' ? t('statuses:all', { defaultValue: 'All' }) : modelLabel(key)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -262,14 +260,6 @@ export default function AuditLogsPage() {
                       <TableRow key={`${log.id}-detail`}>
                         <TableCell colSpan={6} className="bg-muted/30 p-4">
                           <div className="grid gap-4 md:grid-cols-2">
-                            <div>
-                              <p className="mb-1 text-sm font-semibold">
-                                {t('audit_logs:data', { defaultValue: 'Data' })}
-                              </p>
-                              <pre className="bg-background max-h-64 overflow-auto rounded-md border p-3 text-xs">
-                                {JSON.stringify(log.data, null, 2)}
-                              </pre>
-                            </div>
                             {log.previousData && (
                               <div>
                                 <p className="mb-1 text-sm font-semibold">
@@ -282,6 +272,14 @@ export default function AuditLogsPage() {
                                 </pre>
                               </div>
                             )}
+                            <div>
+                              <p className="mb-1 text-sm font-semibold">
+                                {t('audit_logs:data', { defaultValue: 'Data' })}
+                              </p>
+                              <pre className="bg-background max-h-64 overflow-auto rounded-md border p-3 text-xs">
+                                {JSON.stringify(log.data, null, 2)}
+                              </pre>
+                            </div>
                           </div>
                           {log.ipAddress && (
                             <p className="text-muted-foreground mt-2 text-xs">
