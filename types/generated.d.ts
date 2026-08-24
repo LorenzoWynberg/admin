@@ -581,6 +581,9 @@ declare namespace App.Data.Order {
   export type ReconcileOrderData = {
     items: Array<App.Data.Quote.StoreQuoteItemData>;
     notes: string | null;
+    timeFee: number | null;
+    surcharge: number | null;
+    discountRate: number | null;
   };
   export type StoreOrderData = {
     deliveryAddress: App.Data.Address.StoreSnapshotAddressData;

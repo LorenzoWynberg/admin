@@ -8,14 +8,24 @@ interface ReconcileParams {
   orderPublicId: string;
   items: { orderStopId?: number | null; label: string; quantity: number; unitPrice: number }[];
   notes?: string | null;
+  timeFee?: number | null;
+  surcharge?: number | null;
+  discountRate?: number | null;
 }
 
 export function useReconcileOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ orderPublicId, items, notes }: ReconcileParams) =>
-      OrderService.reconcile(orderPublicId, { items, notes }),
+    mutationFn: ({
+      orderPublicId,
+      items,
+      notes,
+      timeFee,
+      surcharge,
+      discountRate,
+    }: ReconcileParams) =>
+      OrderService.reconcile(orderPublicId, { items, notes, timeFee, surcharge, discountRate }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },

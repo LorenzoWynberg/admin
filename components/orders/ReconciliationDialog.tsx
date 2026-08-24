@@ -13,14 +13,16 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { ExternalLink, FileText } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
 import { useOrderReceipts, useReconcileOrder } from '@/hooks/orders';
 import { QuoteLineItemsEditor } from '@/components/quotes/QuoteLineItemsEditor';
 import { ImagePreviewDialog } from '@/components/orders/ImagePreviewDialog';
+import { computeReconciliationTotal } from '@/utils/reconciliation';
 import { formatCurrency } from '@/utils/format';
-import { actionLabel } from '@/utils/lang';
+import { actionLabel, validationAttribute } from '@/utils/lang';
 
 type OrderReceiptData = App.Data.Order.OrderReceiptData;
 type QuoteData = App.Data.Quote.QuoteData;
@@ -44,55 +46,10 @@ interface ReconciliationDialogProps {
   customerCurrencySymbol?: string;
 }
 
-/**
- * Mirror the API's reconciliation total formula:
- *   subtotal = serviceFees + itemsTotal
- *   discount = subtotal × discountRate
- *   subtotalAfterDiscount = subtotal - discount
- *   taxTotal = subtotalAfterDiscount × taxRate
- *   total = subtotalAfterDiscount + taxTotal
- *
- * All amounts are in base currency (CRC).
- */
-function computeEstimatedTotal(
-  quote: QuoteData,
-  newItemsTotal: number
-): {
-  serviceFees: number;
-  newItemsTotal: number;
-  newSubtotal: number;
-  discountAmount: number;
-  newSubtotalAfterDiscount: number;
-  taxTotal: number;
-  estimatedTotal: number;
-  delta: number;
-} {
-  const serviceFees =
-    (quote.baseFare ?? 0) +
-    (quote.distanceFee ?? 0) +
-    (quote.timeFee ?? 0) +
-    (quote.surcharge ?? 0);
-  const newSubtotal = serviceFees + newItemsTotal;
-  const discountRate = quote.discountRate ?? 0;
-  const discountAmount = Math.round(newSubtotal * discountRate * 100) / 100;
-  const newSubtotalAfterDiscount = newSubtotal - discountAmount;
-  const taxRate = quote.taxRate ?? 0;
-  const taxTotal = Math.round(newSubtotalAfterDiscount * taxRate * 100) / 100;
-  const estimatedTotal = Math.round((newSubtotalAfterDiscount + taxTotal) * 100) / 100;
-  // Compare against the original quote total (base currency)
-  const originalQuoteTotal = quote.total ?? 0;
-  const delta = Math.round((estimatedTotal - originalQuoteTotal) * 100) / 100;
-
-  return {
-    serviceFees,
-    newItemsTotal,
-    newSubtotal,
-    discountAmount,
-    newSubtotalAfterDiscount,
-    taxTotal,
-    estimatedTotal,
-    delta,
-  };
+interface FeeInputs {
+  timeFee: string;
+  surcharge: string;
+  discountRate: string;
 }
 
 function ReceiptThumbnail({
@@ -173,22 +130,42 @@ export function ReconciliationDialog({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<ReconciliationLineItem[]>([]);
+  const [fees, setFees] = useState<FeeInputs>({ timeFee: '', surcharge: '', discountRate: '' });
   const [notes, setNotes] = useState('');
   const [previewReceipt, setPreviewReceipt] = useState<OrderReceiptData | null>(null);
   const reconcile = useReconcileOrder();
   const { data: receipts } = useOrderReceipts({ orderPublicId, enabled: open });
 
+  const timeFee = parseFloat(fees.timeFee) || 0;
+  const surcharge = parseFloat(fees.surcharge) || 0;
+  const discountRate = (parseFloat(fees.discountRate) || 0) / 100;
+
   const newItemsTotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-  const est = computeEstimatedTotal(currentQuote, newItemsTotal);
+  const est = computeReconciliationTotal(currentQuote, newItemsTotal, {
+    timeFee,
+    surcharge,
+    discountRate,
+  });
   const originalTotal = currentQuote.total ?? 0;
-  const hasDiscount = (currentQuote.discountRate ?? 0) > 0;
+  const hasDiscount = discountRate > 0;
   const hasTax = (currentQuote.taxRate ?? 0) > 0;
 
   const handleOpenChange = (val: boolean) => {
-    if (val && currentQuote.items?.length) {
-      setItems(buildInitialItems(currentQuote.items, orderStops));
+    if (val) {
+      if (currentQuote.items?.length) {
+        setItems(buildInitialItems(currentQuote.items, orderStops));
+      }
+      setFees({
+        timeFee: currentQuote.timeFee ? String(currentQuote.timeFee) : '',
+        surcharge: currentQuote.surcharge ? String(currentQuote.surcharge) : '',
+        discountRate: currentQuote.discountRate ? String(currentQuote.discountRate * 100) : '',
+      });
     }
     setOpen(val);
+  };
+
+  const handleFeeChange = (field: keyof FeeInputs, value: string) => {
+    setFees((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = () => {
@@ -214,7 +191,14 @@ export function ReconciliationDialog({
     }));
 
     reconcile.mutate(
-      { orderPublicId, items: apiItems, notes: notes || null },
+      {
+        orderPublicId,
+        items: apiItems,
+        notes: notes || null,
+        timeFee,
+        surcharge,
+        discountRate,
+      },
       {
         onSuccess: () => {
           toast.success(
@@ -300,6 +284,53 @@ export function ReconciliationDialog({
               currencySymbol={currencySymbol}
             />
 
+            {/* Adjustable Fees — prefilled from the original quote */}
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <div className="grid gap-2">
+                <Label htmlFor="reconciliation-time-fee">
+                  {validationAttribute('timeFee', true)} ({currencySymbol})
+                </Label>
+                <Input
+                  id="reconciliation-time-fee"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={fees.timeFee}
+                  onChange={(e) => handleFeeChange('timeFee', e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="reconciliation-surcharge">
+                  {validationAttribute('surcharge', true)} ({currencySymbol})
+                </Label>
+                <Input
+                  id="reconciliation-surcharge"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={fees.surcharge}
+                  onChange={(e) => handleFeeChange('surcharge', e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="reconciliation-discount-rate">
+                  {validationAttribute('discount', true)} (%)
+                </Label>
+                <Input
+                  id="reconciliation-discount-rate"
+                  type="number"
+                  step="1"
+                  min="0"
+                  max="100"
+                  placeholder="0"
+                  value={fees.discountRate}
+                  onChange={(e) => handleFeeChange('discountRate', e.target.value)}
+                />
+              </div>
+            </div>
+
             {/* Cost Breakdown & Delta — same formula as the API */}
             {items.length > 0 && (
               <div className="space-y-1.5 rounded-lg border p-3 text-sm">
@@ -319,9 +350,7 @@ export function ReconciliationDialog({
                   <div className="flex justify-between text-green-600 dark:text-green-400">
                     <span>
                       {t('orders:reconciliation.discount', { defaultValue: 'Discount' })}{' '}
-                      <span className="text-xs">
-                        ({((currentQuote.discountRate ?? 0) * 100).toFixed(0)}%)
-                      </span>
+                      <span className="text-xs">({(discountRate * 100).toFixed(0)}%)</span>
                     </span>
                     <span>−{formatCurrency(est.discountAmount, currencySymbol)}</span>
                   </div>
