@@ -290,7 +290,7 @@ export const Enums = {
   PaymentProvider: {
     Tilopay: "tilopay",
     Onvo: "onvo",
-    Cash: "cash",
+    Manual: "manual",
   },
   PaymentStatus: {
     UNPAID: "unpaid",

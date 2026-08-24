@@ -150,6 +150,7 @@ declare namespace App.Data.Business {
     typeId: number;
     typeName?: string;
     usersCanApproveOwnOrders?: boolean;
+    allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -168,6 +169,7 @@ declare namespace App.Data.Business {
     name?: string;
     typeId?: number;
     usersCanApproveOwnOrders?: boolean;
+    allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
   };
 }
 declare namespace App.Data.Catalog {
@@ -518,6 +520,7 @@ declare namespace App.Data.Order {
     cancelFee?: number | null;
     totalPaid?: number;
     hasFailedPayment?: boolean;
+    collectOnDeliveryMethod?: App.Enums.PaymentMethodType | null;
     user?: App.Data.User.UserData;
     business?: App.Data.Business.BusinessData | null;
     driver?: App.Data.Driver.DriverData | null;
@@ -650,7 +653,10 @@ declare namespace App.Data.Payment {
     currencyCode?: string;
     fxRate?: number | null;
     providerChargeId?: string | null;
+    reference?: string | null;
     receiptUrl?: string | null;
+    proofUrl?: string | null;
+    notes?: string | null;
     paidAt?: string | null;
     authorizedAt?: string | null;
     authExpiresAt?: string | null;
@@ -676,6 +682,13 @@ declare namespace App.Data.Payment {
     active?: boolean;
     createdAt?: string;
     updatedAt?: string;
+  };
+  export type RecordPaymentData = {
+    method: App.Enums.PaymentMethodType;
+    amount: number;
+    reference: string | null;
+    notes: string | null;
+    proof: any | null;
   };
   export type RefundData = {
     id?: number;
@@ -1079,6 +1092,7 @@ declare namespace App.Data.User {
     avatar?: string;
     sexId?: number;
     langCode?: string;
+    allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     preferredCurrency?: string | null;
   };
   export type UserData = {
@@ -1091,6 +1105,7 @@ declare namespace App.Data.User {
     avatar?: string;
     langCode: string;
     preferredCurrency?: string | null;
+    allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     businessId?: number | null;
     sexId?: number | null;
     isAdmin: boolean;
@@ -1401,7 +1416,7 @@ declare namespace App.Enums {
   export enum PaymentProvider {
     Tilopay = 'tilopay',
     Onvo = 'onvo',
-    Cash = 'cash',
+    Manual = 'manual',
   }
   export enum PaymentStatus {
     UNPAID = 'unpaid',
