@@ -328,6 +328,12 @@ export const Enums = {
     Standard: "standard",
     Reconciliation: "reconciliation",
   },
+  RefundMethod: {
+    Gateway: "gateway",
+    SinpeTransfer: "sinpe_transfer",
+    Cash: "cash",
+    Credit: "credit",
+  },
   RefundRequestStatus: {
     Pending: "pending",
     Approved: "approved",

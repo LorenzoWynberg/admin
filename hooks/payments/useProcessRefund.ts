@@ -1,21 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { PaymentService } from '@/services/paymentService';
+import { PaymentService, type RefundParams } from '@/services/paymentService';
 import { toast } from 'sonner';
 import { isApiError } from '@/lib/api/error';
 import { crudErrorMessage, crudSuccessMessage } from '@/utils/lang';
 
-type StoreRefundData = App.Data.Payment.StoreRefundData;
-
-interface RefundParams {
+interface RefundArgs {
   paymentPublicId: string;
-  data: StoreRefundData;
+  data: RefundParams;
 }
 
 export function useProcessRefund() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ paymentPublicId, data }: RefundParams) =>
+    mutationFn: ({ paymentPublicId, data }: RefundArgs) =>
       PaymentService.refund(paymentPublicId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
