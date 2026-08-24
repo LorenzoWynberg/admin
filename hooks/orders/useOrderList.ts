@@ -9,6 +9,7 @@ interface UseOrderListParams {
   excludeTerminal?: boolean;
   paymentStatus?: string;
   hasQuote?: boolean;
+  collectOnDelivery?: boolean;
   search?: string;
   pickupFrom?: string;
   pickupTo?: string;

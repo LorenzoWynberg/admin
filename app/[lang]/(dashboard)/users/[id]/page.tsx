@@ -1,18 +1,14 @@
 'use client';
 
-import {
-  actionLabel,
-  modelLabel,
-  resourceMessage,
-  validationAttribute,
-} from '@/utils/lang';
+import { actionLabel, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { formatDate } from '@/utils/format';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { useUser, useDeleteUser } from '@/hooks/users';
+import { useUser, useDeleteUser, useUpdateUser } from '@/hooks/users';
 import { RoleBadge } from '@/components/users/RoleBadge';
+import { PaymentMethodsCard } from '@/components/payments/PaymentMethodsCard';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useCatalogElement } from '@/hooks/catalogs/useCatalogStore';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -53,7 +49,15 @@ export default function UserDetailPage() {
 
   const { data: user, isLoading, error } = useUser(userId);
   const deleteUser = useDeleteUser();
+  const updateUser = useUpdateUser();
   const sexElement = useCatalogElement(user?.sexId);
+
+  const handleChangePaymentMethods = (next: string[]) => {
+    updateUser.mutate({
+      id: userId,
+      data: { allowedPaymentMethods: next as App.Enums.PaymentMethodType[] },
+    });
+  };
 
   const handleDelete = () => {
     if (
@@ -267,6 +271,13 @@ export default function UserDetailPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Payment Methods */}
+        <PaymentMethodsCard
+          allowedMethods={user.allowedPaymentMethods}
+          onChange={handleChangePaymentMethods}
+          isPending={updateUser.isPending}
+        />
 
         {/* Timestamps */}
         <Card>
