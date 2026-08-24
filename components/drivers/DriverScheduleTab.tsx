@@ -43,9 +43,11 @@ function formatTimeHHMM(date: Date): string {
 
 interface Props {
   driverId: string;
+  /** When true, renders the calendar as view-only — no create/edit/delete/save. */
+  readOnly?: boolean;
 }
 
-export function DriverScheduleTab({ driverId }: Props) {
+export function DriverScheduleTab({ driverId, readOnly = false }: Props) {
   const { t, i18n } = useTranslation();
   const { data, isLoading } = useDriverSchedules(driverId);
   const syncSchedules = useSyncSchedules(driverId);
@@ -187,11 +189,13 @@ export function DriverScheduleTab({ driverId }: Props) {
               defaultValue: 'Availability Calendar',
             })}
           </CardTitle>
-          <Button onClick={handleSaveSchedules} disabled={syncSchedules.isPending} size="sm">
-            {syncSchedules.isPending
-              ? t('common:saving', { defaultValue: 'Saving...' })
-              : actionLabel('save')}
-          </Button>
+          {!readOnly && (
+            <Button onClick={handleSaveSchedules} disabled={syncSchedules.isPending} size="sm">
+              {syncSchedules.isPending
+                ? t('common:saving', { defaultValue: 'Saving...' })
+                : actionLabel('save')}
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
           <FullCalendar
@@ -207,24 +211,26 @@ export function DriverScheduleTab({ driverId }: Props) {
             slotLabelFormat={{ hour: 'numeric', minute: '2-digit', hour12: true }}
             height={800}
             events={calendarEvents}
-            dateClick={handleDateClick}
-            eventClick={handleEventClick}
+            dateClick={readOnly ? undefined : handleDateClick}
+            eventClick={readOnly ? undefined : handleEventClick}
           />
         </CardContent>
       </Card>
 
-      <ScheduleEventDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        mode={dialogMode}
-        date={dialogDate}
-        startTime={dialogStartTime}
-        endTime={dialogEndTime}
-        vehicleType={dialogVehicleType}
-        isSaving={syncSchedules.isPending}
-        onSave={handleSaveEntry}
-        onDelete={handleDeleteEntry}
-      />
+      {!readOnly && (
+        <ScheduleEventDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          mode={dialogMode}
+          date={dialogDate}
+          startTime={dialogStartTime}
+          endTime={dialogEndTime}
+          vehicleType={dialogVehicleType}
+          isSaving={syncSchedules.isPending}
+          onSave={handleSaveEntry}
+          onDelete={handleDeleteEntry}
+        />
+      )}
     </div>
   );
 }

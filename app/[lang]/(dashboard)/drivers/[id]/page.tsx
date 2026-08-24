@@ -26,6 +26,7 @@ import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useDriver, useDeleteDriver, useUpdateDriver } from '@/hooks/drivers';
+import { useRole } from '@/hooks/auth';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -62,6 +63,7 @@ export default function DriverDetailPage() {
   const params = useParams();
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
+  const { isAdmin } = useRole();
   const driverId = params.id as string;
 
   const { data: driver, isLoading, error } = useDriver(driverId);
@@ -168,21 +170,31 @@ export default function DriverDetailPage() {
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Switch
-              checked={driver.active !== false}
-              onCheckedChange={(checked) =>
-                updateDriver.mutate({ id: driverId, data: { active: checked } })
-              }
-              disabled={updateDriver.isPending}
-            />
-            <Label className="text-sm font-medium">
-              {driver.active !== false ? statusLabel('active') : statusLabel('inactive')}
-            </Label>
+            {isAdmin ? (
+              <>
+                <Switch
+                  checked={driver.active !== false}
+                  onCheckedChange={(checked) =>
+                    updateDriver.mutate({ id: driverId, data: { active: checked } })
+                  }
+                  disabled={updateDriver.isPending}
+                />
+                <Label className="text-sm font-medium">
+                  {driver.active !== false ? statusLabel('active') : statusLabel('inactive')}
+                </Label>
+              </>
+            ) : (
+              <Badge variant={driver.active !== false ? 'default' : 'secondary'}>
+                {driver.active !== false ? statusLabel('active') : statusLabel('inactive')}
+              </Badge>
+            )}
           </div>
-          <Button variant="destructive" onClick={handleDelete} disabled={deleteDriver.isPending}>
-            <Trash2 className="mr-2 h-4 w-4" />
-            {actionLabel('delete')}
-          </Button>
+          {isAdmin && (
+            <Button variant="destructive" onClick={handleDelete} disabled={deleteDriver.isPending}>
+              <Trash2 className="mr-2 h-4 w-4" />
+              {actionLabel('delete')}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -289,54 +301,66 @@ export default function DriverDetailPage() {
                   <Label className="text-muted-foreground text-sm">
                     {t('drivers:default_vehicle_type', { defaultValue: 'Default Vehicle' })}
                   </Label>
-                  <Select
-                    value={driver.defaultVehicleType}
-                    onValueChange={(value) =>
-                      updateDriver.mutate({
-                        id: driverId,
-                        data: { defaultVehicleType: value as App.Enums.VehicleType },
-                      })
-                    }
-                    disabled={updateDriver.isPending}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(Enums.VehicleType).map((vt) => (
-                        <SelectItem key={vt} value={vt}>
-                          {capitalize(vehicleTypeLabel(vt))}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {isAdmin ? (
+                    <Select
+                      value={driver.defaultVehicleType}
+                      onValueChange={(value) =>
+                        updateDriver.mutate({
+                          id: driverId,
+                          data: { defaultVehicleType: value as App.Enums.VehicleType },
+                        })
+                      }
+                      disabled={updateDriver.isPending}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(Enums.VehicleType).map((vt) => (
+                          <SelectItem key={vt} value={vt}>
+                            {capitalize(vehicleTypeLabel(vt))}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <span className="font-medium">
+                      {capitalize(vehicleTypeLabel(driver.defaultVehicleType))}
+                    </span>
+                  )}
                 </div>
 
                 <div className="grid gap-2">
                   <Label className="text-muted-foreground text-sm">
                     {t('drivers:dispatch_policy', { defaultValue: 'Dispatch Policy' })}
                   </Label>
-                  <Select
-                    value={driver.dispatchPolicy}
-                    onValueChange={(value) =>
-                      updateDriver.mutate({
-                        id: driverId,
-                        data: { dispatchPolicy: value as App.Enums.DispatchPolicy },
-                      })
-                    }
-                    disabled={updateDriver.isPending}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(Enums.DispatchPolicy).map((policy) => (
-                        <SelectItem key={policy} value={policy}>
-                          {capitalize(dispatchPolicyLabel(policy))}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {isAdmin ? (
+                    <Select
+                      value={driver.dispatchPolicy}
+                      onValueChange={(value) =>
+                        updateDriver.mutate({
+                          id: driverId,
+                          data: { dispatchPolicy: value as App.Enums.DispatchPolicy },
+                        })
+                      }
+                      disabled={updateDriver.isPending}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(Enums.DispatchPolicy).map((policy) => (
+                          <SelectItem key={policy} value={policy}>
+                            {capitalize(dispatchPolicyLabel(policy))}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <span className="font-medium">
+                      {capitalize(dispatchPolicyLabel(driver.dispatchPolicy))}
+                    </span>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -384,10 +408,12 @@ export default function DriverDetailPage() {
                       })}
                     </p>
                   )}
-                  <Button variant="outline" size="sm" onClick={() => setMapOpen(true)}>
-                    <Pencil className="mr-2 h-3.5 w-3.5" />
-                    {baseCenter ? actionLabel('edit') : actionLabel('set')}
-                  </Button>
+                  {isAdmin && (
+                    <Button variant="outline" size="sm" onClick={() => setMapOpen(true)}>
+                      <Pencil className="mr-2 h-3.5 w-3.5" />
+                      {baseCenter ? actionLabel('edit') : actionLabel('set')}
+                    </Button>
+                  )}
 
                   <Dialog open={mapOpen} onOpenChange={setMapOpen}>
                     <DialogContent className="sm:max-w-3xl">
@@ -424,7 +450,7 @@ export default function DriverDetailPage() {
 
         {!isOutsourced && (
           <TabsContent value="schedule">
-            <DriverScheduleTab driverId={driverId} />
+            <DriverScheduleTab driverId={driverId} readOnly={!isAdmin} />
           </TabsContent>
         )}
       </Tabs>
