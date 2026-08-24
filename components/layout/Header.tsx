@@ -17,12 +17,14 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, Menu, User } from 'lucide-react';
 import { NotificationBell } from '@/components/notifications';
 import { useSidebarStore } from '@/stores/useSidebarStore';
+import { useRole } from '@/hooks/auth';
 
 export function Header() {
   const { t } = useTranslation();
   const router = useLocalizedRouter();
   const { user } = useAuth();
   const { setOpen } = useSidebarStore();
+  const { isAdmin } = useRole();
 
   const handleLogout = async () => {
     await Auth.logout();
@@ -70,11 +72,15 @@ export function Header() {
                 </p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/settings')}>
-              <User className="mr-2 h-4 w-4" />
-              {t('common:profile', { defaultValue: 'Profile' })}
-            </DropdownMenuItem>
+            {isAdmin && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/settings')}>
+                  <User className="mr-2 h-4 w-4" />
+                  {t('common:profile', { defaultValue: 'Profile' })}
+                </DropdownMenuItem>
+              </>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
