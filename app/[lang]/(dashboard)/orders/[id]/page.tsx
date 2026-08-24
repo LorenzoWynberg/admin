@@ -23,6 +23,7 @@ import {
   ExternalLink,
   Info,
   Loader2,
+  Headset,
 } from 'lucide-react';
 
 import { useMemo, useState } from 'react';
@@ -44,6 +45,7 @@ import { EditStopAddressDialog } from '@/components/orders/EditStopAddressDialog
 import { EditStopDetailsDialog } from '@/components/orders/EditStopDetailsDialog';
 import { AddStopDialog } from '@/components/orders/AddStopDialog';
 import { ReconciliationDialog } from '@/components/orders/ReconciliationDialog';
+import { ReassignDispatcherDialog } from '@/components/dispatch/ReassignDispatcherDialog';
 import { ChatTabs } from '@/components/chat/ChatTabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -62,6 +64,8 @@ import {
   useUpdateStop,
 } from '@/hooks/orders';
 import { useCurrencyList } from '@/hooks/currencies';
+import { useDispatchUsers } from '@/hooks/users';
+import { useRole } from '@/hooks/auth';
 import { Enums } from '@/data/app-enums';
 
 type QuoteStatus = App.Enums.QuoteStatus;
@@ -74,11 +78,14 @@ export default function OrderDetailPage() {
   const router = useLocalizedRouter();
   const orderId = params.id as string;
 
+  const { isAdmin } = useRole();
   const { data: order, isLoading, error } = useOrder({ id: orderId });
   const deleteOrder = useDeleteOrder();
   const calculateDistance = useCalculateDistance();
   const outsourceOrder = useOutsourceOrder();
   const updateStop = useUpdateStop();
+  const { data: dispatchersData } = useDispatchUsers({ enabled: isAdmin });
+  const dispatcherName = dispatchersData?.items?.find((d) => d.id === order?.dispatcherId)?.name;
   const { data: currencyListData } = useCurrencyList();
   const baseCurrencySymbol = currencyListData?.items?.find((c) => c.isBase)?.symbol || '₡';
   const currencySymbol = baseCurrencySymbol;
@@ -800,6 +807,28 @@ export default function OrderDetailPage() {
                   <p className="font-medium">{order.driver.licensePlateNumber}</p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Dispatcher */}
+        {isAdmin && order.publicId && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Headset className="h-5 w-5" />
+                  {t('orders:detail.dispatcher', { defaultValue: 'Dispatcher' })}
+                </CardTitle>
+                <ReassignDispatcherDialog
+                  order={{ publicId: order.publicId, dispatcherId: order.dispatcherId }}
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="font-medium">
+                {dispatcherName || t('orders:detail.unassigned', { defaultValue: 'Unassigned' })}
+              </p>
             </CardContent>
           </Card>
         )}
