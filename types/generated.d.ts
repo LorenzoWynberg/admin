@@ -908,6 +908,11 @@ declare namespace App.Data.Route {
     driver?: App.Data.Driver.DriverData | null;
     stops?: Array<App.Data.Route.RouteStopData>;
   };
+  export type RouteGeometryData = {
+    encodedPolyline: string | null;
+    etaToNextStopMinutes: number | null;
+    etaToLastStopMinutes: number | null;
+  };
   export type RouteStopData = {
     id: number;
     routeId?: number;
