@@ -10,16 +10,12 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import {
-  actionLabel,
-  modelLabel,
-  resourceMessage,
-  validationAttribute,
-} from '@/utils/lang';
+import { actionLabel, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import { useRole } from '@/hooks/auth';
 import { useBusinessList } from '@/hooks/businesses';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, Building2 } from 'lucide-react';
@@ -28,6 +24,7 @@ import { formatDate } from '@/utils/format';
 export default function BusinessesPage() {
   const { t, ready } = useTranslation();
   const router = useRouter();
+  const { isDispatch } = useRole();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
@@ -92,7 +89,13 @@ export default function BusinessesPage() {
           ) : businesses.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <Building2 className="mb-4 h-12 w-12" />
-              <p>{t('businesses:no_businesses', { defaultValue: 'No businesses found' })}</p>
+              <p>
+                {isDispatch
+                  ? t('businesses:no_businesses_dispatch', {
+                      defaultValue: 'No businesses in your book yet',
+                    })
+                  : t('businesses:no_businesses', { defaultValue: 'No businesses found' })}
+              </p>
             </div>
           ) : (
             <Table>
