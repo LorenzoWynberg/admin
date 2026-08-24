@@ -345,6 +345,7 @@ export const Enums = {
     CLIENT: "client",
     DRIVER: "driver",
     ADMIN: "admin",
+    DISPATCH: "dispatch",
   },
   RouteDateMode: {
     TODAY: "today",
