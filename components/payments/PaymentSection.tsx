@@ -11,6 +11,7 @@ import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { RefundDialog } from './RefundDialog';
 import { RecordPaymentDialog } from './RecordPaymentDialog';
 import { VoidPaymentDialog } from './VoidPaymentDialog';
+import { getRefundMethodLabel } from './RefundMethodFields';
 import { formatDate, formatCurrency } from '@/utils/format';
 import { capitalize, statusLabel, validationAttribute } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
@@ -66,26 +67,67 @@ export function getPaymentMethodLabel(
   }
 }
 
+function EvidenceLinkButton({ href, label }: { href: string; label: string }) {
+  return (
+    <Button variant="outline" size="sm" asChild>
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        <ExternalLink className="mr-2 h-4 w-4" />
+        {label}
+      </a>
+    </Button>
+  );
+}
+
 function RefundCard({ refund }: { refund: RefundData }) {
+  const { t } = useTranslation();
   const currencySymbol = useOrderCurrencySymbol(refund.currencyCode);
 
   return (
-    <div className="bg-destructive/5 flex items-center justify-between rounded-md border border-red-200 px-3 py-2">
-      <div className="space-y-0.5">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs">{refund.publicId}</span>
-          <Badge variant="outline">{statusLabel('refunded')}</Badge>
+    <div className="bg-destructive/5 space-y-2 rounded-md border border-red-200 px-3 py-2">
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-xs">{refund.publicId}</span>
+            <Badge variant="outline">{statusLabel('refunded')}</Badge>
+            {refund.method && (
+              <Badge variant="outline">{getRefundMethodLabel(t, refund.method)}</Badge>
+            )}
+          </div>
+          {refund.reason && <p className="text-muted-foreground text-xs">{refund.reason}</p>}
+          {refund.reference && (
+            <p className="text-muted-foreground text-xs">
+              {validationAttribute('reference', true)}: {refund.reference}
+            </p>
+          )}
         </div>
-        {refund.reason && <p className="text-muted-foreground text-xs">{refund.reason}</p>}
+        <div className="text-right">
+          <p className="text-destructive text-sm font-semibold">
+            -{formatCurrency(refund.amount || 0, currencySymbol)}
+          </p>
+          {refund.refundedAt && (
+            <p className="text-muted-foreground text-xs">{formatDate(refund.refundedAt)}</p>
+          )}
+        </div>
       </div>
-      <div className="text-right">
-        <p className="text-destructive text-sm font-semibold">
-          -{formatCurrency(refund.amount || 0, currencySymbol)}
-        </p>
-        {refund.refundedAt && (
-          <p className="text-muted-foreground text-xs">{formatDate(refund.refundedAt)}</p>
-        )}
-      </div>
+
+      {(refund.proofUrl || refund.signatureUrl) && (
+        <div className="flex gap-2">
+          {refund.proofUrl && (
+            <EvidenceLinkButton
+              href={refund.proofUrl}
+              label={t('payments:proof', { defaultValue: 'Proof' })}
+            />
+          )}
+          {refund.signatureUrl && (
+            <EvidenceLinkButton
+              href={refund.signatureUrl}
+              label={t('payments:refund.signature_label', {
+                defaultValue: 'Signed handover slip',
+              })}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -171,20 +213,16 @@ function PaymentCard({ payment }: { payment: PaymentData }) {
         </div>
         <div className="flex gap-2">
           {payment.proofUrl && (
-            <Button variant="outline" size="sm" asChild>
-              <a href={payment.proofUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                {t('payments:proof', { defaultValue: 'Proof' })}
-              </a>
-            </Button>
+            <EvidenceLinkButton
+              href={payment.proofUrl}
+              label={t('payments:proof', { defaultValue: 'Proof' })}
+            />
           )}
           {payment.receiptUrl && (
-            <Button variant="outline" size="sm" asChild>
-              <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                {t('payments:receipt', { defaultValue: 'Receipt' })}
-              </a>
-            </Button>
+            <EvidenceLinkButton
+              href={payment.receiptUrl}
+              label={t('payments:receipt', { defaultValue: 'Receipt' })}
+            />
           )}
           {canRefund && <RefundDialog payment={payment} />}
           {canVoid && payment.publicId && <VoidPaymentDialog paymentPublicId={payment.publicId} />}
