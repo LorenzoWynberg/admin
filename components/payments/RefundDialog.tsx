@@ -21,6 +21,8 @@ import { useProcessRefund } from '@/hooks/payments';
 import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { actionLabel, validationAttribute } from '@/utils/lang';
 import { formatCurrency } from '@/utils/format';
+import { Enums } from '@/data/app-enums';
+import { RefundMethodFields, getDefaultRefundMethod } from './RefundMethodFields';
 
 type PaymentData = App.Data.Payment.PaymentData;
 
@@ -36,18 +38,27 @@ export function RefundDialog({ payment, onSuccess }: RefundDialogProps) {
   const processRefund = useProcessRefund();
 
   const maxAmount = (payment.amount || 0) - (payment.totalRefunded || 0);
+  const isManual = payment.provider === Enums.PaymentProvider.Manual;
 
   const [formData, setFormData] = useState({
     amount: '',
     reason: '',
+    method: Enums.RefundMethod.Gateway as string,
+    reference: '',
   });
+  const [proof, setProof] = useState<File | null>(null);
+  const [signature, setSignature] = useState<File | null>(null);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
       setFormData({
         amount: maxAmount.toString(),
         reason: '',
+        method: getDefaultRefundMethod(isManual, payment.method),
+        reference: '',
       });
+      setProof(null);
+      setSignature(null);
     }
     setOpen(isOpen);
   };
@@ -75,7 +86,11 @@ export function RefundDialog({ payment, onSuccess }: RefundDialogProps) {
         paymentPublicId: payment.publicId,
         data: {
           amount,
+          method: formData.method,
           reason: formData.reason || null,
+          reference: formData.reference || null,
+          proof,
+          signature,
         },
       },
       {
@@ -156,6 +171,17 @@ export function RefundDialog({ payment, onSuccess }: RefundDialogProps) {
               </p>
             )}
           </div>
+
+          {/* Refund Method + Evidence */}
+          <RefundMethodFields
+            isManual={isManual}
+            method={formData.method}
+            onMethodChange={(value) => handleChange('method', value)}
+            reference={formData.reference}
+            onReferenceChange={(value) => handleChange('reference', value)}
+            onProofChange={setProof}
+            onSignatureChange={setSignature}
+          />
 
           {/* Reason Input */}
           <div className="grid gap-2">
