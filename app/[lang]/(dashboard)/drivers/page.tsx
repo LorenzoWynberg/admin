@@ -22,6 +22,7 @@ import {
 } from '@/utils/lang';
 import { Input } from '@/components/ui/input';
 import { useDriverList } from '@/hooks/drivers';
+import { useRole } from '@/hooks/auth';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -44,6 +45,7 @@ function getInitials(name?: string): string {
 export default function DriversPage() {
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
+  const { isAdmin } = useRole();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
@@ -69,10 +71,12 @@ export default function DriversPage() {
             {t('drivers:manage_description', { defaultValue: 'Manage driver accounts' })}
           </p>
         </div>
-        <Button onClick={() => router.push('/drivers/create')}>
-          <Plus className="mr-2 h-4 w-4" />
-          {resourceMessage('create_one', 'driver')}
-        </Button>
+        {isAdmin && (
+          <Button onClick={() => router.push('/drivers/create')}>
+            <Plus className="mr-2 h-4 w-4" />
+            {resourceMessage('create_one', 'driver')}
+          </Button>
+        )}
       </div>
 
       <Card>
