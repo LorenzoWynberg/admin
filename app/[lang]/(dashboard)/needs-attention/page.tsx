@@ -6,11 +6,14 @@ import { useOrderList } from '@/hooks/orders';
 import { useNeedsAttention } from '@/hooks/orders/useNeedsAttention';
 import { usePendingReconciliation } from '@/hooks/orders/usePendingReconciliation';
 import { usePendingRefundRequests } from '@/hooks/refundRequests';
+import { useCurrencyList } from '@/hooks/currencies';
 import { NeedsAttentionCard } from '@/components/orders/NeedsAttentionCard';
 import { PendingReconciliationCard } from '@/components/orders/PendingReconciliationCard';
 import { RefundRequestCard } from '@/components/orders/RefundRequestCard';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { PaymentStatusBadge } from '@/components/orders/PaymentStatusBadge';
+import { RecordPaymentDialog } from '@/components/payments/RecordPaymentDialog';
+import { getPaymentMethodLabel, getOrderDueAmount } from '@/components/payments/PaymentSection';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +23,8 @@ import { RefreshCw, AlertTriangle, Eye, Clock, User, Building2 } from 'lucide-re
 import { formatDateTime } from '@/utils/format';
 import { Enums } from '@/data/app-enums';
 import { actionLabel } from '@/utils/lang';
+
+type OrderData = App.Data.Order.OrderData;
 
 const { AttentionUrgency } = Enums;
 
@@ -31,6 +36,38 @@ const summaryStyles: Record<string, string> = {
   [AttentionUrgency.Medium]: 'bg-amber-100 text-amber-800',
   [AttentionUrgency.Low]: 'bg-gray-100 text-gray-800',
 };
+
+function OrderSummaryCardHeader({ order }: { order: OrderData }) {
+  return (
+    <CardHeader className="pb-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="font-mono text-sm font-semibold">#{order.publicId}</span>
+        <OrderStatusBadge
+          status={(order.status ?? Enums.OrderStatus.PENDING) as App.Enums.OrderStatus}
+        />
+        <PaymentStatusBadge status={order.paymentStatus} />
+      </div>
+      <div className="text-muted-foreground mt-1 flex flex-col gap-1 text-sm">
+        {order.user && (
+          <span className="flex items-center gap-1">
+            <User className="h-3.5 w-3.5" />
+            {order.user.name}
+          </span>
+        )}
+        {order.business && (
+          <span className="flex items-center gap-1">
+            <Building2 className="h-3.5 w-3.5" />
+            {order.business.name}
+          </span>
+        )}
+        <span className="flex items-center gap-1">
+          <Clock className="h-3.5 w-3.5" />
+          {formatDateTime(order.createdAt)}
+        </span>
+      </div>
+    </CardHeader>
+  );
+}
 
 export default function NeedsAttentionPage() {
   const { t } = useTranslation('orders');
@@ -49,16 +86,30 @@ export default function NeedsAttentionPage() {
     excludeTerminal: true,
   });
   const {
-    data: unpaidData,
-    isLoading: unpaidLoading,
-    refetch: refetchUnpaid,
-    isRefetching: isRefetchingUnpaid,
+    data: unpaidPrepaymentData,
+    isLoading: unpaidPrepaymentLoading,
+    refetch: refetchUnpaidPrepayment,
+    isRefetching: isRefetchingUnpaidPrepayment,
   } = useOrderList({
     page: 1,
     perPage: 100,
     paymentStatus: Enums.PaymentStatus.UNPAID,
     hasQuote: true,
     excludeTerminal: true,
+    collectOnDelivery: false,
+  });
+  const {
+    data: unpaidCollectData,
+    isLoading: unpaidCollectLoading,
+    refetch: refetchUnpaidCollect,
+    isRefetching: isRefetchingUnpaidCollect,
+  } = useOrderList({
+    page: 1,
+    perPage: 100,
+    paymentStatus: Enums.PaymentStatus.UNPAID,
+    hasQuote: true,
+    excludeTerminal: true,
+    collectOnDelivery: true,
   });
   const {
     data: reconciliationData,
@@ -73,6 +124,7 @@ export default function NeedsAttentionPage() {
     isRefetching: isRefetchingRefundRequests,
   } = usePendingRefundRequests();
   const [filter, setFilter] = useState<string>('all');
+  const { data: currencyListData } = useCurrencyList();
 
   const items = data?.data ?? [];
   const summary = (data?.summary ?? {}) as Record<string, number>;
@@ -82,16 +134,23 @@ export default function NeedsAttentionPage() {
   const refundRequests = refundRequestsData?.items ?? [];
   const reconciliationOrders = reconciliationData?.data ?? [];
   const unquotedOrders = unquotedData?.items ?? [];
-  const unpaidOrders = unpaidData?.items ?? [];
+  const unpaidPrepaymentOrders = unpaidPrepaymentData?.items ?? [];
+  const unpaidCollectOrders = unpaidCollectData?.items ?? [];
   const unquotedCount = unquotedData?.meta?.total ?? unquotedOrders.length;
-  const unpaidCount = unpaidData?.meta?.total ?? unpaidOrders.length;
+  const unpaidPrepaymentCount = unpaidPrepaymentData?.meta?.total ?? unpaidPrepaymentOrders.length;
+  const unpaidCollectCount = unpaidCollectData?.meta?.total ?? unpaidCollectOrders.length;
+  const unpaidCount = unpaidPrepaymentCount + unpaidCollectCount;
 
   const urgentCount = (summary.critical ?? 0) + (summary.high ?? 0);
+
+  const currencySymbolFor = (code?: string | null) =>
+    currencyListData?.items?.find((c) => c.code === code)?.symbol || code || '₡';
 
   const handleRefreshAll = () => {
     refetch();
     refetchUnquoted();
-    refetchUnpaid();
+    refetchUnpaidPrepayment();
+    refetchUnpaidCollect();
     refetchReconciliation();
     refetchRefundRequests();
   };
@@ -99,7 +158,8 @@ export default function NeedsAttentionPage() {
   const anyRefetching =
     isRefetching ||
     isRefetchingUnquoted ||
-    isRefetchingUnpaid ||
+    isRefetchingUnpaidPrepayment ||
+    isRefetchingUnpaidCollect ||
     isRefetchingReconciliation ||
     isRefetchingRefundRequests;
 
@@ -298,66 +358,100 @@ export default function NeedsAttentionPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="not-paid" className="space-y-4">
-          {unpaidLoading ? (
-            <div className="text-muted-foreground py-12 text-center">
-              {t('common:loading', { defaultValue: 'Loading...' })}
-            </div>
-          ) : unpaidOrders.length === 0 ? (
-            <div className="text-muted-foreground py-12 text-center">
-              {t('needs_attention.no_unpaid', {
-                defaultValue: 'No unpaid orders pending payment',
+        <TabsContent value="not-paid" className="space-y-8">
+          {/* Awaiting prepayment */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold">
+              {t('needs_attention.awaiting_prepayment_heading', {
+                defaultValue: 'Awaiting Prepayment',
               })}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {unpaidOrders.map((order) => (
-                <Card key={order.publicId}>
-                  <CardHeader className="pb-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-sm font-semibold">#{order.publicId}</span>
-                      <OrderStatusBadge
-                        status={
-                          (order.status ?? Enums.OrderStatus.PENDING) as App.Enums.OrderStatus
-                        }
-                      />
-                      <PaymentStatusBadge status={order.paymentStatus} />
-                    </div>
-                    <div className="text-muted-foreground mt-1 flex flex-col gap-1 text-sm">
-                      {order.user && (
-                        <span className="flex items-center gap-1">
-                          <User className="h-3.5 w-3.5" />
-                          {order.user.name}
-                        </span>
-                      )}
-                      {order.business && (
-                        <span className="flex items-center gap-1">
-                          <Building2 className="h-3.5 w-3.5" />
-                          {order.business.name}
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" />
-                        {formatDateTime(order.createdAt)}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => router.push(`/orders/${order.publicId}`)}
-                      >
-                        <Eye className="mr-1 h-4 w-4" />
-                        {actionLabel('view')}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+            </h3>
+            {unpaidPrepaymentLoading ? (
+              <div className="text-muted-foreground py-12 text-center">
+                {t('common:loading', { defaultValue: 'Loading...' })}
+              </div>
+            ) : unpaidPrepaymentOrders.length === 0 ? (
+              <div className="text-muted-foreground py-12 text-center">
+                {t('needs_attention.no_unpaid', {
+                  defaultValue: 'No unpaid orders pending payment',
+                })}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {unpaidPrepaymentOrders.map((order) => (
+                  <Card key={order.publicId}>
+                    <OrderSummaryCardHeader order={order} />
+                    <CardContent>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {order.publicId && (
+                          <RecordPaymentDialog
+                            orderPublicId={order.publicId}
+                            currencySymbol={currencySymbolFor(order.currencyCode)}
+                            defaultAmount={getOrderDueAmount(order)}
+                            onSuccess={refetchUnpaidPrepayment}
+                          />
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => router.push(`/orders/${order.publicId}`)}
+                        >
+                          <Eye className="mr-1 h-4 w-4" />
+                          {actionLabel('view')}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Collect on delivery, in progress */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold">
+              {t('needs_attention.collect_on_delivery_heading', {
+                defaultValue: 'Collect on Delivery — In Progress',
+              })}
+            </h3>
+            {unpaidCollectLoading ? (
+              <div className="text-muted-foreground py-12 text-center">
+                {t('common:loading', { defaultValue: 'Loading...' })}
+              </div>
+            ) : unpaidCollectOrders.length === 0 ? (
+              <div className="text-muted-foreground py-12 text-center">
+                {t('needs_attention.no_collect_on_delivery', {
+                  defaultValue: 'No orders currently collecting payment on delivery',
+                })}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {unpaidCollectOrders.map((order) => (
+                  <Card key={order.publicId}>
+                    <OrderSummaryCardHeader order={order} />
+                    <CardContent className="space-y-3">
+                      <p className="text-muted-foreground text-sm">
+                        {t('needs_attention.collect_method_label', {
+                          method: getPaymentMethodLabel(t, order.collectOnDeliveryMethod),
+                          defaultValue: 'Collecting via {{method}}',
+                        })}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => router.push(`/orders/${order.publicId}`)}
+                        >
+                          <Eye className="mr-1 h-4 w-4" />
+                          {actionLabel('view')}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="refund-requests" className="space-y-4">

@@ -1,22 +1,18 @@
 'use client';
 
-import {
-  actionLabel,
-  modelLabel,
-  resourceMessage,
-  validationAttribute,
-} from '@/utils/lang';
+import { actionLabel, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
-import { useBusiness, useDeleteBusiness } from '@/hooks/businesses';
+import { useBusiness, useDeleteBusiness, useUpdateBusiness } from '@/hooks/businesses';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Building2, User, MapPin, Calendar, Trash2 } from 'lucide-react';
 import { formatDate } from '@/utils/format';
 import { useBusinessTaxProfile } from '@/hooks/tax-profiles';
 import { TaxProfileCard } from '@/components/TaxProfileCard';
+import { PaymentMethodsCard } from '@/components/payments/PaymentMethodsCard';
 
 export default function BusinessDetailPage() {
   const params = useParams();
@@ -27,6 +23,14 @@ export default function BusinessDetailPage() {
   const { data: business, isLoading, error } = useBusiness(businessId);
   const { data: taxProfile } = useBusinessTaxProfile(businessId);
   const deleteBusiness = useDeleteBusiness();
+  const updateBusiness = useUpdateBusiness();
+
+  const handleChangePaymentMethods = (next: string[]) => {
+    updateBusiness.mutate({
+      id: businessId,
+      data: { allowedPaymentMethods: next as App.Enums.PaymentMethodType[] },
+    });
+  };
 
   const formatAddress = (address?: App.Data.Address.AddressData | null): string => {
     const notSpecified = t('businesses:detail.not_specified', { defaultValue: 'Not specified' });
@@ -170,6 +174,13 @@ export default function BusinessDetailPage() {
             <p className="font-medium">{formatAddress(business.primaryAddress)}</p>
           </CardContent>
         </Card>
+
+        {/* Payment Methods */}
+        <PaymentMethodsCard
+          allowedMethods={business.allowedPaymentMethods}
+          onChange={handleChangePaymentMethods}
+          isPending={updateBusiness.isPending}
+        />
 
         <Card>
           <CardHeader>

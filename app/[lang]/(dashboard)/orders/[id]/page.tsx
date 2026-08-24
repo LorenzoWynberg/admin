@@ -741,7 +741,12 @@ export default function OrderDetailPage() {
                 {t('orders:detail.payment_status', { defaultValue: 'Payment Status' })}
               </span>
               <Badge
-                variant={order.paymentStatus === Enums.PaymentStatus.PAID || order.paymentStatus === Enums.PaymentStatus.AUTHORIZED ? 'default' : 'secondary'}
+                variant={
+                  order.paymentStatus === Enums.PaymentStatus.PAID ||
+                  order.paymentStatus === Enums.PaymentStatus.AUTHORIZED
+                    ? 'default'
+                    : 'secondary'
+                }
               >
                 {statusLabel(order.paymentStatus || Enums.PaymentStatus.UNPAID)}
               </Badge>
@@ -750,7 +755,7 @@ export default function OrderDetailPage() {
         </Card>
 
         {/* Payments Section */}
-        {order.publicId && <PaymentSection orderPublicId={order.publicId} />}
+        {order.publicId && <PaymentSection order={order} />}
 
         {/* Invoices Section */}
         {order.publicId && <InvoiceSection orderPublicId={order.publicId} />}
