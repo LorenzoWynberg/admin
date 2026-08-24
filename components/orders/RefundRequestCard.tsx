@@ -5,14 +5,14 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DenyRefundRequestDialog } from './DenyRefundRequestDialog';
-import { useApproveRefundRequest } from '@/hooks/refundRequests';
+import { ApproveRefundRequestDialog } from './ApproveRefundRequestDialog';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { PaymentStatusBadge } from './PaymentStatusBadge';
 import { getDateLocale } from '@/utils/format';
 import { actionLabel } from '@/utils/lang';
 import { formatCurrency } from '@/utils/format';
 import { useCurrencyList } from '@/hooks/currencies/useCurrencyList';
-import { Eye, Clock, Check, Building2 } from 'lucide-react';
+import { Eye, Clock, Building2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 type RefundRequestData = App.Data.RefundRequest.RefundRequestData;
@@ -24,7 +24,6 @@ interface RefundRequestCardProps {
 export function RefundRequestCard({ refundRequest }: RefundRequestCardProps) {
   const { t, i18n } = useTranslation('orders');
   const router = useLocalizedRouter();
-  const approveMutation = useApproveRefundRequest();
 
   const order = refundRequest.order;
   const user = refundRequest.user;
@@ -87,19 +86,10 @@ export function RefundRequestCard({ refundRequest }: RefundRequestCardProps) {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              if (refundRequest.publicId) {
-                approveMutation.mutate(refundRequest.publicId as string);
-              }
-            }}
-            disabled={approveMutation.isPending}
-          >
-            <Check className="mr-1 h-4 w-4" />
-            {actionLabel('approve')}
-          </Button>
+          <ApproveRefundRequestDialog
+            publicId={refundRequest.publicId as string}
+            orderPublicId={orderPublicId}
+          />
 
           <DenyRefundRequestDialog publicId={refundRequest.publicId as string} />
 
