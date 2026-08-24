@@ -103,8 +103,8 @@ export function ApproveRefundRequestDialog({
             {t('models:refund_request', { count: 1, defaultValue: 'Refund Request' })}
           </DialogTitle>
           <DialogDescription>
-            {t('payments:refund.description', {
-              defaultValue: 'Enter the amount to refund. This cannot be undone.',
+            {t('payments:refund_request.approve_description', {
+              defaultValue: 'Choose how the refund will be settled. This cannot be undone.',
             })}
           </DialogDescription>
         </DialogHeader>
