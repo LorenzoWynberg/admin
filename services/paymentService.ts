@@ -1,8 +1,8 @@
 import { api } from '@/lib/api/client';
+import { appendRefundEvidence, type RefundEvidenceParams } from './refundEvidence';
 
 type PaymentData = App.Data.Payment.PaymentData;
 type RefundData = App.Data.Payment.RefundData;
-type StoreRefundData = App.Data.Payment.StoreRefundData;
 type Single<T> = Api.Response.Single<T>;
 type Paginated<T> = Api.Response.Paginated<T>;
 
@@ -12,6 +12,11 @@ export interface RecordPaymentParams {
   reference?: string | null;
   notes?: string | null;
   proof?: File | null;
+}
+
+export interface RefundParams extends RefundEvidenceParams {
+  amount: number;
+  reason?: string | null;
 }
 
 interface ListParams {
@@ -57,12 +62,18 @@ export const PaymentService = {
   },
 
   /**
-   * Process a refund for a payment (admin only)
+   * Process a refund for a payment (admin only). Multipart because of the
+   * optional proof / signed-handover-slip evidence images.
    */
-  async refund(paymentPublicId: string, data: StoreRefundData): Promise<RefundData> {
-    const response = await api.post<Single<RefundData>>(
+  async refund(paymentPublicId: string, data: RefundParams): Promise<RefundData> {
+    const formData = new FormData();
+    formData.append('amount', String(data.amount));
+    appendRefundEvidence(formData, data);
+    if (data.reason) formData.append('reason', data.reason);
+
+    const response = await api.postMultipart<Single<RefundData>>(
       `/payments/${paymentPublicId}/refund`,
-      data
+      formData
     );
     return response.item;
   },

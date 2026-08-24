@@ -1,29 +1,29 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { RefundRequestService } from '@/services/refundRequestService';
+import {
+  RefundRequestService,
+  type ApproveRefundRequestParams,
+} from '@/services/refundRequestService';
 import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
+import { crudErrorMessage, crudSuccessMessage } from '@/utils/lang';
+
+interface ApproveRefundRequestArgs {
+  publicId: string;
+  data: ApproveRefundRequestParams;
+}
 
 export function useApproveRefundRequest() {
-  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (publicId: string) => RefundRequestService.approve(publicId),
+    mutationFn: ({ publicId, data }: ApproveRefundRequestArgs) =>
+      RefundRequestService.approve(publicId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['refund-requests'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success(
-        t('payments:refund_request.approved', { defaultValue: 'Refund request approved' })
-      );
+      toast.success(crudSuccessMessage('approved', 'refund_request'));
     },
     onError: () => {
-      toast.error(
-        t('resource:error.updating', {
-          count: 1,
-          resource: t('models:refund_request', { count: 1 }),
-          defaultValue: 'Failed to approve refund request',
-        })
-      );
+      toast.error(crudErrorMessage('approving', 'refund_request'));
     },
   });
 }
