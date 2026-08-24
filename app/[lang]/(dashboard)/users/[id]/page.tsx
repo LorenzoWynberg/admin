@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useUser, useDeleteUser, useUpdateUser } from '@/hooks/users';
+import { useRole } from '@/hooks/auth';
 import { RoleBadge } from '@/components/users/RoleBadge';
 import { PaymentMethodsCard } from '@/components/payments/PaymentMethodsCard';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
@@ -45,6 +46,7 @@ export default function UserDetailPage() {
   const params = useParams();
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
+  const { isAdmin } = useRole();
   const userId = params.id as string;
 
   const { data: user, isLoading, error } = useUser(userId);
@@ -114,10 +116,12 @@ export default function UserDetailPage() {
             </p>
           </div>
         </div>
-        <Button variant="destructive" onClick={handleDelete} disabled={deleteUser.isPending}>
-          <Trash2 className="mr-2 h-4 w-4" />
-          {actionLabel('delete')}
-        </Button>
+        {isAdmin && (
+          <Button variant="destructive" onClick={handleDelete} disabled={deleteUser.isPending}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            {actionLabel('delete')}
+          </Button>
+        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
