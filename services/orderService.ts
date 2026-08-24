@@ -60,6 +60,7 @@ interface ListParams {
   excludeTerminal?: boolean;
   paymentStatus?: string;
   hasQuote?: boolean;
+  collectOnDelivery?: boolean;
   search?: string;
   pickupFrom?: string;
   pickupTo?: string;
@@ -76,6 +77,8 @@ function buildQueryString(params: ListParams): string {
   if (params.excludeTerminal) query.set('filter[exclude_terminal]', '1');
   if (params.paymentStatus) query.set('filter[payment_status]', params.paymentStatus);
   if (typeof params.hasQuote === 'boolean') query.set('filter[has_quote]', String(params.hasQuote));
+  if (typeof params.collectOnDelivery === 'boolean')
+    query.set('filter[collect_on_delivery]', String(params.collectOnDelivery));
   if (params.search) query.set('search', params.search);
   if (params.pickupFrom) query.set('pickupFrom', params.pickupFrom);
   if (params.pickupTo) query.set('pickupTo', params.pickupTo);
