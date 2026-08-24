@@ -28,7 +28,9 @@ import { Enums } from '@/data/app-enums';
 import { formatDate, formatCurrency } from '@/utils/format';
 import { Input } from '@/components/ui/input';
 import { useOrderList } from '@/hooks/orders';
+import { useDispatchUsers } from '@/hooks/users';
 import { useCurrencyList } from '@/hooks/currencies/useCurrencyList';
+import { useRole } from '@/hooks/auth';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -52,6 +54,7 @@ function formatAddress(address?: App.Data.Address.AddressData | null): string {
 export default function OrdersPage() {
   const { t, ready } = useTranslation();
   const router = useRouter();
+  const { isAdmin, isDispatch } = useRole();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<string>('all');
   const [search, setSearch] = useState('');
@@ -77,6 +80,14 @@ export default function OrdersPage() {
   const { data: currencyListData } = useCurrencyList();
   const baseCurrencySymbol = currencyListData?.items?.find((c) => c.isBase)?.symbol || '₡';
   const meta = data?.meta;
+
+  // Dispatcher names are resolved client-side — OrderData only carries
+  // `dispatcherId`, not the related user. The orders list endpoint has no
+  // `filter[dispatcher]` param, so this column is display-only.
+  const { data: dispatchersData } = useDispatchUsers({ enabled: isAdmin });
+  const dispatcherNameById = new Map(
+    (dispatchersData?.items ?? []).map((dispatcher) => [dispatcher.id, dispatcher.name])
+  );
 
   if (!ready) {
     return null;
@@ -249,7 +260,13 @@ export default function OrdersPage() {
           ) : orders.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <Package className="mb-4 h-12 w-12" />
-              <p>{t('orders:no_orders', { defaultValue: 'No orders found' })}</p>
+              <p>
+                {isDispatch
+                  ? t('orders:no_orders_dispatch', {
+                      defaultValue: 'No orders in your book yet',
+                    })
+                  : t('orders:no_orders', { defaultValue: 'No orders found' })}
+              </p>
             </div>
           ) : (
             <Table>
@@ -263,6 +280,11 @@ export default function OrdersPage() {
                   <TableHead>{t('orders:detail.stops', { defaultValue: 'Stops' })}</TableHead>
                   <TableHead>{t('orders:to', { defaultValue: 'To' })}</TableHead>
                   <TableHead>{modelLabel('quote')}</TableHead>
+                  {isAdmin && (
+                    <TableHead>
+                      {t('orders:detail.dispatcher', { defaultValue: 'Dispatcher' })}
+                    </TableHead>
+                  )}
                   <TableHead>{actionLabel('created')}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -295,6 +317,13 @@ export default function OrdersPage() {
                         ? formatCurrency(order.currentQuote.total, baseCurrencySymbol)
                         : '-'}
                     </TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        {(order.dispatcherId != null &&
+                          dispatcherNameById.get(order.dispatcherId)) ||
+                          '—'}
+                      </TableCell>
+                    )}
                     <TableCell>{formatDate(order.createdAt)}</TableCell>
                   </TableRow>
                 ))}
