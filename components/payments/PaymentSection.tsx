@@ -9,16 +9,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderPayments } from '@/hooks/payments';
 import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { RefundDialog } from './RefundDialog';
+import { RecordPaymentDialog } from './RecordPaymentDialog';
+import { VoidPaymentDialog } from './VoidPaymentDialog';
 import { formatDate, formatCurrency } from '@/utils/format';
-import { capitalize, statusLabel } from '@/utils/lang';
+import { capitalize, statusLabel, validationAttribute } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
 import type { TFunction } from 'i18next';
 
 type PaymentData = App.Data.Payment.PaymentData;
 type RefundData = App.Data.Payment.RefundData;
+type OrderData = App.Data.Order.OrderData;
 
 interface PaymentSectionProps {
-  orderPublicId: string;
+  order: OrderData;
 }
 
 function getStatusBadgeVariant(
@@ -38,7 +41,11 @@ function getStatusBadgeVariant(
   }
 }
 
-function getPaymentMethodLabel(
+export function getOrderDueAmount(order: OrderData): number | null {
+  return order.currentQuote?.customerTotal ?? order.currentQuote?.total ?? null;
+}
+
+export function getPaymentMethodLabel(
   t: TFunction,
   method?: string | null,
   brand?: string | null
@@ -51,7 +58,7 @@ function getPaymentMethodLabel(
     case Enums.PaymentMethodType.ApplePay:
       return 'Apple Pay';
     case Enums.PaymentMethodType.SinpeMobile:
-      return 'SINPE Movil';
+      return t('payments:sinpe_mobile', { defaultValue: 'SINPE Móvil' });
     case Enums.PaymentMethodType.Cash:
       return t('payments:cash', { defaultValue: 'Cash' });
     default:
@@ -89,6 +96,9 @@ function PaymentCard({ payment }: { payment: PaymentData }) {
   const refundableAmount = (payment.amount || 0) - (payment.totalRefunded || 0);
   const canRefund = payment.status === Enums.TransactionStatus.Succeeded && refundableAmount > 0;
   const isAuthorized = payment.status === Enums.TransactionStatus.Authorized;
+  const canVoid =
+    payment.provider === Enums.PaymentProvider.Manual &&
+    payment.status === Enums.TransactionStatus.Succeeded;
 
   return (
     <div className="bg-muted/30 rounded-lg border p-4">
@@ -148,6 +158,11 @@ function PaymentCard({ payment }: { payment: PaymentData }) {
               {t('payments:charge_id', { defaultValue: 'Charge' })}: {payment.providerChargeId}
             </span>
           )}
+          {payment.reference && (
+            <span>
+              {validationAttribute('reference', true)}: {payment.reference}
+            </span>
+          )}
           {payment.fxRate && payment.fxRate !== 1 && (
             <span>
               {t('payments:fx_rate', { defaultValue: 'FX Rate' })}: {payment.fxRate.toFixed(4)}
@@ -155,6 +170,14 @@ function PaymentCard({ payment }: { payment: PaymentData }) {
           )}
         </div>
         <div className="flex gap-2">
+          {payment.proofUrl && (
+            <Button variant="outline" size="sm" asChild>
+              <a href={payment.proofUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                {t('payments:proof', { defaultValue: 'Proof' })}
+              </a>
+            </Button>
+          )}
           {payment.receiptUrl && (
             <Button variant="outline" size="sm" asChild>
               <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer">
@@ -164,8 +187,15 @@ function PaymentCard({ payment }: { payment: PaymentData }) {
             </Button>
           )}
           {canRefund && <RefundDialog payment={payment} />}
+          {canVoid && payment.publicId && <VoidPaymentDialog paymentPublicId={payment.publicId} />}
         </div>
       </div>
+
+      {payment.notes && (
+        <p className="text-muted-foreground mt-2 text-xs">
+          {validationAttribute('notes', true)}: {payment.notes}
+        </p>
+      )}
 
       {/* Refunds */}
       {payment.refunds && payment.refunds.length > 0 && (
@@ -184,17 +214,30 @@ function PaymentCard({ payment }: { payment: PaymentData }) {
   );
 }
 
-export function PaymentSection({ orderPublicId }: PaymentSectionProps) {
+export function PaymentSection({ order }: PaymentSectionProps) {
   const { t } = useTranslation();
+  const orderPublicId = order.publicId as string;
   const { data: payments, isLoading, error } = useOrderPayments({ orderPublicId });
   const summaryCurrencySymbol = useOrderCurrencySymbol(payments?.[0]?.currencyCode);
+  const orderCurrencySymbol = useOrderCurrencySymbol(order.currencyCode);
+  const isUnpaid = order.paymentStatus === Enums.PaymentStatus.UNPAID;
+  const defaultAmount = getOrderDueAmount(order);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CreditCard className="h-5 w-5" />
-          {t('payments:section_title', { defaultValue: 'Payments' })}
+        <CardTitle className="flex items-center justify-between gap-2">
+          <span className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" />
+            {t('payments:section_title', { defaultValue: 'Payments' })}
+          </span>
+          {isUnpaid && (
+            <RecordPaymentDialog
+              orderPublicId={orderPublicId}
+              currencySymbol={orderCurrencySymbol}
+              defaultAmount={defaultAmount}
+            />
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent>

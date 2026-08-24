@@ -75,6 +75,37 @@ function buildRequestOptions(
 }
 
 /**
+ * Build request options for a multipart/form-data body. Omits Content-Type
+ * so the browser sets the correct `multipart/form-data; boundary=...` value.
+ */
+function buildMultipartRequestOptions(formData: FormData, options: FetchOptions = {}): RequestInit {
+  const token = getToken();
+  const lang = getLang();
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'Accept-Language': lang,
+    ...options.headers,
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const requestInit: RequestInit = {
+    method: 'POST',
+    headers,
+    credentials: 'include',
+    body: formData,
+  };
+
+  if (options.signal) {
+    requestInit.signal = options.signal;
+  }
+
+  return requestInit;
+}
+
+/**
  * Handle API response
  */
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -149,6 +180,20 @@ export const api = {
   async destroy<T>(endpoint: string, body?: unknown, options: FetchOptions = {}): Promise<T> {
     const url = `${API_URL}${endpoint}`;
     const response = await fetch(url, buildRequestOptions('DELETE', body, options));
+    return handleResponse<T>(response);
+  },
+
+  /**
+   * POST a multipart/form-data body (e.g. file uploads). Bypasses the JSON
+   * `post()` above, which always JSON.stringifies and sets Content-Type.
+   */
+  async postMultipart<T>(
+    endpoint: string,
+    formData: FormData,
+    options: FetchOptions = {}
+  ): Promise<T> {
+    const url = `${API_URL}${endpoint}`;
+    const response = await fetch(url, buildMultipartRequestOptions(formData, options));
     return handleResponse<T>(response);
   },
 };

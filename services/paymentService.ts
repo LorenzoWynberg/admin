@@ -6,6 +6,14 @@ type StoreRefundData = App.Data.Payment.StoreRefundData;
 type Single<T> = Api.Response.Single<T>;
 type Paginated<T> = Api.Response.Paginated<T>;
 
+export interface RecordPaymentParams {
+  method: string;
+  amount: number;
+  reference?: string | null;
+  notes?: string | null;
+  proof?: File | null;
+}
+
 interface ListParams {
   page?: number;
   perPage?: number;
@@ -67,5 +75,33 @@ export const PaymentService = {
       `/payments/${paymentPublicId}/refunds?perPage=100`
     );
     return response.items;
+  },
+
+  /**
+   * Record a manual (cash / SINPE Móvil) payment for an order (admin only).
+   * Multipart because of the optional proof image.
+   */
+  async recordPayment(orderPublicId: string, data: RecordPaymentParams): Promise<PaymentData> {
+    const formData = new FormData();
+    formData.append('method', data.method);
+    formData.append('amount', String(data.amount));
+    if (data.reference) formData.append('reference', data.reference);
+    if (data.notes) formData.append('notes', data.notes);
+    if (data.proof) formData.append('proof', data.proof);
+
+    const response = await api.postMultipart<Single<PaymentData>>(
+      `/orders/${orderPublicId}/payments/record`,
+      formData
+    );
+    return response.item;
+  },
+
+  /**
+   * Void a manual payment (admin only). Order reverts to unpaid and a fresh
+   * collect-on-delivery intent is recreated if the order isn't terminal.
+   */
+  async voidPayment(paymentPublicId: string): Promise<PaymentData> {
+    const response = await api.post<Single<PaymentData>>(`/payments/${paymentPublicId}/void`);
+    return response.item;
   },
 };
