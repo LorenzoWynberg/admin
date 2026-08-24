@@ -697,6 +697,10 @@ declare namespace App.Data.Payment {
     orderId?: number | null;
     amount?: number;
     currencyCode?: string;
+    method?: App.Enums.RefundMethod;
+    reference?: string | null;
+    proofUrl?: string | null;
+    signatureUrl?: string | null;
     reason?: string | null;
     refundedAt?: string | null;
     createdAt?: string;
@@ -704,7 +708,11 @@ declare namespace App.Data.Payment {
   };
   export type StoreRefundData = {
     amount: number;
+    method: App.Enums.RefundMethod;
     reason: string | null;
+    reference: string | null;
+    proof: any | null;
+    signature: any | null;
   };
 }
 declare namespace App.Data.Pricing {
@@ -847,6 +855,12 @@ declare namespace App.Data.Quote {
   };
 }
 declare namespace App.Data.RefundRequest {
+  export type ApproveRefundRequestData = {
+    method: App.Enums.RefundMethod;
+    reference: string | null;
+    proof: any | null;
+    signature: any | null;
+  };
   export type RefundRequestData = {
     id?: number;
     publicId?: string;
@@ -1453,6 +1467,12 @@ declare namespace App.Enums {
   export enum QuoteType {
     Standard = 'standard',
     Reconciliation = 'reconciliation',
+  }
+  export enum RefundMethod {
+    Gateway = 'gateway',
+    SinpeTransfer = 'sinpe_transfer',
+    Cash = 'cash',
+    Credit = 'credit',
   }
   export enum RefundRequestStatus {
     Pending = 'pending',
