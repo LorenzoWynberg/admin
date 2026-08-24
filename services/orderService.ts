@@ -148,6 +148,16 @@ export const OrderService = {
   },
 
   /**
+   * Reassign an order to a different dispatcher, or unassign it (admin only)
+   */
+  async changeDispatcher(publicId: string, dispatcherId: number | null): Promise<OrderData> {
+    const response = await api.patch<Single<OrderData>>(`/orders/${publicId}/dispatcher`, {
+      dispatcherId,
+    });
+    return response.item;
+  },
+
+  /**
    * Manually outsource an order to external provider (admin only)
    */
   async outsource(publicId: string): Promise<OrderData> {

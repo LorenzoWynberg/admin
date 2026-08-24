@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useUser, useDeleteUser, useUpdateUser } from '@/hooks/users';
 import { useRole } from '@/hooks/auth';
 import { RoleBadge } from '@/components/users/RoleBadge';
+import { DispatcherPicker } from '@/components/dispatch/DispatcherPicker';
 import { PaymentMethodsCard } from '@/components/payments/PaymentMethodsCard';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useCatalogElement } from '@/hooks/catalogs/useCatalogStore';
@@ -58,6 +59,13 @@ export default function UserDetailPage() {
     updateUser.mutate({
       id: userId,
       data: { allowedPaymentMethods: next as App.Enums.PaymentMethodType[] },
+    });
+  };
+
+  const handleChangeDispatcher = (next: number | null) => {
+    updateUser.mutate({
+      id: userId,
+      data: { dispatcherId: next },
     });
   };
 
@@ -282,6 +290,15 @@ export default function UserDetailPage() {
           onChange={handleChangePaymentMethods}
           isPending={updateUser.isPending}
         />
+
+        {/* Dispatcher */}
+        {isAdmin && (
+          <DispatcherPicker
+            dispatcherId={user.dispatcherId}
+            onChange={handleChangeDispatcher}
+            isPending={updateUser.isPending}
+          />
+        )}
 
         {/* Timestamps */}
         <Card>

@@ -17,18 +17,14 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import {
-  actionLabel,
-  modelLabel,
-  resourceMessage,
-  validationAttribute,
-} from '@/utils/lang';
+import { actionLabel, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { formatDate } from '@/utils/format';
 import { useUserList } from '@/hooks/users';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import { useRole } from '@/hooks/auth';
 import { RoleBadge } from '@/components/users/RoleBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -49,6 +45,7 @@ function getInitials(name?: string): string {
 export default function UsersPage() {
   const { t, ready } = useTranslation();
   const router = useRouter();
+  const { isDispatch } = useRole();
   const [page, setPage] = useState(1);
   const [role, setRole] = useState<string>('all');
   const [search, setSearch] = useState('');
@@ -153,7 +150,11 @@ export default function UsersPage() {
           ) : users.length === 0 ? (
             <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <Users className="mb-4 h-12 w-12" />
-              <p>{t('users:no_users', { defaultValue: 'No users found' })}</p>
+              <p>
+                {isDispatch
+                  ? t('users:no_users_dispatch', { defaultValue: 'No users in your book yet' })
+                  : t('users:no_users', { defaultValue: 'No users found' })}
+              </p>
             </div>
           ) : (
             <Table>
