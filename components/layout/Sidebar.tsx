@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useNeedsAttention } from '@/hooks/orders/useNeedsAttention';
 import { usePendingReconciliation } from '@/hooks/orders/usePendingReconciliation';
+import { useRole } from '@/hooks/auth';
 
 const navigation = [
   { modelKey: 'dashboard', href: '/', icon: LayoutDashboard, isModel: false },
@@ -51,9 +52,16 @@ const navigation = [
     icon: DollarSign,
     isModel: false,
     translationKey: 'pricing:title',
+    adminOnly: true,
   },
   { modelKey: 'notification', href: '/notifications', icon: Bell, isModel: true },
-  { modelKey: 'audit_log', href: '/audit-logs', icon: ScrollText, isModel: true },
+  {
+    modelKey: 'audit_log',
+    href: '/audit-logs',
+    icon: ScrollText,
+    isModel: true,
+    adminOnly: true,
+  },
   { modelKey: 'guide', href: '/guide', icon: BookOpen, isModel: false },
 ];
 
@@ -64,9 +72,12 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const lang = (params?.lang as string) || 'en';
   const { data: needsAttentionData } = useNeedsAttention();
   const { data: pendingReconciliationData } = usePendingReconciliation();
+  const { isAdmin } = useRole();
   const urgentCount =
     (needsAttentionData?.summary?.critical ?? 0) + (needsAttentionData?.summary?.high ?? 0);
   const reconciliationCount = pendingReconciliationData?.summary?.count ?? 0;
+
+  const visibleNavigation = navigation.filter((item) => !item.adminOnly || isAdmin);
 
   const withLang = (href: string) => `/${lang}${href === '/' ? '' : href}`;
   const pathWithoutLang = pathname.replace(new RegExp(`^/${lang}`), '') || '/';
@@ -96,7 +107,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 overflow-y-auto p-4">
-        {navigation.map((item) => {
+        {visibleNavigation.map((item) => {
           const isActive =
             pathWithoutLang === item.href ||
             (item.href !== '/' && pathWithoutLang.startsWith(item.href));
@@ -131,21 +142,23 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       {/* Settings at bottom */}
-      <div className="border-t p-4">
-        <Link
-          href={withLang('/settings')}
-          onClick={onNavigate}
-          className={cn(
-            'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-            pathWithoutLang === '/settings'
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-          )}
-        >
-          <Settings className="h-5 w-5" />
-          {ready ? capitalize(t('common:settings', { count: 2 })) : ''}
-        </Link>
-      </div>
+      {isAdmin && (
+        <div className="border-t p-4">
+          <Link
+            href={withLang('/settings')}
+            onClick={onNavigate}
+            className={cn(
+              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+              pathWithoutLang === '/settings'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            )}
+          >
+            <Settings className="h-5 w-5" />
+            {ready ? capitalize(t('common:settings', { count: 2 })) : ''}
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
