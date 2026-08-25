@@ -5,6 +5,7 @@ export { useCalculateDistance } from './useCalculateDistance';
 export { useUpdateStop } from './useUpdateStop';
 export { useCreateStop } from './useCreateStop';
 export { useChangeTier } from './useChangeTier';
+export { useChangeDispatcher } from './useChangeDispatcher';
 export { useOutsourceOrder } from './useOutsourceOrder';
 export { useRetryDispatch } from './useRetryDispatch';
 export { useAssignOrder } from './useAssignOrder';

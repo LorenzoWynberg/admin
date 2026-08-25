@@ -11,6 +11,7 @@ const roleConfig: Record<
   'business.user': { label: 'Business User', variant: 'secondary' },
   client: { label: 'Client', variant: 'outline' },
   driver: { label: 'Driver', variant: 'default' },
+  dispatch: { label: 'Dispatch', variant: 'secondary' },
 };
 
 interface RoleBadgeProps {

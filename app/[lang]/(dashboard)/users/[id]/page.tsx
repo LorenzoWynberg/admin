@@ -7,7 +7,9 @@ import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useUser, useDeleteUser, useUpdateUser } from '@/hooks/users';
+import { useRole } from '@/hooks/auth';
 import { RoleBadge } from '@/components/users/RoleBadge';
+import { DispatcherPicker } from '@/components/dispatch/DispatcherPicker';
 import { PaymentMethodsCard } from '@/components/payments/PaymentMethodsCard';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useCatalogElement } from '@/hooks/catalogs/useCatalogStore';
@@ -45,6 +47,7 @@ export default function UserDetailPage() {
   const params = useParams();
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
+  const { isAdmin } = useRole();
   const userId = params.id as string;
 
   const { data: user, isLoading, error } = useUser(userId);
@@ -56,6 +59,13 @@ export default function UserDetailPage() {
     updateUser.mutate({
       id: userId,
       data: { allowedPaymentMethods: next as App.Enums.PaymentMethodType[] },
+    });
+  };
+
+  const handleChangeDispatcher = (next: number | null) => {
+    updateUser.mutate({
+      id: userId,
+      data: { dispatcherId: next },
     });
   };
 
@@ -114,10 +124,12 @@ export default function UserDetailPage() {
             </p>
           </div>
         </div>
-        <Button variant="destructive" onClick={handleDelete} disabled={deleteUser.isPending}>
-          <Trash2 className="mr-2 h-4 w-4" />
-          {actionLabel('delete')}
-        </Button>
+        {isAdmin && (
+          <Button variant="destructive" onClick={handleDelete} disabled={deleteUser.isPending}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            {actionLabel('delete')}
+          </Button>
+        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -278,6 +290,15 @@ export default function UserDetailPage() {
           onChange={handleChangePaymentMethods}
           isPending={updateUser.isPending}
         />
+
+        {/* Dispatcher */}
+        {isAdmin && (
+          <DispatcherPicker
+            dispatcherId={user.dispatcherId}
+            onChange={handleChangeDispatcher}
+            isPending={updateUser.isPending}
+          />
+        )}
 
         {/* Timestamps */}
         <Card>

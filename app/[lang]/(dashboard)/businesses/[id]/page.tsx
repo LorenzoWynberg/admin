@@ -7,12 +7,14 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { useBusiness, useDeleteBusiness, useUpdateBusiness } from '@/hooks/businesses';
+import { useRole } from '@/hooks/auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Building2, User, MapPin, Calendar, Trash2 } from 'lucide-react';
 import { formatDate } from '@/utils/format';
 import { useBusinessTaxProfile } from '@/hooks/tax-profiles';
 import { TaxProfileCard } from '@/components/TaxProfileCard';
 import { PaymentMethodsCard } from '@/components/payments/PaymentMethodsCard';
+import { DispatcherPicker } from '@/components/dispatch/DispatcherPicker';
 
 export default function BusinessDetailPage() {
   const params = useParams();
@@ -24,11 +26,19 @@ export default function BusinessDetailPage() {
   const { data: taxProfile } = useBusinessTaxProfile(businessId);
   const deleteBusiness = useDeleteBusiness();
   const updateBusiness = useUpdateBusiness();
+  const { isAdmin } = useRole();
 
   const handleChangePaymentMethods = (next: string[]) => {
     updateBusiness.mutate({
       id: businessId,
       data: { allowedPaymentMethods: next as App.Enums.PaymentMethodType[] },
+    });
+  };
+
+  const handleChangeDispatcher = (next: number | null) => {
+    updateBusiness.mutate({
+      id: businessId,
+      data: { dispatcherId: next },
     });
   };
 
@@ -181,6 +191,15 @@ export default function BusinessDetailPage() {
           onChange={handleChangePaymentMethods}
           isPending={updateBusiness.isPending}
         />
+
+        {/* Dispatcher */}
+        {isAdmin && (
+          <DispatcherPicker
+            dispatcherId={business.dispatcherId}
+            onChange={handleChangeDispatcher}
+            isPending={updateBusiness.isPending}
+          />
+        )}
 
         <Card>
           <CardHeader>

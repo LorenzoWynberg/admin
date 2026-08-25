@@ -151,6 +151,7 @@ declare namespace App.Data.Business {
     typeName?: string;
     usersCanApproveOwnOrders?: boolean;
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
+    dispatcherId?: number | null;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -170,6 +171,7 @@ declare namespace App.Data.Business {
     typeId?: number;
     usersCanApproveOwnOrders?: boolean;
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
+    dispatcherId?: number | null;
   };
 }
 declare namespace App.Data.Catalog {
@@ -486,6 +488,7 @@ declare namespace App.Data.Order {
     businessId?: number | null;
     driverId?: number | null;
     preferredDriverId?: number | null;
+    dispatcherId?: number | null;
     deliveryAddressId?: number | null;
     contactName?: string | null;
     contactPhone?: string | null;
@@ -619,6 +622,9 @@ declare namespace App.Data.Order {
     latitude: number;
     longitude: number;
     address: string;
+  };
+  export type UpdateOrderDispatcherData = {
+    dispatcherId: number | null;
   };
   export type UpdateOrderStopData = {
     addressId?: number | null;
@@ -1108,6 +1114,7 @@ declare namespace App.Data.User {
     langCode?: string;
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     preferredCurrency?: string | null;
+    dispatcherId?: number | null;
   };
   export type UserData = {
     id: number;
@@ -1121,6 +1128,7 @@ declare namespace App.Data.User {
     preferredCurrency?: string | null;
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     businessId?: number | null;
+    dispatcherId?: number | null;
     sexId?: number | null;
     isAdmin: boolean;
     isBusinessAccount: boolean;
@@ -1485,6 +1493,7 @@ declare namespace App.Enums {
     CLIENT = 'client',
     DRIVER = 'driver',
     ADMIN = 'admin',
+    DISPATCH = 'dispatch',
   }
   export enum RouteDateMode {
     TODAY = 'today',
