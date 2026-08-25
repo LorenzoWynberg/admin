@@ -88,7 +88,9 @@ export default function OrdersPage() {
   // powers the admin-only dispatcher filter below (`filter[dispatcher]`).
   const { data: dispatchersData } = useDispatchUsers({ enabled: isAdmin });
   const dispatchers = dispatchersData?.items ?? [];
-  const dispatcherNameById = new Map(dispatchers.map((dispatcher) => [dispatcher.id, dispatcher.name]));
+  const dispatcherNameById = new Map(
+    dispatchers.map((dispatcher) => [dispatcher.id, dispatcher.name])
+  );
 
   if (!ready) {
     return null;
