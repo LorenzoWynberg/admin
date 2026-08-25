@@ -57,6 +57,7 @@ export default function OrdersPage() {
   const { isAdmin, isDispatch } = useRole();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<string>('all');
+  const [dispatcherFilter, setDispatcherFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [pickupFrom, setPickupFrom] = useState('');
   const [pickupTo, setPickupTo] = useState('');
@@ -69,6 +70,7 @@ export default function OrdersPage() {
     page,
     perPage: 15,
     status: status === 'all' ? undefined : status,
+    dispatcher: isAdmin && dispatcherFilter !== 'all' ? dispatcherFilter : undefined,
     search: search || undefined,
     pickupFrom: pickupFrom || undefined,
     pickupTo: pickupTo || undefined,
@@ -81,12 +83,13 @@ export default function OrdersPage() {
   const baseCurrencySymbol = currencyListData?.items?.find((c) => c.isBase)?.symbol || '₡';
   const meta = data?.meta;
 
-  // Dispatcher names are resolved client-side — OrderData only carries
-  // `dispatcherId`, not the related user. The orders list endpoint has no
-  // `filter[dispatcher]` param, so this column is display-only.
+  // Dispatcher names are resolved client-side for the table column — OrderData
+  // only carries `dispatcherId`, not the related user. The same list also
+  // powers the admin-only dispatcher filter below (`filter[dispatcher]`).
   const { data: dispatchersData } = useDispatchUsers({ enabled: isAdmin });
+  const dispatchers = dispatchersData?.items ?? [];
   const dispatcherNameById = new Map(
-    (dispatchersData?.items ?? []).map((dispatcher) => [dispatcher.id, dispatcher.name])
+    dispatchers.map((dispatcher) => [dispatcher.id, dispatcher.name])
   );
 
   if (!ready) {
@@ -160,6 +163,32 @@ export default function OrdersPage() {
                 ))}
               </SelectContent>
             </Select>
+            {isAdmin && (
+              <Select
+                value={dispatcherFilter}
+                onValueChange={(value) => {
+                  setDispatcherFilter(value);
+                  resetPage();
+                }}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue
+                    placeholder={t('common:dispatcher.title', { defaultValue: 'Dispatcher' })}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('common:all', { defaultValue: 'All' })}</SelectItem>
+                  {dispatchers.map((dispatcher) => (
+                    <SelectItem key={dispatcher.id} value={String(dispatcher.id)}>
+                      {dispatcher.name}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="unassigned">
+                    {t('orders:detail.unassigned', { defaultValue: 'Unassigned' })}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
           <div className="flex flex-wrap gap-4">
             <div className="grid gap-1">

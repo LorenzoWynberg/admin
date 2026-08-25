@@ -66,6 +66,8 @@ interface ListParams {
   pickupTo?: string;
   deliveryFrom?: string;
   deliveryTo?: string;
+  /** A dispatch user id, or `'unassigned'` for orders with no dispatcher */
+  dispatcher?: string;
 }
 
 function buildQueryString(params: ListParams): string {
@@ -79,6 +81,7 @@ function buildQueryString(params: ListParams): string {
   if (typeof params.hasQuote === 'boolean') query.set('filter[has_quote]', String(params.hasQuote));
   if (typeof params.collectOnDelivery === 'boolean')
     query.set('filter[collect_on_delivery]', String(params.collectOnDelivery));
+  if (params.dispatcher) query.set('filter[dispatcher]', params.dispatcher);
   if (params.search) query.set('search', params.search);
   if (params.pickupFrom) query.set('pickupFrom', params.pickupFrom);
   if (params.pickupTo) query.set('pickupTo', params.pickupTo);
