@@ -15,6 +15,8 @@ interface UseOrderListParams {
   pickupTo?: string;
   deliveryFrom?: string;
   deliveryTo?: string;
+  /** A dispatch user id, or `'unassigned'` for orders with no dispatcher */
+  dispatcher?: string;
   enabled?: boolean;
 }
 
