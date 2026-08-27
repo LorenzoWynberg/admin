@@ -1115,6 +1115,7 @@ declare namespace App.Data.User {
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     preferredCurrency?: string | null;
     dispatcherId?: number | null;
+    role?: string;
   };
   export type UserData = {
     id: number;
