@@ -44,21 +44,15 @@ export function RefundDialog({ payment, onSuccess }: RefundDialogProps) {
     amount: '',
     reason: '',
     method: Enums.RefundMethod.Gateway as string,
-    reference: '',
   });
-  const [proof, setProof] = useState<File | null>(null);
-  const [signature, setSignature] = useState<File | null>(null);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
       setFormData({
         amount: maxAmount.toString(),
         reason: '',
-        method: getDefaultRefundMethod(isManual, payment.method),
-        reference: '',
+        method: getDefaultRefundMethod(isManual),
       });
-      setProof(null);
-      setSignature(null);
     }
     setOpen(isOpen);
   };
@@ -88,9 +82,6 @@ export function RefundDialog({ payment, onSuccess }: RefundDialogProps) {
           amount,
           method: formData.method,
           reason: formData.reason || null,
-          reference: formData.reference || null,
-          proof,
-          signature,
         },
       },
       {
@@ -172,15 +163,11 @@ export function RefundDialog({ payment, onSuccess }: RefundDialogProps) {
             )}
           </div>
 
-          {/* Refund Method + Evidence */}
+          {/* How the refund is settled */}
           <RefundMethodFields
             isManual={isManual}
             method={formData.method}
             onMethodChange={(value) => handleChange('method', value)}
-            reference={formData.reference}
-            onReferenceChange={(value) => handleChange('reference', value)}
-            onProofChange={setProof}
-            onSignatureChange={setSignature}
           />
 
           {/* Reason Input */}

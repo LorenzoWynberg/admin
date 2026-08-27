@@ -49,22 +49,17 @@ export function ApproveRefundRequestDialog({
 
   // The method the admin hasn't explicitly overridden — recomputed from the
   // loaded payment each render rather than synced via an effect.
-  const defaultMethod = getDefaultRefundMethod(isManual, settledPayment?.method);
+  const defaultMethod = getDefaultRefundMethod(isManual);
 
   const [formData, setFormData] = useState({
     method: null as string | null,
-    reference: '',
   });
-  const [proof, setProof] = useState<File | null>(null);
-  const [signature, setSignature] = useState<File | null>(null);
 
   const method = formData.method ?? defaultMethod;
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
-      setFormData({ method: null, reference: '' });
-      setProof(null);
-      setSignature(null);
+      setFormData({ method: null });
     }
     setOpen(isOpen);
   };
@@ -73,12 +68,7 @@ export function ApproveRefundRequestDialog({
     approveMutation.mutate(
       {
         publicId,
-        data: {
-          method,
-          reference: formData.reference || null,
-          proof,
-          signature,
-        },
+        data: { method },
       },
       {
         onSuccess: () => {
@@ -114,10 +104,6 @@ export function ApproveRefundRequestDialog({
             isManual={isManual}
             method={method}
             onMethodChange={(value) => setFormData((prev) => ({ ...prev, method: value }))}
-            reference={formData.reference}
-            onReferenceChange={(value) => setFormData((prev) => ({ ...prev, reference: value }))}
-            onProofChange={setProof}
-            onSignatureChange={setSignature}
           />
         </div>
 

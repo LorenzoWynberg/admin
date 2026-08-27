@@ -151,6 +151,7 @@ declare namespace App.Data.Business {
     typeName?: string;
     usersCanApproveOwnOrders?: boolean;
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
+    creditBalance?: number;
     dispatcherId?: number | null;
     createdAt?: string;
     updatedAt?: string;
@@ -244,6 +245,27 @@ declare namespace App.Data.Chat {
     imageUrl: string | null;
     createdAt: string;
     user?: App.Data.User.UserData;
+  };
+}
+declare namespace App.Data.Credit {
+  export type CreditData = {
+    id?: number;
+    publicId?: string;
+    type?: App.Enums.CreditEntryType;
+    amount?: number;
+    originalAmount?: number | null;
+    originalCurrency?: string | null;
+    fxRate?: number | null;
+    sourceRefundId?: number | null;
+    appliedOrderId?: number | null;
+    notes?: string | null;
+    createdAt?: string;
+  };
+  export type StoreCreditData = {
+    ownerPublicId: string;
+    amount: number;
+    type: App.Enums.CreditEntryType;
+    notes: string | null;
   };
 }
 declare namespace App.Data.Currency {
@@ -704,9 +726,6 @@ declare namespace App.Data.Payment {
     amount?: number;
     currencyCode?: string;
     method?: App.Enums.RefundMethod;
-    reference?: string | null;
-    proofUrl?: string | null;
-    signatureUrl?: string | null;
     reason?: string | null;
     refundedAt?: string | null;
     createdAt?: string;
@@ -716,9 +735,6 @@ declare namespace App.Data.Payment {
     amount: number;
     method: App.Enums.RefundMethod;
     reason: string | null;
-    reference: string | null;
-    proof: any | null;
-    signature: any | null;
   };
 }
 declare namespace App.Data.Pricing {
@@ -863,9 +879,6 @@ declare namespace App.Data.Quote {
 declare namespace App.Data.RefundRequest {
   export type ApproveRefundRequestData = {
     method: App.Enums.RefundMethod;
-    reference: string | null;
-    proof: any | null;
-    signature: any | null;
   };
   export type RefundRequestData = {
     id?: number;
@@ -1128,6 +1141,7 @@ declare namespace App.Data.User {
     langCode: string;
     preferredCurrency?: string | null;
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
+    creditBalance?: number;
     businessId?: number | null;
     dispatcherId?: number | null;
     sexId?: number | null;
@@ -1246,6 +1260,13 @@ declare namespace App.Enums {
     TimeSensitiveViolation = 'time_sensitive_violation',
     OutsideOperatingHours = 'outside_operating_hours',
     OutsideDriverShift = 'outside_driver_shift',
+  }
+  export enum CreditEntryType {
+    RefundGrant = 'refund_grant',
+    AdminGrant = 'admin_grant',
+    OrderApplication = 'order_application',
+    ApplicationReversal = 'application_reversal',
+    AdminVoid = 'admin_void',
   }
   export enum CrudAction {
     Retrieved = 'retrieved',
@@ -1366,6 +1387,7 @@ declare namespace App.Enums {
     Invoice = 'invoice',
     InvoiceItem = 'invoice_item',
     RefundRequest = 'refund_request',
+    Credit = 'credit',
   }
   export enum NotificationAction {
     QuoteRequested = 'quote_requested',
@@ -1391,6 +1413,7 @@ declare namespace App.Enums {
     RefundRequestCreated = 'refund_request_created',
     RefundRequestApproved = 'refund_request_approved',
     RefundRequestDenied = 'refund_request_denied',
+    CreditGranted = 'credit_granted',
   }
   export enum NotificationStatus {
     Unread = 'unread',
@@ -1435,6 +1458,7 @@ declare namespace App.Enums {
     SinpeMobile = 'sinpe_mobile',
     ApplePay = 'apple_pay',
     Cash = 'cash',
+    Credit = 'credit',
   }
   export enum PaymentProvider {
     Tilopay = 'tilopay',
@@ -1479,8 +1503,6 @@ declare namespace App.Enums {
   }
   export enum RefundMethod {
     Gateway = 'gateway',
-    SinpeTransfer = 'sinpe_transfer',
-    Cash = 'cash',
     Credit = 'credit',
   }
   export enum RefundRequestStatus {

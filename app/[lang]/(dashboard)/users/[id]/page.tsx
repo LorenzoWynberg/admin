@@ -17,6 +17,7 @@ import { useRole } from '@/hooks/auth';
 import { useAuth } from '@/stores/useAuthStore';
 import { RoleBadge } from '@/components/users/RoleBadge';
 import { ASSIGNABLE_ROLES, ChangeRoleDialog } from '@/components/users/ChangeRoleDialog';
+import { CreditLedgerCard } from '@/components/credits/CreditLedgerCard';
 import { DispatcherPicker } from '@/components/dispatch/DispatcherPicker';
 import { PaymentMethodsCard } from '@/components/payments/PaymentMethodsCard';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
@@ -307,6 +308,10 @@ export default function UserDetailPage() {
             isPending={updateUser.isPending}
           />
         )}
+
+        {/* Credit ledger — balance plus the entries behind it. Granting and
+            voiding are admin-only, matching the tier refunds sit at. */}
+        <CreditLedgerCard ownerPublicId={user.publicId} canManage={isAdmin} />
 
         {/* Timestamps */}
         <Card>

@@ -95,11 +95,6 @@ function RefundCard({ refund }: { refund: RefundData }) {
             )}
           </div>
           {refund.reason && <p className="text-muted-foreground text-xs">{refund.reason}</p>}
-          {refund.reference && (
-            <p className="text-muted-foreground text-xs">
-              {validationAttribute('reference', true)}: {refund.reference}
-            </p>
-          )}
         </div>
         <div className="text-right">
           <p className="text-destructive text-sm font-semibold">
@@ -110,25 +105,6 @@ function RefundCard({ refund }: { refund: RefundData }) {
           )}
         </div>
       </div>
-
-      {(refund.proofUrl || refund.signatureUrl) && (
-        <div className="flex gap-2">
-          {refund.proofUrl && (
-            <EvidenceLinkButton
-              href={refund.proofUrl}
-              label={t('payments:proof', { defaultValue: 'Proof' })}
-            />
-          )}
-          {refund.signatureUrl && (
-            <EvidenceLinkButton
-              href={refund.signatureUrl}
-              label={t('payments:refund.signature_label', {
-                defaultValue: 'Signed handover slip',
-              })}
-            />
-          )}
-        </div>
-      )}
     </div>
   );
 }

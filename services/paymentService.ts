@@ -1,5 +1,4 @@
 import { api } from '@/lib/api/client';
-import { appendRefundEvidence, type RefundEvidenceParams } from './refundEvidence';
 
 type PaymentData = App.Data.Payment.PaymentData;
 type RefundData = App.Data.Payment.RefundData;
@@ -14,8 +13,10 @@ export interface RecordPaymentParams {
   proof?: File | null;
 }
 
-export interface RefundParams extends RefundEvidenceParams {
+export interface RefundParams {
   amount: number;
+  /** How the refund is settled: a card reversal, or credit on the account. */
+  method: string;
   reason?: string | null;
 }
 
@@ -66,15 +67,11 @@ export const PaymentService = {
    * optional proof / signed-handover-slip evidence images.
    */
   async refund(paymentPublicId: string, data: RefundParams): Promise<RefundData> {
-    const formData = new FormData();
-    formData.append('amount', String(data.amount));
-    appendRefundEvidence(formData, data);
-    if (data.reason) formData.append('reason', data.reason);
-
-    const response = await api.postMultipart<Single<RefundData>>(
-      `/payments/${paymentPublicId}/refund`,
-      formData
-    );
+    const response = await api.post<Single<RefundData>>(`/payments/${paymentPublicId}/refund`, {
+      amount: data.amount,
+      method: data.method,
+      reason: data.reason ?? null,
+    });
     return response.item;
   },
 
