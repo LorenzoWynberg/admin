@@ -5,6 +5,8 @@ import { useAuthStore } from '@/stores/useAuthStore';
 type UserData = App.Data.User.UserData;
 type LoginResponse = Api.Response.Login;
 type SingleUser = Api.Response.Single<UserData>;
+type UpdatePasswordPayload = App.Data.User.UpdatePasswordData;
+type SuccessBasic = Api.Response.SuccessBasic;
 
 interface LoginCredentials {
   email: string;
@@ -89,6 +91,13 @@ export const Auth = {
       document.cookie = 'auth-token=; path=/; max-age=0';
       return null;
     }
+  },
+
+  /**
+   * Update the authenticated user's password
+   */
+  async updatePassword(payload: UpdatePasswordPayload): Promise<SuccessBasic> {
+    return api.patch<SuccessBasic>('/auth/password', payload);
   },
 
   /**
