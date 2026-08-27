@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import {
   capitalize,
+  getInitials,
   getModelGender,
   validationAttribute,
   validationMessage,
@@ -50,6 +51,40 @@ describe('capitalize', () => {
   it('handles strings starting with special characters', () => {
     expect(capitalize('_test')).toBe('_test');
     expect(capitalize('!hello')).toBe('!hello');
+  });
+});
+
+describe('getInitials', () => {
+  it('returns initials for a two-word name', () => {
+    expect(getInitials('John Doe')).toBe('JD');
+  });
+
+  it('returns a single initial for a single-word name', () => {
+    expect(getInitials('John')).toBe('J');
+  });
+
+  it('returns only the first two initials for a multi-word name', () => {
+    expect(getInitials('John Jacob Doe')).toBe('JJ');
+  });
+
+  it('uppercases lowercase names', () => {
+    expect(getInitials('john doe')).toBe('JD');
+  });
+
+  it('returns ? for undefined', () => {
+    expect(getInitials(undefined)).toBe('?');
+  });
+
+  it('returns ? for an empty string', () => {
+    expect(getInitials('')).toBe('?');
+  });
+
+  it('handles extra whitespace between words', () => {
+    expect(getInitials('John  Doe')).toBe('JD');
+  });
+
+  it('handles leading and trailing whitespace', () => {
+    expect(getInitials('  John Doe  ')).toBe('JD');
   });
 });
 

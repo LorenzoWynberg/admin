@@ -17,7 +17,13 @@ import {
 } from '@/components/ui/select';
 
 import { useState } from 'react';
-import { actionLabel, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  getInitials,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
 import { formatDate } from '@/utils/format';
 import { useUserList } from '@/hooks/users';
 import { Input } from '@/components/ui/input';
@@ -31,16 +37,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 
 type Role = App.Enums.Role;
-
-function getInitials(name?: string): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 export default function UsersPage() {
   const { t, ready } = useTranslation();

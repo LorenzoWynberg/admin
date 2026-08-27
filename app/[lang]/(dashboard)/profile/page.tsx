@@ -8,19 +8,9 @@ import { RoleBadge } from '@/components/users/RoleBadge';
 import { ChangePasswordCard } from '@/components/profile/ChangePasswordCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { validationAttribute } from '@/utils/lang';
+import { getInitials, validationAttribute } from '@/utils/lang';
 
 type Role = App.Enums.Role;
-
-function getInitials(name?: string): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 /**
  * Every authenticated panel role (admin, dispatch) lands here — unlike

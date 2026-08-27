@@ -1,6 +1,12 @@
 'use client';
 
-import { actionLabel, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
+import {
+  actionLabel,
+  getInitials,
+  modelLabel,
+  resourceMessage,
+  validationAttribute,
+} from '@/utils/lang';
 import { formatDate } from '@/utils/format';
 import { Badge } from '@/components/ui/badge';
 import { useParams } from 'next/navigation';
@@ -34,16 +40,6 @@ import {
 } from 'lucide-react';
 
 type Role = App.Enums.Role;
-
-function getInitials(name?: string): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 export default function UserDetailPage() {
   const params = useParams();

@@ -3,6 +3,7 @@
 import {
   actionLabel,
   capitalize,
+  getInitials,
   modelLabel,
   resourceMessage,
   statusLabel,
@@ -43,16 +44,6 @@ import { DriverScheduleTab } from '@/components/drivers/DriverScheduleTab';
 import { ArrowLeft, User, CreditCard, Car, Calendar, Trash2, MapPin, Pencil } from 'lucide-react';
 import { GeoService } from '@/services/geoService';
 import { formatDate } from '@/utils/format';
-
-function getInitials(name?: string): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 function isLicenseExpired(date?: string): boolean {
   if (!date) return false;

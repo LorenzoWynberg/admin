@@ -14,6 +14,21 @@ export const capitalize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+/**
+ * Get up to two uppercase initials from a name, for use in avatar fallbacks.
+ * @param name - The full name (e.g. 'John Doe')
+ * @returns Up to two uppercase initials (e.g. 'JD'), or '?' when no name is given
+ */
+export const getInitials = (name?: string): string => {
+  if (!name) return '?';
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+};
+
 export const validationAttribute = (key: string, toUpper = true) => {
   const translation = i18next.t(`validation:attributes.${key}`);
   return toUpper ? capitalize(translation) : translation;
