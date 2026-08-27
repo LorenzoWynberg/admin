@@ -550,7 +550,9 @@ To add or modify translations:
 
 ### Namespaces
 
-`addresses`, `auth`, `cache`, `common`, `http`, `models`, `orders`, `pagination`, `languages`, `passwords`, `resource`, `statuses`, `validation`
+The registered set lives in `config/i18next.ts` (`const namespaces`) — that array is the source of truth; a namespace not listed there will silently fail to load even if the API serves its JSON. Currently registered:
+
+`addresses`, `audit_logs`, `auth`, `businesses`, `catalogs`, `chat`, `common`, `currencies`, `drivers`, `errors`, `http`, `languages`, `models`, `notifications`, `orders`, `pagination`, `passwords`, `payments`, `pricing`, `quotes`, `resource`, `routes`, `statuses`, `tax`, `users`, `validation`
 
 ### Usage
 
