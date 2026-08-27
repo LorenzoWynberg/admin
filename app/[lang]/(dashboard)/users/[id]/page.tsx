@@ -8,7 +8,9 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useUser, useDeleteUser, useUpdateUser } from '@/hooks/users';
 import { useRole } from '@/hooks/auth';
+import { useAuth } from '@/stores/useAuthStore';
 import { RoleBadge } from '@/components/users/RoleBadge';
+import { ASSIGNABLE_ROLES, ChangeRoleDialog } from '@/components/users/ChangeRoleDialog';
 import { DispatcherPicker } from '@/components/dispatch/DispatcherPicker';
 import { PaymentMethodsCard } from '@/components/payments/PaymentMethodsCard';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
@@ -48,6 +50,7 @@ export default function UserDetailPage() {
   const { t, ready } = useTranslation();
   const router = useLocalizedRouter();
   const { isAdmin } = useRole();
+  const { user: currentUser } = useAuth();
   const userId = params.id as string;
 
   const { data: user, isLoading, error } = useUser(userId);
@@ -102,6 +105,12 @@ export default function UserDetailPage() {
     );
   }
 
+  // The API only allows role changes among client/dispatch/admin (driver and
+  // business.* users are a structural requirement), and never on the
+  // caller's own account — mirror both restrictions in what we render.
+  const canChangeRole =
+    isAdmin && ASSIGNABLE_ROLES.includes(user.role as Role) && currentUser?.id !== user.id;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -118,6 +127,9 @@ export default function UserDetailPage() {
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold">{user.name}</h1>
               <RoleBadge role={user.role as Role} />
+              {canChangeRole && (
+                <ChangeRoleDialog userId={userId} currentRole={user.role as Role} />
+              )}
             </div>
             <p className="text-muted-foreground">
               {modelLabel('user')} {user.publicId}
