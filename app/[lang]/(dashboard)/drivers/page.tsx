@@ -13,6 +13,7 @@ import { useState } from 'react';
 import {
   actionLabel,
   capitalize,
+  getInitials,
   modelLabel,
   resourceMessage,
   statusLabel,
@@ -31,16 +32,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Plus, Search, Truck } from 'lucide-react';
 import { formatDate } from '@/utils/format';
-
-function getInitials(name?: string): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 export default function DriversPage() {
   const { t, ready } = useTranslation();
