@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderPayments } from '@/hooks/payments';
+import { useRole } from '@/hooks/auth';
 import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { RefundDialog } from './RefundDialog';
 import { RecordPaymentDialog } from './RecordPaymentDialog';
@@ -134,11 +135,16 @@ function RefundCard({ refund }: { refund: RefundData }) {
 
 function PaymentCard({ payment }: { payment: PaymentData }) {
   const { t } = useTranslation();
+  const { isAdmin } = useRole();
   const currencySymbol = useOrderCurrencySymbol(payment.currencyCode);
   const refundableAmount = (payment.amount || 0) - (payment.totalRefunded || 0);
-  const canRefund = payment.status === Enums.TransactionStatus.Succeeded && refundableAmount > 0;
+  // Refund issuance and voiding a recorded payment are admin-only at the API;
+  // recording (RecordPaymentDialog below) is staff, book-scoped for dispatch.
+  const canRefund =
+    isAdmin && payment.status === Enums.TransactionStatus.Succeeded && refundableAmount > 0;
   const isAuthorized = payment.status === Enums.TransactionStatus.Authorized;
   const canVoid =
+    isAdmin &&
     payment.provider === Enums.PaymentProvider.Manual &&
     payment.status === Enums.TransactionStatus.Succeeded;
 
