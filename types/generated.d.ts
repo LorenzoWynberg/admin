@@ -142,6 +142,27 @@ declare namespace App.Data.Auth {
     password: string;
   };
 }
+declare namespace App.Data.Balance {
+  export type BalanceEntryData = {
+    id?: number;
+    publicId?: string;
+    type?: App.Enums.BalanceEntryType;
+    amount?: number;
+    originalAmount?: number | null;
+    originalCurrency?: string | null;
+    fxRate?: number | null;
+    sourceRefundId?: number | null;
+    appliedOrderId?: number | null;
+    notes?: string | null;
+    createdAt?: string;
+  };
+  export type StoreBalanceEntryData = {
+    ownerPublicId: string;
+    amount: number;
+    type: App.Enums.BalanceEntryType;
+    notes: string | null;
+  };
+}
 declare namespace App.Data.Business {
   export type BusinessData = {
     id: number;
@@ -151,7 +172,7 @@ declare namespace App.Data.Business {
     typeName?: string;
     usersCanApproveOwnOrders?: boolean;
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
-    creditBalance?: number;
+    balance?: number;
     dispatcherId?: number | null;
     createdAt?: string;
     updatedAt?: string;
@@ -245,27 +266,6 @@ declare namespace App.Data.Chat {
     imageUrl: string | null;
     createdAt: string;
     user?: App.Data.User.UserData;
-  };
-}
-declare namespace App.Data.Credit {
-  export type CreditData = {
-    id?: number;
-    publicId?: string;
-    type?: App.Enums.CreditEntryType;
-    amount?: number;
-    originalAmount?: number | null;
-    originalCurrency?: string | null;
-    fxRate?: number | null;
-    sourceRefundId?: number | null;
-    appliedOrderId?: number | null;
-    notes?: string | null;
-    createdAt?: string;
-  };
-  export type StoreCreditData = {
-    ownerPublicId: string;
-    amount: number;
-    type: App.Enums.CreditEntryType;
-    notes: string | null;
   };
 }
 declare namespace App.Data.Currency {
@@ -1143,7 +1143,7 @@ declare namespace App.Data.User {
     langCode: string;
     preferredCurrency?: string | null;
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
-    creditBalance?: number;
+    balance?: number;
     businessId?: number | null;
     dispatcherId?: number | null;
     sexId?: number | null;
@@ -1252,6 +1252,14 @@ declare namespace App.Enums {
     DELIVERY = 'delivery',
     INSTRUCTIONS = 'instructions',
   }
+  export enum BalanceEntryType {
+    RefundGrant = 'refund_grant',
+    AdminGrant = 'admin_grant',
+    OrderApplication = 'order_application',
+    ApplicationReversal = 'application_reversal',
+    AdminVoid = 'admin_void',
+    CancellationFee = 'cancellation_fee',
+  }
   export enum ChatChannel {
     Support = 'support',
     Delivery = 'delivery',
@@ -1262,14 +1270,6 @@ declare namespace App.Enums {
     TimeSensitiveViolation = 'time_sensitive_violation',
     OutsideOperatingHours = 'outside_operating_hours',
     OutsideDriverShift = 'outside_driver_shift',
-  }
-  export enum CreditEntryType {
-    RefundGrant = 'refund_grant',
-    AdminGrant = 'admin_grant',
-    OrderApplication = 'order_application',
-    ApplicationReversal = 'application_reversal',
-    AdminVoid = 'admin_void',
-    CancellationFee = 'cancellation_fee',
   }
   export enum CrudAction {
     Retrieved = 'retrieved',
@@ -1390,7 +1390,7 @@ declare namespace App.Enums {
     Invoice = 'invoice',
     InvoiceItem = 'invoice_item',
     RefundRequest = 'refund_request',
-    Credit = 'credit',
+    BalanceEntry = 'balance_entry',
   }
   export enum NotificationAction {
     QuoteRequested = 'quote_requested',
@@ -1416,7 +1416,7 @@ declare namespace App.Enums {
     RefundRequestCreated = 'refund_request_created',
     RefundRequestApproved = 'refund_request_approved',
     RefundRequestDenied = 'refund_request_denied',
-    CreditGranted = 'credit_granted',
+    BalanceCredited = 'balance_credited',
     RefundDue = 'refund_due',
     RefundSettled = 'refund_settled',
   }
@@ -1463,7 +1463,7 @@ declare namespace App.Enums {
     SinpeMobile = 'sinpe_mobile',
     ApplePay = 'apple_pay',
     Cash = 'cash',
-    Credit = 'credit',
+    Balance = 'balance',
   }
   export enum PaymentProvider {
     Tilopay = 'tilopay',
@@ -1508,7 +1508,7 @@ declare namespace App.Enums {
   }
   export enum RefundMethod {
     Gateway = 'gateway',
-    Credit = 'credit',
+    Balance = 'balance',
   }
   export enum RefundRequestOrigin {
     Customer = 'customer',

@@ -200,7 +200,7 @@ declare namespace Api.Broadcast {
         refundRequestPublicId: string;
         status: string;
         adminNotes: string | null;
-        /** How it was settled — a card reversal or credit. Null when denied. */
+        /** How it was settled — a card reversal or account balance. Null when denied. */
         refundMethod: string | null;
         refundAmount: number | null;
     }
@@ -216,10 +216,10 @@ declare namespace Api.Broadcast {
         currency: string;
     }
 
-    /** credit.granted */
-    export interface CreditGranted extends Base {
-        creditId: number;
-        creditPublicId: string;
+    /** balance.credited */
+    export interface BalanceCredited extends Base {
+        balanceEntryId: number;
+        balanceEntryPublicId: string;
         /** Signed, in base currency. Positive for a grant. */
         amount: number;
         /** The owner's balance after this entry, in base currency. */
@@ -252,6 +252,6 @@ declare namespace Api.Broadcast {
         | UnassignedOrderEscalation
         | RefundRequestCreated
         | RefundRequestResolved
-        | CreditGranted
+        | BalanceCredited
         | RefundDue;
 }

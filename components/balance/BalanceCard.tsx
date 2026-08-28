@@ -14,7 +14,7 @@ import {
   Dialog,
 } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useCreditLedger, useGrantCredit } from '@/hooks/credits';
+import { useBalance, useAdjustBalance } from '@/hooks/balance';
 import { actionLabel, validationAttribute } from '@/utils/lang';
 import { formatCurrency, formatDate } from '@/utils/format';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,7 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Enums } from '@/data/app-enums';
 
-interface CreditLedgerCardProps {
+interface BalanceCardProps {
   /** The account whose ledger this is — a user or a business public id. */
   ownerPublicId: string;
   /** Whether the viewer may move the balance. Grant/void is admin-only. */
@@ -37,9 +37,9 @@ interface CreditLedgerCardProps {
  * The balance is never edited directly — it is the sum of the entries, so a
  * correction is a new entry rather than a changed number.
  */
-export function CreditLedgerCard({ ownerPublicId, canManage = false }: CreditLedgerCardProps) {
+export function BalanceCard({ ownerPublicId, canManage = false }: BalanceCardProps) {
   const { t } = useTranslation();
-  const { data, isLoading } = useCreditLedger(ownerPublicId);
+  const { data, isLoading } = useBalance(ownerPublicId);
 
   const balance = data?.balance ?? 0;
   const entries = data?.entries ?? [];
@@ -50,20 +50,20 @@ export function CreditLedgerCard({ ownerPublicId, canManage = false }: CreditLed
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="flex items-center gap-2 text-base">
           <Wallet className="h-4 w-4" />
-          {t('payments:credit.title')}
+          {t('payments:balance.title')}
         </CardTitle>
         {canManage && <GrantCreditDialog ownerPublicId={ownerPublicId} balance={balance} />}
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
           <p className="text-2xl font-semibold">{formatCurrency(balance, symbol)}</p>
-          <p className="text-muted-foreground text-xs">{t('payments:credit.balance_hint')}</p>
+          <p className="text-muted-foreground text-xs">{t('payments:balance.balance_hint')}</p>
         </div>
 
         {isLoading && <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />}
 
         {!isLoading && entries.length === 0 && (
-          <p className="text-muted-foreground text-sm">{t('payments:credit.empty')}</p>
+          <p className="text-muted-foreground text-sm">{t('payments:balance.empty')}</p>
         )}
 
         {entries.length > 0 && (
@@ -78,7 +78,13 @@ export function CreditLedgerCard({ ownerPublicId, canManage = false }: CreditLed
   );
 }
 
-function CreditEntryRow({ entry, symbol }: { entry: App.Data.Credit.CreditData; symbol: string }) {
+function CreditEntryRow({
+  entry,
+  symbol,
+}: {
+  entry: App.Data.Balance.BalanceEntryData;
+  symbol: string;
+}) {
   const { t } = useTranslation();
   const amount = entry.amount ?? 0;
   const isCredit = amount >= 0;
@@ -86,7 +92,7 @@ function CreditEntryRow({ entry, symbol }: { entry: App.Data.Credit.CreditData; 
   return (
     <li className="flex items-start justify-between gap-3 py-2">
       <div className="space-y-0.5">
-        <Badge variant="outline">{t(`payments:credit_type.${entry.type}`)}</Badge>
+        <Badge variant="outline">{t(`payments:balance_entry_type.${entry.type}`)}</Badge>
         {entry.notes && <p className="text-muted-foreground text-xs">{entry.notes}</p>}
         {entry.createdAt && (
           <p className="text-muted-foreground text-xs">{formatDate(entry.createdAt)}</p>
@@ -103,19 +109,19 @@ function CreditEntryRow({ entry, symbol }: { entry: App.Data.Credit.CreditData; 
 function GrantCreditDialog({ ownerPublicId, balance }: { ownerPublicId: string; balance: number }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<string>(Enums.CreditEntryType.AdminGrant);
+  const [type, setType] = useState<string>(Enums.BalanceEntryType.AdminGrant);
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
-  const grant = useGrantCredit();
+  const grant = useAdjustBalance();
 
   const parsed = parseFloat(amount);
-  const isVoid = type === Enums.CreditEntryType.AdminVoid;
+  const isVoid = type === Enums.BalanceEntryType.AdminVoid;
   const isValid =
     !isNaN(parsed) && parsed > 0 && notes.trim().length >= 3 && (!isVoid || parsed <= balance);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
-      setType(Enums.CreditEntryType.AdminGrant);
+      setType(Enums.BalanceEntryType.AdminGrant);
       setAmount('');
       setNotes('');
     }
@@ -135,13 +141,13 @@ function GrantCreditDialog({ ownerPublicId, balance }: { ownerPublicId: string; 
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          {t('payments:credit.adjust')}
+          {t('payments:balance.adjust')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{t('payments:credit.adjust')}</DialogTitle>
-          <DialogDescription>{t('payments:credit.adjust_description')}</DialogDescription>
+          <DialogTitle>{t('payments:balance.adjust')}</DialogTitle>
+          <DialogDescription>{t('payments:balance.adjust_description')}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
@@ -150,19 +156,19 @@ function GrantCreditDialog({ ownerPublicId, balance }: { ownerPublicId: string; 
               type="button"
               variant={isVoid ? 'outline' : 'default'}
               size="sm"
-              onClick={() => setType(Enums.CreditEntryType.AdminGrant)}
+              onClick={() => setType(Enums.BalanceEntryType.AdminGrant)}
             >
               <Plus className="mr-1 h-4 w-4" />
-              {t('payments:credit_type.admin_grant')}
+              {t('payments:balance_entry_type.admin_grant')}
             </Button>
             <Button
               type="button"
               variant={isVoid ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setType(Enums.CreditEntryType.AdminVoid)}
+              onClick={() => setType(Enums.BalanceEntryType.AdminVoid)}
             >
               <Minus className="mr-1 h-4 w-4" />
-              {t('payments:credit_type.admin_void')}
+              {t('payments:balance_entry_type.admin_void')}
             </Button>
           </div>
 
@@ -179,7 +185,7 @@ function GrantCreditDialog({ ownerPublicId, balance }: { ownerPublicId: string; 
             />
             {isVoid && parsed > balance && (
               <p className="text-destructive text-xs">
-                {t('payments:credit.void_exceeds_balance')}
+                {t('payments:balance.void_exceeds_balance')}
               </p>
             )}
           </div>
@@ -191,7 +197,7 @@ function GrantCreditDialog({ ownerPublicId, balance }: { ownerPublicId: string; 
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder={t('payments:credit.notes_placeholder')}
+              placeholder={t('payments:balance.notes_placeholder')}
             />
           </div>
         </div>

@@ -1,17 +1,17 @@
 import { api } from '@/lib/api/client';
 
-type CreditData = App.Data.Credit.CreditData;
+type BalanceEntryData = App.Data.Balance.BalanceEntryData;
 type Multiple<T> = Api.Response.Multiple<T>;
 type Single<T> = Api.Response.Single<T>;
 
-export interface CreditLedger {
-  entries: CreditData[];
+export interface BalanceLedger {
+  entries: BalanceEntryData[];
   /** Balance in base currency. */
   balance: number;
   baseCurrency: string | null;
 }
 
-export interface GrantCreditParams {
+export interface AdjustBalanceParams {
   ownerPublicId: string;
   amount: number;
   /** `admin_grant` to add balance, `admin_void` to remove it. */
@@ -20,14 +20,14 @@ export interface GrantCreditParams {
   notes: string;
 }
 
-export const CreditService = {
+export const BalanceService = {
   /**
    * An account's ledger. Omit `ownerPublicId` for the caller's own; staff may
    * pass one to read any account's.
    */
-  async list(ownerPublicId?: string): Promise<CreditLedger> {
+  async list(ownerPublicId?: string): Promise<BalanceLedger> {
     const query = ownerPublicId ? `?owner=${encodeURIComponent(ownerPublicId)}` : '';
-    const response = await api.get<Multiple<CreditData>>(`/credits${query}`);
+    const response = await api.get<Multiple<BalanceEntryData>>(`/balance${query}`);
 
     const extra = (response.extra ?? {}) as { balance?: number; baseCurrency?: string | null };
 
@@ -39,8 +39,8 @@ export const CreditService = {
   },
 
   /** Add or remove balance by hand (admin only). */
-  async grant(data: GrantCreditParams): Promise<CreditData> {
-    const response = await api.post<Single<CreditData>>('/credits', {
+  async grant(data: AdjustBalanceParams): Promise<BalanceEntryData> {
+    const response = await api.post<Single<BalanceEntryData>>('/balance', {
       ownerPublicId: data.ownerPublicId,
       amount: data.amount,
       type: data.type,

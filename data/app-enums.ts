@@ -87,6 +87,14 @@ export const Enums = {
     DELIVERY: "delivery",
     INSTRUCTIONS: "instructions",
   },
+  BalanceEntryType: {
+    RefundGrant: "refund_grant",
+    AdminGrant: "admin_grant",
+    OrderApplication: "order_application",
+    ApplicationReversal: "application_reversal",
+    AdminVoid: "admin_void",
+    CancellationFee: "cancellation_fee",
+  },
   ChatChannel: {
     Support: "support",
     Delivery: "delivery",
@@ -97,14 +105,6 @@ export const Enums = {
     TimeSensitiveViolation: "time_sensitive_violation",
     OutsideOperatingHours: "outside_operating_hours",
     OutsideDriverShift: "outside_driver_shift",
-  },
-  CreditEntryType: {
-    RefundGrant: "refund_grant",
-    AdminGrant: "admin_grant",
-    OrderApplication: "order_application",
-    ApplicationReversal: "application_reversal",
-    AdminVoid: "admin_void",
-    CancellationFee: "cancellation_fee",
   },
   CrudAction: {
     Retrieved: "retrieved",
@@ -225,7 +225,7 @@ export const Enums = {
     Invoice: "invoice",
     InvoiceItem: "invoice_item",
     RefundRequest: "refund_request",
-    Credit: "credit",
+    BalanceEntry: "balance_entry",
   },
   NotificationAction: {
     QuoteRequested: "quote_requested",
@@ -251,7 +251,7 @@ export const Enums = {
     RefundRequestCreated: "refund_request_created",
     RefundRequestApproved: "refund_request_approved",
     RefundRequestDenied: "refund_request_denied",
-    CreditGranted: "credit_granted",
+    BalanceCredited: "balance_credited",
     RefundDue: "refund_due",
     RefundSettled: "refund_settled",
   },
@@ -298,7 +298,7 @@ export const Enums = {
     SinpeMobile: "sinpe_mobile",
     ApplePay: "apple_pay",
     Cash: "cash",
-    Credit: "credit",
+    Balance: "balance",
   },
   PaymentProvider: {
     Tilopay: "tilopay",
@@ -343,7 +343,7 @@ export const Enums = {
   },
   RefundMethod: {
     Gateway: "gateway",
-    Credit: "credit",
+    Balance: "balance",
   },
   RefundRequestOrigin: {
     Customer: "customer",
