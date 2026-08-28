@@ -180,16 +180,31 @@ export function ReconciliationDialog({
   const hasDiscount = discountRate > 0;
   const hasTax = (currentQuote.taxRate ?? 0) > 0;
 
+  // Seeding the waiting minutes has to wait for the tolerance to arrive:
+  // seeded at open, before the settings query resolves, the allowance reads
+  // as zero and the admin is shown a number higher than what would be
+  // charged — and never corrected, because seeding happens once.
+  const [waitSeeded, setWaitSeeded] = useState(false);
+
+  if (open && idleData && !waitSeeded) {
+    setFees((prev) => ({
+      ...prev,
+      idleMinutes: String(currentQuote.idleMinutes ?? recordedWaitMinutes),
+    }));
+    setWaitSeeded(true);
+  }
+
   const handleOpenChange = (val: boolean) => {
     if (val) {
       if (currentQuote.items?.length) {
         setItems(buildInitialItems(currentQuote.items, orderStops));
       }
       setFees({
-        idleMinutes: String(currentQuote.idleMinutes ?? recordedWaitMinutes),
+        idleMinutes: '',
         surcharge: currentQuote.surcharge ? String(currentQuote.surcharge) : '',
         discountRate: currentQuote.discountRate ? String(currentQuote.discountRate * 100) : '',
       });
+      setWaitSeeded(false);
     }
     setOpen(val);
   };
