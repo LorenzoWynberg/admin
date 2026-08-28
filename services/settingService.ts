@@ -6,6 +6,7 @@ type Single<T> = Api.Response.Single<T>;
 
 type ExchangeRateModeResponse = { exchangeRateMode: string };
 type SupportedVehicleTypesResponse = { supportedVehicleTypes: string[] };
+type IdleTimeResponse = { idleMinuteRate: number; idleFreeMinutes: number };
 
 export const SettingService = {
   /**
@@ -43,6 +44,32 @@ export const SettingService = {
       { exchangeRateMode }
     );
     return { exchangeRateMode: response.exchangeRateMode };
+  },
+
+  /**
+   * How waiting time is priced: the per-minute rate, and how much of it at
+   * each stop is normal enough to be free.
+   */
+  async getIdleTime(): Promise<IdleTimeResponse> {
+    const response = await api.get<IdleTimeResponse & { message: string }>('/settings/idle-time');
+    return {
+      idleMinuteRate: response.idleMinuteRate,
+      idleFreeMinutes: response.idleFreeMinutes,
+    };
+  },
+
+  /**
+   * Price waiting time (admin only).
+   */
+  async updateIdleTime(data: Partial<IdleTimeResponse>): Promise<IdleTimeResponse> {
+    const response = await api.patch<IdleTimeResponse & { message: string }>(
+      '/settings/idle-time',
+      data
+    );
+    return {
+      idleMinuteRate: response.idleMinuteRate,
+      idleFreeMinutes: response.idleFreeMinutes,
+    };
   },
 
   /**

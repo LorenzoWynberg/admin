@@ -11,6 +11,8 @@ interface ReconcileParams {
   timeFee?: number | null;
   surcharge?: number | null;
   discountRate?: number | null;
+  /** Minutes the driver waited. The API refuses this alongside timeFee. */
+  idleMinutes?: number | null;
 }
 
 export function useReconcileOrder() {
@@ -24,8 +26,16 @@ export function useReconcileOrder() {
       timeFee,
       surcharge,
       discountRate,
+      idleMinutes,
     }: ReconcileParams) =>
-      OrderService.reconcile(orderPublicId, { items, notes, timeFee, surcharge, discountRate }),
+      OrderService.reconcile(orderPublicId, {
+        items,
+        notes,
+        timeFee,
+        surcharge,
+        discountRate,
+        idleMinutes,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },

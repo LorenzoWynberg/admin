@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeReconciliationTotal } from '../reconciliation';
+import { chargeableWaitMinutes, idleCharge, computeReconciliationTotal } from '../reconciliation';
 
 const quote = {
   baseFare: 10,
@@ -47,5 +47,45 @@ describe('computeReconciliationTotal', () => {
     expect(result.serviceFees).toBe(0);
     expect(result.estimatedTotal).toBe(100);
     expect(result.delta).toBe(100);
+  });
+});
+
+describe('idleCharge', () => {
+  it('prices reported minutes at the configured rate', () => {
+    expect(idleCharge(30, 0.5)).toBe(15);
+  });
+
+  it('rounds to cents so the estimate matches what the API charges', () => {
+    expect(idleCharge(7, 0.333)).toBe(2.33);
+  });
+
+  it('charges nothing when the rate is unset', () => {
+    expect(idleCharge(30, 0)).toBe(0);
+  });
+
+  it('charges nothing for no waiting', () => {
+    expect(idleCharge(0, 0.5)).toBe(0);
+  });
+
+  it('treats a blank input as no charge rather than NaN', () => {
+    expect(idleCharge(NaN, 0.5)).toBe(0);
+  });
+});
+
+describe('chargeableWaitMinutes', () => {
+  it('gives the free allowance at every stop, not once over the order', () => {
+    expect(chargeableWaitMinutes([10, 10], 5)).toBe(10);
+  });
+
+  it('charges nothing for normal dwell time', () => {
+    expect(chargeableWaitMinutes([4, 3], 5)).toBe(0);
+  });
+
+  it('ignores stops the driver never finished', () => {
+    expect(chargeableWaitMinutes([35, null, undefined], 5)).toBe(30);
+  });
+
+  it('charges everything when nothing is free', () => {
+    expect(chargeableWaitMinutes([10, 10], 0)).toBe(20);
   });
 });

@@ -252,6 +252,8 @@ export const OrderService = {
       timeFee?: number | null;
       surcharge?: number | null;
       discountRate?: number | null;
+      /** Minutes the driver waited. Mutually exclusive with timeFee. */
+      idleMinutes?: number | null;
     }
   ): Promise<QuoteData> {
     const response = await api.post<Single<QuoteData>>(`/orders/${orderPublicId}/reconcile`, data);

@@ -7,10 +7,11 @@ import {
   SelectItem,
   Select,
 } from '@/components/ui/select';
-import { Globe, Coins, Clock, Truck, ChevronRight } from 'lucide-react';
+import { Globe, Coins, Clock, Truck, ChevronRight, Hourglass } from 'lucide-react';
 
 import { useState } from 'react';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +20,12 @@ import type { LangCode } from '@/stores/useLangStore';
 import { usePathname } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
-import { useSupportedVehicleTypes, useUpdateSupportedVehicleTypes } from '@/hooks/settings';
+import {
+  useSupportedVehicleTypes,
+  useUpdateSupportedVehicleTypes,
+  useIdleTime,
+  useUpdateIdleTime,
+} from '@/hooks/settings';
 import { Enums } from '@/data/app-enums';
 import { actionLabel, capitalize, vehicleTypeLabel } from '@/utils/lang';
 
@@ -41,6 +47,34 @@ export default function SettingsPage() {
     setSupportedVehicleTypes(vehicleTypesData.supportedVehicleTypes ?? []);
     setVehicleTypesInitialized(true);
   }
+
+  // The rate lives here rather than on the reconciliation screen: it is a
+  // price-list decision, made once, not a per-order one.
+  const { data: idleData, isLoading: idleRateLoading } = useIdleTime();
+  const updateIdleRate = useUpdateIdleTime();
+
+  const [idleRateDraft, setIdleRateDraft] = useState('');
+  const [idleFreeDraft, setIdleFreeDraft] = useState('');
+  const [idleRateInitialized, setIdleRateInitialized] = useState(false);
+
+  if (idleData && !idleRateInitialized) {
+    setIdleRateDraft(String(idleData.idleMinuteRate ?? 0));
+    setIdleFreeDraft(String(idleData.idleFreeMinutes ?? 0));
+    setIdleRateInitialized(true);
+  }
+
+  const parsedIdleRate = Number(idleRateDraft);
+  const parsedIdleFree = Number(idleFreeDraft);
+  const isIdleRateValid =
+    idleRateDraft.trim() !== '' &&
+    !isNaN(parsedIdleRate) &&
+    parsedIdleRate >= 0 &&
+    idleFreeDraft.trim() !== '' &&
+    !isNaN(parsedIdleFree) &&
+    parsedIdleFree >= 0;
+  const isIdleRateDirty =
+    parsedIdleRate !== (idleData?.idleMinuteRate ?? 0) ||
+    parsedIdleFree !== (idleData?.idleFreeMinutes ?? 0);
 
   const toggleVehicleType = (value: string) => {
     setSupportedVehicleTypes((prev) =>
@@ -149,6 +183,72 @@ export default function SettingsPage() {
                 size="sm"
               >
                 {updateVehicleTypes.isPending
+                  ? t('common:saving', { defaultValue: 'Saving...' })
+                  : actionLabel('save')}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Hourglass className="h-5 w-5" />
+            {t('payments:idle_time.title')}
+          </CardTitle>
+          <CardDescription>{t('payments:idle_time.description')}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {idleRateLoading ? (
+            <div className="flex items-center justify-center py-6">
+              <div className="border-primary h-6 w-6 animate-spin rounded-full border-4 border-t-transparent" />
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="idle-minute-rate">{t('payments:idle_time.rate_label')}</Label>
+                  <Input
+                    id="idle-minute-rate"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={idleRateDraft}
+                    onChange={(e) => setIdleRateDraft(e.target.value)}
+                  />
+                  {parsedIdleRate === 0 && (
+                    <p className="text-muted-foreground text-xs">
+                      {t('payments:idle_time.off_hint')}
+                    </p>
+                  )}
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="idle-free-minutes">{t('payments:idle_time.free_label')}</Label>
+                  <Input
+                    id="idle-free-minutes"
+                    type="number"
+                    step="1"
+                    min="0"
+                    value={idleFreeDraft}
+                    onChange={(e) => setIdleFreeDraft(e.target.value)}
+                  />
+                  <p className="text-muted-foreground text-xs">
+                    {t('payments:idle_time.free_hint')}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() =>
+                  updateIdleRate.mutate({
+                    idleMinuteRate: parsedIdleRate,
+                    idleFreeMinutes: parsedIdleFree,
+                  })
+                }
+                disabled={updateIdleRate.isPending || !isIdleRateValid || !isIdleRateDirty}
+                size="sm"
+              >
+                {updateIdleRate.isPending
                   ? t('common:saving', { defaultValue: 'Saving...' })
                   : actionLabel('save')}
               </Button>

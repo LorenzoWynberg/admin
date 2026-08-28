@@ -18,9 +18,14 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
 import { useOrderReceipts, useReconcileOrder } from '@/hooks/orders';
+import { useIdleTime } from '@/hooks/settings';
 import { QuoteLineItemsEditor } from '@/components/quotes/QuoteLineItemsEditor';
 import { ImagePreviewDialog } from '@/components/orders/ImagePreviewDialog';
-import { computeReconciliationTotal } from '@/utils/reconciliation';
+import {
+  computeReconciliationTotal,
+  chargeableWaitMinutes,
+  idleCharge,
+} from '@/utils/reconciliation';
 import { formatCurrency } from '@/utils/format';
 import { actionLabel, validationAttribute } from '@/utils/lang';
 
@@ -47,7 +52,8 @@ interface ReconciliationDialogProps {
 }
 
 interface FeeInputs {
-  timeFee: string;
+  /** Minutes the driver waited. Priced by the configured rate, not typed as money. */
+  idleMinutes: string;
   surcharge: string;
   discountRate: string;
 }
@@ -130,13 +136,34 @@ export function ReconciliationDialog({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<ReconciliationLineItem[]>([]);
-  const [fees, setFees] = useState<FeeInputs>({ timeFee: '', surcharge: '', discountRate: '' });
+  const [fees, setFees] = useState<FeeInputs>({
+    idleMinutes: '',
+    surcharge: '',
+    discountRate: '',
+  });
   const [notes, setNotes] = useState('');
   const [previewReceipt, setPreviewReceipt] = useState<OrderReceiptData | null>(null);
   const reconcile = useReconcileOrder();
   const { data: receipts } = useOrderReceipts({ orderPublicId, enabled: open });
 
-  const timeFee = parseFloat(fees.timeFee) || 0;
+  // Waiting time is entered as minutes and priced here, so the admin sees
+  // what the driver's "it took thirty, not ten" actually costs before they
+  // commit to it.
+  const { data: idleData } = useIdleTime();
+  const idleMinuteRate = idleData?.idleMinuteRate ?? 0;
+  const idleFreeMinutes = idleData?.idleFreeMinutes ?? 0;
+
+  // What the driver recorded at the stops. The field is seeded with this
+  // rather than left blank: the admin is confirming a number, not producing
+  // one from a phone call.
+  const recordedWaitMinutes = chargeableWaitMinutes(
+    orderStops.map((stop) => stop.routeStop?.waitMinutes),
+    idleFreeMinutes
+  );
+
+  const idleMinutes = parseInt(fees.idleMinutes, 10) || 0;
+  const timeFee = idleCharge(idleMinutes, idleMinuteRate);
+
   const surcharge = parseFloat(fees.surcharge) || 0;
   const discountRate = (parseFloat(fees.discountRate) || 0) / 100;
 
@@ -156,7 +183,7 @@ export function ReconciliationDialog({
         setItems(buildInitialItems(currentQuote.items, orderStops));
       }
       setFees({
-        timeFee: currentQuote.timeFee ? String(currentQuote.timeFee) : '',
+        idleMinutes: String(currentQuote.idleMinutes ?? recordedWaitMinutes),
         surcharge: currentQuote.surcharge ? String(currentQuote.surcharge) : '',
         discountRate: currentQuote.discountRate ? String(currentQuote.discountRate * 100) : '',
       });
@@ -195,7 +222,7 @@ export function ReconciliationDialog({
         orderPublicId,
         items: apiItems,
         notes: notes || null,
-        timeFee,
+        idleMinutes,
         surcharge,
         discountRate,
       },
@@ -287,18 +314,28 @@ export function ReconciliationDialog({
             {/* Adjustable Fees — prefilled from the original quote */}
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <div className="grid gap-2">
-                <Label htmlFor="reconciliation-time-fee">
-                  {validationAttribute('timeFee', true)} ({currencySymbol})
+                <Label htmlFor="reconciliation-idle-minutes">
+                  {t('payments:idle_time.minutes_label')}
                 </Label>
                 <Input
-                  id="reconciliation-time-fee"
+                  id="reconciliation-idle-minutes"
                   type="number"
-                  step="0.01"
+                  step="1"
                   min="0"
-                  placeholder="0.00"
-                  value={fees.timeFee}
-                  onChange={(e) => handleFeeChange('timeFee', e.target.value)}
+                  placeholder="0"
+                  value={fees.idleMinutes}
+                  onChange={(e) => handleFeeChange('idleMinutes', e.target.value)}
                 />
+                <p className="text-muted-foreground text-xs">
+                  {idleMinutes > 0
+                    ? `${t('payments:idle_time.charge_label')}: ${formatCurrency(timeFee, currencySymbol)}`
+                    : `${t('payments:idle_time.rate_label')}: ${formatCurrency(idleMinuteRate, currencySymbol)}`}
+                </p>
+                {recordedWaitMinutes > 0 && idleMinutes !== recordedWaitMinutes && (
+                  <p className="text-muted-foreground text-xs">
+                    {t('payments:idle_time.driver_recorded', { minutes: recordedWaitMinutes })}
+                  </p>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="reconciliation-surcharge">

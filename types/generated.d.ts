@@ -614,6 +614,7 @@ declare namespace App.Data.Order {
     timeFee: number | null;
     surcharge: number | null;
     discountRate: number | null;
+    idleMinutes: number | null;
   };
   export type StoreOrderData = {
     deliveryAddress: App.Data.Address.StoreSnapshotAddressData;
@@ -819,6 +820,8 @@ declare namespace App.Data.Quote {
     distanceKm?: number | null;
     distanceFee?: number | null;
     timeFee?: number | null;
+    idleMinutes?: number | null;
+    idleMinuteRate?: number | null;
     surcharge?: number | null;
     discountRate?: number | null;
     taxRate?: number | null;
@@ -943,6 +946,9 @@ declare namespace App.Data.Route {
   export type ReorderStopsData = {
     stopIds: Array<any>;
   };
+  export type ReportWaitData = {
+    minutes: number;
+  };
   export type RouteData = {
     id?: number;
     publicId?: string;
@@ -977,6 +983,9 @@ declare namespace App.Data.Route {
     delayFlaggedAt?: string | null;
     delayReason?: string | null;
     arrivingAt?: string | null;
+    arrivedAt?: string | null;
+    reportedWaitMinutes?: number | null;
+    waitMinutes?: number | null;
     notes?: string | null;
     podPhotoPath?: string | null;
     podSignaturePath?: string | null;
@@ -1010,6 +1019,8 @@ declare namespace App.Data.Setting {
     unassignedEscalationHours: number;
     unassignedAutoCancelEnabled: boolean;
     exchangeRateMode: App.Enums.ExchangeRateMode;
+    idleMinuteRate: number;
+    idleFreeMinutes: number;
   };
   export type UpdateSettingData = {
     noServiceStart?: string;
@@ -1019,6 +1030,8 @@ declare namespace App.Data.Setting {
     unassignedAutoCancelEnabled?: boolean;
     exchangeRateMode?: string;
     supportedVehicleTypes?: Array<any>;
+    idleMinuteRate?: number;
+    idleFreeMinutes?: number;
   };
 }
 declare namespace App.Data.Shared {
