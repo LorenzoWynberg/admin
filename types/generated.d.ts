@@ -986,6 +986,7 @@ declare namespace App.Data.Route {
     arrivedAt?: string | null;
     reportedWaitMinutes?: number | null;
     waitMinutes?: number | null;
+    estimatedMinutes?: number;
     notes?: string | null;
     podPhotoPath?: string | null;
     podSignaturePath?: string | null;
@@ -1020,7 +1021,7 @@ declare namespace App.Data.Setting {
     unassignedAutoCancelEnabled: boolean;
     exchangeRateMode: App.Enums.ExchangeRateMode;
     idleMinuteRate: number;
-    idleFreeMinutes: number;
+    idleGraceMinutes: number;
   };
   export type UpdateSettingData = {
     noServiceStart?: string;
@@ -1031,7 +1032,7 @@ declare namespace App.Data.Setting {
     exchangeRateMode?: string;
     supportedVehicleTypes?: Array<any>;
     idleMinuteRate?: number;
-    idleFreeMinutes?: number;
+    idleGraceMinutes?: number;
   };
 }
 declare namespace App.Data.Shared {

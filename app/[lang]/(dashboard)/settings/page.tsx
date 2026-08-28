@@ -54,27 +54,27 @@ export default function SettingsPage() {
   const updateIdleRate = useUpdateIdleTime();
 
   const [idleRateDraft, setIdleRateDraft] = useState('');
-  const [idleFreeDraft, setIdleFreeDraft] = useState('');
+  const [idleGraceDraft, setIdleGraceDraft] = useState('');
   const [idleRateInitialized, setIdleRateInitialized] = useState(false);
 
   if (idleData && !idleRateInitialized) {
     setIdleRateDraft(String(idleData.idleMinuteRate ?? 0));
-    setIdleFreeDraft(String(idleData.idleFreeMinutes ?? 0));
+    setIdleGraceDraft(String(idleData.idleGraceMinutes ?? 0));
     setIdleRateInitialized(true);
   }
 
   const parsedIdleRate = Number(idleRateDraft);
-  const parsedIdleFree = Number(idleFreeDraft);
+  const parsedIdleGrace = Number(idleGraceDraft);
   const isIdleRateValid =
     idleRateDraft.trim() !== '' &&
     !isNaN(parsedIdleRate) &&
     parsedIdleRate >= 0 &&
-    idleFreeDraft.trim() !== '' &&
-    !isNaN(parsedIdleFree) &&
-    parsedIdleFree >= 0;
+    idleGraceDraft.trim() !== '' &&
+    !isNaN(parsedIdleGrace) &&
+    parsedIdleGrace >= 0;
   const isIdleRateDirty =
     parsedIdleRate !== (idleData?.idleMinuteRate ?? 0) ||
-    parsedIdleFree !== (idleData?.idleFreeMinutes ?? 0);
+    parsedIdleGrace !== (idleData?.idleGraceMinutes ?? 0);
 
   const toggleVehicleType = (value: string) => {
     setSupportedVehicleTypes((prev) =>
@@ -224,17 +224,17 @@ export default function SettingsPage() {
                   )}
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="idle-free-minutes">{t('payments:idle_time.free_label')}</Label>
+                  <Label htmlFor="idle-grace-minutes">{t('payments:idle_time.grace_label')}</Label>
                   <Input
-                    id="idle-free-minutes"
+                    id="idle-grace-minutes"
                     type="number"
                     step="1"
                     min="0"
-                    value={idleFreeDraft}
-                    onChange={(e) => setIdleFreeDraft(e.target.value)}
+                    value={idleGraceDraft}
+                    onChange={(e) => setIdleGraceDraft(e.target.value)}
                   />
                   <p className="text-muted-foreground text-xs">
-                    {t('payments:idle_time.free_hint')}
+                    {t('payments:idle_time.grace_hint')}
                   </p>
                 </div>
               </div>
@@ -242,7 +242,7 @@ export default function SettingsPage() {
                 onClick={() =>
                   updateIdleRate.mutate({
                     idleMinuteRate: parsedIdleRate,
-                    idleFreeMinutes: parsedIdleFree,
+                    idleGraceMinutes: parsedIdleGrace,
                   })
                 }
                 disabled={updateIdleRate.isPending || !isIdleRateValid || !isIdleRateDirty}

@@ -13,23 +13,30 @@ export function idleCharge(minutes: number, ratePerMinute: number): number {
   return Math.round(minutes * ratePerMinute * 100) / 100;
 }
 
-/**
- * What the driver's recorded waiting adds up to across an order's stops.
- *
- * Mirrors the API: the free allowance is given at every stop, not once over
- * the order — handing a parcel over takes a few minutes at each door, and
- * spending the allowance at the first stop would bill normal work at the
- * second.
- */
-export function chargeableWaitMinutes(
-  stopWaits: (number | null | undefined)[],
-  freeMinutesPerStop: number
-): number {
-  const free = Number.isFinite(freeMinutesPerStop) ? Math.max(0, freeMinutesPerStop) : 0;
+export interface StopWait {
+  /** What the stop actually took, driver-reported or measured. */
+  waitMinutes?: number | null;
+  /** What it was quoted for — the allowance it is measured against. */
+  estimatedMinutes?: number | null;
+}
 
-  return stopWaits.reduce<number>((sum, waited) => {
-    const minutes = Number.isFinite(waited) ? (waited as number) : 0;
-    return sum + Math.max(0, minutes - free);
+/**
+ * What the driver's recorded time adds up to across an order's stops.
+ *
+ * Mirrors the API: each stop is measured against its own estimate, because
+ * forty minutes at a supermarket run is the job and forty minutes at a parcel
+ * drop is waiting. The tolerance sits on top of the estimate and applies at
+ * every stop — nobody hits an estimate exactly, and one order-wide allowance
+ * spent at the first stop would bill normal work at the second.
+ */
+export function chargeableWaitMinutes(stops: StopWait[], toleranceMinutes: number): number {
+  const tolerance = Number.isFinite(toleranceMinutes) ? Math.max(0, toleranceMinutes) : 0;
+
+  return stops.reduce<number>((sum, stop) => {
+    const waited = Number.isFinite(stop.waitMinutes) ? (stop.waitMinutes as number) : 0;
+    const estimate = Number.isFinite(stop.estimatedMinutes) ? (stop.estimatedMinutes as number) : 0;
+
+    return sum + Math.max(0, waited - estimate - tolerance);
   }, 0);
 }
 

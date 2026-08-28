@@ -21,7 +21,7 @@ export function useUpdateIdleTime() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { idleMinuteRate?: number; idleFreeMinutes?: number }) =>
+    mutationFn: (data: { idleMinuteRate?: number; idleGraceMinutes?: number }) =>
       SettingService.updateIdleTime(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'idle-time'] });

@@ -73,19 +73,39 @@ describe('idleCharge', () => {
 });
 
 describe('chargeableWaitMinutes', () => {
-  it('gives the free allowance at every stop, not once over the order', () => {
-    expect(chargeableWaitMinutes([10, 10], 5)).toBe(10);
+  it('charges nothing for a stop that took as long as it was quoted for', () => {
+    expect(chargeableWaitMinutes([{ waitMinutes: 10, estimatedMinutes: 10 }], 5)).toBe(0);
   });
 
-  it('charges nothing for normal dwell time', () => {
-    expect(chargeableWaitMinutes([4, 3], 5)).toBe(0);
+  it('charges only the time past the estimate and the tolerance', () => {
+    expect(chargeableWaitMinutes([{ waitMinutes: 45, estimatedMinutes: 10 }], 5)).toBe(30);
+  });
+
+  it('lets a generous estimate absorb the time it bought', () => {
+    expect(chargeableWaitMinutes([{ waitMinutes: 40, estimatedMinutes: 40 }], 5)).toBe(0);
+  });
+
+  it('measures every stop against its own estimate', () => {
+    expect(
+      chargeableWaitMinutes(
+        [
+          { waitMinutes: 30, estimatedMinutes: 30 },
+          { waitMinutes: 30, estimatedMinutes: 5 },
+        ],
+        5
+      )
+    ).toBe(20);
   });
 
   it('ignores stops the driver never finished', () => {
-    expect(chargeableWaitMinutes([35, null, undefined], 5)).toBe(30);
-  });
-
-  it('charges everything when nothing is free', () => {
-    expect(chargeableWaitMinutes([10, 10], 0)).toBe(20);
+    expect(
+      chargeableWaitMinutes(
+        [
+          { waitMinutes: 45, estimatedMinutes: 10 },
+          { waitMinutes: null, estimatedMinutes: 10 },
+        ],
+        5
+      )
+    ).toBe(30);
   });
 });

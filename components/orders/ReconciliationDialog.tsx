@@ -151,14 +151,17 @@ export function ReconciliationDialog({
   // commit to it.
   const { data: idleData } = useIdleTime();
   const idleMinuteRate = idleData?.idleMinuteRate ?? 0;
-  const idleFreeMinutes = idleData?.idleFreeMinutes ?? 0;
+  const idleGraceMinutes = idleData?.idleGraceMinutes ?? 0;
 
-  // What the driver recorded at the stops. The field is seeded with this
-  // rather than left blank: the admin is confirming a number, not producing
-  // one from a phone call.
+  // What the driver recorded at the stops, measured against what each stop
+  // was quoted for. The field is seeded with this rather than left blank: the
+  // admin is confirming a number, not producing one from a phone call.
   const recordedWaitMinutes = chargeableWaitMinutes(
-    orderStops.map((stop) => stop.routeStop?.waitMinutes),
-    idleFreeMinutes
+    orderStops.map((stop) => ({
+      waitMinutes: stop.routeStop?.waitMinutes,
+      estimatedMinutes: stop.routeStop?.estimatedMinutes,
+    })),
+    idleGraceMinutes
   );
 
   const idleMinutes = parseInt(fees.idleMinutes, 10) || 0;
