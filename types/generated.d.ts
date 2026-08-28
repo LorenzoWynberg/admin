@@ -174,6 +174,7 @@ declare namespace App.Data.Business {
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     balance?: number;
     dispatcherId?: number | null;
+    balanceDebtCeiling?: number | null;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -194,6 +195,7 @@ declare namespace App.Data.Business {
     usersCanApproveOwnOrders?: boolean;
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     dispatcherId?: number | null;
+    balanceDebtCeiling?: number | null;
   };
 }
 declare namespace App.Data.Catalog {
@@ -1130,6 +1132,7 @@ declare namespace App.Data.User {
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     preferredCurrency?: string | null;
     dispatcherId?: number | null;
+    balanceDebtCeiling?: number | null;
     role?: string;
   };
   export type UserData = {
@@ -1146,6 +1149,7 @@ declare namespace App.Data.User {
     balance?: number;
     businessId?: number | null;
     dispatcherId?: number | null;
+    balanceDebtCeiling?: number | null;
     sexId?: number | null;
     isAdmin: boolean;
     isBusinessAccount: boolean;
@@ -1259,6 +1263,8 @@ declare namespace App.Enums {
     ApplicationReversal = 'application_reversal',
     AdminVoid = 'admin_void',
     CancellationFee = 'cancellation_fee',
+    UnderCollection = 'under_collection',
+    DebtSettlement = 'debt_settlement',
   }
   export enum ChatChannel {
     Support = 'support',
@@ -1348,6 +1354,7 @@ declare namespace App.Enums {
     RefundReceipt = 'refund_receipt',
     SurchargeReceipt = 'surcharge_receipt',
     FinalReceipt = 'final_receipt',
+    CancellationReceipt = 'cancellation_receipt',
   }
   export enum LogLevel {
     Emergency = 'emergency',

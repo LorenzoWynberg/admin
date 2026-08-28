@@ -94,6 +94,8 @@ export const Enums = {
     ApplicationReversal: "application_reversal",
     AdminVoid: "admin_void",
     CancellationFee: "cancellation_fee",
+    UnderCollection: "under_collection",
+    DebtSettlement: "debt_settlement",
   },
   ChatChannel: {
     Support: "support",
@@ -183,6 +185,7 @@ export const Enums = {
     RefundReceipt: "refund_receipt",
     SurchargeReceipt: "surcharge_receipt",
     FinalReceipt: "final_receipt",
+    CancellationReceipt: "cancellation_receipt",
   },
   LogLevel: {
     Emergency: "emergency",

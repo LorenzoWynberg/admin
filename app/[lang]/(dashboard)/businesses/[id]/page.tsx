@@ -15,6 +15,7 @@ import { useBusinessTaxProfile } from '@/hooks/tax-profiles';
 import { TaxProfileCard } from '@/components/TaxProfileCard';
 import { PaymentMethodsCard } from '@/components/payments/PaymentMethodsCard';
 import { DispatcherPicker } from '@/components/dispatch/DispatcherPicker';
+import { BalanceCard } from '@/components/balance/BalanceCard';
 
 export default function BusinessDetailPage() {
   const params = useParams();
@@ -39,6 +40,13 @@ export default function BusinessDetailPage() {
     updateBusiness.mutate({
       id: businessId,
       data: { dispatcherId: next },
+    });
+  };
+
+  const handleChangeDebtCeiling = (next: number | null) => {
+    updateBusiness.mutate({
+      id: businessId,
+      data: { balanceDebtCeiling: next },
     });
   };
 
@@ -190,6 +198,16 @@ export default function BusinessDetailPage() {
           allowedMethods={business.allowedPaymentMethods}
           onChange={handleChangePaymentMethods}
           isPending={updateBusiness.isPending}
+        />
+
+        {/* Balance — a business order draws the company's balance, not the
+            member's, so this is the only place a pooled balance is visible. */}
+        <BalanceCard
+          ownerPublicId={business.publicId}
+          canManage={isAdmin}
+          debtCeiling={business.balanceDebtCeiling}
+          onDebtCeilingChange={handleChangeDebtCeiling}
+          isSavingCeiling={updateBusiness.isPending}
         />
 
         {/* Dispatcher */}

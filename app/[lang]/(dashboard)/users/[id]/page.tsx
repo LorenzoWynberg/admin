@@ -69,6 +69,13 @@ export default function UserDetailPage() {
     });
   };
 
+  const handleChangeDebtCeiling = (next: number | null) => {
+    updateUser.mutate({
+      id: userId,
+      data: { balanceDebtCeiling: next },
+    });
+  };
+
   const handleDelete = () => {
     if (
       confirm(
@@ -311,7 +318,13 @@ export default function UserDetailPage() {
 
         {/* Account balance plus the entries behind it. Granting and voiding
             are admin-only, matching the tier refunds sit at. */}
-        <BalanceCard ownerPublicId={user.publicId} canManage={isAdmin} />
+        <BalanceCard
+          ownerPublicId={user.publicId}
+          canManage={isAdmin}
+          debtCeiling={user.balanceDebtCeiling}
+          onDebtCeilingChange={handleChangeDebtCeiling}
+          isSavingCeiling={updateUser.isPending}
+        />
 
         {/* Timestamps */}
         <Card>

@@ -29,6 +29,11 @@ interface BalanceCardProps {
   ownerPublicId: string;
   /** Whether the viewer may move the balance. Grant/void is admin-only. */
   canManage?: boolean;
+  /** This account's own debt ceiling, or null when it follows the default. */
+  debtCeiling?: number | null;
+  /** Omit to hide the ceiling control entirely. */
+  onDebtCeilingChange?: (value: number | null) => void;
+  isSavingCeiling?: boolean;
 }
 
 /**
@@ -37,7 +42,13 @@ interface BalanceCardProps {
  * The balance is never edited directly — it is the sum of the entries, so a
  * correction is a new entry rather than a changed number.
  */
-export function BalanceCard({ ownerPublicId, canManage = false }: BalanceCardProps) {
+export function BalanceCard({
+  ownerPublicId,
+  canManage = false,
+  debtCeiling,
+  onDebtCeilingChange,
+  isSavingCeiling = false,
+}: BalanceCardProps) {
   const { t } = useTranslation();
   const { data, isLoading } = useBalance(ownerPublicId);
 
@@ -45,19 +56,28 @@ export function BalanceCard({ ownerPublicId, canManage = false }: BalanceCardPro
   const entries = data?.entries ?? [];
   const symbol = data?.baseCurrency ?? '';
 
+  // A short delivery can leave an account owing us. Admin reads the ledger of
+  // record, so it stays in base currency — but it has to be obvious at a
+  // glance which way the money points.
+  const isDebt = balance < 0;
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="flex items-center gap-2 text-base">
           <Wallet className="h-4 w-4" />
-          {t('payments:balance.title')}
+          {isDebt ? t('payments:balance.debt_title') : t('payments:balance.title')}
         </CardTitle>
         {canManage && <GrantCreditDialog ownerPublicId={ownerPublicId} balance={balance} />}
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <p className="text-2xl font-semibold">{formatCurrency(balance, symbol)}</p>
-          <p className="text-muted-foreground text-xs">{t('payments:balance.balance_hint')}</p>
+          <p className={`text-2xl font-semibold ${isDebt ? 'text-destructive' : ''}`}>
+            {formatCurrency(balance, symbol)}
+          </p>
+          <p className="text-muted-foreground text-xs">
+            {isDebt ? t('payments:balance.debt_hint') : t('payments:balance.balance_hint')}
+          </p>
         </div>
 
         {isLoading && <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />}
@@ -73,8 +93,69 @@ export function BalanceCard({ ownerPublicId, canManage = false }: BalanceCardPro
             ))}
           </ul>
         )}
+
+        {canManage && onDebtCeilingChange && (
+          <DebtCeilingField
+            value={debtCeiling ?? null}
+            onChange={onDebtCeilingChange}
+            isPending={isSavingCeiling}
+          />
+        )}
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * How far this account may go into debt before it is refused a new order.
+ *
+ * Blank means the account follows the configured default, which is what
+ * almost every account should do — this is here for the two ends of the
+ * curve: a long-standing business that has earned more rope, and someone who
+ * has walked away from a debt once and has earned less.
+ */
+function DebtCeilingField({
+  value,
+  onChange,
+  isPending,
+}: {
+  value: number | null;
+  onChange: (value: number | null) => void;
+  isPending: boolean;
+}) {
+  const { t } = useTranslation();
+  const [draft, setDraft] = useState(value === null ? '' : String(value));
+
+  const trimmed = draft.trim();
+  const parsed = trimmed === '' ? null : Number(trimmed);
+  const isValid = parsed === null || (!isNaN(parsed) && parsed >= 0);
+  const isDirty = (value === null ? '' : String(value)) !== trimmed;
+
+  return (
+    <div className="border-border grid gap-2 border-t pt-4">
+      <Label htmlFor="debt-ceiling">{validationAttribute('balanceDebtCeiling', true)}</Label>
+      <div className="flex gap-2">
+        <Input
+          id="debt-ceiling"
+          type="number"
+          step="0.01"
+          min="0"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder={t('payments:balance.ceiling_default')}
+        />
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!isValid || !isDirty || isPending}
+          onClick={() => onChange(parsed)}
+        >
+          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {actionLabel('save')}
+        </Button>
+      </div>
+      <p className="text-muted-foreground text-xs">{t('payments:balance.ceiling_hint')}</p>
+    </div>
   );
 }
 
