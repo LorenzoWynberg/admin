@@ -1269,6 +1269,7 @@ declare namespace App.Enums {
     OrderApplication = 'order_application',
     ApplicationReversal = 'application_reversal',
     AdminVoid = 'admin_void',
+    CancellationFee = 'cancellation_fee',
   }
   export enum CrudAction {
     Retrieved = 'retrieved',
