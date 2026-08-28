@@ -251,6 +251,8 @@ export const Enums = {
     RefundRequestApproved: 'refund_request_approved',
     RefundRequestDenied: 'refund_request_denied',
     CreditGranted: 'credit_granted',
+    RefundDue: 'refund_due',
+    RefundSettled: 'refund_settled',
   },
   NotificationStatus: {
     Unread: 'unread',
@@ -341,6 +343,10 @@ export const Enums = {
   RefundMethod: {
     Gateway: 'gateway',
     Credit: 'credit',
+  },
+  RefundRequestOrigin: {
+    Customer: 'customer',
+    System: 'system',
   },
   RefundRequestStatus: {
     Pending: 'pending',

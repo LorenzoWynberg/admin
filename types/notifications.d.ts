@@ -200,6 +200,20 @@ declare namespace Api.Broadcast {
     refundRequestPublicId: string;
     status: string;
     adminNotes: string | null;
+    /** How it was settled — a card reversal or credit. Null when denied. */
+    refundMethod: string | null;
+    refundAmount: number | null;
+  }
+
+  /** refund.due */
+  export interface RefundDue extends Base {
+    orderId: number;
+    orderPublicId: string;
+    refundRequestId: number;
+    refundRequestPublicId: string;
+    /** What we owe, in the order's currency. */
+    amount: number;
+    currency: string;
   }
 
   /** credit.granted */
@@ -238,5 +252,6 @@ declare namespace Api.Broadcast {
     | UnassignedOrderEscalation
     | RefundRequestCreated
     | RefundRequestResolved
-    | CreditGranted;
+    | CreditGranted
+    | RefundDue;
 }

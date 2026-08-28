@@ -10,6 +10,7 @@ import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { PaymentStatusBadge } from './PaymentStatusBadge';
 import { getDateLocale } from '@/utils/format';
 import { actionLabel } from '@/utils/lang';
+import { Enums } from '@/data/app-enums';
 import { formatCurrency } from '@/utils/format';
 import { useCurrencyList } from '@/hooks/currencies/useCurrencyList';
 import { Eye, Clock, Building2 } from 'lucide-react';
@@ -30,6 +31,8 @@ export function RefundRequestCard({ refundRequest }: RefundRequestCardProps) {
   const business = order?.business;
   const orderPublicId = order?.publicId ?? '';
   const reason = refundRequest.reason ?? '';
+  const isSystemRaised = refundRequest.origin === Enums.RefundRequestOrigin.System;
+  const owed = refundRequest.amount ?? null;
   const { data: currencyListData } = useCurrencyList();
   const currencySymbol =
     currencyListData?.items?.find((c) => c.code === order?.currencyCode)?.symbol ||
@@ -50,7 +53,11 @@ export function RefundRequestCard({ refundRequest }: RefundRequestCardProps) {
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-mono text-sm font-semibold">#{orderPublicId}</span>
           <Badge variant="outline" className="bg-orange-50 text-orange-700">
-            {t('payments:refund_request.refund_requested', { defaultValue: 'Refund Requested' })}
+            {isSystemRaised
+              ? t('payments:refund_request.owed_to_customer')
+              : t('payments:refund_request.refund_requested', {
+                  defaultValue: 'Refund Requested',
+                })}
           </Badge>
           {order?.paymentStatus && <PaymentStatusBadge status={order.paymentStatus} />}
           {createdAgo && (
@@ -68,7 +75,14 @@ export function RefundRequestCard({ refundRequest }: RefundRequestCardProps) {
               {business.name}
             </span>
           )}
-          {totalPaid != null && totalPaid > 0 && (
+          {owed != null && (
+            <span className="font-medium text-red-600">
+              {t('payments:refund_request.owed_amount', {
+                amount: formatCurrency(owed, currencySymbol),
+              })}
+            </span>
+          )}
+          {owed == null && totalPaid != null && totalPaid > 0 && (
             <span className="font-medium text-red-600">
               {formatCurrency(totalPaid, currencySymbol)}
             </span>

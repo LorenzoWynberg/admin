@@ -885,6 +885,8 @@ declare namespace App.Data.RefundRequest {
     publicId?: string;
     orderId?: number;
     userId?: number;
+    origin?: App.Enums.RefundRequestOrigin;
+    amount?: number | null;
     reason?: string;
     status?: App.Enums.RefundRequestStatus;
     adminNotes?: string | null;
@@ -1414,6 +1416,8 @@ declare namespace App.Enums {
     RefundRequestApproved = 'refund_request_approved',
     RefundRequestDenied = 'refund_request_denied',
     CreditGranted = 'credit_granted',
+    RefundDue = 'refund_due',
+    RefundSettled = 'refund_settled',
   }
   export enum NotificationStatus {
     Unread = 'unread',
@@ -1504,6 +1508,10 @@ declare namespace App.Enums {
   export enum RefundMethod {
     Gateway = 'gateway',
     Credit = 'credit',
+  }
+  export enum RefundRequestOrigin {
+    Customer = 'customer',
+    System = 'system',
   }
   export enum RefundRequestStatus {
     Pending = 'pending',
