@@ -82,7 +82,14 @@ export function QuoteDetailDialog({
             {quote.timeFee != null && quote.timeFee > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  {validationAttribute('timeFee', true)}
+                  {t('payments:idle_time.title')}
+                  {/* The admin fields the call about this charge, so they get
+                      the same arithmetic the customer's receipt prints. */}
+                  {quote.idleMinutes != null && quote.idleMinuteRate != null && (
+                    <span className="text-muted-foreground/70 ml-1 text-xs">
+                      {quote.idleMinutes} × {formatCurrency(quote.idleMinuteRate, currencySymbol)}
+                    </span>
+                  )}
                 </span>
                 <span>{formatCurrency(quote.timeFee, currencySymbol)}</span>
               </div>

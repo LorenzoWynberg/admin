@@ -13,31 +13,47 @@ export function idleCharge(minutes: number, ratePerMinute: number): number {
   return Math.round(minutes * ratePerMinute * 100) / 100;
 }
 
-export interface StopWait {
-  /** What the stop actually took, driver-reported or measured. */
-  waitMinutes?: number | null;
-  /** What it was quoted for — the allowance it is measured against. */
-  estimatedMinutes?: number | null;
+/**
+ * Minutes at one stop that are actually billable.
+ *
+ * Mirrors the API: a normal stop is already covered by the base fare, so the
+ * included allowance comes off before anything is charged. Only time the
+ * customer asked the driver to spend beyond an ordinary stop is time they pay
+ * for.
+ */
+export function billableMinutes(minutes: number | null | undefined, included: number): number {
+  const spent = Number.isFinite(minutes) ? (minutes as number) : 0;
+  const free = Number.isFinite(included) ? Math.max(0, included) : 0;
+
+  return Math.max(0, spent - free);
 }
 
 /**
- * What the driver's recorded time adds up to across an order's stops.
- *
- * Mirrors the API: each stop is measured against its own estimate, because
- * forty minutes at a supermarket run is the job and forty minutes at a parcel
- * drop is waiting. The tolerance sits on top of the estimate and applies at
- * every stop — nobody hits an estimate exactly, and one order-wide allowance
- * spent at the first stop would bill normal work at the second.
+ * Billable minutes across a set of stops — the admin's estimates when
+ * quoting, the driver's recorded times when reconciling. One arithmetic on
+ * both sides is the point: a day that went to plan prices exactly as quoted.
  */
-export function chargeableWaitMinutes(stops: StopWait[], toleranceMinutes: number): number {
+export function totalBillableMinutes(
+  stopMinutes: (number | null | undefined)[],
+  included: number
+): number {
+  return stopMinutes.reduce<number>((sum, minutes) => sum + billableMinutes(minutes, included), 0);
+}
+
+/**
+ * Whether the day differed from the estimate by enough to re-price it.
+ *
+ * Nobody hits an estimate exactly, and re-billing over two minutes costs more
+ * in support than it earns.
+ */
+export function differsEnoughToReprice(
+  quoted: number,
+  actual: number,
+  toleranceMinutes: number
+): boolean {
   const tolerance = Number.isFinite(toleranceMinutes) ? Math.max(0, toleranceMinutes) : 0;
 
-  return stops.reduce<number>((sum, stop) => {
-    const waited = Number.isFinite(stop.waitMinutes) ? (stop.waitMinutes as number) : 0;
-    const estimate = Number.isFinite(stop.estimatedMinutes) ? (stop.estimatedMinutes as number) : 0;
-
-    return sum + Math.max(0, waited - estimate - tolerance);
-  }, 0);
+  return Math.abs(actual - quoted) > tolerance;
 }
 
 export interface ReconciliationQuoteFields {

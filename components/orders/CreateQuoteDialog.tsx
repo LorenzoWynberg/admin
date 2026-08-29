@@ -38,6 +38,8 @@ import {
 import { formatRateDisplay } from '@/utils/currency';
 import { partitionQuoteItems } from '@/utils/quoteItems';
 import { Enums } from '@/data/app-enums';
+import { useIdleTime } from '@/hooks/settings';
+import { idleCharge, totalBillableMinutes } from '@/utils/reconciliation';
 
 interface CreateQuoteDialogProps {
   orderId: number;
@@ -109,6 +111,12 @@ export function CreateQuoteDialog({
   // stopPublicId → minutes the driver is occupied at that stop. Only holds
   // admin overrides; the editor falls back to the default for absent stops.
   const [stopDurations, setStopDurations] = useState<Record<string, number>>({});
+
+  // Stop durations are priced now, not just planned around, so the dialog
+  // needs the same rate and allowance the API prices with.
+  const { data: idleData } = useIdleTime();
+  const idleMinuteRate = idleData?.idleMinuteRate ?? 0;
+  const includedMinutes = idleData?.includedMinutes ?? 0;
 
   // Compute effective proposed times: feasibility suggestions override defaults when not editing
   const effectivePickup =
@@ -186,7 +194,15 @@ export function CreateQuoteDialog({
   const calculation = useMemo(() => {
     if (!pricing) return null;
 
-    const timeFee = parseFloat(formData.timeFee) || 0;
+    // Blank means the server derives it from the stop durations, so the
+    // preview has to derive the same figure or the admin is shown a total the
+    // quote will not have.
+    const timeFee = formData.timeFee
+      ? parseFloat(formData.timeFee) || 0
+      : idleCharge(
+          totalBillableMinutes(Object.values(stopDurations), includedMinutes),
+          idleMinuteRate
+        );
     const surcharge = parseFloat(formData.surcharge) || 0;
     const discountRate = (parseFloat(formData.discountRate) || 0) / 100;
 
@@ -211,7 +227,16 @@ export function CreateQuoteDialog({
       tax,
       total,
     };
-  }, [pricing, formData.timeFee, formData.surcharge, formData.discountRate, itemsTotal]);
+  }, [
+    pricing,
+    formData.timeFee,
+    formData.surcharge,
+    formData.discountRate,
+    itemsTotal,
+    stopDurations,
+    includedMinutes,
+    idleMinuteRate,
+  ]);
 
   // Calculate customer currency conversion
   const customerConversion = (() => {

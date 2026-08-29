@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { chargeableWaitMinutes, idleCharge, computeReconciliationTotal } from '../reconciliation';
+import {
+  billableMinutes,
+  totalBillableMinutes,
+  differsEnoughToReprice,
+  idleCharge,
+  computeReconciliationTotal,
+} from '../reconciliation';
 
 const quote = {
   baseFare: 10,
@@ -72,40 +78,43 @@ describe('idleCharge', () => {
   });
 });
 
-describe('chargeableWaitMinutes', () => {
-  it('charges nothing for a stop that took as long as it was quoted for', () => {
-    expect(chargeableWaitMinutes([{ waitMinutes: 10, estimatedMinutes: 10 }], 5)).toBe(0);
+describe('billableMinutes', () => {
+  it('charges nothing for an ordinary stop', () => {
+    expect(billableMinutes(5, 5)).toBe(0);
+    expect(billableMinutes(3, 5)).toBe(0);
   });
 
-  it('charges only the time past the estimate and the tolerance', () => {
-    expect(chargeableWaitMinutes([{ waitMinutes: 45, estimatedMinutes: 10 }], 5)).toBe(30);
+  it('charges only the time beyond an ordinary stop', () => {
+    expect(billableMinutes(40, 5)).toBe(35);
   });
 
-  it('lets a generous estimate absorb the time it bought', () => {
-    expect(chargeableWaitMinutes([{ waitMinutes: 40, estimatedMinutes: 40 }], 5)).toBe(0);
+  it('treats a stop with nothing recorded as nothing billable', () => {
+    expect(billableMinutes(null, 5)).toBe(0);
+    expect(billableMinutes(undefined, 5)).toBe(0);
+  });
+});
+
+describe('totalBillableMinutes', () => {
+  it('gives the allowance at every stop, not once over the order', () => {
+    expect(totalBillableMinutes([30, 30], 5)).toBe(50);
   });
 
-  it('measures every stop against its own estimate', () => {
-    expect(
-      chargeableWaitMinutes(
-        [
-          { waitMinutes: 30, estimatedMinutes: 30 },
-          { waitMinutes: 30, estimatedMinutes: 5 },
-        ],
-        5
-      )
-    ).toBe(20);
+  it('prices a run of ordinary stops at nothing', () => {
+    expect(totalBillableMinutes([5, 4, 5], 5)).toBe(0);
+  });
+});
+
+describe('differsEnoughToReprice', () => {
+  it('leaves a day that went to plan alone', () => {
+    expect(differsEnoughToReprice(35, 37, 5)).toBe(false);
+    expect(differsEnoughToReprice(35, 33, 5)).toBe(false);
   });
 
-  it('ignores stops the driver never finished', () => {
-    expect(
-      chargeableWaitMinutes(
-        [
-          { waitMinutes: 45, estimatedMinutes: 10 },
-          { waitMinutes: null, estimatedMinutes: 10 },
-        ],
-        5
-      )
-    ).toBe(30);
+  it('re-prices a day that ran well over', () => {
+    expect(differsEnoughToReprice(35, 50, 5)).toBe(true);
+  });
+
+  it('re-prices a day that ran well under, so the customer gets it back', () => {
+    expect(differsEnoughToReprice(35, 10, 5)).toBe(true);
   });
 });

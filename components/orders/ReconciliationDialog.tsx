@@ -23,7 +23,7 @@ import { QuoteLineItemsEditor } from '@/components/quotes/QuoteLineItemsEditor';
 import { ImagePreviewDialog } from '@/components/orders/ImagePreviewDialog';
 import {
   computeReconciliationTotal,
-  chargeableWaitMinutes,
+  totalBillableMinutes,
   idleCharge,
 } from '@/utils/reconciliation';
 import { formatCurrency } from '@/utils/format';
@@ -151,17 +151,14 @@ export function ReconciliationDialog({
   // commit to it.
   const { data: idleData } = useIdleTime();
   const idleMinuteRate = idleData?.idleMinuteRate ?? 0;
-  const idleGraceMinutes = idleData?.idleGraceMinutes ?? 0;
+  const includedMinutes = idleData?.includedMinutes ?? 0;
 
-  // What the driver recorded at the stops, measured against what each stop
-  // was quoted for. The field is seeded with this rather than left blank: the
+  // What the driver actually recorded, priced by the same arithmetic the
+  // quote used. The field is seeded with this rather than left blank: the
   // admin is confirming a number, not producing one from a phone call.
-  const recordedWaitMinutes = chargeableWaitMinutes(
-    orderStops.map((stop) => ({
-      waitMinutes: stop.routeStop?.waitMinutes,
-      estimatedMinutes: stop.routeStop?.estimatedMinutes,
-    })),
-    idleGraceMinutes
+  const recordedWaitMinutes = totalBillableMinutes(
+    orderStops.map((stop) => stop.routeStop?.waitMinutes),
+    includedMinutes
   );
 
   const idleMinutes = parseInt(fees.idleMinutes, 10) || 0;

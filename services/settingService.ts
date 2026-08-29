@@ -6,7 +6,12 @@ type Single<T> = Api.Response.Single<T>;
 
 type ExchangeRateModeResponse = { exchangeRateMode: string };
 type SupportedVehicleTypesResponse = { supportedVehicleTypes: string[] };
-type IdleTimeResponse = { idleMinuteRate: number; idleGraceMinutes: number };
+type IdleTimeResponse = {
+  idleMinuteRate: number;
+  idleGraceMinutes: number;
+  /** Minutes every stop carries free, so both apps price like the API. */
+  includedMinutes: number;
+};
 
 export const SettingService = {
   /**
@@ -55,6 +60,7 @@ export const SettingService = {
     return {
       idleMinuteRate: response.idleMinuteRate,
       idleGraceMinutes: response.idleGraceMinutes,
+      includedMinutes: response.includedMinutes,
     };
   },
 
@@ -69,6 +75,7 @@ export const SettingService = {
     return {
       idleMinuteRate: response.idleMinuteRate,
       idleGraceMinutes: response.idleGraceMinutes,
+      includedMinutes: response.includedMinutes,
     };
   },
 
