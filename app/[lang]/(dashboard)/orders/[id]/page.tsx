@@ -45,6 +45,7 @@ import { EditStopAddressDialog } from '@/components/orders/EditStopAddressDialog
 import { EditStopDetailsDialog } from '@/components/orders/EditStopDetailsDialog';
 import { AddStopDialog } from '@/components/orders/AddStopDialog';
 import { ReconciliationDialog } from '@/components/orders/ReconciliationDialog';
+import { ShareTrackingLinkDialog } from '@/components/orders/ShareTrackingLinkDialog';
 import { ReassignDispatcherDialog } from '@/components/dispatch/ReassignDispatcherDialog';
 import { ChatTabs } from '@/components/chat/ChatTabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -252,6 +253,7 @@ export default function OrderDetailPage() {
                 }
               />
             )}
+          {order.publicId && <ShareTrackingLinkDialog orderPublicId={order.publicId} />}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
             <Trash2 className="mr-2 h-4 w-4" />
             {actionLabel('delete')}

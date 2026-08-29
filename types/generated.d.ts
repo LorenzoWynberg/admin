@@ -608,6 +608,22 @@ declare namespace App.Data.Order {
     etaToDropoffMinutes: number | null;
     stops: Array<App.Data.Order.TrackingStopData>;
   };
+  export type PublicTrackingData = {
+    status: App.Enums.OrderStatus;
+    isOnDropoffLeg: boolean;
+    driverLatitude: number | null;
+    driverLongitude: number | null;
+    driverFirstName: string | null;
+    driverLicensePlate: string | null;
+    encodedPolyline: string | null;
+    etaToDropoffMinutes: number | null;
+    dropoffStop: App.Data.Order.PublicTrackingStopData | null;
+  };
+  export type PublicTrackingStopData = {
+    latitude: number;
+    longitude: number;
+    status: App.Enums.RouteStopStatus;
+  };
   export type ReconcileOrderData = {
     items: Array<App.Data.Quote.StoreQuoteItemData>;
     notes: string | null;
@@ -1356,6 +1372,7 @@ declare namespace App.Enums {
     Forbidden = 403,
     NotFound = 404,
     Conflict = 409,
+    Gone = 410,
     UnprocessableEntity = 422,
     TooManyRequests = 429,
     InternalServerError = 500,

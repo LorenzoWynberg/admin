@@ -1,4 +1,5 @@
 import { api } from '@/lib/api/client';
+import { isApiError } from '@/lib/api/error';
 
 type OrderData = App.Data.Order.OrderData;
 type QuoteData = App.Data.Quote.QuoteData;
@@ -50,6 +51,21 @@ export interface ChangeTierResult {
     routeId: number | null;
     message: string;
   };
+}
+
+/**
+ * `GET /orders/{order}/share` reports state only — the token is stored as a
+ * SHA-256 digest server-side, so the plaintext URL can never be reconstructed
+ * from it. `shareUrl` only ever comes back from `mintShareLink`.
+ */
+export interface ShareLinkStatus {
+  shareExpiresAt: string;
+}
+
+/** The response shape shared by mint (`POST`) and revoke (`DELETE`). */
+export interface ShareLinkResult {
+  shareUrl: string | null;
+  shareExpiresAt: string | null;
 }
 
 interface ListParams {
@@ -158,6 +174,36 @@ export const OrderService = {
       dispatcherId,
     });
     return response.item;
+  },
+
+  /**
+   * Check whether this order has an active public tracking link, without
+   * minting one. Returns `null` when there is none — the API answers that
+   * case with a 404 rather than a body, so it's normalized here instead of
+   * making every caller catch an `ApiError` for a routine state check.
+   */
+  async getShareStatus(publicId: string): Promise<ShareLinkStatus | null> {
+    try {
+      return await api.get<ShareLinkStatus>(`/orders/${publicId}/share`);
+    } catch (error) {
+      if (isApiError(error) && error.status === 404) return null;
+      throw error;
+    }
+  },
+
+  /**
+   * Mint this order's public tracking link. Calling this again rotates the
+   * token, invalidating any link already sent to a customer.
+   */
+  async mintShareLink(publicId: string): Promise<ShareLinkResult> {
+    return api.post<ShareLinkResult>(`/orders/${publicId}/share`);
+  },
+
+  /**
+   * Revoke this order's public tracking link, if any.
+   */
+  async revokeShareLink(publicId: string): Promise<ShareLinkResult> {
+    return api.destroy<ShareLinkResult>(`/orders/${publicId}/share`);
   },
 
   /**
