@@ -104,35 +104,26 @@ export function ShareTrackingLinkDialog({ orderPublicId }: ShareTrackingLinkDial
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Link2 className="mr-1 h-4 w-4" />
-          {t('share.button', { defaultValue: 'Tracking Link' })}
+          {t('share.button')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{t('share.title', { defaultValue: 'Customer Tracking Link' })}</DialogTitle>
-          <DialogDescription>
-            {t('share.description', {
-              defaultValue:
-                'Give the customer a link to follow their delivery live. No account needed to open it.',
-            })}
-          </DialogDescription>
+          <DialogTitle>{t('share.title')}</DialogTitle>
+          <DialogDescription>{t('share.description')}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {isLoading ? (
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
               <Loader2 className="h-4 w-4 animate-spin" />
-              {t('common:loading', { defaultValue: 'Loading...' })}
+              {t('common:loading')}
             </div>
           ) : isError ? (
             <div className="border-destructive/30 bg-destructive/10 flex items-start gap-2 rounded-md border p-3">
               <AlertTriangle className="text-destructive mt-0.5 h-4 w-4 shrink-0" />
               <p className="text-destructive text-sm">
-                {isApiError(statusError)
-                  ? statusError.message
-                  : t('share.status_load_error', {
-                      defaultValue: "Couldn't load this order's tracking link status.",
-                    })}
+                {isApiError(statusError) ? statusError.message : t('share.status_load_error')}
               </p>
             </div>
           ) : (
@@ -142,17 +133,16 @@ export function ShareTrackingLinkDialog({ orderPublicId }: ShareTrackingLinkDial
                   variant="outline"
                   className="border-emerald-200 bg-emerald-100 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300"
                 >
-                  {t('share.status_active', { defaultValue: 'Active' })}
+                  {t('share.status_active')}
                 </Badge>
               ) : (
                 <Badge variant="outline" className="text-muted-foreground">
-                  {t('share.status_none', { defaultValue: 'No active link' })}
+                  {t('share.status_none')}
                 </Badge>
               )}
               {hasActiveLink && shareStatus?.shareExpiresAt && (
                 <span className="text-muted-foreground text-sm">
-                  {t('share.expires_label', { defaultValue: 'Expires' })}{' '}
-                  {formatDateTime(shareStatus.shareExpiresAt)}
+                  {t('share.expires_label')} {formatDateTime(shareStatus.shareExpiresAt)}
                 </span>
               )}
             </div>
@@ -160,9 +150,7 @@ export function ShareTrackingLinkDialog({ orderPublicId }: ShareTrackingLinkDial
 
           {hasActiveLink && mintedUrl && (
             <div className="space-y-1.5">
-              <Label htmlFor="share-url">
-                {t('share.url_label', { defaultValue: 'Tracking URL' })}
-              </Label>
+              <Label htmlFor="share-url">{t('share.url_label')}</Label>
               <div className="flex gap-2">
                 <Input
                   id="share-url"
@@ -175,7 +163,7 @@ export function ShareTrackingLinkDialog({ orderPublicId }: ShareTrackingLinkDial
                   variant="outline"
                   size="icon"
                   onClick={handleCopy}
-                  aria-label={t('share.copy_button', { defaultValue: 'Copy' })}
+                  aria-label={t('share.copy_button')}
                 >
                   {copied ? (
                     <Check className="h-4 w-4 text-emerald-600" />
@@ -186,29 +174,21 @@ export function ShareTrackingLinkDialog({ orderPublicId }: ShareTrackingLinkDial
               </div>
               {copied && (
                 <p className="text-xs text-emerald-600 dark:text-emerald-400">
-                  {t('share.copied', { defaultValue: 'Copied to clipboard.' })}
+                  {t('share.copied')}
                 </p>
               )}
             </div>
           )}
 
           {hasActiveLink && !mintedUrl && !isLoading && (
-            <p className="text-muted-foreground text-sm">
-              {t('share.url_hidden_notice', {
-                defaultValue:
-                  "This link's URL can't be shown again. Rotate it to get a fresh one to copy.",
-              })}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('share.url_hidden_notice')}</p>
           )}
 
           {confirmingRotate && (
             <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
               <p className="text-sm text-amber-700 dark:text-amber-400">
-                {t('share.rotate_warning', {
-                  defaultValue:
-                    'This creates a new link and immediately invalidates the current one. Anyone still holding it will no longer be able to track this order.',
-                })}
+                {t('share.rotate_warning')}
               </p>
             </div>
           )}
@@ -224,7 +204,7 @@ export function ShareTrackingLinkDialog({ orderPublicId }: ShareTrackingLinkDial
               disabled={isPending}
             >
               <Ban className="mr-1 h-4 w-4" />
-              {t('share.revoke_button', { defaultValue: 'Revoke' })}
+              {t('share.revoke_button')}
             </Button>
           ) : (
             <span />
@@ -253,9 +233,9 @@ export function ShareTrackingLinkDialog({ orderPublicId }: ShareTrackingLinkDial
               )}
               {hasActiveLink
                 ? confirmingRotate
-                  ? t('share.confirm_rotate', { defaultValue: 'Yes, Rotate Link' })
-                  : t('share.rotate_button', { defaultValue: 'Rotate Link' })
-                : t('share.create_button', { defaultValue: 'Create Link' })}
+                  ? t('share.confirm_rotate')
+                  : t('share.rotate_button')
+                : t('share.create_button')}
             </Button>
           </div>
         </DialogFooter>
