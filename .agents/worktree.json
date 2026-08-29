@@ -1,6 +1,6 @@
 {
   "install": "npm ci",
-  "gate": "npm run build",
-  "scopedCheck": "npm run build",
+  "gate": "npm run check && npm run test:run",
+  "scopedCheck": "npm run check",
   "envFiles": []
 }
