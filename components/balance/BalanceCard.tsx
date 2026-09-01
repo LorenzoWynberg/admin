@@ -13,9 +13,16 @@ import {
   DialogTitle,
   Dialog,
 } from '@/components/ui/dialog';
+import {
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+  SelectItem,
+  Select,
+} from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useBalance, useAdjustBalance } from '@/hooks/balance';
-import { actionLabel, validationAttribute } from '@/utils/lang';
+import { actionLabel, statusLabel, validationAttribute } from '@/utils/lang';
 import { formatCurrency, formatDate } from '@/utils/format';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -34,6 +41,29 @@ interface BalanceCardProps {
   /** Omit to hide the ceiling control entirely. */
   onDebtCeilingChange?: (value: number | null) => void;
   isSavingCeiling?: boolean;
+  /**
+   * This account's billing cycle (an `App.Enums.BillingCycle` value).
+   * Undefined/null renders as `PerOrder`. Typed as `string`, not the
+   * nominal TS enum — DTO fields pass their raw string value here, which a
+   * nominal enum type would reject at the call site.
+   */
+  billingCycle?: string | null;
+  /** Omit to hide the billing cycle control entirely. */
+  onBillingCycleChange?: (value: string) => void;
+  isSavingBillingCycle?: boolean;
+  /** Days of grace after a failed settlement before the account is blocked. */
+  gracePeriodDays?: number | null;
+  /** Omit to hide the grace period control entirely. */
+  onGracePeriodDaysChange?: (value: number | null) => void;
+  isSavingGracePeriod?: boolean;
+  /**
+   * Why THIS row is blocked from ordering, or null (an
+   * `App.Enums.AccountBlockReason` value, typed as `string` for the same
+   * reason as `billingCycle` above). On a business member this describes
+   * their own account, never the company's — the company's reason lives on
+   * `BusinessData` and is rendered on the business's own card.
+   */
+  blockReason?: string | null;
 }
 
 /**
@@ -48,6 +78,13 @@ export function BalanceCard({
   debtCeiling,
   onDebtCeilingChange,
   isSavingCeiling = false,
+  billingCycle,
+  onBillingCycleChange,
+  isSavingBillingCycle = false,
+  gracePeriodDays,
+  onGracePeriodDaysChange,
+  isSavingGracePeriod = false,
+  blockReason,
 }: BalanceCardProps) {
   const { t } = useTranslation();
   const { data, isLoading } = useBalance(ownerPublicId);
@@ -67,6 +104,7 @@ export function BalanceCard({
         <CardTitle className="flex items-center gap-2 text-base">
           <Wallet className="h-4 w-4" />
           {isDebt ? t('payments:balance.debt_title') : t('payments:balance.title')}
+          <BlockReasonBadge reason={blockReason} />
         </CardTitle>
         {canManage && <GrantCreditDialog ownerPublicId={ownerPublicId} balance={balance} />}
       </CardHeader>
@@ -101,8 +139,121 @@ export function BalanceCard({
             isPending={isSavingCeiling}
           />
         )}
+
+        {canManage && onBillingCycleChange && (
+          <BillingCycleField
+            value={billingCycle}
+            onChange={onBillingCycleChange}
+            isPending={isSavingBillingCycle}
+          />
+        )}
+
+        {canManage && onGracePeriodDaysChange && (
+          <GracePeriodField
+            value={gracePeriodDays ?? null}
+            onChange={onGracePeriodDaysChange}
+            isPending={isSavingGracePeriod}
+          />
+        )}
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * Why this account cannot order right now — over its debt ceiling, or a
+ * settlement past its grace period. Renders nothing when the account isn't
+ * blocked, since the absence of a reason is the common case.
+ */
+function BlockReasonBadge({ reason }: { reason?: string | null }) {
+  if (!reason) return null;
+
+  return (
+    <Badge data-testid="block-reason-badge" variant="destructive">
+      {statusLabel(reason)}
+    </Badge>
+  );
+}
+
+/**
+ * How often this account is charged: per order, or on a deferred cycle that
+ * accrues deliveries and settles them together. Options are derived from the
+ * enum itself so a new cycle case can't silently go missing from the list.
+ */
+function BillingCycleField({
+  value,
+  onChange,
+  isPending,
+}: {
+  value?: string | null;
+  onChange: (value: string) => void;
+  isPending: boolean;
+}) {
+  const current = value ?? Enums.BillingCycle.PerOrder;
+
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor="billing-cycle">{validationAttribute('billingCycle', true)}</Label>
+      <Select value={current} onValueChange={onChange} disabled={isPending}>
+        <SelectTrigger id="billing-cycle" className="w-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.values(Enums.BillingCycle).map((cycle) => (
+            <SelectItem key={cycle} value={cycle}>
+              {statusLabel(cycle)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+/**
+ * How many days a deferred account gets after a failed settlement before it
+ * is blocked from ordering. Blank follows the configured default, same as
+ * the debt ceiling above.
+ */
+function GracePeriodField({
+  value,
+  onChange,
+  isPending,
+}: {
+  value: number | null;
+  onChange: (value: number | null) => void;
+  isPending: boolean;
+}) {
+  const [draft, setDraft] = useState(value === null ? '' : String(value));
+
+  const trimmed = draft.trim();
+  const parsed = trimmed === '' ? null : Number(trimmed);
+  const isValid = parsed === null || (Number.isInteger(parsed) && parsed >= 0);
+  const isDirty = (value === null ? '' : String(value)) !== trimmed;
+
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor="grace-period">{validationAttribute('gracePeriodDays', true)}</Label>
+      <div className="flex gap-2">
+        <Input
+          id="grace-period"
+          type="number"
+          step="1"
+          min="0"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+        />
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!isValid || !isDirty || isPending}
+          onClick={() => onChange(parsed)}
+        >
+          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {actionLabel('save')}
+        </Button>
+      </div>
+    </div>
   );
 }
 

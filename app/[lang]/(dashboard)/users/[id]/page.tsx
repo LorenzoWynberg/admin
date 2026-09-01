@@ -76,6 +76,20 @@ export default function UserDetailPage() {
     });
   };
 
+  const handleChangeBillingCycle = (next: string) => {
+    updateUser.mutate({
+      id: userId,
+      data: { billingCycle: next as App.Enums.BillingCycle },
+    });
+  };
+
+  const handleChangeGracePeriod = (next: number | null) => {
+    updateUser.mutate({
+      id: userId,
+      data: { gracePeriodDays: next },
+    });
+  };
+
   const handleDelete = () => {
     if (
       confirm(
@@ -324,6 +338,13 @@ export default function UserDetailPage() {
           debtCeiling={user.balanceDebtCeiling}
           onDebtCeilingChange={handleChangeDebtCeiling}
           isSavingCeiling={updateUser.isPending}
+          billingCycle={user.billingCycle}
+          onBillingCycleChange={handleChangeBillingCycle}
+          isSavingBillingCycle={updateUser.isPending}
+          gracePeriodDays={user.gracePeriodDays}
+          onGracePeriodDaysChange={handleChangeGracePeriod}
+          isSavingGracePeriod={updateUser.isPending}
+          blockReason={user.blockReason}
         />
 
         {/* Timestamps */}
