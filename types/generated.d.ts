@@ -175,6 +175,9 @@ declare namespace App.Data.Business {
     balance?: number;
     dispatcherId?: number | null;
     balanceDebtCeiling?: number | null;
+    billingCycle?: App.Enums.BillingCycle;
+    gracePeriodDays?: number | null;
+    blockReason?: App.Enums.AccountBlockReason | null;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -196,6 +199,8 @@ declare namespace App.Data.Business {
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     dispatcherId?: number | null;
     balanceDebtCeiling?: number | null;
+    billingCycle?: App.Enums.BillingCycle;
+    gracePeriodDays?: number | null;
   };
 }
 declare namespace App.Data.Catalog {
@@ -1051,6 +1056,20 @@ declare namespace App.Data.Setting {
     idleGraceMinutes?: number;
   };
 }
+declare namespace App.Data.Settlement {
+  export type SettlementData = {
+    id: number;
+    publicId: string;
+    cutoffAt: string;
+    amount: number;
+    creditApplied: number;
+    netDue: number;
+    currencyCode: string;
+    status: App.Enums.SettlementStatus;
+    failedAt: string | null;
+    createdAt: string;
+  };
+}
 declare namespace App.Data.Shared {
   export type FullLangData = {
     en: string;
@@ -1163,6 +1182,8 @@ declare namespace App.Data.User {
     preferredCurrency?: string | null;
     dispatcherId?: number | null;
     balanceDebtCeiling?: number | null;
+    billingCycle?: App.Enums.BillingCycle;
+    gracePeriodDays?: number | null;
     role?: string;
   };
   export type UserData = {
@@ -1180,6 +1201,9 @@ declare namespace App.Data.User {
     businessId?: number | null;
     dispatcherId?: number | null;
     balanceDebtCeiling?: number | null;
+    billingCycle?: App.Enums.BillingCycle;
+    gracePeriodDays?: number | null;
+    blockReason?: App.Enums.AccountBlockReason | null;
     sexId?: number | null;
     isAdmin: boolean;
     isBusinessAccount: boolean;
