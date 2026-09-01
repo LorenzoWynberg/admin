@@ -25,11 +25,18 @@ import { Enums } from '@/data/app-enums';
 interface ApproveRefundRequestDialogProps {
   publicId: string;
   orderPublicId: string;
+  /**
+   * The order's payment status. `ON_ACCOUNT` is the one value that changes
+   * what this dialog may offer, because such an order has no payment row for
+   * the settlement lookup below to find.
+   */
+  paymentStatus?: string | null;
 }
 
 export function ApproveRefundRequestDialog({
   publicId,
   orderPublicId,
+  paymentStatus,
 }: ApproveRefundRequestDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -47,9 +54,17 @@ export function ApproveRefundRequestDialog({
     .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))[0];
   const isManual = settledPayment?.provider === Enums.PaymentProvider.Manual;
 
+  // A delivery billed to an account was never charged, so it has no payment
+  // row at all — the lookup above finds nothing and, left alone, reads that
+  // emptiness as a card payment and offers to reverse a charge that does not
+  // exist. The API branches on this same status and accepts nothing but
+  // credit, so the dialog has to know it before the admin picks.
+  const isOnAccount = paymentStatus === Enums.PaymentStatus.ON_ACCOUNT;
+  const balanceOnly = isOnAccount || isManual;
+
   // The method the admin hasn't explicitly overridden — recomputed from the
   // loaded payment each render rather than synced via an effect.
-  const defaultMethod = getDefaultRefundMethod(isManual);
+  const defaultMethod = getDefaultRefundMethod(balanceOnly);
 
   const [formData, setFormData] = useState({
     method: null as string | null,
@@ -101,7 +116,7 @@ export function ApproveRefundRequestDialog({
 
         <div className="grid gap-4 py-4">
           <RefundMethodFields
-            isManual={isManual}
+            balanceOnly={balanceOnly}
             method={method}
             onMethodChange={(value) => setFormData((prev) => ({ ...prev, method: value }))}
           />

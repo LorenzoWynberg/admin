@@ -165,7 +165,7 @@ export function RefundDialog({ payment, onSuccess }: RefundDialogProps) {
 
           {/* How the refund is settled */}
           <RefundMethodFields
-            isManual={isManual}
+            balanceOnly={isManual}
             method={formData.method}
             onMethodChange={(value) => handleChange('method', value)}
           />
