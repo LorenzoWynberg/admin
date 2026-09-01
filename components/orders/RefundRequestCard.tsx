@@ -103,6 +103,7 @@ export function RefundRequestCard({ refundRequest }: RefundRequestCardProps) {
           <ApproveRefundRequestDialog
             publicId={refundRequest.publicId as string}
             orderPublicId={orderPublicId}
+            paymentStatus={order?.paymentStatus}
           />
 
           <DenyRefundRequestDialog publicId={refundRequest.publicId as string} />
