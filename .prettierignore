@@ -8,3 +8,9 @@ coverage
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# API-owned declaration files (byte-identical copies from api/resources/types —
+# never formatted or edited here; see CLAUDE.md cross-project sync)
+types/generated.d.ts
+types/response.d.ts
+types/notifications.d.ts
