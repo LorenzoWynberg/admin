@@ -1,6 +1,10 @@
 // AUTO-GENERATED. Do not edit.
 // Source: /types/generated.d.ts -> App.Enums
 export const Enums = {
+  AccountBlockReason: {
+    DebtCeiling: 'debt_ceiling',
+    SettlementOverdue: 'settlement_overdue',
+  },
   AddressType: {
     Saved: 'saved',
     Snapshot: 'snapshot',
@@ -96,6 +100,15 @@ export const Enums = {
     CancellationFee: 'cancellation_fee',
     UnderCollection: 'under_collection',
     DebtSettlement: 'debt_settlement',
+    DeferredCharge: 'deferred_charge',
+    SettlementApplication: 'settlement_application',
+    DeferredChargeReversal: 'deferred_charge_reversal',
+  },
+  BillingCycle: {
+    PerOrder: 'per_order',
+    Weekly: 'weekly',
+    Biweekly: 'biweekly',
+    Monthly: 'monthly',
   },
   ChatChannel: {
     Support: 'support',
@@ -230,6 +243,7 @@ export const Enums = {
     InvoiceItem: 'invoice_item',
     RefundRequest: 'refund_request',
     BalanceEntry: 'balance_entry',
+    Settlement: 'settlement',
   },
   NotificationAction: {
     QuoteRequested: 'quote_requested',
@@ -258,6 +272,9 @@ export const Enums = {
     BalanceCredited: 'balance_credited',
     RefundDue: 'refund_due',
     RefundSettled: 'refund_settled',
+    SettlementCharged: 'settlement_charged',
+    SettlementFailed: 'settlement_failed',
+    SettlementBlockWarning: 'settlement_block_warning',
   },
   NotificationStatus: {
     Unread: 'unread',
@@ -313,6 +330,7 @@ export const Enums = {
     UNPAID: 'unpaid',
     AUTHORIZED: 'authorized',
     PAID: 'paid',
+    ON_ACCOUNT: 'on_account',
     SURCHARGE_DUE: 'surcharge_due',
     REFUNDED: 'refunded',
     VOIDED: 'voided',
@@ -396,6 +414,12 @@ export const Enums = {
   ScheduleChangeReason: {
     Reassigned: 'reassigned',
     Rescheduled: 'rescheduled',
+  },
+  SettlementStatus: {
+    Pending: 'pending',
+    Paid: 'paid',
+    Failed: 'failed',
+    PartiallyPaid: 'partially_paid',
   },
   TipoIdentificacion: {
     Fisica: '01',

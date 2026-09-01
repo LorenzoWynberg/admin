@@ -75,7 +75,7 @@ export function OrderActivityCard({ order }: OrderActivityCardProps) {
             <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
           </div>
         ) : timeline.length > 0 ? (
-          <div className={`space-y-1${hasSchedule ? ' border-t pt-3' : ''}`}>
+          <div className={`space-y-1${hasSchedule ? 'border-t pt-3' : ''}`}>
             {timeline.map((entry) => (
               <div key={entry.id} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">

@@ -9,14 +9,16 @@ Cómo operar Mandados día a día — desde la cotización hasta la conciliació
 </div>
 
 ### ¿Qué es Mandados? {#what-is-mandados}
+
 Mandados es una plataforma de logística de mensajería de última milla. El cliente solicita una orden desde su aplicación móvil indicando qué necesita comprar, recoger o entregar; el panel administrativo gestiona ese pedido durante todo su ciclo de vida; el conductor ejecuta la ruta físicamente.
 
 ### Tres aplicaciones, un panel {#three-apps}
-| Aplicación | Quién la usa | Rol |
-| --- | --- | --- |
-| **Cliente** (móvil) | Personas o negocios | Crean órdenes, reciben cotizaciones, dan seguimiento, califican. |
-| **Conductor** (móvil) | Mensajeros en planilla | Reciben rutas asignadas, ejecutan paradas, registran prueba de entrega. |
-| **Panel Admin** (web) | Operaciones | Cotizan, despachan, monitorean conflictos, concilian, gestionan tarifas. |
+
+| Aplicación            | Quién la usa           | Rol                                                                      |
+| --------------------- | ---------------------- | ------------------------------------------------------------------------ |
+| **Cliente** (móvil)   | Personas o negocios    | Crean órdenes, reciben cotizaciones, dan seguimiento, califican.         |
+| **Conductor** (móvil) | Mensajeros en planilla | Reciben rutas asignadas, ejecutan paradas, registran prueba de entrega.  |
+| **Panel Admin** (web) | Operaciones            | Cotizan, despachan, monitorean conflictos, concilian, gestionan tarifas. |
 
 <div class="callout info">
 <strong>Los conductores están en planilla</strong>
@@ -26,6 +28,7 @@ El objetivo de despacho es <em>bin-packing</em>: maximizar paradas por conductor
 ---
 
 ## Acceso al panel {#signing-in}
+
 El panel se accede desde un navegador web moderno. La pantalla de inicio de sesión solicita correo y contraseña.
 
 <figure>
@@ -34,11 +37,13 @@ El panel se accede desde un navegador web moderno. La pantalla de inicio de sesi
 </figure>
 
 ### Cambiar idioma {#change-language}
-El panel está disponible en **español**, **inglés** y **francés**. El idioma se selecciona desde la sección *Configuraciones*; también puede cambiar la URL agregando el código de idioma (`/es/...`, `/en/...`, `/fr/...`).
+
+El panel está disponible en **español**, **inglés** y **francés**. El idioma se selecciona desde la sección _Configuraciones_; también puede cambiar la URL agregando el código de idioma (`/es/...`, `/en/...`, `/fr/...`).
 
 ---
 
 ## Vista general {#overview}
+
 <figure>
   <img src="/guide/screenshots/02-panel.png" alt="Vista general del panel principal" />
   <figcaption>Pantalla <em>Panel</em> — el resumen del día con métricas operativas.</figcaption>
@@ -53,6 +58,7 @@ Al iniciar sesión llegará al **Panel** principal. Esta pantalla resume:
 Use el panel como punto de partida diario, pero la verdadera mesa de trabajo es [**Necesita Atención**](#needs-attention) — donde se concentra todo lo accionable.
 
 ### Menú lateral {#sidebar-menu}
+
 La navegación principal vive en la barra izquierda. Está organizada de mayor a menor frecuencia de uso:
 
 <div class="section-cards">
@@ -84,15 +90,17 @@ La navegación principal vive en la barra izquierda. Está organizada de mayor a
 </figure>
 
 ### Las cinco pestañas {#five-tabs}
-| Pestaña | Qué contiene | Acción esperada |
-| --- | --- | --- |
-| **Conflictos** | Órdenes que el sistema no pudo despachar automáticamente o que tienen problemas de factibilidad (ventana imposible, sin conductor disponible, distancia excede el rango). | Revisar el motivo, reasignar manualmente, ajustar la ventana o desestimar la orden. |
-| **Conciliación** | Órdenes <span class="pill blue">Completada</span> donde el conductor entregó pero el monto cobrado debe ajustarse al monto real de los productos comprados. | Abrir el diálogo de conciliación, ingresar precios reales por línea, generar la cotización final. |
-| **Sin Cotizar** | Órdenes que el cliente acaba de crear y que aún no tienen cotización. | Verificar direcciones de cada parada, crear la cotización y enviarla al cliente. |
-| **Sin Pagar** | Órdenes entregadas que aún no han sido pagadas por el cliente. | Dar seguimiento al cobro, marcar como pagado cuando corresponda. |
-| **Solicitudes de Reembolso** | Reclamos de clientes que solicitan devolución total o parcial. | Revisar evidencia (prueba de entrega, fotos), aprobar o rechazar. |
+
+| Pestaña                      | Qué contiene                                                                                                                                                              | Acción esperada                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Conflictos**               | Órdenes que el sistema no pudo despachar automáticamente o que tienen problemas de factibilidad (ventana imposible, sin conductor disponible, distancia excede el rango). | Revisar el motivo, reasignar manualmente, ajustar la ventana o desestimar la orden.               |
+| **Conciliación**             | Órdenes <span class="pill blue">Completada</span> donde el conductor entregó pero el monto cobrado debe ajustarse al monto real de los productos comprados.               | Abrir el diálogo de conciliación, ingresar precios reales por línea, generar la cotización final. |
+| **Sin Cotizar**              | Órdenes que el cliente acaba de crear y que aún no tienen cotización.                                                                                                     | Verificar direcciones de cada parada, crear la cotización y enviarla al cliente.                  |
+| **Sin Pagar**                | Órdenes entregadas que aún no han sido pagadas por el cliente.                                                                                                            | Dar seguimiento al cobro, marcar como pagado cuando corresponda.                                  |
+| **Solicitudes de Reembolso** | Reclamos de clientes que solicitan devolución total o parcial.                                                                                                            | Revisar evidencia (prueba de entrega, fotos), aprobar o rechazar.                                 |
 
 ### Filtros de severidad {#severity-filters}
+
 Dentro de cada pestaña, las órdenes están priorizadas por severidad: <span class="pill red">Crítico</span> <span class="pill amber">Alto</span> <span class="pill blue">Medio</span> <span class="pill gray">Bajo</span>. Los filtros superiores permiten enfocar el trabajo del día.
 
 <div class="callout tip">
@@ -121,7 +129,7 @@ Las siguientes secciones detallan cada fase desde la perspectiva del administrad
 
 ## 1 · Cotizar una orden nueva {#quote}
 
-Cuando un cliente crea una orden desde su app, ésta llega al panel en estado <span class="pill amber">Pendiente</span> sin cotización. Aparecerá en la pestaña *Sin Cotizar* de Necesita Atención y al inicio del listado de Órdenes.
+Cuando un cliente crea una orden desde su app, ésta llega al panel en estado <span class="pill amber">Pendiente</span> sin cotización. Aparecerá en la pestaña _Sin Cotizar_ de Necesita Atención y al inicio del listado de Órdenes.
 
 Para esta guía seguimos una orden real (`ORD-KA2SEDK3A75X`) creada por el cliente Lorenzo Wynberg con la tarea «Comprar 2 cajas de leche y pan en Auto Mercado» y entrega en Calle 6, Hospital, San José.
 
@@ -131,7 +139,8 @@ Para esta guía seguimos una orden real (`ORD-KA2SEDK3A75X`) creada por el clien
 </figure>
 
 ### Paso 1.1 — Detectarla en Necesita Atención {#step-1-1}
-Cuando llega la orden, el contador de la pestaña *Sin Cotizar* aumenta. Es la primera señal del día.
+
+Cuando llega la orden, el contador de la pestaña _Sin Cotizar_ aumenta. Es la primera señal del día.
 
 <figure>
   <img src="/guide/screenshots/22-needs-attention.png" alt="Necesita Atención con badge en Sin Cotizar" />
@@ -139,6 +148,7 @@ Cuando llega la orden, el contador de la pestaña *Sin Cotizar* aumenta. Es la p
 </figure>
 
 ### Paso 1.2 — Abrir el detalle de la orden {#step-1-2}
+
 Haga clic sobre la orden para abrir su detalle. En este punto verá las paradas, los detalles de tiempo, el historial de cotizaciones (vacío en este punto) y los pagos.
 
 <figure>
@@ -152,7 +162,8 @@ Cuando el cliente solo describe la tarea sin fijar ubicación, el administrador 
 </div>
 
 ### Paso 1.3 — Agregar la dirección de recolección {#step-1-3}
-1. En la tarjeta *Paradas*, haga clic en `+ Agregar Dirección` dentro de la parada de recolección.
+
+1. En la tarjeta _Paradas_, haga clic en `+ Agregar Dirección` dentro de la parada de recolección.
 2. Busque el comercio en el directorio de [Direcciones](#addresses) o ingrese una nueva.
 3. Confirme. La parada se completa, la advertencia amarilla desaparece, y aparecen los botones `Crear Cotización` y `Calcular Distancia`.
 
@@ -162,6 +173,7 @@ Cuando el cliente solo describe la tarea sin fijar ubicación, el administrador 
 </figure>
 
 ### Paso 1.4 — Crear la cotización (Borrador) {#step-1-4}
+
 1. Presione `Crear Cotización`.
 2. Se abrirá un diálogo donde podrá:
    - Agregar líneas de productos por parada (descripción, cantidad, precio unitario estimado) — desde catálogo o manuales.
@@ -176,6 +188,7 @@ Cuando el cliente solo describe la tarea sin fijar ubicación, el administrador 
 </figure>
 
 ### Paso 1.5 — Enviar la cotización al cliente {#step-1-5}
+
 Cuando la cotización está revisada, presione `Enviar al Cliente`. El estado de la cotización pasa a <span class="pill blue">Enviado</span> y el de la orden a <span class="pill blue">Cotizada</span>. El cliente recibe una notificación en su app y puede aceptar o rechazar.
 
 <figure>
@@ -184,6 +197,7 @@ Cuando la cotización está revisada, presione `Enviar al Cliente`. El estado de
 </figure>
 
 ### Paso 1.6 — Cliente acepta → orden Aprobada {#step-1-6}
+
 Cuando el cliente acepta desde su app, la orden pasa automáticamente a <span class="pill green">Aprobado</span>. La cotización ya muestra los renglones de la compra estimada y la orden está lista para despachar.
 
 <figure>
@@ -192,14 +206,15 @@ Cuando el cliente acepta desde su app, la orden pasa automáticamente a <span cl
 </figure>
 
 ### Estados de la cotización {#quote-states}
-| Estado | Significado |
-| --- | --- |
-| <span class="pill gray">Borrador</span> | Guardada pero no enviada — solo la ve el administrador. |
-| <span class="pill blue">Enviado</span> | Visible para el cliente; espera su aprobación. |
-| <span class="pill green">Aceptado</span> | Cliente aceptó. La orden pasa a <span class="pill green">Aprobado</span>. |
-| <span class="pill red">Rechazado</span> | Cliente rechazó. Puede generar otra cotización si es necesario. |
-| <span class="pill gray">Expirado</span> | Pasó la fecha de validez sin aceptación. |
-| <span class="pill green">Finalizado</span> | Generada al cierre tras la conciliación. |
+
+| Estado                                     | Significado                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------- |
+| <span class="pill gray">Borrador</span>    | Guardada pero no enviada — solo la ve el administrador.                   |
+| <span class="pill blue">Enviado</span>     | Visible para el cliente; espera su aprobación.                            |
+| <span class="pill green">Aceptado</span>   | Cliente aceptó. La orden pasa a <span class="pill green">Aprobado</span>. |
+| <span class="pill red">Rechazado</span>    | Cliente rechazó. Puede generar otra cotización si es necesario.           |
+| <span class="pill gray">Expirado</span>    | Pasó la fecha de validez sin aceptación.                                  |
+| <span class="pill green">Finalizado</span> | Generada al cierre tras la conciliación.                                  |
 
 <figure>
   <img src="/guide/screenshots/20-quotes-list.png" alt="Listado de cotizaciones" />
@@ -215,7 +230,7 @@ Una orden <span class="pill green">Aprobado</span> está lista para asignarle un
 - Factibilidad de horario contra la ventana del cliente.
 - Distancia desde la posición actual / próximo destino del conductor.
 - Capacidad restante del vehículo.
-- Densidad de la ruta — el algoritmo prefiere agregar paradas a un conductor activo en la zona antes que asignar a uno ocioso (estrategia de *bin-packing*).
+- Densidad de la ruta — el algoritmo prefiere agregar paradas a un conductor activo en la zona antes que asignar a uno ocioso (estrategia de _bin-packing_).
 
 <div class="callout info">
 <strong>Despacho automático vs manual</strong>
@@ -223,7 +238,8 @@ La gran mayoría de órdenes se despachan solas. El administrador interviene cua
 </div>
 
 ### Resultado del despacho {#dispatch-result}
-Una vez asignado, el estado pasa a <span class="pill blue">Conductor Asignado</span>, la parada de recolección se reclasifica a *Compra* (porque tiene productos a comprar) y se genera una entrada en la sección Rutas.
+
+Una vez asignado, el estado pasa a <span class="pill blue">Conductor Asignado</span>, la parada de recolección se reclasifica a _Compra_ (porque tiene productos a comprar) y se genera una entrada en la sección Rutas.
 
 <figure>
   <img src="/guide/screenshots/35-order-assigned.png" alt="Orden con conductor asignado" />
@@ -236,7 +252,8 @@ Una vez asignado, el estado pasa a <span class="pill blue">Conductor Asignado</s
 </figure>
 
 ### Cuando hay conflicto {#dispatch-conflict}
-Si el sistema no encuentra un despacho factible, la orden queda en *Conflictos*. Las acciones típicas son:
+
+Si el sistema no encuentra un despacho factible, la orden queda en _Conflictos_. Las acciones típicas son:
 
 1. **Asignar manualmente** — abrir la orden, presionar `Asignar Conductor`, elegir de la lista.
 2. **Ajustar la ventana** — extender el rango temporal si la única razón es la disponibilidad horaria.
@@ -254,30 +271,33 @@ Cada orden tiene exactamente un punto de entrega final. Si el cliente necesita e
 
 Una vez asignada, la orden recorre estados a medida que el conductor avanza:
 
-| Estado | Significado |
-| --- | --- |
-| <span class="pill blue">Conductor Asignado</span> | Conductor recibió la asignación pero aún no inició. |
-| <span class="pill blue">Recogiendo</span> · <span class="pill blue">Llegando</span> · <span class="pill blue">En sitio</span> | Subestados durante la fase de recolección/compra. |
-| <span class="pill blue">Recolectada</span> | Compras hechas, listo para entregar. |
-| <span class="pill blue">En Tránsito</span> | Camino al destino final. |
-| <span class="pill blue">Llegando</span> · <span class="pill blue">En sitio</span> (entrega) | Subestados de la fase de entrega. |
-| <span class="pill amber">Esperando confirmación</span> | Pendiente de PIN del cliente o foto de prueba. |
-| <span class="pill green">Completado</span> | Entregada con prueba registrada. |
+| Estado                                                                                                                        | Significado                                         |
+| ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| <span class="pill blue">Conductor Asignado</span>                                                                             | Conductor recibió la asignación pero aún no inició. |
+| <span class="pill blue">Recogiendo</span> · <span class="pill blue">Llegando</span> · <span class="pill blue">En sitio</span> | Subestados durante la fase de recolección/compra.   |
+| <span class="pill blue">Recolectada</span>                                                                                    | Compras hechas, listo para entregar.                |
+| <span class="pill blue">En Tránsito</span>                                                                                    | Camino al destino final.                            |
+| <span class="pill blue">Llegando</span> · <span class="pill blue">En sitio</span> (entrega)                                   | Subestados de la fase de entrega.                   |
+| <span class="pill amber">Esperando confirmación</span>                                                                        | Pendiente de PIN del cliente o foto de prueba.      |
+| <span class="pill green">Completado</span>                                                                                    | Entregada con prueba registrada.                    |
 
 ### Recolección — el conductor compra {#monitor-pickup}
+
 <figure>
   <img src="/guide/screenshots/37-order-picking-up.png" alt="Orden en estado Recogiendo" />
   <figcaption>Estado <em>Recogiendo</em> — el conductor está en o camino al comercio para realizar la compra.</figcaption>
 </figure>
 
 ### En tránsito — camino al destino {#monitor-transit}
+
 <figure>
   <img src="/guide/screenshots/39-order-in-transit-active.png" alt="Orden en tránsito" />
   <figcaption>Estado <em>En Tránsito</em> — la compra está hecha y el conductor va camino al cliente.</figcaption>
 </figure>
 
 ### Entrega completada {#monitor-delivered}
-Al confirmar la entrega con PIN y foto, la orden pasa a <span class="pill green">Completado</span>. Las paradas quedan marcadas como *Completado*.
+
+Al confirmar la entrega con PIN y foto, la orden pasa a <span class="pill green">Completado</span>. Las paradas quedan marcadas como _Completado_.
 
 <figure>
   <img src="/guide/screenshots/40-order-completed-needs-reconciliation.png" alt="Orden completada esperando conciliación" />
@@ -285,6 +305,7 @@ Al confirmar la entrega con PIN y foto, la orden pasa a <span class="pill green"
 </figure>
 
 ### PIN y prueba de entrega {#pin-and-pod}
+
 Cada orden tiene un **PIN de 6 dígitos** generado al crear la orden. El cliente lo recibe en su app; el conductor debe pedirlo al entregar para confirmar identidad. Adicionalmente, según configuración, puede requerirse:
 
 - **Prueba fotográfica** — el conductor toma foto del paquete entregado.
@@ -296,7 +317,7 @@ Sin la prueba requerida, la orden queda en <span class="pill amber">Esperando co
 
 ## 4 · Conciliar montos finales {#reconcile}
 
-La conciliación es el ajuste posterior a la entrega: la cotización inicial es una *estimación* de cuánto costarán los productos. El precio real solo se conoce cuando el conductor compra. La conciliación reconcilia ambos montos y genera un cargo o crédito si hay diferencia.
+La conciliación es el ajuste posterior a la entrega: la cotización inicial es una _estimación_ de cuánto costarán los productos. El precio real solo se conoce cuando el conductor compra. La conciliación reconcilia ambos montos y genera un cargo o crédito si hay diferencia.
 
 <div class="callout info">
 <strong>Cuándo aparece</strong>
@@ -309,7 +330,8 @@ Las órdenes <span class="pill green">Completado</span> con pago <em>Autorizado<
 </figure>
 
 ### Paso 4.1 — Abrir el diálogo de conciliación {#step-4-1}
-Desde el detalle de una orden completada con pago autorizado aparece el botón `Conciliar` en el encabezado (también es accesible directamente desde la pestaña *Conciliación* de Necesita Atención). Al presionarlo se abre el formulario completo.
+
+Desde el detalle de una orden completada con pago autorizado aparece el botón `Conciliar` en el encabezado (también es accesible directamente desde la pestaña _Conciliación_ de Necesita Atención). Al presionarlo se abre el formulario completo.
 
 <figure>
   <img src="/guide/screenshots/42-reconciliation-dialog.png" alt="Diálogo de Conciliación abierto sobre la orden completada" />
@@ -317,18 +339,20 @@ Desde el detalle de una orden completada con pago autorizado aparece el botón `
 </figure>
 
 ### Paso 4.2 — Ajustar líneas con los precios reales {#step-4-2}
-1. Para cada línea, edite la *Cantidad* y el *Precio Unitario* usando lo realmente pagado (basado en el comprobante de compra). Por ejemplo, si la *Caja de leche entera 1L (×2)* cotizada a ₡1,500 salió en ₡1,700, ingrese ₡1,700.
+
+1. Para cada línea, edite la _Cantidad_ y el _Precio Unitario_ usando lo realmente pagado (basado en el comprobante de compra). Por ejemplo, si la _Caja de leche entera 1L (×2)_ cotizada a ₡1,500 salió en ₡1,700, ingrese ₡1,700.
 2. Si el conductor adquirió artículos extra que no estaban en la cotización, presione `+ Agregar Artículo` y registre la nueva línea.
-3. Si algún artículo no fue conseguido, presione la *×* al final de la línea para eliminarla — saldrá del total.
-4. Use el campo *Notas* para dejar contexto al cliente sobre el ajuste (opcional pero recomendado cuando hay sobrecargo).
-5. Revise la fila *Diferencia*: positivo = sobrecargo (el cliente debe la diferencia), negativo = crédito (se cobra menos de lo autorizado), cero = sin ajuste.
+3. Si algún artículo no fue conseguido, presione la _×_ al final de la línea para eliminarla — saldrá del total.
+4. Use el campo _Notas_ para dejar contexto al cliente sobre el ajuste (opcional pero recomendado cuando hay sobrecargo).
+5. Revise la fila _Diferencia_: positivo = sobrecargo (el cliente debe la diferencia), negativo = crédito (se cobra menos de lo autorizado), cero = sin ajuste.
 
 ### Paso 4.3 — Generar la conciliación {#step-4-3}
+
 Al confirmar el diálogo, el sistema:
 
 - Crea una nueva cotización en estado <span class="pill green">Finalizado</span> (versión 2).
 - Captura del pago autorizado el monto final correcto. Si el monto real es menor que el autorizado, solo cobra lo real. Si es mayor, marca el pago como <span class="pill amber">Sobrecargo Pendiente</span>.
-- Marca la orden con `reconciled_at` y la quita de la pestaña *Conciliación*.
+- Marca la orden con `reconciled_at` y la quita de la pestaña _Conciliación_.
 
 <figure>
   <img src="/guide/screenshots/42-order-reconciled.png" alt="Orden tras la conciliación" />
@@ -336,10 +360,11 @@ Al confirmar el diálogo, el sistema:
 </figure>
 
 ### Resultado posible {#reconciliation-outcomes}
-| Diferencia | Resultado | Estado de pago |
-| --- | --- | --- |
-| Real = cotizado | Sin ajuste — captura del monto autorizado. | <span class="pill green">Pagado</span> |
-| Real &lt; cotizado | Captura por el monto real (más bajo). El cliente solo paga lo realmente comprado. | <span class="pill green">Pagado</span> |
+
+| Diferencia         | Resultado                                                                                    | Estado de pago                                                       |
+| ------------------ | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Real = cotizado    | Sin ajuste — captura del monto autorizado.                                                   | <span class="pill green">Pagado</span>                               |
+| Real &lt; cotizado | Captura por el monto real (más bajo). El cliente solo paga lo realmente comprado.            | <span class="pill green">Pagado</span>                               |
 | Real &gt; cotizado | Sobrecargo — el cliente debe pagar la diferencia, generalmente con un segundo cobro o saldo. | <span class="pill amber">Sobrecargo Pendiente</span> hasta cubrirse. |
 
 <div class="callout tip">
@@ -413,11 +438,12 @@ Sección crítica del panel. Aquí se gestionan los mensajeros que ejecutan las 
 </figure>
 
 ### Internos vs Externalizados (outsourced) {#internal-vs-outsourced}
+
 El sistema distingue dos tipos de conductores:
 
-| Tipo | Cuándo se usa | Características |
-| --- | --- | --- |
-| **Interno** (en planilla) | Operación regular, día a día. | Recibe salario fijo. Tiene **horario configurable** y **ubicación base**. El sistema lo considera para despacho automático según factibilidad. |
+| Tipo                           | Cuándo se usa                                                                                       | Características                                                                                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Interno** (en planilla)      | Operación regular, día a día.                                                                       | Recibe salario fijo. Tiene **horario configurable** y **ubicación base**. El sistema lo considera para despacho automático según factibilidad.                |
 | **Externalizado** (outsourced) | Cuando ningún conductor interno tiene factibilidad para una orden y no se puede ajustar la ventana. | Proveedor externo que se paga por viaje. **No** tiene horario ni ubicación base — su disponibilidad se asume bajo demanda. Reduce margen, úsese con criterio. |
 
 <div class="callout info">
@@ -432,19 +458,19 @@ Los conductores internos reciben salario fijo. Esto cambia cómo se piensa la as
   <figcaption>Pestaña <em>Detalles</em>. Encabezado con nombre, ID público, toggle <em>Activo</em> y botón <em>Eliminar</em>. Cuatro tarjetas con la información esencial.</figcaption>
 </figure>
 
-La pestaña *Detalles* contiene cinco tarjetas:
+La pestaña _Detalles_ contiene cinco tarjetas:
 
-| Tarjeta | Contenido | Acciones |
-| --- | --- | --- |
-| **Cuenta de Usuario** | Nombre, correo electrónico, teléfono. | Botón *Ver Perfil de Usuario* abre la cuenta del conductor en la sección Usuarios. |
-| **Información de Licencia** | Número de licencia y fecha de vencimiento. | Si la licencia venció, aparece la etiqueta <span class="pill red">Vencido</span> automáticamente. |
-| **Información del Vehículo** | Placa del vehículo. | Editable. |
-| **Fechas** | Fecha de creación y última actualización del registro. | Solo lectura. |
-| **Ubicación Base** <span class="pill gray">solo internos</span> | Coordenadas y dirección desde donde el conductor inicia/termina su turno. | Botón *Editar/Establecer* abre un mapa donde se ancla la posición. Se usa para cálculos de factibilidad de despacho. |
+| Tarjeta                                                         | Contenido                                                                 | Acciones                                                                                                             |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Cuenta de Usuario**                                           | Nombre, correo electrónico, teléfono.                                     | Botón _Ver Perfil de Usuario_ abre la cuenta del conductor en la sección Usuarios.                                   |
+| **Información de Licencia**                                     | Número de licencia y fecha de vencimiento.                                | Si la licencia venció, aparece la etiqueta <span class="pill red">Vencido</span> automáticamente.                    |
+| **Información del Vehículo**                                    | Placa del vehículo.                                                       | Editable.                                                                                                            |
+| **Fechas**                                                      | Fecha de creación y última actualización del registro.                    | Solo lectura.                                                                                                        |
+| **Ubicación Base** <span class="pill gray">solo internos</span> | Coordenadas y dirección desde donde el conductor inicia/termina su turno. | Botón _Editar/Establecer_ abre un mapa donde se ancla la posición. Se usa para cálculos de factibilidad de despacho. |
 
 #### Toggle Activo
 
-El toggle *Activo* en la esquina superior derecha controla si el conductor está disponible globalmente para asignaciones. Útil para vacaciones, suspensiones o licencias prolongadas — alterna sin necesidad de eliminar el registro.
+El toggle _Activo_ en la esquina superior derecha controla si el conductor está disponible globalmente para asignaciones. Útil para vacaciones, suspensiones o licencias prolongadas — alterna sin necesidad de eliminar el registro.
 
 ### Configurar el horario del conductor — pestaña Horario {#driver-schedule}
 
@@ -457,7 +483,7 @@ El toggle *Activo* en la esquina superior derecha controla si el conductor está
 
 #### Cómo funciona el calendario
 
-- **Vista por defecto: Semana**, con horas de 4:00 a.m. a 10:00 p.m. Botón *Mes* alterna a vista mensual.
+- **Vista por defecto: Semana**, con horas de 4:00 a.m. a 10:00 p.m. Botón _Mes_ alterna a vista mensual.
 - **Cada bloque azul es un turno disponible** — durante ese rango el conductor puede recibir asignaciones.
 - **Días pasados se muestran en gris** y son de solo lectura (no se modifica el histórico).
 - **Día actual destacado** en color amarillo claro.
@@ -495,27 +521,27 @@ Configure los horarios de la semana siguiente cada viernes. Use bloques de maña
 
 El alta de un nuevo conductor requiere:
 
-| Campo | Obligatorio | Notas |
-| --- | --- | --- |
-| Nombre completo | Sí | Aparecerá en notificaciones al cliente y en el listado. |
-| Correo electrónico | Sí | Será el usuario de acceso a la app móvil del conductor. |
-| Teléfono | Sí | Formato Costa Rica: `+506 XXXX-XXXX`. |
-| Contraseña | Sí | Genere una temporal — el conductor podrá cambiarla en su primer ingreso. |
-| Fecha de nacimiento | Sí | Verificación de mayoría de edad y datos de planilla. |
-| Sexo | Sí | Lista predefinida. |
-| Código de idioma | Sí | Idioma con que recibirá notificaciones (es / en / fr). |
-| Avatar | No | Foto que verán los clientes y el cuadro administrativo. |
-| Número de licencia | Sí | Se valida formato. |
-| Placa del vehículo | Sí | Formato CR: `ABC-123`. |
-| Fecha de vencimiento de licencia | Sí | El sistema marca como <span class="pill red">Vencido</span> al pasar la fecha. |
-| Foto de licencia (frente y dorso) | Sí | Adjuntar PDF o imagen para auditoría. |
+| Campo                             | Obligatorio | Notas                                                                          |
+| --------------------------------- | ----------- | ------------------------------------------------------------------------------ |
+| Nombre completo                   | Sí          | Aparecerá en notificaciones al cliente y en el listado.                        |
+| Correo electrónico                | Sí          | Será el usuario de acceso a la app móvil del conductor.                        |
+| Teléfono                          | Sí          | Formato Costa Rica: `+506 XXXX-XXXX`.                                          |
+| Contraseña                        | Sí          | Genere una temporal — el conductor podrá cambiarla en su primer ingreso.       |
+| Fecha de nacimiento               | Sí          | Verificación de mayoría de edad y datos de planilla.                           |
+| Sexo                              | Sí          | Lista predefinida.                                                             |
+| Código de idioma                  | Sí          | Idioma con que recibirá notificaciones (es / en / fr).                         |
+| Avatar                            | No          | Foto que verán los clientes y el cuadro administrativo.                        |
+| Número de licencia                | Sí          | Se valida formato.                                                             |
+| Placa del vehículo                | Sí          | Formato CR: `ABC-123`.                                                         |
+| Fecha de vencimiento de licencia  | Sí          | El sistema marca como <span class="pill red">Vencido</span> al pasar la fecha. |
+| Foto de licencia (frente y dorso) | Sí          | Adjuntar PDF o imagen para auditoría.                                          |
 
 #### Después de crear el conductor
 
 1. Abra el detalle del conductor recién creado.
-2. En la pestaña *Detalles*, configure la **Ubicación Base** (de dónde sale a trabajar).
-3. Pase a la pestaña *Horario* y configure su disponibilidad de la semana en curso.
-4. Active el toggle *Activo* si no lo está.
+2. En la pestaña _Detalles_, configure la **Ubicación Base** (de dónde sale a trabajar).
+3. Pase a la pestaña _Horario_ y configure su disponibilidad de la semana en curso.
+4. Active el toggle _Activo_ si no lo está.
 
 Solo después de estos tres pasos el conductor estará listo para recibir asignaciones automáticas.
 
@@ -643,7 +669,7 @@ Esta sección controla qué monedas acepta la plataforma, cómo se obtienen los 
 
 El primer interruptor decide cómo se obtienen las tasas:
 
-- **Automático** <span class="pill green">por defecto</span> — el sistema descarga tasas desde proveedores externos (p. ej. *gometa*) y las refresca de forma programada. Aparece el botón `Sincronizar Tasas` en la esquina superior derecha para forzar una actualización inmediata.
+- **Automático** <span class="pill green">por defecto</span> — el sistema descarga tasas desde proveedores externos (p. ej. _gometa_) y las refresca de forma programada. Aparece el botón `Sincronizar Tasas` en la esquina superior derecha para forzar una actualización inmediata.
 - **Manual** — el administrador fija el tipo de cambio a mano por cada moneda. Útil cuando se quiere usar una tasa fija negociada con un banco o aislar la operación de oscilaciones intradía.
 
 <figure>
@@ -653,21 +679,21 @@ El primer interruptor decide cómo se obtienen las tasas:
 
 #### Moneda base
 
-La tarjeta *Moneda Base* muestra cuál es la moneda en la que se almacenan todos los importes internos (en el ejemplo, CRC con precisión de 2 decimales). No se puede deshabilitar y su tipo de cambio siempre es `1.000000`. Cambiar la moneda base es una operación de migración — no se hace desde este panel.
+La tarjeta _Moneda Base_ muestra cuál es la moneda en la que se almacenan todos los importes internos (en el ejemplo, CRC con precisión de 2 decimales). No se puede deshabilitar y su tipo de cambio siempre es `1.000000`. Cambiar la moneda base es una operación de migración — no se hace desde este panel.
 
 #### Tabla de monedas
 
 La tabla lista todas las monedas configuradas. Columnas:
 
-| Columna | Qué muestra |
-| --- | --- |
-| **Código / Nombre / Símbolo** | Identificadores ISO 4217 y la moneda mostrada (p. ej. `USD · US Dollar · $`). |
-| **Tipo de Cambio** | Tasa actual respecto a la moneda base. En modo manual muestra la tasa fijada por el admin. |
-| **Fecha de Tasa** | Cuándo se actualizó por última vez, con etiqueta de la fuente (p. ej. *gometa*) o <span class="pill gray">Manual</span>. |
-| **Redondeo** | Resumen del modo + incremento (p. ej. `nearest @ 0.01`). |
-| **Estado** | <span class="pill blue">Base</span>, <span class="pill green">Activo</span> o <span class="pill gray">Deshabilitado</span>. |
-| **Habilitado** | Switch para activar/desactivar. La moneda base no se puede desactivar. |
-| **Acciones** | Botón *Editar* — abre el diálogo de configuración de la moneda. |
+| Columna                       | Qué muestra                                                                                                                 |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Código / Nombre / Símbolo** | Identificadores ISO 4217 y la moneda mostrada (p. ej. `USD · US Dollar · $`).                                               |
+| **Tipo de Cambio**            | Tasa actual respecto a la moneda base. En modo manual muestra la tasa fijada por el admin.                                  |
+| **Fecha de Tasa**             | Cuándo se actualizó por última vez, con etiqueta de la fuente (p. ej. _gometa_) o <span class="pill gray">Manual</span>.    |
+| **Redondeo**                  | Resumen del modo + incremento (p. ej. `nearest @ 0.01`).                                                                    |
+| **Estado**                    | <span class="pill blue">Base</span>, <span class="pill green">Activo</span> o <span class="pill gray">Deshabilitado</span>. |
+| **Habilitado**                | Switch para activar/desactivar. La moneda base no se puede desactivar.                                                      |
+| **Acciones**                  | Botón _Editar_ — abre el diálogo de configuración de la moneda.                                                             |
 
 #### Diálogo de edición — redondeo
 
@@ -676,7 +702,7 @@ La tabla lista todas las monedas configuradas. Columnas:
   <figcaption>Diálogo <em>Editar Configuración de Redondeo</em>. Dos campos: <em>Modo de Redondeo</em> (Al más cercano, Redondear hacia arriba, Redondear hacia abajo) e <em>Incremento de Redondeo</em> (0.01 = centavos, 0.10 = décimos, 0.50, 1.00…).</figcaption>
 </figure>
 
-El redondeo afecta cómo se presentan los importes al cliente final, no cómo se almacenan internamente. Por ejemplo, una cotización calculada en ₡7,683.50 con incremento `1` y modo *Al más cercano* se muestra como ₡7,684.
+El redondeo afecta cómo se presentan los importes al cliente final, no cómo se almacenan internamente. Por ejemplo, una cotización calculada en ₡7,683.50 con incremento `1` y modo _Al más cercano_ se muestra como ₡7,684.
 
 #### Diálogo de edición — tasa manual (solo modo Manual)
 
@@ -707,8 +733,8 @@ El primer interruptor enciende o apaga la ventana de servicio. **Cuando está de
 
 Dos campos de hora controlan la ventana del día:
 
-- *El servicio cierra a las* — hora a la que deja de aceptarse trabajo (inicio del bloque cerrado).
-- *El servicio abre a las* — hora a la que vuelve la operación (fin del bloque cerrado).
+- _El servicio cierra a las_ — hora a la que deja de aceptarse trabajo (inicio del bloque cerrado).
+- _El servicio abre a las_ — hora a la que vuelve la operación (fin del bloque cerrado).
 
 Si la ventana cruza la medianoche, la barra de timeline lo dibuja correctamente: dos segmentos verdes a los extremos del día y un segmento rojo en el medio (cerrado). En el caso normal (apertura en la mañana y cierre en la noche), se ve un segmento verde central rodeado de dos rojos.
 
@@ -717,7 +743,7 @@ Si la ventana cruza la medianoche, la barra de timeline lo dibuja correctamente:
 Las órdenes pagadas que no consiguen conductor escalan automáticamente para evitar quedar olvidadas:
 
 - **Cancelación automática habilitada** — si se enciende, las órdenes que cumplan el umbral se cancelan con reembolso completo. Si se apaga, simplemente se notifica al admin y la orden permanece abierta hasta intervención manual.
-- **Umbral de escalación (horas laborales)** — número de horas *dentro de la ventana de servicio* tras las que se dispara la escalación. El campo acepta 1–24.
+- **Umbral de escalación (horas laborales)** — número de horas _dentro de la ventana de servicio_ tras las que se dispara la escalación. El campo acepta 1–24.
 
 <div class="callout info">
 <strong>«Horas laborales», no reloj de pared</strong>
@@ -729,55 +755,65 @@ El umbral se cuenta solo durante horas dentro de la ventana de servicio. Una ord
 ## Glosario de estados {#state-glossary}
 
 ### Estados de la orden {#order-states}
-| Código interno | Etiqueta | Significado |
-| --- | --- | --- |
-| `pending` | <span class="pill amber">Pendiente</span> | Cliente creó la orden — esperando cotización. |
-| `estimated` | <span class="pill blue">Cotizada</span> | Cotización enviada — esperando respuesta del cliente. |
-| `approved` | <span class="pill green">Aprobada</span> | Cliente aceptó — lista para despacho. |
-| `assigned` | <span class="pill blue">Asignada</span> | Conductor asignado — recoger pendiente. |
-| `picking_up` · `arriving_at_pickup` · `arrived_at_pickup` | <span class="pill blue">Recolección</span> | Sub-estados durante la fase de recolección. |
-| `picked_up` | <span class="pill blue">Recolectada</span> | Productos en mano del conductor. |
-| `in_transit` | <span class="pill blue">En Tránsito</span> | Camino al destino final. |
-| `arriving_at_drop_off` · `arrived_at_drop_off` | <span class="pill blue">Entrega</span> | Sub-estados al llegar al destino. |
-| `waiting_confirmation` | <span class="pill amber">Esperando confirmación</span> | Falta PIN o prueba fotográfica. |
-| `completed` | <span class="pill green">Completada</span> | Entregada — pendiente de conciliación. |
-| `canceled` | <span class="pill gray">Cancelada</span> | Cliente o admin canceló antes de despachar. |
-| `denied` | <span class="pill red">Rechazada</span> | Admin rechazó la cotización. |
-| `delivery_failed` | <span class="pill red">Entrega fallida</span> | No se pudo entregar (cliente ausente, dirección errónea, etc.). |
-| `returned_to_sender` | <span class="pill gray">Devuelta</span> | Productos retornados al remitente. |
+
+| Código interno                                            | Etiqueta                                               | Significado                                                     |
+| --------------------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------- |
+| `pending`                                                 | <span class="pill amber">Pendiente</span>              | Cliente creó la orden — esperando cotización.                   |
+| `estimated`                                               | <span class="pill blue">Cotizada</span>                | Cotización enviada — esperando respuesta del cliente.           |
+| `approved`                                                | <span class="pill green">Aprobada</span>               | Cliente aceptó — lista para despacho.                           |
+| `assigned`                                                | <span class="pill blue">Asignada</span>                | Conductor asignado — recoger pendiente.                         |
+| `picking_up` · `arriving_at_pickup` · `arrived_at_pickup` | <span class="pill blue">Recolección</span>             | Sub-estados durante la fase de recolección.                     |
+| `picked_up`                                               | <span class="pill blue">Recolectada</span>             | Productos en mano del conductor.                                |
+| `in_transit`                                              | <span class="pill blue">En Tránsito</span>             | Camino al destino final.                                        |
+| `arriving_at_drop_off` · `arrived_at_drop_off`            | <span class="pill blue">Entrega</span>                 | Sub-estados al llegar al destino.                               |
+| `waiting_confirmation`                                    | <span class="pill amber">Esperando confirmación</span> | Falta PIN o prueba fotográfica.                                 |
+| `completed`                                               | <span class="pill green">Completada</span>             | Entregada — pendiente de conciliación.                          |
+| `canceled`                                                | <span class="pill gray">Cancelada</span>               | Cliente o admin canceló antes de despachar.                     |
+| `denied`                                                  | <span class="pill red">Rechazada</span>                | Admin rechazó la cotización.                                    |
+| `delivery_failed`                                         | <span class="pill red">Entrega fallida</span>          | No se pudo entregar (cliente ausente, dirección errónea, etc.). |
+| `returned_to_sender`                                      | <span class="pill gray">Devuelta</span>                | Productos retornados al remitente.                              |
 
 ### Estados de pago {#payment-states}
-| Código | Etiqueta | Significado |
-| --- | --- | --- |
-| `unpaid` | <span class="pill amber">Sin Pagar</span> | Sin pago registrado. |
-| `paid` | <span class="pill green">Pagado</span> | Cobro completo recibido. |
+
+| Código          | Etiqueta                                             | Significado                               |
+| --------------- | ---------------------------------------------------- | ----------------------------------------- |
+| `unpaid`        | <span class="pill amber">Sin Pagar</span>            | Sin pago registrado.                      |
+| `paid`          | <span class="pill green">Pagado</span>               | Cobro completo recibido.                  |
 | `surcharge_due` | <span class="pill amber">Sobrecargo Pendiente</span> | Tras conciliación quedó saldo por cobrar. |
-| `refunded` | <span class="pill gray">Reembolsada</span> | Devolución total ejecutada. |
+| `refunded`      | <span class="pill gray">Reembolsada</span>           | Devolución total ejecutada.               |
 
 ---
 
 ## Preguntas frecuentes {#faq}
 
 ### El cliente quiere modificar la dirección de entrega después de aprobada — ¿se puede? {#faq-edit-address}
+
 Sí, mientras la orden esté en estado <span class="pill green">Aprobada</span> o <span class="pill blue">Asignada</span> y el conductor no haya iniciado la fase de recolección, las direcciones son editables. Una vez que la orden pasa a <span class="pill blue">Recolectada</span>, las direcciones quedan bloqueadas. Para cambios posteriores, lo correcto es crear una nueva orden.
 
 ### ¿Qué hago si un conductor reporta un problema durante la entrega? {#faq-delivery-problem}
-El conductor puede marcar *Entrega Fallida* desde su app, lo cual mueve la orden a <span class="pill red">Entrega fallida</span>. Esto la lleva a la pestaña *Conflictos* de Necesita Atención. Las opciones son: reintentar la entrega (re-asignar), devolver al remitente, o marcar como pérdida cubierta por seguro.
+
+El conductor puede marcar _Entrega Fallida_ desde su app, lo cual mueve la orden a <span class="pill red">Entrega fallida</span>. Esto la lleva a la pestaña _Conflictos_ de Necesita Atención. Las opciones son: reintentar la entrega (re-asignar), devolver al remitente, o marcar como pérdida cubierta por seguro.
 
 ### El despacho automático asignó al conductor «equivocado» — ¿puedo reasignar? {#faq-reassign-driver}
+
 Sí. Desde el detalle de la orden, presione `Reasignar` — verá la lista de conductores con disponibilidad ordenados por factibilidad. Tenga en cuenta que reasignar puede empeorar la densidad global de rutas; el algoritmo ya optimiza por bin-packing.
 
 ### ¿Cuándo se sub-contrata (outsourcing)? {#faq-outsource-when}
+
 Cuando ningún conductor de planilla tiene factibilidad para la orden y el cliente no acepta extender la ventana. Es una decisión costosa — reduce margen porque se paga al proveedor externo. Use con criterio.
 
 ### El cliente pagó pero la orden quedó en «Sobrecargo Pendiente» — ¿por qué? {#faq-surcharge-pending}
+
 Porque la conciliación detectó que el monto real de productos fue mayor a la cotización inicial. El cliente pagó la cotización original, pero queda un delta. Notifíquele para cobrar la diferencia.
 
 ### ¿Qué diferencia hay entre cancelar y rechazar una orden? {#faq-cancel-vs-reject}
+
 **Cancelar** es para órdenes ya cotizadas o aprobadas que se desisten (cliente o admin). **Rechazar** es exclusivo del paso de cotización — el admin decide no atenderla (capacidad insuficiente, fuera de zona, etc.).
 
 ### ¿Cómo se generan los PIN de entrega? {#faq-pin-generation}
+
 Automáticamente al crear la orden — un código de 6 dígitos único por orden. Se muestra al cliente en su app y al conductor durante la entrega. Sirve como verificación de identidad del receptor.
 
 ### ¿Puedo crear una orden desde el panel sin que el cliente la inicie? {#faq-admin-create}
+
 No directamente desde el panel. Las órdenes siempre nacen del lado del cliente (app móvil). El panel administra el ciclo de vida — cotizar, despachar, conciliar — pero no expone un formulario para crear órdenes manualmente. Si un cliente llama por teléfono, la práctica es guiarlo a que la cree desde su app o coordinar con el equipo técnico para usar el endpoint de API directamente.

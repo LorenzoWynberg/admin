@@ -26,7 +26,8 @@ function useHashScrollInMain() {
       const el = document.getElementById(decodeURIComponent(hash));
       const main = document.querySelector('main');
       if (!el || !main) return;
-      const top = el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - 16;
+      const top =
+        el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - 16;
       main.scrollTo({ top, behavior: 'instant' as ScrollBehavior });
     };
 
@@ -46,11 +47,7 @@ export function GuideRenderer({ content }: { content: string }) {
       <article className="guide-root">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkHeadingId]}
-          rehypePlugins={[
-            rehypeRaw,
-            rehypeSlug,
-            [rehypeAutolinkHeadings, { behavior: 'wrap' }],
-          ]}
+          rehypePlugins={[rehypeRaw, rehypeSlug, [rehypeAutolinkHeadings, { behavior: 'wrap' }]]}
         >
           {content}
         </ReactMarkdown>
