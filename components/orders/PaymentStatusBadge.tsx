@@ -9,6 +9,7 @@ const paymentStyles: Record<PaymentStatus, string> = {
   unpaid: 'bg-gray-100 text-gray-600 border-gray-200',
   authorized: 'bg-blue-100 text-blue-800 border-blue-200',
   paid: 'bg-green-100 text-green-800 border-green-200',
+  on_account: 'bg-violet-100 text-violet-800 border-violet-200',
   refunded: 'bg-blue-100 text-blue-800 border-blue-200',
   surcharge_due: 'bg-amber-100 text-amber-800 border-amber-200',
   voided: 'bg-gray-100 text-gray-600 border-gray-200',
