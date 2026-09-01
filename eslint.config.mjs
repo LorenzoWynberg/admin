@@ -17,6 +17,7 @@ const eslintConfig = defineConfig([
     // Generated files (synced from API — never edit manually)
     'types/generated.d.ts',
     'types/response.d.ts',
+    'types/notifications.d.ts',
     'coverage/**',
   ]),
 ]);
