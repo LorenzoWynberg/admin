@@ -1200,6 +1200,10 @@ declare namespace App.Data.User {
   };
 }
 declare namespace App.Enums {
+  export enum AccountBlockReason {
+    DebtCeiling = 'debt_ceiling',
+    SettlementOverdue = 'settlement_overdue',
+  }
   export enum AddressType {
     Saved = 'saved',
     Snapshot = 'snapshot',
@@ -1295,6 +1299,15 @@ declare namespace App.Enums {
     CancellationFee = 'cancellation_fee',
     UnderCollection = 'under_collection',
     DebtSettlement = 'debt_settlement',
+    DeferredCharge = 'deferred_charge',
+    SettlementApplication = 'settlement_application',
+    DeferredChargeReversal = 'deferred_charge_reversal',
+  }
+  export enum BillingCycle {
+    PerOrder = 'per_order',
+    Weekly = 'weekly',
+    Biweekly = 'biweekly',
+    Monthly = 'monthly',
   }
   export enum ChatChannel {
     Support = 'support',
@@ -1429,6 +1442,7 @@ declare namespace App.Enums {
     InvoiceItem = 'invoice_item',
     RefundRequest = 'refund_request',
     BalanceEntry = 'balance_entry',
+    Settlement = 'settlement',
   }
   export enum NotificationAction {
     QuoteRequested = 'quote_requested',
@@ -1457,6 +1471,9 @@ declare namespace App.Enums {
     BalanceCredited = 'balance_credited',
     RefundDue = 'refund_due',
     RefundSettled = 'refund_settled',
+    SettlementCharged = 'settlement_charged',
+    SettlementFailed = 'settlement_failed',
+    SettlementBlockWarning = 'settlement_block_warning',
   }
   export enum NotificationStatus {
     Unread = 'unread',
@@ -1512,6 +1529,7 @@ declare namespace App.Enums {
     UNPAID = 'unpaid',
     AUTHORIZED = 'authorized',
     PAID = 'paid',
+    ON_ACCOUNT = 'on_account',
     SURCHARGE_DUE = 'surcharge_due',
     REFUNDED = 'refunded',
     VOIDED = 'voided',
@@ -1595,6 +1613,12 @@ declare namespace App.Enums {
   export enum ScheduleChangeReason {
     Reassigned = 'reassigned',
     Rescheduled = 'rescheduled',
+  }
+  export enum SettlementStatus {
+    Pending = 'pending',
+    Paid = 'paid',
+    Failed = 'failed',
+    PartiallyPaid = 'partially_paid',
   }
   export enum TipoIdentificacion {
     Fisica = '01',
