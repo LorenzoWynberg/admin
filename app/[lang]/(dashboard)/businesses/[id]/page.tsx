@@ -50,6 +50,20 @@ export default function BusinessDetailPage() {
     });
   };
 
+  const handleChangeBillingCycle = (next: string) => {
+    updateBusiness.mutate({
+      id: businessId,
+      data: { billingCycle: next as App.Enums.BillingCycle },
+    });
+  };
+
+  const handleChangeGracePeriod = (next: number | null) => {
+    updateBusiness.mutate({
+      id: businessId,
+      data: { gracePeriodDays: next },
+    });
+  };
+
   const formatAddress = (address?: App.Data.Address.AddressData | null): string => {
     const notSpecified = t('businesses:detail.not_specified', { defaultValue: 'Not specified' });
     if (!address) return notSpecified;
@@ -208,6 +222,13 @@ export default function BusinessDetailPage() {
           debtCeiling={business.balanceDebtCeiling}
           onDebtCeilingChange={handleChangeDebtCeiling}
           isSavingCeiling={updateBusiness.isPending}
+          billingCycle={business.billingCycle}
+          onBillingCycleChange={handleChangeBillingCycle}
+          isSavingBillingCycle={updateBusiness.isPending}
+          gracePeriodDays={business.gracePeriodDays}
+          onGracePeriodDaysChange={handleChangeGracePeriod}
+          isSavingGracePeriod={updateBusiness.isPending}
+          blockReason={business.blockReason}
         />
 
         {/* Dispatcher */}
