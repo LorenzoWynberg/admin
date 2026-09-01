@@ -13,11 +13,7 @@ function readGuide(lang: string): string {
   return fs.readFileSync(path.join(process.cwd(), 'content/guide/guide.es.md'), 'utf8');
 }
 
-export default async function GuidePage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default async function GuidePage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const content = readGuide(lang);
   return <GuideRenderer content={content} />;

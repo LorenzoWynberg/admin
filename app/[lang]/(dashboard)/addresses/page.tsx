@@ -10,12 +10,7 @@ import {
 } from '@/components/ui/table';
 
 import { useState } from 'react';
-import {
-  actionLabel,
-  modelLabel,
-  resourceMessage,
-  validationAttribute,
-} from '@/utils/lang';
+import { actionLabel, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useAddressList } from '@/hooks/addresses';
