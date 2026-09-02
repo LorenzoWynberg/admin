@@ -9,14 +9,16 @@ Comment opérer Mandados au quotidien — de la cotation à la conciliation.
 </div>
 
 ### Qu'est-ce que Mandados ? {#what-is-mandados}
+
 Mandados est une plateforme de logistique de messagerie du dernier kilomètre. Les clients créent des commandes depuis leur application mobile en indiquant ce qu'ils ont besoin d'acheter, de récupérer ou de faire livrer ; le panneau d'administration gère cette commande pendant tout son cycle de vie ; le chauffeur exécute physiquement l'itinéraire.
 
 ### Trois applications, un seul panneau {#three-apps}
-| Application | Qui l'utilise | Rôle |
-| --- | --- | --- |
-| **Client** (mobile) | Particuliers ou entreprises | Créent des commandes, reçoivent des devis, suivent la livraison, notent. |
-| **Chauffeur** (mobile) | Messagers salariés | Reçoivent les itinéraires assignés, exécutent les arrêts, enregistrent la preuve de livraison. |
-| **Panneau Admin** (web) | Opérations | Cotent, répartissent, surveillent les conflits, concilient, gèrent la tarification. |
+
+| Application             | Qui l'utilise               | Rôle                                                                                           |
+| ----------------------- | --------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Client** (mobile)     | Particuliers ou entreprises | Créent des commandes, reçoivent des devis, suivent la livraison, notent.                       |
+| **Chauffeur** (mobile)  | Messagers salariés          | Reçoivent les itinéraires assignés, exécutent les arrêts, enregistrent la preuve de livraison. |
+| **Panneau Admin** (web) | Opérations                  | Cotent, répartissent, surveillent les conflits, concilient, gèrent la tarification.            |
 
 <div class="callout info">
 <strong>Les chauffeurs sont salariés</strong>
@@ -26,6 +28,7 @@ L'objectif de répartition est le <em>bin-packing</em> : maximiser les arrêts p
 ---
 
 ## Connexion au panneau {#signing-in}
+
 Le panneau s'ouvre depuis n'importe quel navigateur moderne. L'écran de connexion demande l'e-mail et le mot de passe.
 
 <figure>
@@ -34,11 +37,13 @@ Le panneau s'ouvre depuis n'importe quel navigateur moderne. L'écran de connexi
 </figure>
 
 ### Changer la langue {#change-language}
-Le panneau est disponible en **espagnol**, **anglais** et **français**. Choisissez la langue depuis la section *Paramètres* ; vous pouvez aussi modifier l'URL en remplaçant le code de langue (`/fr/...`, `/es/...`, `/en/...`).
+
+Le panneau est disponible en **espagnol**, **anglais** et **français**. Choisissez la langue depuis la section _Paramètres_ ; vous pouvez aussi modifier l'URL en remplaçant le code de langue (`/fr/...`, `/es/...`, `/en/...`).
 
 ---
 
 ## Vue d'ensemble {#overview}
+
 <figure>
   <img src="/guide/screenshots/02-panel.png" alt="Vue d'ensemble du tableau de bord" />
   <figcaption><em>Tableau de bord</em> — le récapitulatif quotidien avec les métriques opérationnelles.</figcaption>
@@ -53,6 +58,7 @@ Le panneau est disponible en **espagnol**, **anglais** et **français**. Choisis
 Utilisez le tableau de bord comme point de départ quotidien, mais le vrai poste de travail est [**Demande l'attention**](#needs-attention) — où tout ce qui est actionnable est concentré.
 
 ### Menu latéral {#sidebar-menu}
+
 La navigation principale vit dans la barre de gauche. Elle est organisée du plus au moins fréquemment utilisé :
 
 <div class="section-cards">
@@ -84,15 +90,17 @@ La navigation principale vit dans la barre de gauche. Elle est organisée du plu
 </figure>
 
 ### Les cinq onglets {#five-tabs}
-| Onglet | Contenu | Action attendue |
-| --- | --- | --- |
-| **Conflits** | Commandes que le système n'a pas pu répartir automatiquement ou qui ont des problèmes de faisabilité (fenêtre impossible, aucun chauffeur disponible, distance hors plage). | Examiner le motif, réaffecter manuellement, ajuster la fenêtre ou écarter la commande. |
-| **Conciliation** | Commandes <span class="pill blue">Terminée</span> où le chauffeur a livré mais le montant facturé doit être ajusté au coût réel des produits achetés. | Ouvrir la boîte de conciliation, saisir les prix réels par ligne, générer le devis final. |
-| **Non Cotées** | Commandes que le client vient de créer et qui n'ont pas encore de devis. | Vérifier les adresses de chaque arrêt, créer le devis et l'envoyer au client. |
-| **Non Payées** | Commandes livrées mais non encore payées par le client. | Faire le suivi de l'encaissement, marquer comme payée le moment venu. |
-| **Demandes de remboursement** | Réclamations de clients demandant un remboursement total ou partiel. | Examiner les preuves (preuve de livraison, photos), approuver ou rejeter. |
+
+| Onglet                        | Contenu                                                                                                                                                                     | Action attendue                                                                           |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **Conflits**                  | Commandes que le système n'a pas pu répartir automatiquement ou qui ont des problèmes de faisabilité (fenêtre impossible, aucun chauffeur disponible, distance hors plage). | Examiner le motif, réaffecter manuellement, ajuster la fenêtre ou écarter la commande.    |
+| **Conciliation**              | Commandes <span class="pill blue">Terminée</span> où le chauffeur a livré mais le montant facturé doit être ajusté au coût réel des produits achetés.                       | Ouvrir la boîte de conciliation, saisir les prix réels par ligne, générer le devis final. |
+| **Non Cotées**                | Commandes que le client vient de créer et qui n'ont pas encore de devis.                                                                                                    | Vérifier les adresses de chaque arrêt, créer le devis et l'envoyer au client.             |
+| **Non Payées**                | Commandes livrées mais non encore payées par le client.                                                                                                                     | Faire le suivi de l'encaissement, marquer comme payée le moment venu.                     |
+| **Demandes de remboursement** | Réclamations de clients demandant un remboursement total ou partiel.                                                                                                        | Examiner les preuves (preuve de livraison, photos), approuver ou rejeter.                 |
 
 ### Filtres de sévérité {#severity-filters}
+
 À l'intérieur de chaque onglet, les commandes sont priorisées par sévérité : <span class="pill red">Critique</span> <span class="pill amber">Élevée</span> <span class="pill blue">Moyenne</span> <span class="pill gray">Basse</span>. Les filtres en haut permettent de cibler le travail du jour.
 
 <div class="callout tip">
@@ -121,7 +129,7 @@ Les sections suivantes détaillent chaque phase du point de vue de l'administrat
 
 ## 1 · Coter une nouvelle commande {#quote}
 
-Quand un client crée une commande depuis son application, elle arrive dans le panneau à l'état <span class="pill amber">En attente</span> sans devis. Elle apparaîtra dans l'onglet *Non Cotées* de Demande l'attention et en tête de la liste des Commandes.
+Quand un client crée une commande depuis son application, elle arrive dans le panneau à l'état <span class="pill amber">En attente</span> sans devis. Elle apparaîtra dans l'onglet _Non Cotées_ de Demande l'attention et en tête de la liste des Commandes.
 
 Pour ce guide nous suivons une vraie commande (`ORD-KA2SEDK3A75X`) créée par le client Lorenzo Wynberg avec la tâche « Acheter 2 boîtes de lait et du pain à Auto Mercado » et livraison à Calle 6, Hospital, San José.
 
@@ -131,7 +139,8 @@ Pour ce guide nous suivons une vraie commande (`ORD-KA2SEDK3A75X`) créée par l
 </figure>
 
 ### Étape 1.1 — La repérer dans Demande l'attention {#step-1-1}
-Quand la commande arrive, le compteur de l'onglet *Non Cotées* augmente. C'est le premier signal de la journée.
+
+Quand la commande arrive, le compteur de l'onglet _Non Cotées_ augmente. C'est le premier signal de la journée.
 
 <figure>
   <img src="/guide/screenshots/22-needs-attention.png" alt="Demande l'attention avec un badge sur Non Cotées" />
@@ -139,6 +148,7 @@ Quand la commande arrive, le compteur de l'onglet *Non Cotées* augmente. C'est 
 </figure>
 
 ### Étape 1.2 — Ouvrir le détail de la commande {#step-1-2}
+
 Cliquez sur la commande pour ouvrir son détail. À ce stade vous verrez les arrêts, les détails horaires, l'historique des devis (vide ici) et les paiements.
 
 <figure>
@@ -152,7 +162,8 @@ Quand le client ne décrit que la tâche sans fixer de lieu, l'administrateur do
 </div>
 
 ### Étape 1.3 — Ajouter l'adresse de récupération {#step-1-3}
-1. Sur la carte *Arrêts*, cliquez sur `+ Ajouter une adresse` dans l'arrêt de récupération.
+
+1. Sur la carte _Arrêts_, cliquez sur `+ Ajouter une adresse` dans l'arrêt de récupération.
 2. Cherchez le commerce dans l'annuaire [Adresses](#addresses) ou saisissez-en une nouvelle.
 3. Confirmez. L'arrêt est complété, l'avertissement jaune disparaît, et les boutons `Créer un devis` et `Calculer la distance` apparaissent.
 
@@ -162,6 +173,7 @@ Quand le client ne décrit que la tâche sans fixer de lieu, l'administrateur do
 </figure>
 
 ### Étape 1.4 — Créer le devis (Brouillon) {#step-1-4}
+
 1. Cliquez sur `Créer un devis`.
 2. Une boîte de dialogue s'ouvre où vous pouvez :
    - Ajouter des lignes de produits par arrêt (description, quantité, prix unitaire estimé) — depuis un catalogue ou saisies à la main.
@@ -176,6 +188,7 @@ Quand le client ne décrit que la tâche sans fixer de lieu, l'administrateur do
 </figure>
 
 ### Étape 1.5 — Envoyer le devis au client {#step-1-5}
+
 Quand le devis est revu, cliquez sur `Envoyer au client`. Le statut du devis passe à <span class="pill blue">Envoyé</span> et celui de la commande à <span class="pill blue">Cotée</span>. Le client reçoit une notification dans son application et peut accepter ou rejeter.
 
 <figure>
@@ -184,6 +197,7 @@ Quand le devis est revu, cliquez sur `Envoyer au client`. Le statut du devis pas
 </figure>
 
 ### Étape 1.6 — Le client accepte → commande Approuvée {#step-1-6}
+
 Quand le client accepte depuis son application, la commande passe automatiquement à <span class="pill green">Approuvée</span>. Le devis montre déjà les lignes de produits estimés et la commande est prête à être répartie.
 
 <figure>
@@ -192,14 +206,15 @@ Quand le client accepte depuis son application, la commande passe automatiquemen
 </figure>
 
 ### États du devis {#quote-states}
-| État | Signification |
-| --- | --- |
-| <span class="pill gray">Brouillon</span> | Enregistré mais non envoyé — seul l'administrateur le voit. |
-| <span class="pill blue">Envoyé</span> | Visible par le client ; en attente de son approbation. |
-| <span class="pill green">Accepté</span> | Le client a accepté. La commande passe à <span class="pill green">Approuvée</span>. |
-| <span class="pill red">Rejeté</span> | Le client a refusé. Vous pouvez générer un autre devis si nécessaire. |
-| <span class="pill gray">Expiré</span> | La date de validité est passée sans acceptation. |
-| <span class="pill green">Finalisé</span> | Généré à la clôture après la conciliation. |
+
+| État                                     | Signification                                                                       |
+| ---------------------------------------- | ----------------------------------------------------------------------------------- |
+| <span class="pill gray">Brouillon</span> | Enregistré mais non envoyé — seul l'administrateur le voit.                         |
+| <span class="pill blue">Envoyé</span>    | Visible par le client ; en attente de son approbation.                              |
+| <span class="pill green">Accepté</span>  | Le client a accepté. La commande passe à <span class="pill green">Approuvée</span>. |
+| <span class="pill red">Rejeté</span>     | Le client a refusé. Vous pouvez générer un autre devis si nécessaire.               |
+| <span class="pill gray">Expiré</span>    | La date de validité est passée sans acceptation.                                    |
+| <span class="pill green">Finalisé</span> | Généré à la clôture après la conciliation.                                          |
 
 <figure>
   <img src="/guide/screenshots/20-quotes-list.png" alt="Liste des devis" />
@@ -215,7 +230,7 @@ Une commande <span class="pill green">Approuvée</span> est prête à recevoir u
 - La faisabilité horaire par rapport à la fenêtre du client.
 - La distance depuis la position actuelle / la prochaine destination du chauffeur.
 - La capacité restante du véhicule.
-- La densité de l'itinéraire — l'algorithme préfère ajouter des arrêts à un chauffeur déjà actif dans la zone plutôt que d'assigner à un chauffeur inactif (stratégie de *bin-packing*).
+- La densité de l'itinéraire — l'algorithme préfère ajouter des arrêts à un chauffeur déjà actif dans la zone plutôt que d'assigner à un chauffeur inactif (stratégie de _bin-packing_).
 
 <div class="callout info">
 <strong>Répartition automatique vs manuelle</strong>
@@ -223,7 +238,8 @@ La grande majorité des commandes se répartit toute seule. L'administrateur int
 </div>
 
 ### Résultat de la répartition {#dispatch-result}
-Une fois assignée, l'état passe à <span class="pill blue">Chauffeur assigné</span>, l'arrêt de récupération est reclassé en *Achat* (parce qu'il a des produits à acheter) et une entrée apparaît dans la section Itinéraires.
+
+Une fois assignée, l'état passe à <span class="pill blue">Chauffeur assigné</span>, l'arrêt de récupération est reclassé en _Achat_ (parce qu'il a des produits à acheter) et une entrée apparaît dans la section Itinéraires.
 
 <figure>
   <img src="/guide/screenshots/35-order-assigned.png" alt="Commande avec chauffeur assigné" />
@@ -236,7 +252,8 @@ Une fois assignée, l'état passe à <span class="pill blue">Chauffeur assigné<
 </figure>
 
 ### Quand il y a un conflit {#dispatch-conflict}
-Si le système ne trouve pas de répartition faisable, la commande reste dans *Conflits*. Les actions typiques sont :
+
+Si le système ne trouve pas de répartition faisable, la commande reste dans _Conflits_. Les actions typiques sont :
 
 1. **Assigner manuellement** — ouvrir la commande, cliquer sur `Assigner un chauffeur`, choisir dans la liste.
 2. **Ajuster la fenêtre** — étendre la plage horaire si la seule cause est la disponibilité.
@@ -254,29 +271,32 @@ Chaque commande a exactement un point de livraison final. Si le client doit livr
 
 Une fois assignée, la commande parcourt les états au fur et à mesure que le chauffeur avance :
 
-| État | Signification |
-| --- | --- |
-| <span class="pill blue">Chauffeur assigné</span> | Le chauffeur a reçu l'assignation mais n'a pas encore commencé. |
-| <span class="pill blue">En récupération</span> · <span class="pill blue">Arrive</span> · <span class="pill blue">Sur place</span> | Sous-états pendant la phase de récupération/achat. |
-| <span class="pill blue">Récupérée</span> | Achats faits, prêts à livrer. |
-| <span class="pill blue">En transit</span> | En route vers la destination finale. |
-| <span class="pill blue">Arrive</span> · <span class="pill blue">Sur place</span> (livraison) | Sous-états de la phase de livraison. |
-| <span class="pill amber">En attente de confirmation</span> | En attente du PIN client ou de la photo de preuve. |
-| <span class="pill green">Terminée</span> | Livrée avec preuve enregistrée. |
+| État                                                                                                                              | Signification                                                   |
+| --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| <span class="pill blue">Chauffeur assigné</span>                                                                                  | Le chauffeur a reçu l'assignation mais n'a pas encore commencé. |
+| <span class="pill blue">En récupération</span> · <span class="pill blue">Arrive</span> · <span class="pill blue">Sur place</span> | Sous-états pendant la phase de récupération/achat.              |
+| <span class="pill blue">Récupérée</span>                                                                                          | Achats faits, prêts à livrer.                                   |
+| <span class="pill blue">En transit</span>                                                                                         | En route vers la destination finale.                            |
+| <span class="pill blue">Arrive</span> · <span class="pill blue">Sur place</span> (livraison)                                      | Sous-états de la phase de livraison.                            |
+| <span class="pill amber">En attente de confirmation</span>                                                                        | En attente du PIN client ou de la photo de preuve.              |
+| <span class="pill green">Terminée</span>                                                                                          | Livrée avec preuve enregistrée.                                 |
 
 ### Récupération — le chauffeur achète {#monitor-pickup}
+
 <figure>
   <img src="/guide/screenshots/37-order-picking-up.png" alt="Commande à l'état En récupération" />
   <figcaption>État <em>En récupération</em> — le chauffeur est sur place ou en route vers le commerce pour faire l'achat.</figcaption>
 </figure>
 
 ### En transit — en route vers la destination {#monitor-transit}
+
 <figure>
   <img src="/guide/screenshots/39-order-in-transit-active.png" alt="Commande en transit" />
   <figcaption>État <em>En transit</em> — l'achat est fait et le chauffeur est en route vers le client.</figcaption>
 </figure>
 
 ### Livraison terminée {#monitor-delivered}
+
 Quand la livraison est confirmée avec PIN et photo, la commande passe à <span class="pill green">Terminée</span>. Les arrêts sont marqués <em>Terminé</em>.
 
 <figure>
@@ -285,6 +305,7 @@ Quand la livraison est confirmée avec PIN et photo, la commande passe à <span 
 </figure>
 
 ### PIN et preuve de livraison {#pin-and-pod}
+
 Chaque commande a un **PIN à 6 chiffres** généré à la création de la commande. Le client le reçoit dans son application ; le chauffeur doit le demander à la livraison pour confirmer l'identité. Selon la configuration, peuvent également être requis :
 
 - **Preuve photographique** — le chauffeur prend une photo du colis livré.
@@ -296,7 +317,7 @@ Sans la preuve requise, la commande reste à l'état <span class="pill amber">En
 
 ## 4 · Concilier les montants finaux {#reconcile}
 
-La conciliation est l'ajustement post-livraison : le devis initial est une *estimation* du coût des produits. Le prix réel n'est connu qu'au moment où le chauffeur achète. La conciliation rapproche les deux montants et génère une charge ou un crédit s'il y a une différence.
+La conciliation est l'ajustement post-livraison : le devis initial est une _estimation_ du coût des produits. Le prix réel n'est connu qu'au moment où le chauffeur achète. La conciliation rapproche les deux montants et génère une charge ou un crédit s'il y a une différence.
 
 <div class="callout info">
 <strong>Quand elle apparaît</strong>
@@ -309,7 +330,8 @@ Les commandes <span class="pill green">Terminée</span> avec paiement <em>Autori
 </figure>
 
 ### Étape 4.1 — Ouvrir la boîte de conciliation {#step-4-1}
-Depuis le détail d'une commande terminée avec paiement autorisé, un bouton `Concilier` apparaît dans l'en-tête (accessible aussi directement depuis l'onglet *Conciliation* de Demande l'attention). Cliquer dessus ouvre le formulaire complet.
+
+Depuis le détail d'une commande terminée avec paiement autorisé, un bouton `Concilier` apparaît dans l'en-tête (accessible aussi directement depuis l'onglet _Conciliation_ de Demande l'attention). Cliquer dessus ouvre le formulaire complet.
 
 <figure>
   <img src="/guide/screenshots/42-reconciliation-dialog.png" alt="Boîte de conciliation ouverte sur la commande terminée" />
@@ -317,18 +339,20 @@ Depuis le détail d'une commande terminée avec paiement autorisé, un bouton `C
 </figure>
 
 ### Étape 4.2 — Ajuster les lignes avec les prix réels {#step-4-2}
-1. Pour chaque ligne, modifiez la *Quantité* et le *Prix unitaire* en utilisant ce qui a été réellement payé (basé sur le ticket d'achat). Par exemple, si la *Boîte de lait 1L (×2)* cotée à ₡1 500 est sortie à ₡1 700, entrez ₡1 700.
+
+1. Pour chaque ligne, modifiez la _Quantité_ et le _Prix unitaire_ en utilisant ce qui a été réellement payé (basé sur le ticket d'achat). Par exemple, si la _Boîte de lait 1L (×2)_ cotée à ₡1 500 est sortie à ₡1 700, entrez ₡1 700.
 2. Si le chauffeur a acquis des extras qui n'étaient pas dans le devis, cliquez sur `+ Ajouter un article` et enregistrez la nouvelle ligne.
-3. Si un article n'a pas été trouvé, cliquez sur le *×* en fin de ligne pour la supprimer — elle sort du total.
-4. Utilisez le champ *Notes* pour laisser au client un contexte sur l'ajustement (optionnel mais recommandé en cas de surcharge).
-5. Vérifiez la ligne *Différence* : positif = surcharge (le client doit la différence), négatif = crédit (on facture moins que l'autorisé), zéro = pas d'ajustement.
+3. Si un article n'a pas été trouvé, cliquez sur le _×_ en fin de ligne pour la supprimer — elle sort du total.
+4. Utilisez le champ _Notes_ pour laisser au client un contexte sur l'ajustement (optionnel mais recommandé en cas de surcharge).
+5. Vérifiez la ligne _Différence_ : positif = surcharge (le client doit la différence), négatif = crédit (on facture moins que l'autorisé), zéro = pas d'ajustement.
 
 ### Étape 4.3 — Générer la conciliation {#step-4-3}
+
 À la confirmation de la boîte, le système :
 
 - Crée un nouveau devis à l'état <span class="pill green">Finalisé</span> (version 2).
 - Capture du paiement autorisé le montant final correct. Si le réel est inférieur à l'autorisé, seul le réel est capturé. S'il est supérieur, le paiement est marqué <span class="pill amber">Surcharge en attente</span>.
-- Estampille la commande avec `reconciled_at` et la retire de l'onglet *Conciliation*.
+- Estampille la commande avec `reconciled_at` et la retire de l'onglet _Conciliation_.
 
 <figure>
   <img src="/guide/screenshots/42-order-reconciled.png" alt="Commande après la conciliation" />
@@ -336,10 +360,11 @@ Depuis le détail d'une commande terminée avec paiement autorisé, un bouton `C
 </figure>
 
 ### Résultats possibles {#reconciliation-outcomes}
-| Différence | Résultat | État du paiement |
-| --- | --- | --- |
-| Réel = coté | Pas d'ajustement — capture du montant autorisé. | <span class="pill green">Payé</span> |
-| Réel &lt; coté | Capture du montant réel (plus bas). Le client ne paie que ce qui a réellement été acheté. | <span class="pill green">Payé</span> |
+
+| Différence     | Résultat                                                                                         | État du paiement                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| Réel = coté    | Pas d'ajustement — capture du montant autorisé.                                                  | <span class="pill green">Payé</span>                                     |
+| Réel &lt; coté | Capture du montant réel (plus bas). Le client ne paie que ce qui a réellement été acheté.        | <span class="pill green">Payé</span>                                     |
 | Réel &gt; coté | Surcharge — le client doit payer la différence, généralement via un second prélèvement ou solde. | <span class="pill amber">Surcharge en attente</span> jusqu'à couverture. |
 
 <div class="callout tip">
@@ -413,11 +438,12 @@ Section critique du panneau. C'est ici que l'on gère les messagers qui exécute
 </figure>
 
 ### Internes vs externalisés (outsourced) {#internal-vs-outsourced}
+
 Le système distingue deux types de chauffeurs :
 
-| Type | Quand l'utiliser | Caractéristiques |
-| --- | --- | --- |
-| **Interne** (salarié) | Opération régulière, au quotidien. | Salaire fixe. Possède un **horaire configurable** et un **lieu de base**. Le système le considère pour la répartition automatique selon la faisabilité. |
+| Type                         | Quand l'utiliser                                                                                           | Caractéristiques                                                                                                                                                       |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Interne** (salarié)        | Opération régulière, au quotidien.                                                                         | Salaire fixe. Possède un **horaire configurable** et un **lieu de base**. Le système le considère pour la répartition automatique selon la faisabilité.                |
 | **Externalisé** (outsourced) | Quand aucun chauffeur interne n'est faisable pour une commande et que la fenêtre ne peut pas être ajustée. | Prestataire externe payé au voyage. **Pas** d'horaire ni de lieu de base — sa disponibilité est supposée à la demande. Réduit la marge ; à utiliser avec discernement. |
 
 <div class="callout info">
@@ -432,19 +458,19 @@ Les chauffeurs internes reçoivent un salaire fixe. Cela change la logique d'aff
   <figcaption>Onglet <em>Détails</em>. En-tête avec nom, ID public, bascule <em>Actif</em> et bouton <em>Supprimer</em>. Quatre cartes avec les informations essentielles.</figcaption>
 </figure>
 
-L'onglet *Détails* contient cinq cartes :
+L'onglet _Détails_ contient cinq cartes :
 
-| Carte | Contenu | Actions |
-| --- | --- | --- |
-| **Compte utilisateur** | Nom, e-mail, téléphone. | Le bouton <em>Voir le profil utilisateur</em> ouvre le compte du chauffeur dans la section Utilisateurs. |
-| **Informations du permis** | Numéro de permis et date d'expiration. | Si le permis est expiré, l'étiquette <span class="pill red">Expiré</span> apparaît automatiquement. |
-| **Informations du véhicule** | Plaque du véhicule. | Modifiable. |
-| **Dates** | Date de création et dernière mise à jour de l'enregistrement. | Lecture seule. |
+| Carte                                                               | Contenu                                                                | Actions                                                                                                                                |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **Compte utilisateur**                                              | Nom, e-mail, téléphone.                                                | Le bouton <em>Voir le profil utilisateur</em> ouvre le compte du chauffeur dans la section Utilisateurs.                               |
+| **Informations du permis**                                          | Numéro de permis et date d'expiration.                                 | Si le permis est expiré, l'étiquette <span class="pill red">Expiré</span> apparaît automatiquement.                                    |
+| **Informations du véhicule**                                        | Plaque du véhicule.                                                    | Modifiable.                                                                                                                            |
+| **Dates**                                                           | Date de création et dernière mise à jour de l'enregistrement.          | Lecture seule.                                                                                                                         |
 | **Lieu de base** <span class="pill gray">internes uniquement</span> | Coordonnées et adresse d'où le chauffeur commence/termine son service. | Le bouton <em>Modifier/Définir</em> ouvre une carte pour fixer la position. Utilisé pour les calculs de faisabilité de la répartition. |
 
 #### Bascule Actif
 
-La bascule *Actif* dans le coin supérieur droit contrôle si le chauffeur est globalement disponible pour les assignations. Utile pour les vacances, suspensions ou congés prolongés — bascule sans avoir à supprimer l'enregistrement.
+La bascule _Actif_ dans le coin supérieur droit contrôle si le chauffeur est globalement disponible pour les assignations. Utile pour les vacances, suspensions ou congés prolongés — bascule sans avoir à supprimer l'enregistrement.
 
 ### Configurer l'horaire du chauffeur — onglet Horaire {#driver-schedule}
 
@@ -457,7 +483,7 @@ La bascule *Actif* dans le coin supérieur droit contrôle si le chauffeur est g
 
 #### Comment fonctionne le calendrier
 
-- **Vue par défaut : Semaine**, avec des heures de 4h00 à 22h00. Le bouton *Mois* bascule en vue mensuelle.
+- **Vue par défaut : Semaine**, avec des heures de 4h00 à 22h00. Le bouton _Mois_ bascule en vue mensuelle.
 - **Chaque bloc bleu est un quart disponible** — pendant cette plage le chauffeur peut recevoir des assignations.
 - **Les jours passés s'affichent en gris** et sont en lecture seule (on ne modifie pas l'historique).
 - **Le jour courant est mis en évidence** en jaune clair.
@@ -495,27 +521,27 @@ Configurez les horaires de la semaine suivante chaque vendredi. Utilisez des blo
 
 L'inscription d'un nouveau chauffeur exige :
 
-| Champ | Obligatoire | Notes |
-| --- | --- | --- |
-| Nom complet | Oui | Apparaîtra dans les notifications client et dans la liste. |
-| E-mail | Oui | Sera l'identifiant d'accès à l'application mobile du chauffeur. |
-| Téléphone | Oui | Format Costa Rica : `+506 XXXX-XXXX`. |
-| Mot de passe | Oui | Générez-en un temporaire — le chauffeur pourra le changer à sa première connexion. |
-| Date de naissance | Oui | Vérification de la majorité et données de paie. |
-| Sexe | Oui | Liste prédéfinie. |
-| Code de langue | Oui | Langue dans laquelle il recevra les notifications (es / en / fr). |
-| Avatar | Non | Photo que verront les clients et le tableau d'administration. |
-| Numéro de permis | Oui | Le format est validé. |
-| Plaque du véhicule | Oui | Format CR : `ABC-123`. |
-| Date d'expiration du permis | Oui | Le système marque <span class="pill red">Expiré</span> au passage de la date. |
-| Photo du permis (recto et verso) | Oui | Joindre un PDF ou une image pour l'audit. |
+| Champ                            | Obligatoire | Notes                                                                              |
+| -------------------------------- | ----------- | ---------------------------------------------------------------------------------- |
+| Nom complet                      | Oui         | Apparaîtra dans les notifications client et dans la liste.                         |
+| E-mail                           | Oui         | Sera l'identifiant d'accès à l'application mobile du chauffeur.                    |
+| Téléphone                        | Oui         | Format Costa Rica : `+506 XXXX-XXXX`.                                              |
+| Mot de passe                     | Oui         | Générez-en un temporaire — le chauffeur pourra le changer à sa première connexion. |
+| Date de naissance                | Oui         | Vérification de la majorité et données de paie.                                    |
+| Sexe                             | Oui         | Liste prédéfinie.                                                                  |
+| Code de langue                   | Oui         | Langue dans laquelle il recevra les notifications (es / en / fr).                  |
+| Avatar                           | Non         | Photo que verront les clients et le tableau d'administration.                      |
+| Numéro de permis                 | Oui         | Le format est validé.                                                              |
+| Plaque du véhicule               | Oui         | Format CR : `ABC-123`.                                                             |
+| Date d'expiration du permis      | Oui         | Le système marque <span class="pill red">Expiré</span> au passage de la date.      |
+| Photo du permis (recto et verso) | Oui         | Joindre un PDF ou une image pour l'audit.                                          |
 
 #### Après la création du chauffeur
 
 1. Ouvrez le détail du chauffeur fraîchement créé.
-2. Dans l'onglet *Détails*, configurez le **Lieu de base** (d'où il part travailler).
-3. Passez à l'onglet *Horaire* et configurez sa disponibilité pour la semaine en cours.
-4. Activez la bascule *Actif* si elle ne l'est pas.
+2. Dans l'onglet _Détails_, configurez le **Lieu de base** (d'où il part travailler).
+3. Passez à l'onglet _Horaire_ et configurez sa disponibilité pour la semaine en cours.
+4. Activez la bascule _Actif_ si elle ne l'est pas.
 
 Ce n'est qu'après ces trois étapes que le chauffeur sera prêt à recevoir des assignations automatiques.
 
@@ -643,7 +669,7 @@ Cette section contrôle quelles devises la plateforme accepte, comment les taux 
 
 Le premier interrupteur décide comment les taux sont obtenus :
 
-- **Automatique** <span class="pill green">par défaut</span> — le système télécharge les taux depuis des fournisseurs externes (p. ex. *gometa*) et les rafraîchit de manière programmée. Le bouton `Synchroniser les taux` apparaît en haut à droite pour forcer une mise à jour immédiate.
+- **Automatique** <span class="pill green">par défaut</span> — le système télécharge les taux depuis des fournisseurs externes (p. ex. _gometa_) et les rafraîchit de manière programmée. Le bouton `Synchroniser les taux` apparaît en haut à droite pour forcer une mise à jour immédiate.
 - **Manuel** — l'administrateur fixe le taux de change à la main par devise. Utile quand on veut utiliser un taux fixe négocié avec une banque ou isoler l'opération des oscillations intraday.
 
 <figure>
@@ -653,21 +679,21 @@ Le premier interrupteur décide comment les taux sont obtenus :
 
 #### Devise de base
 
-La carte *Devise de base* indique dans quelle devise sont stockés tous les montants internes (dans l'exemple, CRC avec précision de 2 décimales). Elle ne peut pas être désactivée et son taux de change est toujours `1.000000`. Changer la devise de base est une opération de migration — elle ne se fait pas depuis ce panneau.
+La carte _Devise de base_ indique dans quelle devise sont stockés tous les montants internes (dans l'exemple, CRC avec précision de 2 décimales). Elle ne peut pas être désactivée et son taux de change est toujours `1.000000`. Changer la devise de base est une opération de migration — elle ne se fait pas depuis ce panneau.
 
 #### Tableau des devises
 
 Le tableau liste toutes les devises configurées. Colonnes :
 
-| Colonne | Ce qu'elle affiche |
-| --- | --- |
-| **Code / Nom / Symbole** | Identifiants ISO 4217 et la devise affichée (p. ex. `USD · US Dollar · $`). |
-| **Taux de change** | Taux actuel par rapport à la devise de base. En mode manuel affiche le taux fixé par l'admin. |
-| **Date du taux** | Quand il a été mis à jour pour la dernière fois, avec étiquette de la source (p. ex. *gometa*) ou <span class="pill gray">Manuel</span>. |
-| **Arrondi** | Résumé du mode + incrément (p. ex. `nearest @ 0.01`). |
-| **État** | <span class="pill blue">Base</span>, <span class="pill green">Actif</span> ou <span class="pill gray">Désactivé</span>. |
-| **Activé** | Bascule pour activer/désactiver. La devise de base ne peut pas être désactivée. |
-| **Actions** | Bouton <em>Modifier</em> — ouvre la boîte de configuration de la devise. |
+| Colonne                  | Ce qu'elle affiche                                                                                                                       |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Code / Nom / Symbole** | Identifiants ISO 4217 et la devise affichée (p. ex. `USD · US Dollar · $`).                                                              |
+| **Taux de change**       | Taux actuel par rapport à la devise de base. En mode manuel affiche le taux fixé par l'admin.                                            |
+| **Date du taux**         | Quand il a été mis à jour pour la dernière fois, avec étiquette de la source (p. ex. _gometa_) ou <span class="pill gray">Manuel</span>. |
+| **Arrondi**              | Résumé du mode + incrément (p. ex. `nearest @ 0.01`).                                                                                    |
+| **État**                 | <span class="pill blue">Base</span>, <span class="pill green">Actif</span> ou <span class="pill gray">Désactivé</span>.                  |
+| **Activé**               | Bascule pour activer/désactiver. La devise de base ne peut pas être désactivée.                                                          |
+| **Actions**              | Bouton <em>Modifier</em> — ouvre la boîte de configuration de la devise.                                                                 |
 
 #### Boîte d'édition — arrondi
 
@@ -676,7 +702,7 @@ Le tableau liste toutes les devises configurées. Colonnes :
   <figcaption>Boîte <em>Modifier les paramètres d'arrondi</em>. Deux champs : <em>Mode d'arrondi</em> (Au plus proche, Arrondir vers le haut, Arrondir vers le bas) et <em>Incrément d'arrondi</em> (0,01 = centimes, 0,10 = dixièmes, 0,50, 1,00…).</figcaption>
 </figure>
 
-L'arrondi affecte la façon dont les montants sont présentés au client final, pas leur stockage interne. Par exemple, un devis calculé à ₡7 683,50 avec incrément `1` et mode *Au plus proche* s'affiche ₡7 684.
+L'arrondi affecte la façon dont les montants sont présentés au client final, pas leur stockage interne. Par exemple, un devis calculé à ₡7 683,50 avec incrément `1` et mode _Au plus proche_ s'affiche ₡7 684.
 
 #### Boîte d'édition — taux manuel (mode Manuel uniquement)
 
@@ -707,8 +733,8 @@ Le premier interrupteur allume ou éteint la fenêtre de service. **Quand elle e
 
 Deux champs horaires contrôlent la fenêtre du jour :
 
-- *Le service ferme à* — l'heure où l'on cesse d'accepter du travail (début du bloc fermé).
-- *Le service ouvre à* — l'heure où l'opération reprend (fin du bloc fermé).
+- _Le service ferme à_ — l'heure où l'on cesse d'accepter du travail (début du bloc fermé).
+- _Le service ouvre à_ — l'heure où l'opération reprend (fin du bloc fermé).
 
 Si la fenêtre franchit minuit, la barre chronologique la dessine correctement : deux segments verts aux extrémités du jour et un segment rouge au milieu (fermé). Dans le cas normal (ouverture le matin et fermeture le soir), on voit un segment vert central entouré de deux rouges.
 
@@ -717,7 +743,7 @@ Si la fenêtre franchit minuit, la barre chronologique la dessine correctement :
 Les commandes payées qui n'obtiennent pas de chauffeur escaladent automatiquement pour éviter d'être oubliées :
 
 - **Annulation automatique activée** — si activée, les commandes qui atteignent le seuil sont annulées avec remboursement complet. Si désactivée, on se contente de notifier l'admin et la commande reste ouverte jusqu'à intervention manuelle.
-- **Seuil d'escalade (heures ouvrables)** — nombre d'heures *à l'intérieur de la fenêtre de service* après lesquelles l'escalade se déclenche. Le champ accepte 1–24.
+- **Seuil d'escalade (heures ouvrables)** — nombre d'heures _à l'intérieur de la fenêtre de service_ après lesquelles l'escalade se déclenche. Le champ accepte 1–24.
 
 <div class="callout info">
 <strong>« Heures ouvrables », pas l'horloge murale</strong>
@@ -729,55 +755,65 @@ Le seuil ne compte que les heures à l'intérieur de la fenêtre de service. Une
 ## Glossaire des états {#state-glossary}
 
 ### États de la commande {#order-states}
-| Code interne | Étiquette | Signification |
-| --- | --- | --- |
-| `pending` | <span class="pill amber">En attente</span> | Le client a créé la commande — en attente de devis. |
-| `estimated` | <span class="pill blue">Cotée</span> | Devis envoyé — en attente de réponse client. |
-| `approved` | <span class="pill green">Approuvée</span> | Le client a accepté — prête à être répartie. |
-| `assigned` | <span class="pill blue">Assignée</span> | Chauffeur assigné — récupération en attente. |
-| `picking_up` · `arriving_at_pickup` · `arrived_at_pickup` | <span class="pill blue">Récupération</span> | Sous-états pendant la phase de récupération. |
-| `picked_up` | <span class="pill blue">Récupérée</span> | Produits en main du chauffeur. |
-| `in_transit` | <span class="pill blue">En transit</span> | En route vers la destination finale. |
-| `arriving_at_drop_off` · `arrived_at_drop_off` | <span class="pill blue">Livraison</span> | Sous-états à l'arrivée à destination. |
-| `waiting_confirmation` | <span class="pill amber">En attente de confirmation</span> | PIN ou preuve photographique manquant. |
-| `completed` | <span class="pill green">Terminée</span> | Livrée — en attente de conciliation. |
-| `canceled` | <span class="pill gray">Annulée</span> | Client ou admin a annulé avant la répartition. |
-| `denied` | <span class="pill red">Rejetée</span> | L'admin a rejeté le devis. |
-| `delivery_failed` | <span class="pill red">Livraison échouée</span> | Impossible de livrer (client absent, mauvaise adresse, etc.). |
-| `returned_to_sender` | <span class="pill gray">Retournée</span> | Produits retournés à l'expéditeur. |
+
+| Code interne                                              | Étiquette                                                  | Signification                                                 |
+| --------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------- |
+| `pending`                                                 | <span class="pill amber">En attente</span>                 | Le client a créé la commande — en attente de devis.           |
+| `estimated`                                               | <span class="pill blue">Cotée</span>                       | Devis envoyé — en attente de réponse client.                  |
+| `approved`                                                | <span class="pill green">Approuvée</span>                  | Le client a accepté — prête à être répartie.                  |
+| `assigned`                                                | <span class="pill blue">Assignée</span>                    | Chauffeur assigné — récupération en attente.                  |
+| `picking_up` · `arriving_at_pickup` · `arrived_at_pickup` | <span class="pill blue">Récupération</span>                | Sous-états pendant la phase de récupération.                  |
+| `picked_up`                                               | <span class="pill blue">Récupérée</span>                   | Produits en main du chauffeur.                                |
+| `in_transit`                                              | <span class="pill blue">En transit</span>                  | En route vers la destination finale.                          |
+| `arriving_at_drop_off` · `arrived_at_drop_off`            | <span class="pill blue">Livraison</span>                   | Sous-états à l'arrivée à destination.                         |
+| `waiting_confirmation`                                    | <span class="pill amber">En attente de confirmation</span> | PIN ou preuve photographique manquant.                        |
+| `completed`                                               | <span class="pill green">Terminée</span>                   | Livrée — en attente de conciliation.                          |
+| `canceled`                                                | <span class="pill gray">Annulée</span>                     | Client ou admin a annulé avant la répartition.                |
+| `denied`                                                  | <span class="pill red">Rejetée</span>                      | L'admin a rejeté le devis.                                    |
+| `delivery_failed`                                         | <span class="pill red">Livraison échouée</span>            | Impossible de livrer (client absent, mauvaise adresse, etc.). |
+| `returned_to_sender`                                      | <span class="pill gray">Retournée</span>                   | Produits retournés à l'expéditeur.                            |
 
 ### États de paiement {#payment-states}
-| Code | Étiquette | Signification |
-| --- | --- | --- |
-| `unpaid` | <span class="pill amber">Non payée</span> | Aucun paiement enregistré. |
-| `paid` | <span class="pill green">Payée</span> | Encaissement complet reçu. |
+
+| Code            | Étiquette                                            | Signification                                     |
+| --------------- | ---------------------------------------------------- | ------------------------------------------------- |
+| `unpaid`        | <span class="pill amber">Non payée</span>            | Aucun paiement enregistré.                        |
+| `paid`          | <span class="pill green">Payée</span>                | Encaissement complet reçu.                        |
 | `surcharge_due` | <span class="pill amber">Surcharge en attente</span> | Après conciliation il reste un solde à percevoir. |
-| `refunded` | <span class="pill gray">Remboursée</span> | Remboursement total exécuté. |
+| `refunded`      | <span class="pill gray">Remboursée</span>            | Remboursement total exécuté.                      |
 
 ---
 
 ## Questions fréquentes {#faq}
 
 ### Le client veut modifier l'adresse de livraison après l'approbation — c'est possible ? {#faq-edit-address}
+
 Oui, tant que la commande est à l'état <span class="pill green">Approuvée</span> ou <span class="pill blue">Assignée</span> et que le chauffeur n'a pas démarré la phase de récupération, les adresses sont modifiables. Une fois que la commande passe à <span class="pill blue">Récupérée</span>, les adresses sont verrouillées. Pour des changements ultérieurs, le bon réflexe est de créer une nouvelle commande.
 
 ### Que faire si un chauffeur signale un problème pendant la livraison ? {#faq-delivery-problem}
-Le chauffeur peut marquer *Livraison échouée* depuis son application, ce qui déplace la commande vers <span class="pill red">Livraison échouée</span>. Cela l'amène dans l'onglet *Conflits* de Demande l'attention. Les options sont : réessayer la livraison (réassigner), retourner à l'expéditeur, ou marquer comme perte couverte par l'assurance.
+
+Le chauffeur peut marquer _Livraison échouée_ depuis son application, ce qui déplace la commande vers <span class="pill red">Livraison échouée</span>. Cela l'amène dans l'onglet _Conflits_ de Demande l'attention. Les options sont : réessayer la livraison (réassigner), retourner à l'expéditeur, ou marquer comme perte couverte par l'assurance.
 
 ### La répartition automatique a assigné le « mauvais » chauffeur — puis-je réaffecter ? {#faq-reassign-driver}
+
 Oui. Depuis le détail de la commande, cliquez sur `Réaffecter` — vous verrez la liste des chauffeurs disponibles classée par faisabilité. Gardez à l'esprit que réaffecter peut empirer la densité globale des itinéraires ; l'algorithme optimise déjà par bin-packing.
 
 ### Quand sous-traite-t-on (outsourcing) ? {#faq-outsource-when}
+
 Quand aucun chauffeur salarié n'est faisable pour la commande et que le client n'accepte pas d'étendre la fenêtre. C'est une décision coûteuse — elle réduit la marge car on paie le prestataire externe. À utiliser avec discernement.
 
 ### Le client a payé mais la commande est restée en « Surcharge en attente » — pourquoi ? {#faq-surcharge-pending}
+
 Parce que la conciliation a détecté que le coût réel des produits était supérieur au devis initial. Le client a payé le devis original, mais il reste un delta. Notifiez-le pour percevoir la différence.
 
 ### Quelle est la différence entre annuler et rejeter une commande ? {#faq-cancel-vs-reject}
+
 **Annuler** est pour les commandes déjà cotées ou approuvées que l'on abandonne (client ou admin). **Rejeter** est exclusif à l'étape de cotation — l'admin décide de ne pas la prendre (capacité insuffisante, hors zone, etc.).
 
 ### Comment se génèrent les PIN de livraison ? {#faq-pin-generation}
+
 Automatiquement à la création de la commande — un code à 6 chiffres unique par commande. Il est montré au client dans son application et au chauffeur lors de la livraison. Il sert de vérification d'identité du destinataire.
 
 ### Puis-je créer une commande depuis le panneau sans que le client ne l'initie ? {#faq-admin-create}
+
 Pas directement depuis le panneau. Les commandes naissent toujours du côté client (application mobile). Le panneau administre le cycle de vie — coter, répartir, concilier — mais n'expose pas de formulaire pour créer des commandes manuellement. Si un client appelle au téléphone, la pratique est de le guider pour qu'il la crée depuis son application ou de coordonner avec l'équipe technique pour utiliser l'endpoint API directement.

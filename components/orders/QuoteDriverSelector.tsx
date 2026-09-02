@@ -33,7 +33,13 @@ import {
   toDateString,
   addDays,
 } from '@/utils/format';
-import { CalendarClock, ChevronLeft, ChevronRight, Route as RouteIcon, UserCog } from 'lucide-react';
+import {
+  CalendarClock,
+  ChevronLeft,
+  ChevronRight,
+  Route as RouteIcon,
+  UserCog,
+} from 'lucide-react';
 
 type DriverCandidate = App.Data.Feasibility.DriverCandidate;
 
@@ -50,7 +56,6 @@ interface QuoteDriverSelectorProps {
   /** Date the schedule/routes tabs open on (YYYY-MM-DD). Defaults to today. */
   initialDate?: string | null;
 }
-
 
 export function QuoteDriverSelector({
   candidates,
