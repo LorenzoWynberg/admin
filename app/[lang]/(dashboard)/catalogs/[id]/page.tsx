@@ -17,12 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ArrowLeft, Database, List, Calendar, Pencil, Plus } from 'lucide-react';
-import {
-  actionLabel,
-  modelLabel,
-  resourceMessage,
-  validationAttribute,
-} from '@/utils/lang';
+import { actionLabel, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { ElementEditDialog } from '@/components/catalogs/ElementEditDialog';
 import { ElementCreateDialog } from '@/components/catalogs/ElementCreateDialog';
 import { formatDate } from '@/utils/format';

@@ -46,7 +46,8 @@ export function GuideToc({ items }: { items: TocItem[] }) {
     if (!el) return;
     const main = document.querySelector('main');
     if (main) {
-      const top = el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - 16;
+      const top =
+        el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - 16;
       main.scrollTo({ top, behavior: 'smooth' });
     } else {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });

@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  actionLabel,
-  modelLabel,
-  resourceMessage,
-  validationAttribute,
-} from '@/utils/lang';
+import { actionLabel, modelLabel, resourceMessage, validationAttribute } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
 import { formatDate } from '@/utils/format';
 import { useParams } from 'next/navigation';
