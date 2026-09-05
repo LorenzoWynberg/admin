@@ -1,5 +1,7 @@
 {
-  "envFiles": [".env.local"],
+  "envFiles": [
+    ".env.local"
+  ],
   "install": "npm ci",
   "gate": "npm run check && npm run test:run",
   "scopedCheck": "npm run check",
@@ -19,5 +21,19 @@
       "when": "React component/hook work outside components/ui — re-render cost, bundle size, effect and state patterns"
     }
   ],
-  "briefConventions": "docs/strict-rules.md and CLAUDE.md are in this repo — read both. types/generated.d.ts, types/response.d.ts and types/notifications.d.ts are generated in the api repo and copied here byte-identical: never hand-edit them and never run a formatter over them (.prettierignore enforces this). Layering is api (lib/api/) -> services/ -> hooks/. Wait for a store's `hydrated: true` before rendering. Use applyApiErrorsToForm() to bridge API errors into react-hook-form. Use the i18n helpers (actionLabel, modelLabel, crudSuccessMessage), never a raw t() for those, and register any new namespace in config/i18next.ts. Use Enums.EnumName.Value from @/data/app-enums for runtime comparisons, never a magic string."
+  "briefConventions": "docs/strict-rules.md and CLAUDE.md are in this repo — read both. types/generated.d.ts, types/response.d.ts and types/notifications.d.ts are generated in the api repo and copied here byte-identical: never hand-edit them and never run a formatter over them (.prettierignore enforces this). Layering is api (lib/api/) -> services/ -> hooks/. Wait for a store's `hydrated: true` before rendering. Use applyApiErrorsToForm() to bridge API errors into react-hook-form. Use the i18n helpers (actionLabel, modelLabel, crudSuccessMessage), never a raw t() for those, and register any new namespace in config/i18next.ts. Use Enums.EnumName.Value from @/data/app-enums for runtime comparisons, never a magic string.",
+  "docsPaths": [
+    {
+      "path": "docs/architecture.md",
+      "when": "a page, hook, service or shared component described there changes shape"
+    },
+    {
+      "path": "docs/strict-rules.md",
+      "when": "a rule that binds every change in this repo is added, removed or altered"
+    },
+    {
+      "path": "CLAUDE.md",
+      "when": "a pattern, command or cross-repo sync step an agent must follow changes"
+    }
+  ]
 }
