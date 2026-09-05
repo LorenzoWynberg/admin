@@ -43,10 +43,10 @@ export default function BusinessDetailPage() {
     });
   };
 
-  const handleChangeDebtCeiling = (next: number | null) => {
+  const handleChangeBalanceLimit = (next: number | null) => {
     updateBusiness.mutate({
       id: businessId,
-      data: { balanceDebtCeiling: next },
+      data: { balanceLimit: next },
     });
   };
 
@@ -54,13 +54,6 @@ export default function BusinessDetailPage() {
     updateBusiness.mutate({
       id: businessId,
       data: { billingCycle: next as App.Enums.BillingCycle },
-    });
-  };
-
-  const handleChangeGracePeriod = (next: number | null) => {
-    updateBusiness.mutate({
-      id: businessId,
-      data: { gracePeriodDays: next },
     });
   };
 
@@ -219,15 +212,12 @@ export default function BusinessDetailPage() {
         <BalanceCard
           ownerPublicId={business.publicId}
           canManage={isAdmin}
-          debtCeiling={business.balanceDebtCeiling}
-          onDebtCeilingChange={handleChangeDebtCeiling}
-          isSavingCeiling={updateBusiness.isPending}
+          balanceLimit={business.balanceLimit}
+          onBalanceLimitChange={handleChangeBalanceLimit}
+          isSavingLimit={updateBusiness.isPending}
           billingCycle={business.billingCycle}
           onBillingCycleChange={handleChangeBillingCycle}
           isSavingBillingCycle={updateBusiness.isPending}
-          gracePeriodDays={business.gracePeriodDays}
-          onGracePeriodDaysChange={handleChangeGracePeriod}
-          isSavingGracePeriod={updateBusiness.isPending}
           blockReason={business.blockReason}
         />
 

@@ -80,33 +80,6 @@ describe('BalanceCard — billing cycle select', () => {
   });
 });
 
-describe('BalanceCard — grace period field', () => {
-  it('saves a new grace period value', async () => {
-    const user = userEvent.setup();
-    const onGracePeriodDaysChange = vi.fn();
-    render(
-      <BalanceCard
-        ownerPublicId="pub-1"
-        canManage
-        gracePeriodDays={3}
-        onGracePeriodDaysChange={onGracePeriodDaysChange}
-      />
-    );
-
-    const input = screen.getByLabelText('gracePeriodDays');
-    await user.clear(input);
-    await user.type(input, '10');
-    await user.click(screen.getByRole('button', { name: 'save' }));
-
-    expect(onGracePeriodDaysChange).toHaveBeenCalledWith(10);
-  });
-
-  it('does not render the grace period control when onGracePeriodDaysChange is omitted', () => {
-    render(<BalanceCard ownerPublicId="pub-1" canManage />);
-    expect(screen.queryByLabelText('gracePeriodDays')).not.toBeInTheDocument();
-  });
-});
-
 describe('BalanceCard — block reason badge', () => {
   it.each(Object.values(Enums.AccountBlockReason))(
     'renders a badge for block reason "%s"',

@@ -36,11 +36,11 @@ interface BalanceCardProps {
   ownerPublicId: string;
   /** Whether the viewer may move the balance. Grant/void is admin-only. */
   canManage?: boolean;
-  /** This account's own debt ceiling, or null when it follows the default. */
-  debtCeiling?: number | null;
-  /** Omit to hide the ceiling control entirely. */
-  onDebtCeilingChange?: (value: number | null) => void;
-  isSavingCeiling?: boolean;
+  /** This account's own balance limit, or null when it follows the default. */
+  balanceLimit?: number | null;
+  /** Omit to hide the limit control entirely. */
+  onBalanceLimitChange?: (value: number | null) => void;
+  isSavingLimit?: boolean;
   /**
    * This account's billing cycle (an `App.Enums.BillingCycle` value).
    * Undefined/null renders as `PerOrder`. Typed as `string`, not the
@@ -51,11 +51,6 @@ interface BalanceCardProps {
   /** Omit to hide the billing cycle control entirely. */
   onBillingCycleChange?: (value: string) => void;
   isSavingBillingCycle?: boolean;
-  /** Days of grace after a failed settlement before the account is blocked. */
-  gracePeriodDays?: number | null;
-  /** Omit to hide the grace period control entirely. */
-  onGracePeriodDaysChange?: (value: number | null) => void;
-  isSavingGracePeriod?: boolean;
   /**
    * Why THIS row is blocked from ordering, or null (an
    * `App.Enums.AccountBlockReason` value, typed as `string` for the same
@@ -75,15 +70,12 @@ interface BalanceCardProps {
 export function BalanceCard({
   ownerPublicId,
   canManage = false,
-  debtCeiling,
-  onDebtCeilingChange,
-  isSavingCeiling = false,
+  balanceLimit,
+  onBalanceLimitChange,
+  isSavingLimit = false,
   billingCycle,
   onBillingCycleChange,
   isSavingBillingCycle = false,
-  gracePeriodDays,
-  onGracePeriodDaysChange,
-  isSavingGracePeriod = false,
   blockReason,
 }: BalanceCardProps) {
   const { t } = useTranslation();
@@ -132,11 +124,11 @@ export function BalanceCard({
           </ul>
         )}
 
-        {canManage && onDebtCeilingChange && (
-          <DebtCeilingField
-            value={debtCeiling ?? null}
-            onChange={onDebtCeilingChange}
-            isPending={isSavingCeiling}
+        {canManage && onBalanceLimitChange && (
+          <BalanceLimitField
+            value={balanceLimit ?? null}
+            onChange={onBalanceLimitChange}
+            isPending={isSavingLimit}
           />
         )}
 
@@ -147,23 +139,15 @@ export function BalanceCard({
             isPending={isSavingBillingCycle}
           />
         )}
-
-        {canManage && onGracePeriodDaysChange && (
-          <GracePeriodField
-            value={gracePeriodDays ?? null}
-            onChange={onGracePeriodDaysChange}
-            isPending={isSavingGracePeriod}
-          />
-        )}
       </CardContent>
     </Card>
   );
 }
 
 /**
- * Why this account cannot order right now — over its debt ceiling, or a
- * settlement past its grace period. Renders nothing when the account isn't
- * blocked, since the absence of a reason is the common case.
+ * Why this account cannot order right now — over its balance limit, or a
+ * settlement past due. Renders nothing when the account isn't blocked, since
+ * the absence of a reason is the common case.
  */
 function BlockReasonBadge({ reason }: { reason?: string | null }) {
   if (!reason) return null;
@@ -211,53 +195,6 @@ function BillingCycleField({
 }
 
 /**
- * How many days a deferred account gets after a failed settlement before it
- * is blocked from ordering. Blank follows the configured default, same as
- * the debt ceiling above.
- */
-function GracePeriodField({
-  value,
-  onChange,
-  isPending,
-}: {
-  value: number | null;
-  onChange: (value: number | null) => void;
-  isPending: boolean;
-}) {
-  const [draft, setDraft] = useState(value === null ? '' : String(value));
-
-  const trimmed = draft.trim();
-  const parsed = trimmed === '' ? null : Number(trimmed);
-  const isValid = parsed === null || (Number.isInteger(parsed) && parsed >= 0);
-  const isDirty = (value === null ? '' : String(value)) !== trimmed;
-
-  return (
-    <div className="grid gap-2">
-      <Label htmlFor="grace-period">{validationAttribute('gracePeriodDays', true)}</Label>
-      <div className="flex gap-2">
-        <Input
-          id="grace-period"
-          type="number"
-          step="1"
-          min="0"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-        />
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={!isValid || !isDirty || isPending}
-          onClick={() => onChange(parsed)}
-        >
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {actionLabel('save')}
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-/**
  * How far this account may go into debt before it is refused a new order.
  *
  * Blank means the account follows the configured default, which is what
@@ -265,7 +202,7 @@ function GracePeriodField({
  * curve: a long-standing business that has earned more rope, and someone who
  * has walked away from a debt once and has earned less.
  */
-function DebtCeilingField({
+function BalanceLimitField({
   value,
   onChange,
   isPending,
@@ -284,16 +221,16 @@ function DebtCeilingField({
 
   return (
     <div className="border-border grid gap-2 border-t pt-4">
-      <Label htmlFor="debt-ceiling">{validationAttribute('balanceDebtCeiling', true)}</Label>
+      <Label htmlFor="balance-limit">{validationAttribute('balanceLimit', true)}</Label>
       <div className="flex gap-2">
         <Input
-          id="debt-ceiling"
+          id="balance-limit"
           type="number"
           step="0.01"
           min="0"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder={t('payments:balance.ceiling_default')}
+          placeholder={t('payments:balance.limit_default')}
         />
         <Button
           size="sm"
@@ -305,18 +242,12 @@ function DebtCeilingField({
           {actionLabel('save')}
         </Button>
       </div>
-      <p className="text-muted-foreground text-xs">{t('payments:balance.ceiling_hint')}</p>
+      <p className="text-muted-foreground text-xs">{t('payments:balance.limit_hint')}</p>
     </div>
   );
 }
 
-function CreditEntryRow({
-  entry,
-  symbol,
-}: {
-  entry: App.Data.Balance.BalanceEntryData;
-  symbol: string;
-}) {
+function CreditEntryRow({ entry, symbol }: { entry: App.Data.Credit.CreditData; symbol: string }) {
   const { t } = useTranslation();
   const amount = entry.amount ?? 0;
   const isCredit = amount >= 0;
@@ -324,7 +255,7 @@ function CreditEntryRow({
   return (
     <li className="flex items-start justify-between gap-3 py-2">
       <div className="space-y-0.5">
-        <Badge variant="outline">{t(`payments:balance_entry_type.${entry.type}`)}</Badge>
+        <Badge variant="outline">{t(`payments:credit_type.${entry.type}`)}</Badge>
         {entry.notes && <p className="text-muted-foreground text-xs">{entry.notes}</p>}
         {entry.createdAt && (
           <p className="text-muted-foreground text-xs">{formatDate(entry.createdAt)}</p>
@@ -341,19 +272,19 @@ function CreditEntryRow({
 function GrantCreditDialog({ ownerPublicId, balance }: { ownerPublicId: string; balance: number }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<string>(Enums.BalanceEntryType.AdminGrant);
+  const [type, setType] = useState<string>(Enums.CreditType.AdminGrant);
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
   const grant = useAdjustBalance();
 
   const parsed = parseFloat(amount);
-  const isVoid = type === Enums.BalanceEntryType.AdminVoid;
+  const isVoid = type === Enums.CreditType.AdminVoid;
   const isValid =
     !isNaN(parsed) && parsed > 0 && notes.trim().length >= 3 && (!isVoid || parsed <= balance);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
-      setType(Enums.BalanceEntryType.AdminGrant);
+      setType(Enums.CreditType.AdminGrant);
       setAmount('');
       setNotes('');
     }
@@ -388,19 +319,19 @@ function GrantCreditDialog({ ownerPublicId, balance }: { ownerPublicId: string; 
               type="button"
               variant={isVoid ? 'outline' : 'default'}
               size="sm"
-              onClick={() => setType(Enums.BalanceEntryType.AdminGrant)}
+              onClick={() => setType(Enums.CreditType.AdminGrant)}
             >
               <Plus className="mr-1 h-4 w-4" />
-              {t('payments:balance_entry_type.admin_grant')}
+              {t('payments:credit_type.admin_grant')}
             </Button>
             <Button
               type="button"
               variant={isVoid ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setType(Enums.BalanceEntryType.AdminVoid)}
+              onClick={() => setType(Enums.CreditType.AdminVoid)}
             >
               <Minus className="mr-1 h-4 w-4" />
-              {t('payments:balance_entry_type.admin_void')}
+              {t('payments:credit_type.admin_void')}
             </Button>
           </div>
 
