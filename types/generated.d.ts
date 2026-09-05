@@ -803,6 +803,38 @@ declare namespace App.Data.PaymentDestination {
     sortOrder?: number | null;
   };
 }
+declare namespace App.Data.PeriodBill {
+  export type PeriodBillData = {
+    id: number;
+    publicId: string;
+    cutoffAt: string;
+    dueAt: string | null;
+    baseAmount: number;
+    creditApplied: number;
+    netDue: number;
+    isOverdue: boolean;
+    currencyCode: string | null;
+    provider: App.Enums.PaymentProvider | null;
+    providerChargeId: string | null;
+    chargeUnresolvedAt: string | null;
+    status: App.Enums.PeriodBillStatus;
+    settlementMethod: App.Enums.SettlementMethod | null;
+    reference: string | null;
+    proofPath: string | null;
+    proofUrl: string | null;
+    notes?: string | null;
+    perCurrencyTotals?: Record<string, { amount: number; baseAmount: number }>;
+    lines?: Array<App.Data.PeriodBill.PeriodBillLineData>;
+  };
+  export type PeriodBillLineData = {
+    id: number;
+    orderPublicId: string;
+    amount: number;
+    currencyCode: string;
+    fxRate: number | null;
+    baseAmount: number;
+  };
+}
 declare namespace App.Data.Pricing {
   export type PricingRuleData = {
     id?: number;
@@ -1516,10 +1548,9 @@ declare namespace App.Enums {
     RefundRequestDenied = 'refund_request_denied',
     BalanceCredited = 'balance_credited',
     RefundDue = 'refund_due',
-    RefundSettled = 'refund_settled',
-    SettlementCharged = 'settlement_charged',
-    SettlementFailed = 'settlement_failed',
-    SettlementBlockWarning = 'settlement_block_warning',
+    PeriodBillClosed = 'period_bill_closed',
+    PeriodBillDueSoon = 'period_bill_due_soon',
+    PeriodBillDeclarationResolved = 'period_bill_declaration_resolved',
   }
   export enum NotificationStatus {
     Unread = 'unread',
