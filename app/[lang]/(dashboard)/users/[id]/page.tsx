@@ -69,10 +69,10 @@ export default function UserDetailPage() {
     });
   };
 
-  const handleChangeDebtCeiling = (next: number | null) => {
+  const handleChangeBalanceLimit = (next: number | null) => {
     updateUser.mutate({
       id: userId,
-      data: { balanceDebtCeiling: next },
+      data: { balanceLimit: next },
     });
   };
 
@@ -80,13 +80,6 @@ export default function UserDetailPage() {
     updateUser.mutate({
       id: userId,
       data: { billingCycle: next as App.Enums.BillingCycle },
-    });
-  };
-
-  const handleChangeGracePeriod = (next: number | null) => {
-    updateUser.mutate({
-      id: userId,
-      data: { gracePeriodDays: next },
     });
   };
 
@@ -335,15 +328,12 @@ export default function UserDetailPage() {
         <BalanceCard
           ownerPublicId={user.publicId}
           canManage={isAdmin}
-          debtCeiling={user.balanceDebtCeiling}
-          onDebtCeilingChange={handleChangeDebtCeiling}
-          isSavingCeiling={updateUser.isPending}
+          balanceLimit={user.balanceLimit}
+          onBalanceLimitChange={handleChangeBalanceLimit}
+          isSavingLimit={updateUser.isPending}
           billingCycle={user.billingCycle}
           onBillingCycleChange={handleChangeBillingCycle}
           isSavingBillingCycle={updateUser.isPending}
-          gracePeriodDays={user.gracePeriodDays}
-          onGracePeriodDaysChange={handleChangeGracePeriod}
-          isSavingGracePeriod={updateUser.isPending}
           blockReason={user.blockReason}
         />
 

@@ -15,13 +15,13 @@ export function useAdjustBalance() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['balance'] });
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success(crudSuccessMessage('created', 'balance_entry'));
+      toast.success(crudSuccessMessage('created', 'credit'));
     },
     onError: (error) => {
       if (isApiError(error)) {
         toast.error(error.message);
       } else {
-        toast.error(crudErrorMessage('creating', 'balance_entry'));
+        toast.error(crudErrorMessage('creating', 'credit'));
       }
     },
   });

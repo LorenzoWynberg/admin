@@ -52,9 +52,8 @@ vi.mock('@/hooks/users', () => ({
       allowedPaymentMethods: [],
       balance: 0,
       dispatcherId: null,
-      balanceDebtCeiling: null,
+      balanceLimit: null,
       billingCycle: 'per_order',
-      gracePeriodDays: null,
       blockReason: null,
       isAdmin: false,
       isBusinessAccount: false,
@@ -76,21 +75,14 @@ vi.mock('@/hooks/users', () => ({
 vi.mock('@/components/payments/PaymentMethodsCard', () => ({ PaymentMethodsCard: () => null }));
 vi.mock('@/components/dispatch/DispatcherPicker', () => ({ DispatcherPicker: () => null }));
 
-// The billing-select/grace-input mechanics are BalanceCard's own — already
-// covered in components/balance/__tests__/BalanceCard.test.tsx. This page's
-// job is only to shape the payload it hands the update mutation, so the
-// stub exposes exactly the two callbacks that wiring depends on.
+// The billing-select mechanics are BalanceCard's own — already covered in
+// components/balance/__tests__/BalanceCard.test.tsx. This page's job is only
+// to shape the payload it hands the update mutation, so the stub exposes
+// exactly the callback that wiring depends on.
 vi.mock('@/components/balance/BalanceCard', () => ({
-  BalanceCard: ({
-    onBillingCycleChange,
-    onGracePeriodDaysChange,
-  }: {
-    onBillingCycleChange?: (value: string) => void;
-    onGracePeriodDaysChange?: (value: number | null) => void;
-  }) => (
+  BalanceCard: ({ onBillingCycleChange }: { onBillingCycleChange?: (value: string) => void }) => (
     <div>
       <button onClick={() => onBillingCycleChange?.('monthly')}>change-cycle</button>
-      <button onClick={() => onGracePeriodDaysChange?.(14)}>change-grace</button>
     </div>
   ),
 }));
@@ -107,14 +99,5 @@ describe('UserDetailPage — billing controls reach the update mutation', () => 
     await user.click(screen.getByText('change-cycle'));
 
     expect(mutate).toHaveBeenCalledWith({ id: 'user-1', data: { billingCycle: 'monthly' } });
-  });
-
-  it('sends gracePeriodDays under data, keyed by the user id', async () => {
-    const user = userEvent.setup();
-    render(<UserDetailPage />);
-
-    await user.click(screen.getByText('change-grace'));
-
-    expect(mutate).toHaveBeenCalledWith({ id: 'user-1', data: { gracePeriodDays: 14 } });
   });
 });

@@ -2,7 +2,7 @@
 // Source: /types/generated.d.ts -> App.Enums
 export const Enums = {
   AccountBlockReason: {
-    DebtCeiling: 'debt_ceiling',
+    BalanceLimit: 'balance_limit',
     SettlementOverdue: 'settlement_overdue',
   },
   AddressType: {
@@ -91,19 +91,6 @@ export const Enums = {
     DELIVERY: 'delivery',
     INSTRUCTIONS: 'instructions',
   },
-  BalanceEntryType: {
-    RefundGrant: 'refund_grant',
-    AdminGrant: 'admin_grant',
-    OrderApplication: 'order_application',
-    ApplicationReversal: 'application_reversal',
-    AdminVoid: 'admin_void',
-    CancellationFee: 'cancellation_fee',
-    UnderCollection: 'under_collection',
-    DebtSettlement: 'debt_settlement',
-    DeferredCharge: 'deferred_charge',
-    SettlementApplication: 'settlement_application',
-    DeferredChargeReversal: 'deferred_charge_reversal',
-  },
   BillingCycle: {
     PerOrder: 'per_order',
     Weekly: 'weekly',
@@ -120,6 +107,14 @@ export const Enums = {
     TimeSensitiveViolation: 'time_sensitive_violation',
     OutsideOperatingHours: 'outside_operating_hours',
     OutsideDriverShift: 'outside_driver_shift',
+  },
+  CreditType: {
+    RefundGrant: 'refund_grant',
+    AdminGrant: 'admin_grant',
+    OrderApplication: 'order_application',
+    ApplicationReversal: 'application_reversal',
+    AdminVoid: 'admin_void',
+    PeriodBillApplication: 'period_bill_application',
   },
   CrudAction: {
     Retrieved: 'retrieved',
@@ -228,6 +223,7 @@ export const Enums = {
     Notification: 'notification',
     Payment: 'payment',
     PaymentMethod: 'payment_method',
+    PeriodBill: 'period_bill',
     Refund: 'refund',
     Route: 'route',
     RouteStop: 'route_stop',
@@ -242,8 +238,8 @@ export const Enums = {
     Invoice: 'invoice',
     InvoiceItem: 'invoice_item',
     RefundRequest: 'refund_request',
-    BalanceEntry: 'balance_entry',
-    Settlement: 'settlement',
+    Credit: 'credit',
+    PaymentDestination: 'payment_destination',
   },
   NotificationAction: {
     QuoteRequested: 'quote_requested',
@@ -336,6 +332,14 @@ export const Enums = {
     VOIDED: 'voided',
     CHARGEBACK: 'chargeback',
   },
+  PeriodBillStatus: {
+    Open: 'open',
+    Issued: 'issued',
+    AwaitingVerification: 'awaiting_verification',
+    Paid: 'paid',
+    Failed: 'failed',
+    Uncollectible: 'uncollectible',
+  },
   PricingCalculationMode: {
     CUMULATIVE: 'cumulative',
     DISCRETE: 'discrete',
@@ -415,11 +419,11 @@ export const Enums = {
     Reassigned: 'reassigned',
     Rescheduled: 'rescheduled',
   },
-  SettlementStatus: {
-    Pending: 'pending',
-    Paid: 'paid',
-    Failed: 'failed',
-    PartiallyPaid: 'partially_paid',
+  SettlementMethod: {
+    Card: 'card',
+    SinpeMobile: 'sinpe_mobile',
+    Transferencia: 'transferencia',
+    Cash: 'cash',
   },
   TipoIdentificacion: {
     Fisica: '01',
