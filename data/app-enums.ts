@@ -267,10 +267,9 @@ export const Enums = {
     RefundRequestDenied: 'refund_request_denied',
     BalanceCredited: 'balance_credited',
     RefundDue: 'refund_due',
-    RefundSettled: 'refund_settled',
-    SettlementCharged: 'settlement_charged',
-    SettlementFailed: 'settlement_failed',
-    SettlementBlockWarning: 'settlement_block_warning',
+    PeriodBillClosed: 'period_bill_closed',
+    PeriodBillDueSoon: 'period_bill_due_soon',
+    PeriodBillDeclarationResolved: 'period_bill_declaration_resolved',
   },
   NotificationStatus: {
     Unread: 'unread',
