@@ -227,38 +227,37 @@ declare namespace Api.Broadcast {
     notes: string | null;
   }
 
-  /** settlement.charged */
-  export interface SettlementCharged extends Base {
-    settlementId: number;
-    settlementPublicId: string;
-    /** What the period's deliveries came to, gross, in base currency. */
-    amount: number;
-    /** How much of `amount` the account's own credit covered. */
+  /** period_bill.closed */
+  export interface PeriodBillClosed extends Base {
+    periodBillId: number;
+    periodBillPublicId: string;
+    /** The bill's total, in base currency. */
+    total: number;
+    /** How much of `total` the account's own credit covered. */
     creditApplied: number;
-    /** What actually left the card: `amount - creditApplied`. */
-    charged: number;
-    currency: string;
-    cutoffAt: string;
+    /** What is actually owed: `total - creditApplied`. */
+    amountDue: number;
+    /** Null only for a bill that somehow reaches the wire before `close()` stamps it. */
+    dueAt: string | null;
   }
 
-  /** settlement.failed */
-  export interface SettlementFailed extends Base {
-    settlementId: number;
-    settlementPublicId: string;
-    /** The figure the card was asked for, net of any credit applied. */
-    amount: number;
-    currency: string;
-    /** When the account stops being able to order if this is still unpaid. */
-    blockedFrom: string;
+  /** period_bill.due_soon */
+  export interface PeriodBillDueSoon extends Base {
+    periodBillId: number;
+    periodBillPublicId: string;
+    amountDue: number;
+    dueAt: string | null;
   }
 
-  /** settlement.block_warning */
-  export interface SettlementBlockWarning extends Base {
-    settlementId: number;
-    settlementPublicId: string;
-    amount: number;
-    currency: string;
-    blockedFrom: string;
+  /** period_bill.declaration_resolved */
+  export interface PeriodBillDeclarationResolved extends Base {
+    periodBillId: number;
+    periodBillPublicId: string;
+    /** Distinguishes the two outcomes — approved and rejected read identically otherwise. */
+    approved: boolean;
+    /** Set only on a rejection; a re-upload with no reason helps nobody. */
+    reason: string | null;
+    dueAt: string | null;
   }
 
   /** Union of all broadcast notification payloads. */
@@ -288,7 +287,7 @@ declare namespace Api.Broadcast {
     | RefundRequestResolved
     | BalanceCredited
     | RefundDue
-    | SettlementCharged
-    | SettlementFailed
-    | SettlementBlockWarning;
+    | PeriodBillClosed
+    | PeriodBillDueSoon
+    | PeriodBillDeclarationResolved;
 }
