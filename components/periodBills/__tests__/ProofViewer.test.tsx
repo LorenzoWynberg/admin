@@ -104,13 +104,17 @@ describe('ProofViewer — the comprobante opens through the authenticated route'
     expect(screen.queryByAltText('proof')).not.toBeInTheDocument();
   });
 
-  it('reports a missing comprobante instead of showing an empty frame', async () => {
-    vi.mocked(PeriodBillService.fetchProof).mockRejectedValue(new Error('404'));
+  // A load FAILURE, never an absence: this viewer only mounts when `proofUrl`
+  // is set, so the api has already said a comprobante exists. Told "no proof is
+  // attached", an operator stops looking instead of retrying a 401.
+  it('reports a failed load rather than claiming there is no comprobante', async () => {
+    vi.mocked(PeriodBillService.fetchProof).mockRejectedValue(new Error('401'));
     const user = userEvent.setup();
 
     render(<ProofViewer publicId="pb-1" />, { wrapper });
     await user.click(screen.getByRole('button', { name: 'proof' }));
 
-    expect(await screen.findByText('errors:period_bill.proof_missing')).toBeInTheDocument();
+    expect(await screen.findByText('resource:failed_to_load')).toBeInTheDocument();
+    expect(screen.queryByText('errors:period_bill.proof_missing')).not.toBeInTheDocument();
   });
 });
