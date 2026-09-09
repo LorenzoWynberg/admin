@@ -452,7 +452,7 @@ Aprobar o rechazar sobrescribe la nota de la factura. La nota que traiga se mues
 
 ### Registrar un pago que entró por otra vía {#record-bill-payment}
 
-Use `Registrar Pago` cuando el dinero le llegó por otro lado — efectivo en el mostrador, una transferencia que usted ya casó en el banco, una tarjeta cobrada por teléfono. Aquí usted está afirmando un hecho y no presentando un reclamo, así que salda la factura de inmediato, sin verificación posterior.
+Use `Registrar Pago` cuando el dinero le llegó por otro lado — efectivo en el mostrador, una transferencia que usted ya concilió en el banco, una tarjeta cobrada por teléfono. Aquí usted está afirmando un hecho y no presentando un reclamo, así que salda la factura de inmediato, sin verificación posterior.
 
 | Campo                   | Notas                                                                                                                                                                                           |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
