@@ -32,14 +32,19 @@ npm run check      # Run format:check + lint + typecheck
 ## Testing
 
 ```bash
-npm test              # Run tests
-npm test -- --coverage  # Run tests with coverage report
+npm run test:run        # Run tests once and exit — use this in any gate or script
+npm test                # WATCH MODE — never exits; interactive use only
+npm run test:coverage   # Run once with a coverage report
 ```
 
 Tests use Vitest. Test files are in `__tests__/` folders next to source files:
 
 - `lib/api/__tests__/` - API error handling
 - `utils/__tests__/` - Utility functions (form, format, http, lang)
+- `services/__tests__/` - Service-layer request shaping
+- `hooks/*/__tests__/` - React Query hooks
+- `components/*/__tests__/` - Component behavior
+- `app/**/__tests__/` - Page-level behavior
 
 Coverage target: 100% on all tested utility files.
 
@@ -63,7 +68,7 @@ Coverage target: 100% on all tested utility files.
 1. **Three layers**: API (`lib/api/`) → Services (`services/`) → Hooks (`hooks/`)
 2. **Hydration**: Wait for `hydrated: true` from stores before rendering
 3. **API errors**: Use `applyApiErrorsToForm()` to bridge API → form errors
-4. **i18n**: Always use namespaces, provide `defaultValue` for safety
+4. **i18n**: Always use namespaces. **Do not add `defaultValue` to a key that exists** — see below
 5. **Queries**: Invalidate queries after mutations for fresh data
 
 ---
@@ -71,6 +76,24 @@ Coverage target: 100% on all tested utility files.
 ## i18n (Translations)
 
 Translations come from the API via [laravel-to-i18next](https://github.com/LorenzoWynberg/laravel-to-i18next).
+
+### `defaultValue` is a marker, not a safety net
+
+The locale JSON lives in the **api** repo (`lang/{en,es,fr}/`) and is served over
+HTTP — **no consumer repo can add a key.** That is what makes `defaultValue`
+dangerous rather than merely redundant:
+
+- **On a key that exists, never use it.** It silently masks a broken namespace
+  registration or a typo'd key — the string renders, the wiring stays wrong, and
+  nobody finds out. This is the failure this repo has actually hit.
+- **On a key that genuinely does not exist yet**, it is defensible only as a
+  temporary marker that a cross-repo change is half-landed, and it is a debt to
+  clear, not a fallback to leave behind. The right move is to add the key in api
+  first.
+
+If a key you need is missing from api's `lang/`, ask for it there — do not invent
+a fallback here. Existing call sites that still pass `defaultValue` predate this
+rule and are not worth churning on their own.
 
 ### Placeholder Capitalization
 
