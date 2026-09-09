@@ -91,6 +91,12 @@ export const Enums = {
     DELIVERY: 'delivery',
     INSTRUCTIONS: 'instructions',
   },
+  BillAttentionReason: {
+    UnresolvedCharge: 'unresolved_charge',
+    Overdue: 'overdue',
+    DeclarationToVerify: 'declaration_to_verify',
+    Quiet: 'quiet',
+  },
   BillingCycle: {
     PerOrder: 'per_order',
     Weekly: 'weekly',
@@ -331,13 +337,19 @@ export const Enums = {
     VOIDED: 'voided',
     CHARGEBACK: 'chargeback',
   },
+  PeriodBillChargeOutcome: {
+    Settled: 'settled',
+    Declined: 'declined',
+    Unresolved: 'unresolved',
+    NoUsableCard: 'no_usable_card',
+    NotPayable: 'not_payable',
+    Unsupported: 'unsupported',
+  },
   PeriodBillStatus: {
     Open: 'open',
     Issued: 'issued',
     AwaitingVerification: 'awaiting_verification',
     Paid: 'paid',
-    Failed: 'failed',
-    Uncollectible: 'uncollectible',
   },
   PricingCalculationMode: {
     CUMULATIVE: 'cumulative',
@@ -423,6 +435,7 @@ export const Enums = {
     SinpeMobile: 'sinpe_mobile',
     Transferencia: 'transferencia',
     Cash: 'cash',
+    Credit: 'credit',
   },
   TipoIdentificacion: {
     Fisica: '01',

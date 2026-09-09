@@ -1,0 +1,185 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+import { PeriodBillService } from '../periodBillService';
+import { api } from '@/lib/api/client';
+import { Enums } from '@/data/app-enums';
+
+type BillNeedsAttentionData = App.Data.PeriodBill.BillNeedsAttentionData;
+
+vi.mock('@/lib/api/client', () => ({
+  api: {
+    get: vi.fn(),
+    post: vi.fn(),
+    postMultipart: vi.fn(),
+  },
+}));
+
+// `data/app-enums.ts` holds plain string constants; `generated.d.ts` declares
+// nominal TS enums over the same values, and the two are deliberately not
+// assignable to each other. Production code never needs the bridge — it reads
+// these values off DTOs, where they already carry the nominal type — so
+// fixtures cross that boundary once, here.
+function row(
+  publicId: string,
+  reason: string,
+  urgency: string,
+  dueAt: string
+): BillNeedsAttentionData {
+  return {
+    bill: { publicId, dueAt },
+    urgency,
+    reason,
+    ownerType: 'business',
+    ownerPublicId: `owner-${publicId}`,
+    ownerName: `Owner ${publicId}`,
+  } as BillNeedsAttentionData;
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+describe('PeriodBillService.needsAttention', () => {
+  it('hits the exact route literal the api registers', async () => {
+    vi.mocked(api.get).mockResolvedValue({ items: [], extra: { summary: {} } });
+
+    await PeriodBillService.needsAttention();
+
+    expect(api.get).toHaveBeenCalledWith('/period-bills/needs-attention');
+  });
+
+  // The ordering is the API's: `BillAttentionReason` declares its cases in
+  // precedence order and the endpoint emits one row per bill at its most urgent
+  // reason, already sorted. This pins that the service is a pass-through — the
+  // fixture is deliberately in an order that every plausible client-side sort
+  // (by dueAt, by publicId) would change.
+  it('returns the rows in the order the api sent them, unsorted', async () => {
+    const unresolved = row(
+      'pb-zz',
+      Enums.BillAttentionReason.UnresolvedCharge,
+      Enums.AttentionUrgency.Critical,
+      '2030-01-01T00:00:00Z'
+    );
+    const overdue = row(
+      'pb-aa',
+      Enums.BillAttentionReason.Overdue,
+      Enums.AttentionUrgency.High,
+      '2020-01-01T00:00:00Z'
+    );
+
+    vi.mocked(api.get).mockResolvedValue({
+      items: [unresolved, overdue],
+      extra: { summary: { critical: 1, high: 1, medium: 0, low: 0 } },
+    });
+
+    const result = await PeriodBillService.needsAttention();
+
+    expect(result.items.map((item) => item.bill.publicId)).toEqual(['pb-zz', 'pb-aa']);
+    expect(result.summary).toEqual({ critical: 1, high: 1, medium: 0, low: 0 });
+  });
+
+  it('survives a response carrying no summary', async () => {
+    vi.mocked(api.get).mockResolvedValue({ items: [] });
+
+    const result = await PeriodBillService.needsAttention();
+
+    expect(result.summary).toEqual({});
+  });
+});
+
+describe('PeriodBillService.settle', () => {
+  // The api's request DTOs declare no input mapper, so `SettlePeriodBillData`
+  // validates `currencyCode`/`destinationId` verbatim. A snake_case key is
+  // silently dropped rather than rejected, which is why this is pinned.
+  it('sends the method-specific fields under their camelCase names', async () => {
+    vi.mocked(api.postMultipart).mockResolvedValue({ item: {} });
+
+    await PeriodBillService.settle('pb-1', {
+      method: Enums.SettlementMethod.Transferencia as App.Enums.SettlementMethod,
+      currencyCode: 'CRC',
+      reference: 'REF-9',
+      destinationId: 7,
+      notes: 'seen in the bank',
+    });
+
+    const [url, formData] = vi.mocked(api.postMultipart).mock.calls[0];
+    expect(url).toBe('/period-bills/pb-1/settle');
+    expect((formData as FormData).get('currencyCode')).toBe('CRC');
+    expect((formData as FormData).get('destinationId')).toBe('7');
+    expect((formData as FormData).get('method')).toBe(Enums.SettlementMethod.Transferencia);
+    expect((formData as FormData).get('reference')).toBe('REF-9');
+    expect((formData as FormData).get('currency_code')).toBeNull();
+    expect((formData as FormData).get('destination_id')).toBeNull();
+  });
+
+  it('omits an absent destination rather than sending an empty one', async () => {
+    vi.mocked(api.postMultipart).mockResolvedValue({ item: {} });
+
+    await PeriodBillService.settle('pb-1', {
+      method: Enums.SettlementMethod.Cash as App.Enums.SettlementMethod,
+      currencyCode: 'CRC',
+      destinationId: null,
+    });
+
+    const formData = vi.mocked(api.postMultipart).mock.calls[0][1] as FormData;
+    expect(formData.get('destinationId')).toBeNull();
+  });
+});
+
+describe('PeriodBillService verification acts', () => {
+  it('approves with an optional note', async () => {
+    vi.mocked(api.post).mockResolvedValue({ item: {} });
+
+    await PeriodBillService.approveDeclaration('pb-1', null);
+
+    expect(api.post).toHaveBeenCalledWith('/period-bills/pb-1/approve', { notes: null });
+  });
+
+  it('rejects with the reason that reaches the customer', async () => {
+    vi.mocked(api.post).mockResolvedValue({ item: {} });
+
+    await PeriodBillService.rejectDeclaration('pb-1', 'not in the account');
+
+    expect(api.post).toHaveBeenCalledWith('/period-bills/pb-1/reject', {
+      notes: 'not in the account',
+    });
+  });
+});
+
+describe('PeriodBillService.fetchProof', () => {
+  const fetchMock = vi.fn();
+
+  beforeEach(() => {
+    vi.stubGlobal('fetch', fetchMock);
+    fetchMock.mockReset();
+    window.localStorage.setItem(
+      'admin-auth-storage',
+      JSON.stringify({ state: { token: 'tok-123' } })
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    window.localStorage.clear();
+  });
+
+  // `PeriodBillData.proofUrl` names an authenticated stream route on a private
+  // disk. The bytes cannot come through `api.get()`, which parses JSON, and a
+  // request without the bearer token is answered 401 — so the header is the
+  // whole point of this method.
+  it('requests the proof route with the bearer token attached', async () => {
+    fetchMock.mockResolvedValue({ ok: true, blob: async () => new Blob(['x']) });
+
+    await PeriodBillService.fetchProof('pb-1');
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(String(url)).toContain('/period-bills/pb-1/proof');
+    expect((init.headers as Record<string, string>).Authorization).toBe('Bearer tok-123');
+  });
+
+  it('throws rather than returning an error body as if it were the file', async () => {
+    fetchMock.mockResolvedValue({ ok: false, status: 404, blob: async () => new Blob() });
+
+    await expect(PeriodBillService.fetchProof('pb-1')).rejects.toThrow('404');
+  });
+});

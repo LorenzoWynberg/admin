@@ -7,7 +7,7 @@ import {
   SelectItem,
   Select,
 } from '@/components/ui/select';
-import { Globe, Coins, Clock, Truck, ChevronRight, Hourglass } from 'lucide-react';
+import { Globe, Coins, Clock, Truck, ChevronRight, Hourglass, Landmark } from 'lucide-react';
 
 import { useState } from 'react';
 import { Label } from '@/components/ui/label';
@@ -27,7 +27,13 @@ import {
   useUpdateIdleTime,
 } from '@/hooks/settings';
 import { Enums } from '@/data/app-enums';
-import { actionLabel, capitalize, vehicleTypeLabel } from '@/utils/lang';
+import {
+  actionLabel,
+  capitalize,
+  modelLabel,
+  resourceMessage,
+  vehicleTypeLabel,
+} from '@/utils/lang';
 
 const languageCodes = ['en', 'es', 'fr'] as const;
 
@@ -275,6 +281,23 @@ export default function SettingsPage() {
             {t('common:currency_settings_description', {
               defaultValue: 'Manage currencies and exchange rates',
             })}
+          </CardDescription>
+        </CardHeader>
+      </Card>
+      <Card
+        className="hover:bg-muted/50 cursor-pointer transition-colors"
+        onClick={() => router.push('/settings/payment-destinations')}
+      >
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Landmark className="h-5 w-5" />
+              <CardTitle>{capitalize(modelLabel('payment_destination', 2, false))}</CardTitle>
+            </div>
+            <ChevronRight className="text-muted-foreground h-5 w-5" />
+          </div>
+          <CardDescription>
+            {resourceMessage('click_to_manage', 'payment_destination', 2)}
           </CardDescription>
         </CardHeader>
       </Card>
