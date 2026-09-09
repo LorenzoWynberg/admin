@@ -6,8 +6,10 @@ import { useOrderList } from '@/hooks/orders';
 import { useNeedsAttention } from '@/hooks/orders/useNeedsAttention';
 import { usePendingReconciliation } from '@/hooks/orders/usePendingReconciliation';
 import { usePendingRefundRequests } from '@/hooks/refundRequests';
+import { useBillsNeedingAttention } from '@/hooks/periodBills';
 import { useCurrencyList } from '@/hooks/currencies';
 import { NeedsAttentionCard } from '@/components/orders/NeedsAttentionCard';
+import { BillAttentionCard } from '@/components/periodBills/BillAttentionCard';
 import { PendingReconciliationCard } from '@/components/orders/PendingReconciliationCard';
 import { RefundRequestCard } from '@/components/orders/RefundRequestCard';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
@@ -22,7 +24,7 @@ import { useLocalizedRouter } from '@/hooks/useLocalizedRouter';
 import { RefreshCw, AlertTriangle, Eye, Clock, User, Building2 } from 'lucide-react';
 import { formatDateTime } from '@/utils/format';
 import { Enums } from '@/data/app-enums';
-import { actionLabel } from '@/utils/lang';
+import { actionLabel, capitalize, modelLabel } from '@/utils/lang';
 
 type OrderData = App.Data.Order.OrderData;
 
@@ -123,6 +125,12 @@ export default function NeedsAttentionPage() {
     refetch: refetchRefundRequests,
     isRefetching: isRefetchingRefundRequests,
   } = usePendingRefundRequests();
+  const {
+    data: billsData,
+    isLoading: billsLoading,
+    refetch: refetchBills,
+    isRefetching: isRefetchingBills,
+  } = useBillsNeedingAttention();
   const [filter, setFilter] = useState<string>('all');
   const { data: currencyListData } = useCurrencyList();
 
@@ -130,6 +138,15 @@ export default function NeedsAttentionPage() {
   const summary = (data?.summary ?? {}) as Record<string, number>;
 
   const filtered = filter === 'all' ? items : items.filter((i) => i.urgency === filter);
+
+  // Handed on in the order the api sent it. `BillAttentionReason` declares its
+  // cases in precedence order — unresolved charge, overdue, declaration to
+  // verify, quiet — and the endpoint already emits one row per bill at its most
+  // urgent reason, sorted. An unresolved charge outranks an overdue bill
+  // because the customer's money may already be gone while the bill still reads
+  // unpaid, and a client-side re-sort would silently undo that ranking.
+  const bills = billsData?.items ?? [];
+  const billSummary = (billsData?.summary ?? {}) as Record<string, number>;
 
   const refundRequests = refundRequestsData?.items ?? [];
   const reconciliationOrders = reconciliationData?.data ?? [];
@@ -153,6 +170,7 @@ export default function NeedsAttentionPage() {
     refetchUnpaidCollect();
     refetchReconciliation();
     refetchRefundRequests();
+    refetchBills();
   };
 
   const anyRefetching =
@@ -161,7 +179,8 @@ export default function NeedsAttentionPage() {
     isRefetchingUnpaidPrepayment ||
     isRefetchingUnpaidCollect ||
     isRefetchingReconciliation ||
-    isRefetchingRefundRequests;
+    isRefetchingRefundRequests ||
+    isRefetchingBills;
 
   return (
     <div className="space-y-6">
@@ -223,6 +242,17 @@ export default function NeedsAttentionPage() {
                 className="ml-1.5 bg-orange-100 px-1.5 py-0 text-xs text-orange-800"
               >
                 {refundRequests.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="bills">
+            {capitalize(modelLabel('period_bill', 2, false))}
+            {bills.length > 0 && (
+              <Badge
+                variant="secondary"
+                className="ml-1.5 bg-amber-100 px-1.5 py-0 text-xs text-amber-800"
+              >
+                {bills.length}
               </Badge>
             )}
           </TabsTrigger>
@@ -469,6 +499,35 @@ export default function NeedsAttentionPage() {
             <div className="space-y-4">
               {refundRequests.map((request) => (
                 <RefundRequestCard key={request.publicId} refundRequest={request} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="bills" className="space-y-4">
+          {/* The api counts these per urgency across all four reasons, and the
+              breakdown is the triage signal a flat list cannot give: it says
+              how much of the queue is a customer's money possibly already gone
+              versus a bill that is merely quiet. Same shape the conflicts tab
+              renders its own summary in. */}
+          <div className="flex flex-wrap gap-3">
+            {URGENCY_LEVELS.map((level) => (
+              <Badge key={level} className={summaryStyles[level]} variant="secondary">
+                {billSummary[level] ?? 0} {t(`needs_attention.urgency.${level}`)}
+              </Badge>
+            ))}
+          </div>
+
+          {billsLoading ? (
+            <div className="text-muted-foreground py-12 text-center">{t('common:loading')}</div>
+          ) : bills.length === 0 ? (
+            <div className="text-muted-foreground py-12 text-center">
+              {t('payments:period_bill.attention_empty')}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {bills.map((item) => (
+                <BillAttentionCard key={item.bill.publicId} item={item} />
               ))}
             </div>
           )}
