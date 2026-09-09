@@ -804,6 +804,29 @@ declare namespace App.Data.PaymentDestination {
   };
 }
 declare namespace App.Data.PeriodBill {
+  export type ApprovePeriodBillDeclarationData = {
+    notes: string | null;
+  };
+  export type BillNeedsAttentionData = {
+    bill: App.Data.PeriodBill.PeriodBillData;
+    urgency: App.Enums.AttentionUrgency;
+    reason: App.Enums.BillAttentionReason;
+    ownerType: string;
+    ownerPublicId: string | null;
+    ownerName: string | null;
+  };
+  export type DeclarePeriodBillPaymentData = {
+    method: App.Enums.SettlementMethod;
+    currencyCode: string;
+    reference: string;
+    destinationId: number | null;
+    proof: any | null;
+  };
+  export type PayPeriodBillData = {
+    method: App.Enums.SettlementMethod;
+    currencyCode: string;
+    paymentMethodId: string | null;
+  };
   export type PeriodBillData = {
     id: number;
     publicId: string;
@@ -822,9 +845,24 @@ declare namespace App.Data.PeriodBill {
     reference: string | null;
     proofPath: string | null;
     proofUrl: string | null;
+    settlementDestination: {
+      id: number;
+      method: string;
+      currencyCode: string | null;
+      phoneNumber: string | null;
+      bankName: string | null;
+      accountNumber: string | null;
+      iban: string | null;
+      holderName: string;
+      legalId: string;
+    } | null;
     notes?: string | null;
     perCurrencyTotals?: Record<string, { amount: number; baseAmount: number }>;
     lines?: Array<App.Data.PeriodBill.PeriodBillLineData>;
+  };
+  export type PeriodBillDestinationQueryData = {
+    method: App.Enums.SettlementMethod;
+    currencyCode: string;
   };
   export type PeriodBillLineData = {
     id: number;
@@ -833,6 +871,17 @@ declare namespace App.Data.PeriodBill {
     currencyCode: string;
     fxRate: number | null;
     baseAmount: number;
+  };
+  export type RejectPeriodBillDeclarationData = {
+    notes: string;
+  };
+  export type SettlePeriodBillData = {
+    method: App.Enums.SettlementMethod;
+    currencyCode: string;
+    reference: string | null;
+    destinationId: number | null;
+    proof: any | null;
+    notes: string | null;
   };
 }
 declare namespace App.Data.Pricing {
@@ -1372,6 +1421,12 @@ declare namespace App.Enums {
     DELIVERY = 'delivery',
     INSTRUCTIONS = 'instructions',
   }
+  export enum BillAttentionReason {
+    UnresolvedCharge = 'unresolved_charge',
+    Overdue = 'overdue',
+    DeclarationToVerify = 'declaration_to_verify',
+    Quiet = 'quiet',
+  }
   export enum BillingCycle {
     PerOrder = 'per_order',
     Weekly = 'weekly',
@@ -1612,13 +1667,19 @@ declare namespace App.Enums {
     VOIDED = 'voided',
     CHARGEBACK = 'chargeback',
   }
+  export enum PeriodBillChargeOutcome {
+    Settled = 'settled',
+    Declined = 'declined',
+    Unresolved = 'unresolved',
+    NoUsableCard = 'no_usable_card',
+    NotPayable = 'not_payable',
+    Unsupported = 'unsupported',
+  }
   export enum PeriodBillStatus {
     Open = 'open',
     Issued = 'issued',
     AwaitingVerification = 'awaiting_verification',
     Paid = 'paid',
-    Failed = 'failed',
-    Uncollectible = 'uncollectible',
   }
   export enum PricingCalculationMode {
     CUMULATIVE = 'cumulative',
@@ -1704,6 +1765,7 @@ declare namespace App.Enums {
     SinpeMobile = 'sinpe_mobile',
     Transferencia = 'transferencia',
     Cash = 'cash',
+    Credit = 'credit',
   }
   export enum TipoIdentificacion {
     Fisica = '01',
