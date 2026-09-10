@@ -451,7 +451,7 @@ export function ReconciliationDialog({
 
             {/* Notes */}
             <div className="space-y-2">
-              <Label>{t('common:notes', { defaultValue: 'Notes' })}</Label>
+              <Label>{t('common:notes')}</Label>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

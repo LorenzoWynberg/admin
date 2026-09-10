@@ -46,7 +46,7 @@ function ReceiptCard({
             </span>
             {isImage && (
               <Badge variant="secondary" className="text-xs">
-                {t('common:image', { defaultValue: 'Image' })}
+                {t('common:image')}
               </Badge>
             )}
           </div>

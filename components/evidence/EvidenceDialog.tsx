@@ -77,12 +77,7 @@ export function EvidenceDialog({ source, title, resourceLabel, onClose }: Eviden
               <Button variant="outline" size="sm" asChild>
                 <a href={file.url} download={title}>
                   <Download className="mr-2 h-4 w-4" />
-                  {/* `common:download` does not exist in the api's lang files in
-                      any of the three languages. Carried over verbatim from the
-                      dialog this replaces rather than invented here — a consumer
-                      repo cannot add a key — so the fallback stays as the marker
-                      that the key is still owed upstream. */}
-                  {t('common:download', { defaultValue: 'Download' })}
+                  {t('common:download')}
                 </a>
               </Button>
             </div>
