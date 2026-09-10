@@ -270,14 +270,20 @@ Two things about this service are load-bearing:
   date. An unresolved charge outranks an overdue bill because the customer's
   money may already be gone while the bill still reads unpaid. **Never re-sort
   these rows client-side** — it silently discards a ranking nothing else states.
-- **`fetchProof()` bypasses `api.get()` on purpose.** `PeriodBillData.proofUrl`
-  names an authenticated stream route on a private disk, not a storage URL:
-  rendered as a plain `href` or `<img src>` the browser sends no Authorization
-  header and the api answers 401. `api.get()` parses JSON and returns `{}` for a
-  byte stream, so the bytes are fetched here with the token attached and handed
-  to `useBillProof()`, which wraps them in an object URL and revokes it on
-  unmount. `services/uploadService.ts` is the existing precedent for a service
-  doing its own authenticated `fetch`.
+- **`fetchProof()` bypasses `api.get()`, and no longer needs to.**
+  `PeriodBillData.proofUrl` names an authenticated stream route on a private
+  disk, not a storage URL: rendered as a plain `href` or `<img src>` the browser
+  sends no Authorization header and the api answers 401. `api.get()` parses JSON
+  and returns `{}` for a byte stream, so the bytes are fetched here with the
+  token attached and handed to `useBillProof()`, which wraps them in an object
+  URL and revokes it on unmount.
+
+  **New code does not copy this.** `api.getBlob()` now carries a byte stream
+  through the client itself — with the shared 401 handling and api error message
+  that a service doing its own `fetch` loses — behind `FileService.fetchFile()`
+  and `useAuthorizedFile()`, which is what every evidence file (payment proof,
+  POD photo and signature, receipt file, invoice PDF) is read through. Folding
+  `fetchProof()` and `uploadService.ts` onto it is [admin#44].
 
 ### Payment Destination Service
 
