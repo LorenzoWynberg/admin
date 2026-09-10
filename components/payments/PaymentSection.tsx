@@ -1,11 +1,13 @@
 'use client';
 
-import { CreditCard, ExternalLink, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { CreditCard, ExternalLink, FileText, Loader2 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EvidenceDialog } from '@/components/evidence/EvidenceDialog';
 import { useOrderPayments } from '@/hooks/payments';
 import { useRole } from '@/hooks/auth';
 import { useOrderCurrencySymbol } from '@/hooks/currencies';
@@ -68,6 +70,13 @@ export function getPaymentMethodLabel(
   }
 }
 
+/**
+ * The provider's hosted receipt page.
+ *
+ * Still a plain link, and correctly so: `PaymentData.receiptUrl` is a column
+ * the payment provider fills in with an address on *their* site, not one of
+ * this api's stored-file routes. It has no bearer token to carry.
+ */
 function EvidenceLinkButton({ href, label }: { href: string; label: string }) {
   return (
     <Button variant="outline" size="sm" asChild>
@@ -76,6 +85,35 @@ function EvidenceLinkButton({ href, label }: { href: string; label: string }) {
         {label}
       </a>
     </Button>
+  );
+}
+
+/**
+ * The proof behind a manually recorded payment — a transfer receipt or a SINPE
+ * screenshot.
+ *
+ * `PaymentData.proofUrl` names `GET payments/{payment}/proof`, which streams the
+ * file off a private disk once `PaymentPolicy` has cleared the caller — evidence
+ * of somebody else's money, so a link that authenticates nobody will not do.
+ * See {@link EvidenceDialog}. Loads only when an operator asks for it.
+ */
+function PaymentProofButton({ source, label }: { source: string; label: string }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+        <FileText className="mr-2 h-4 w-4" />
+        {label}
+      </Button>
+
+      <EvidenceDialog
+        source={open ? source : null}
+        title={label}
+        resourceLabel={validationAttribute('proof', false)}
+        onClose={() => setOpen(false)}
+      />
+    </>
   );
 }
 
@@ -195,8 +233,8 @@ function PaymentCard({ payment }: { payment: PaymentData }) {
         </div>
         <div className="flex gap-2">
           {payment.proofUrl && (
-            <EvidenceLinkButton
-              href={payment.proofUrl}
+            <PaymentProofButton
+              source={payment.proofUrl}
               label={t('payments:proof', { defaultValue: 'Proof' })}
             />
           )}

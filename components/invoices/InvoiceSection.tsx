@@ -1,20 +1,20 @@
 'use client';
 
+import { useState } from 'react';
 import { Download, FileText, Loader2 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EvidenceDialog } from '@/components/evidence/EvidenceDialog';
 import { useOrderInvoices } from '@/hooks/invoices';
 import { useOrderCurrencySymbol } from '@/hooks/currencies';
 import { formatDate, formatCurrency } from '@/utils/format';
 import { Enums } from '@/data/app-enums';
-import { capitalize } from '@/utils/lang';
+import { capitalize, modelLabel } from '@/utils/lang';
 
 type InvoiceData = App.Data.Invoice.InvoiceData;
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.mandados.test:60';
 
 interface InvoiceSectionProps {
   orderPublicId: string;
@@ -44,6 +44,7 @@ const TYPE_LABEL_KEYS: Record<string, string> = {
 
 function InvoiceCard({ invoice }: { invoice: InvoiceData }) {
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
   const currencySymbol = useOrderCurrencySymbol(invoice.currencyCode);
   const docNumber =
     invoice.documentNumber ||
@@ -73,18 +74,22 @@ function InvoiceCard({ invoice }: { invoice: InvoiceData }) {
         </div>
       </div>
 
+      {/* `GET invoices/{invoice}/pdf` sits behind `auth:sanctum`, so the plain
+          link that used to be here answered 401 for everyone: this document was
+          broken before the evidence files were, by the same mistake. */}
       <div className="mt-3 flex items-center justify-end">
-        <Button variant="outline" size="sm" asChild>
-          <a
-            href={`${API_URL}/invoices/${invoice.publicId}/pdf`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            PDF
-          </a>
+        <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+          <Download className="mr-2 h-4 w-4" />
+          PDF
         </Button>
       </div>
+
+      <EvidenceDialog
+        source={open ? `/invoices/${invoice.publicId}/pdf` : null}
+        title={docNumber}
+        resourceLabel={modelLabel('invoice', 1, false)}
+        onClose={() => setOpen(false)}
+      />
     </div>
   );
 }

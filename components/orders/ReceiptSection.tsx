@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ExternalLink, FileText, Loader2, Receipt } from 'lucide-react';
+import { FileText, Loader2, Receipt } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOrderReceipts } from '@/hooks/orders';
 import { formatDate } from '@/utils/format';
 import { actionLabel, capitalize } from '@/utils/lang';
-import { ImagePreviewDialog } from './ImagePreviewDialog';
+import { ReceiptPreviewDialog } from './ReceiptPreviewDialog';
 
 type OrderReceiptData = App.Data.Order.OrderReceiptData;
 
@@ -56,25 +56,20 @@ function ReceiptCard({
             {receipt.sizeBytes != null && <span>{formatBytes(receipt.sizeBytes)}</span>}
           </div>
         </div>
-        {receipt.fileUrl &&
-          (isImage ? (
-            <Button
-              variant="outline"
-              size="sm"
-              className="shrink-0"
-              onClick={() => onPreview(receipt)}
-            >
-              <Receipt className="mr-2 h-4 w-4" />
-              {actionLabel('view')}
-            </Button>
-          ) : (
-            <Button variant="outline" size="sm" asChild className="shrink-0">
-              <a href={receipt.fileUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                {actionLabel('view')}
-              </a>
-            </Button>
-          ))}
+        {/* One action for both kinds. A PDF used to open in a new tab through a
+            plain link, which cannot carry the bearer token the file's route
+            now requires; the viewer fetches the bytes and embeds them. */}
+        {receipt.fileUrl && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="shrink-0"
+            onClick={() => onPreview(receipt)}
+          >
+            <Receipt className="mr-2 h-4 w-4" />
+            {actionLabel('view')}
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -127,7 +122,7 @@ export function ReceiptSection({ orderPublicId }: ReceiptSectionProps) {
         </CardContent>
       </Card>
 
-      <ImagePreviewDialog receipt={previewReceipt} onClose={() => setPreviewReceipt(null)} />
+      <ReceiptPreviewDialog receipt={previewReceipt} onClose={() => setPreviewReceipt(null)} />
     </>
   );
 }
