@@ -234,7 +234,7 @@ export default function OrderDetailPage() {
                 disabled={outsourceOrder.isPending}
               >
                 <ExternalLink className="mr-2 h-4 w-4" />
-                {t('orders:detail.outsource', { defaultValue: 'Outsource' })}
+                {actionLabel('outsource')}
               </Button>
             )}
           {order.status === Enums.OrderStatus.COMPLETED &&
