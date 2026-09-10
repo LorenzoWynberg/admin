@@ -343,6 +343,7 @@ export const Enums = {
     Unresolved: 'unresolved',
     NoUsableCard: 'no_usable_card',
     NotPayable: 'not_payable',
+    DeclarationPending: 'declaration_pending',
     Unsupported: 'unsupported',
   },
   PeriodBillStatus: {
