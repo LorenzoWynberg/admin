@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { PeriodBillService } from '../periodBillService';
 import { api } from '@/lib/api/client';
@@ -11,6 +11,7 @@ vi.mock('@/lib/api/client', () => ({
     get: vi.fn(),
     post: vi.fn(),
     postMultipart: vi.fn(),
+    getBlob: vi.fn(),
   },
 }));
 
@@ -147,39 +148,17 @@ describe('PeriodBillService verification acts', () => {
 });
 
 describe('PeriodBillService.fetchProof', () => {
-  const fetchMock = vi.fn();
+  // The bearer token and the authenticated-fetch handling (401 clears the
+  // session, a failure raises the api's message) live once in
+  // `api.getBlob()` — see `lib/api/__tests__/client.test.ts` — so this only
+  // pins that `fetchProof` is a pass-through to it with the right route.
+  it('delegates to the shared client, which carries a byte stream that api.get() cannot', async () => {
+    const bytes = new Blob(['x']);
+    vi.mocked(api.getBlob).mockResolvedValue(bytes);
 
-  beforeEach(() => {
-    vi.stubGlobal('fetch', fetchMock);
-    fetchMock.mockReset();
-    window.localStorage.setItem(
-      'admin-auth-storage',
-      JSON.stringify({ state: { token: 'tok-123' } })
-    );
-  });
+    const result = await PeriodBillService.fetchProof('pb-1');
 
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    window.localStorage.clear();
-  });
-
-  // `PeriodBillData.proofUrl` names an authenticated stream route on a private
-  // disk. The bytes cannot come through `api.get()`, which parses JSON, and a
-  // request without the bearer token is answered 401 — so the header is the
-  // whole point of this method.
-  it('requests the proof route with the bearer token attached', async () => {
-    fetchMock.mockResolvedValue({ ok: true, blob: async () => new Blob(['x']) });
-
-    await PeriodBillService.fetchProof('pb-1');
-
-    const [url, init] = fetchMock.mock.calls[0];
-    expect(String(url)).toContain('/period-bills/pb-1/proof');
-    expect((init.headers as Record<string, string>).Authorization).toBe('Bearer tok-123');
-  });
-
-  it('throws rather than returning an error body as if it were the file', async () => {
-    fetchMock.mockResolvedValue({ ok: false, status: 404, blob: async () => new Blob() });
-
-    await expect(PeriodBillService.fetchProof('pb-1')).rejects.toThrow('404');
+    expect(api.getBlob).toHaveBeenCalledWith('/period-bills/pb-1/proof');
+    expect(result).toBe(bytes);
   });
 });

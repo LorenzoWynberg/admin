@@ -122,3 +122,44 @@ describe('api.getBlob — reading a file off an authorized route', () => {
     expect(logout).toHaveBeenCalled();
   });
 });
+
+// `uploadService.ts` and `chatService.ts` used to read the bearer token
+// themselves for a raw multipart `fetch` — the only reason being that a
+// binary/multipart request could not go through the shared client. Both now
+// call `postMultipart()` directly instead of keeping their own copy, which
+// makes token attachment here the one place a regression in either surfaces.
+describe('api.postMultipart — the multipart call every FormData upload now goes through', () => {
+  function okJson(body: unknown = { item: {} }) {
+    return {
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => body,
+    };
+  }
+
+  it('attaches the bearer token, the same as a JSON request', async () => {
+    fetchMock.mockResolvedValue(okJson());
+
+    await api.postMultipart('/upload/image', new FormData());
+
+    expect(headersOf(0).Authorization).toBe('Bearer tok-123');
+  });
+
+  it('omits Content-Type so the browser sets the multipart boundary', async () => {
+    fetchMock.mockResolvedValue(okJson());
+
+    await api.postMultipart('/upload/image', new FormData());
+
+    expect(headersOf(0)['Content-Type']).toBeUndefined();
+  });
+
+  it('sends no token when there is none, rather than a bare "Bearer"', async () => {
+    window.localStorage.clear();
+    fetchMock.mockResolvedValue(okJson());
+
+    await api.postMultipart('/upload/image', new FormData());
+
+    expect(headersOf(0).Authorization).toBeUndefined();
+  });
+});

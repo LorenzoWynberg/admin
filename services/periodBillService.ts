@@ -7,8 +7,6 @@ type SettlementMethod = App.Enums.SettlementMethod;
 type Multiple<T> = Api.Response.Multiple<T>;
 type Single<T> = Api.Response.Single<T>;
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.mandados.cr';
-
 /** How many bills sit at each urgency, counted by the API across all reasons. */
 export type BillAttentionSummary = Partial<Record<AttentionUrgency, number>>;
 
@@ -32,25 +30,6 @@ export interface SettlePeriodBillParams {
   destinationId?: number | null;
   notes?: string | null;
   proof?: File | null;
-}
-
-/**
- * Read the bearer token the way `lib/api/client.ts` and `services/uploadService.ts`
- * both do. Needed here because the comprobante is a byte stream: `api.get()`
- * parses JSON and returns `{}` for anything else, so it cannot carry the file.
- */
-function getToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const stored = localStorage.getItem('admin-auth-storage');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return parsed?.state?.token || null;
-    }
-  } catch {
-    return null;
-  }
-  return null;
 }
 
 export const PeriodBillService = {
@@ -128,18 +107,6 @@ export const PeriodBillService = {
    * here with the token attached and handed to the caller as an object URL.
    */
   async fetchProof(publicId: string): Promise<Blob> {
-    const token = getToken();
-    const response = await fetch(`${API_URL}/period-bills/${publicId}/proof`, {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to load proof (${response.status})`);
-    }
-
-    return response.blob();
+    return api.getBlob(`/period-bills/${publicId}/proof`);
   },
 };
