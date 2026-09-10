@@ -143,7 +143,7 @@ export function NeedsAttentionCard({ item }: NeedsAttentionCardProps) {
             <RefreshCw
               className={`mr-1 h-4 w-4 ${retryDispatch.isPending ? 'animate-spin' : ''}`}
             />
-            {t('needs_attention.retry_dispatch', { defaultValue: 'Retry' })}
+            {t('common:retry')}
           </Button>
 
           {!order.driverId && (
