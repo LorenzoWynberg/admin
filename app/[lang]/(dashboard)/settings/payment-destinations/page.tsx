@@ -101,7 +101,7 @@ export default function PaymentDestinationsPage() {
                   <TableHead>{validationAttribute('holderName')}</TableHead>
                   <TableHead>{validationAttribute('accountNumber')}</TableHead>
                   <TableHead>{validationAttribute('currencyCode')}</TableHead>
-                  <TableHead>{t('common:active')}</TableHead>
+                  <TableHead>{t('common:active', { count: 2 })}</TableHead>
                   <TableHead />
                 </TableRow>
               </TableHeader>
@@ -118,7 +118,9 @@ export default function PaymentDestinationsPage() {
                     <TableCell>{destination.currencyCode ?? '-'}</TableCell>
                     <TableCell>
                       <Badge variant={destination.active ? 'secondary' : 'outline'}>
-                        {destination.active ? t('common:active') : t('common:inactive')}
+                        {destination.active
+                          ? t('common:active', { count: 1 })
+                          : t('common:inactive', { count: 1 })}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">

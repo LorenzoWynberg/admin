@@ -239,10 +239,7 @@ function PaymentCard({ payment }: { payment: PaymentData }) {
             />
           )}
           {payment.receiptUrl && (
-            <EvidenceLinkButton
-              href={payment.receiptUrl}
-              label={t('payments:receipt', { defaultValue: 'Receipt' })}
-            />
+            <EvidenceLinkButton href={payment.receiptUrl} label={t('payments:receipt')} />
           )}
           {canRefund && <RefundDialog payment={payment} />}
           {canVoid && payment.publicId && <VoidPaymentDialog paymentPublicId={payment.publicId} />}
