@@ -21,9 +21,7 @@ export function useMintShareLink() {
       queryClient.setQueryData(['orders', 'share', publicId], {
         shareExpiresAt: data.shareExpiresAt,
       });
-      toast.success(
-        i18next.t('orders:share.toast_minted', { defaultValue: 'Tracking link ready to share.' })
-      );
+      toast.success(i18next.t('orders:share.toast_minted'));
     },
     onError: (error) => {
       if (isApiError(error)) {
@@ -45,9 +43,7 @@ export function useRevokeShareLink() {
     mutationFn: (publicId: string) => OrderService.revokeShareLink(publicId),
     onSuccess: (_data, publicId) => {
       queryClient.setQueryData(['orders', 'share', publicId], null);
-      toast.success(
-        i18next.t('orders:share.toast_revoked', { defaultValue: 'Tracking link revoked.' })
-      );
+      toast.success(i18next.t('orders:share.toast_revoked'));
     },
     onError: (error) => {
       if (isApiError(error)) {

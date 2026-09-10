@@ -85,9 +85,7 @@ export function EditStopDetailsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {t('orders:detail.edit_stop_details', { defaultValue: 'Edit Stop Details' })}
-          </DialogTitle>
+          <DialogTitle>{t('orders:detail.edit_stop_details')}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>

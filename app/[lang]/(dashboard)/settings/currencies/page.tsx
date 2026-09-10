@@ -407,7 +407,7 @@ export default function CurrencySettingsPage() {
                   type="number"
                   step="0.01"
                   min="0"
-                  placeholder={`${t('common:e_g', { defaultValue: 'e.g.' })} 490.00`}
+                  placeholder={`${t('common:e_g')} 490.00`}
                   value={editForm.manualRate}
                   onChange={(e) => setEditForm((f) => ({ ...f, manualRate: e.target.value }))}
                 />
