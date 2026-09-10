@@ -1,5 +1,4 @@
-/* eslint-env serviceworker */
-/* global firebase */
+/* global importScripts, self, firebase */
 /**
  * Firebase Cloud Messaging service worker — web push for the admin dashboard.
  *
