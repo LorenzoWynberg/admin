@@ -26,17 +26,21 @@ interface ApproveRefundRequestDialogProps {
   publicId: string;
   orderPublicId: string;
   /**
-   * The order's payment status. `ON_ACCOUNT` is the one value that changes
-   * what this dialog may offer, because such an order has no payment row for
-   * the settlement lookup below to find.
+   * The API's own verdict that this refund can only be given back as credit,
+   * off `RefundRequestData`. It is the answer rather than the facts behind
+   * it: `Order::refundIsCreditOnly()` decides it, `approve()` branches on
+   * that same method, and this dialog reads the result. Re-deriving it here
+   * from a payment status is what shipped a Gateway default the server
+   * refused every time — a settled period bill moves the order to `PAID`, so
+   * the status no longer tells this apart from an ordinary card delivery.
    */
-  paymentStatus?: string | null;
+  isCreditOnly?: boolean;
 }
 
 export function ApproveRefundRequestDialog({
   publicId,
   orderPublicId,
-  paymentStatus,
+  isCreditOnly,
 }: ApproveRefundRequestDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -54,13 +58,12 @@ export function ApproveRefundRequestDialog({
     .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))[0];
   const isManual = settledPayment?.provider === Enums.PaymentProvider.Manual;
 
-  // A delivery billed to an account was never charged, so it has no payment
-  // row at all — the lookup above finds nothing and, left alone, reads that
-  // emptiness as a card payment and offers to reverse a charge that does not
-  // exist. The API branches on this same status and accepts nothing but
-  // credit, so the dialog has to know it before the admin picks.
-  const isOnAccount = paymentStatus === Enums.PaymentStatus.ON_ACCOUNT;
-  const balanceOnly = isOnAccount || isManual;
+  // Two independent reasons no card charge stands behind this money, and
+  // either one locks the settlement to credit. A manually-settled payment is
+  // visible from here — the row above says so. Whether the delivery was
+  // billed to an account is not, and is not meant to be: the API states that
+  // verdict outright so this dialog never has to reassemble it.
+  const balanceOnly = isCreditOnly || isManual;
 
   // The method the admin hasn't explicitly overridden — recomputed from the
   // loaded payment each render rather than synced via an effect.
