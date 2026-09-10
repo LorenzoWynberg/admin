@@ -136,6 +136,12 @@ export const Enums = {
     Denied: 'denied',
     Sent: 'sent',
   },
+  DebtChargeResolution: {
+    Settled: 'settled',
+    Freed: 'freed',
+    Unresolved: 'unresolved',
+    NotResolvable: 'not_resolvable',
+  },
   DeliveryTier: {
     Expedited: 'expedited',
     Regular: 'regular',

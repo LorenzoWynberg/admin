@@ -1044,6 +1044,7 @@ declare namespace App.Data.RefundRequest {
     refundId?: number | null;
     createdAt?: string;
     updatedAt?: string;
+    isCreditOnly?: boolean;
     order?: App.Data.Order.OrderData | null;
     user?: App.Data.User.UserData | null;
   };
@@ -1465,6 +1466,12 @@ declare namespace App.Enums {
     Approved = 'approved',
     Denied = 'denied',
     Sent = 'sent',
+  }
+  export enum DebtChargeResolution {
+    Settled = 'settled',
+    Freed = 'freed',
+    Unresolved = 'unresolved',
+    NotResolvable = 'not_resolvable',
   }
   export enum DeliveryTier {
     Expedited = 'expedited',
