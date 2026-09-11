@@ -73,6 +73,16 @@ type QuoteStatus = App.Enums.QuoteStatus;
 
 type OrderStatus = App.Enums.OrderStatus;
 
+// Mirrors the API's OrderStatus::terminalStatuses() — it refuses to mint a
+// share link for any of these, so the trigger is hidden rather than dead.
+const TERMINAL_ORDER_STATUSES = new Set<string>([
+  Enums.OrderStatus.COMPLETED,
+  Enums.OrderStatus.CANCELED,
+  Enums.OrderStatus.DELIVERY_FAILED,
+  Enums.OrderStatus.RETURNED_TO_SENDER,
+  Enums.OrderStatus.DENIED,
+]);
+
 export default function OrderDetailPage() {
   const params = useParams();
   const { t, ready } = useTranslation();
@@ -253,7 +263,6 @@ export default function OrderDetailPage() {
                 }
               />
             )}
-          {order.publicId && <ShareTrackingLinkDialog orderPublicId={order.publicId} />}
           <Button variant="destructive" onClick={handleDelete} disabled={deleteOrder.isPending}>
             <Trash2 className="mr-2 h-4 w-4" />
             {actionLabel('delete')}
@@ -504,10 +513,15 @@ export default function OrderDetailPage() {
         {/* Order Details */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              {t('orders:detail.title', { defaultValue: 'Order Details' })}
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Package className="h-5 w-5" />
+                {t('orders:detail.title', { defaultValue: 'Order Details' })}
+              </CardTitle>
+              {order.publicId && !TERMINAL_ORDER_STATUSES.has(order.status ?? '') && (
+                <ShareTrackingLinkDialog orderPublicId={order.publicId} />
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {(order.totalDistanceKm || order.totalEstimatedMinutes) && (
