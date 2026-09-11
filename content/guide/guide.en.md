@@ -75,29 +75,40 @@ The primary navigation lives in the left rail. It's organized from most to least
   <div class="card"><strong class="card-title">Pricing Rules</strong><p>Tariff configuration by distance, tier, window, etc.</p></div>
   <div class="card"><strong class="card-title">Notifications</strong><p>System events surfaced to operations.</p></div>
   <div class="card"><strong class="card-title">Audit Logs</strong><p>Who did what and when.</p></div>
-  <div class="card"><strong class="card-title">Settings</strong><p>Currencies, service windows, language, profile.</p></div>
+  <div class="card"><strong class="card-title">Guide</strong><p>This manual, inside the panel.</p></div>
+  <div class="card"><strong class="card-title">Settings</strong><p>Currencies, payment destinations, service windows, language.</p></div>
 </div>
+
+_Settings sits on its own at the foot of the rail, below the list._
 
 ---
 
 ## Needs Attention <span class="pill green">the most important screen</span> {#needs-attention}
 
-**This is the screen where an administrator spends most of the day.** Any order that needs manual intervention shows up here, organized into tabs by action type.
+**This is the screen where an administrator spends most of the day.** Anything that needs manual intervention shows up here — an order, or an account's bill — organized into tabs by action type.
 
 <figure>
   <img src="/guide/screenshots/22-needs-attention.png" alt="Needs Attention tabs" />
-  <figcaption><em>Needs Attention</em> tabs. The number on each tab shows how many orders are waiting for action.</figcaption>
+  <figcaption><em>Needs Attention</em> tabs. The number on each tab shows how many orders are waiting for action. This capture predates the sixth tab — the current list is the table below.</figcaption>
 </figure>
 
-### The five tabs {#five-tabs}
+### The tabs {#tabs}
 
-| Tab                 | What it holds                                                                                                                                          | Expected action                                                                           |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| **Conflicts**       | Orders the system couldn't dispatch automatically or that hit feasibility issues (impossible window, no driver available, distance out of range).      | Review the reason, reassign manually, adjust the window, or dismiss the order.            |
-| **Reconciliation**  | <span class="pill blue">Completed</span> orders where the driver delivered but the charged amount must be adjusted to match the actual purchase price. | Open the reconciliation dialog, enter the real per-line prices, generate the final quote. |
-| **Not Yet Quoted**  | Orders the customer just created that don't have a quote yet.                                                                                          | Verify each stop's address, create the quote, and send it to the customer.                |
-| **Not Yet Paid**    | Delivered orders that haven't been paid by the customer.                                                                                               | Follow up on collection, mark as paid when settled.                                       |
-| **Refund Requests** | Customer claims requesting a full or partial refund.                                                                                                   | Review evidence (proof of delivery, photos), approve or reject.                           |
+They read left to right, and the table below has one row per tab — if the panel shows you a tab this table doesn't name, the guide is out of date and worth reporting.
+
+| Tab                 | What it holds                                                                                                                                                                                    | Expected action                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| **Conflicts**       | Orders the system couldn't dispatch automatically or that hit feasibility issues (impossible window, no driver available, distance out of range).                                                | Review the reason, reassign manually, adjust the window, or dismiss the order.                       |
+| **Reconciliation**  | <span class="pill blue">Completed</span> orders where the driver delivered but the charged amount must be adjusted to match the actual purchase price.                                           | Open the reconciliation dialog, enter the real per-line prices, generate the final quote.            |
+| **Not Yet Quoted**  | Orders the customer just created that don't have a quote yet.                                                                                                                                    | Verify each stop's address, create the quote, and send it to the customer.                           |
+| **Not Yet Paid**    | Two groups, one under the other: orders that have a quote and are still unpaid, and orders set to collect on delivery (the driver takes the money at the door, in cash or by SINPE Móvil).       | Follow up on collection, mark as paid when settled.                                                  |
+| **Refund Requests** | Customer claims requesting a full or partial refund.                                                                                                                                             | Review evidence (proof of delivery, photos), approve or reject.                                      |
+| **Period bills**    | Bills of accounts billed by period instead of per order: a declared payment waiting to be checked, a bill past its due date, a bill quietly unpaid, or a card charge the gateway never resolved. | [Work the bill](#period-bills) — verify the declaration, or record the payment that already arrived. |
+
+<div class="callout warn">
+<strong>An on-account order is not an unpaid order</strong>
+Orders billed to an account never appear in <em>Not Yet Paid</em>. They carry <span class="pill blue">On Account</span>, which means somebody <em>is</em> paying for them — on a period bill. Chase those from the <em>Period bills</em> tab, not this one.
+</div>
 
 ### Severity filters {#severity-filters}
 
@@ -144,7 +155,7 @@ When the order arrives, the _Not Yet Quoted_ tab counter goes up. That's the fir
 
 <figure>
   <img src="/guide/screenshots/22-needs-attention.png" alt="Needs Attention with badge on Not Yet Quoted" />
-  <figcaption>The <em>Not Yet Quoted</em> tab shows <strong>1</strong> — one order awaiting a quote.</figcaption>
+  <figcaption>The <em>Not Yet Quoted</em> tab shows <strong>1</strong> — one order awaiting a quote. (Same capture as above, so it predates the sixth tab.)</figcaption>
 </figure>
 
 ### Step 1.2 — Open the order detail {#step-1-2}
@@ -369,7 +380,109 @@ When you confirm the dialog, the system:
 
 <div class="callout tip">
 <strong>Payments are "authorized" before delivery</strong>
-When the quote is accepted, the payment gateway authorizes a hold for the quoted amount but <em>doesn't charge yet</em>. Reconciliation is what fires the final capture: at exactly the right amount, no more and no less. This avoids refunds and surprise charges.
+When the quote is accepted, the payment gateway authorizes a hold for the quoted amount but <em>doesn't charge yet</em>. Reconciliation is what fires the final capture: at exactly the right amount, no more and no less. This avoids refunds and surprise charges. <strong>This is the per-order path</strong>; an account billed by period takes no hold at all — see <a href="#period-bills">Billing on account</a>.
+</div>
+
+---
+
+## Billing on account {#period-bills}
+
+Most customers pay per order: the quote is authorized when they accept it and captured at [reconciliation](#reconcile). **An account can instead be billed by period** — it orders all week or all month, nothing is charged per delivery, and one bill covering every order in the period closes at the end of it.
+
+Two things follow, and both change what you see on screen:
+
+- An order billed this way is stamped <span class="pill blue">On Account</span> rather than <span class="pill amber">Unpaid</span>. It is **not** an unpaid order: somebody is paying for it, on a bill that hasn't closed yet.
+- Nobody is asked to collect at the door, so the driver's collect step is suppressed. That's deliberate, not a missing prompt.
+
+<div class="callout info">
+<strong>Nothing is charged automatically</strong>
+The bill closes and sends itself — that is the only automatic part. The <em>money</em> is always an act a person performs: the customer pays it from their app, or an administrator records a payment that arrived some other way. <strong>No saved card is ever charged in the background.</strong> A card saved to check out a delivery is not permission to settle an account balance, so a bill that goes unpaid is followed up by a person, like any other invoice.
+</div>
+
+### The life of a bill {#bill-states}
+
+| Internal code           | Label                                                 | Meaning                                                                                                                                                                                                  |
+| ----------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `open`                  | <span class="pill gray">Open</span>                   | The period is still running. Orders join the bill as they're approved and the total moves. **Nothing is owed yet** — an open bill has no due date.                                                       |
+| `issued`                | <span class="pill blue">Issued</span>                 | The period closed. The total is frozen, any account credit has been applied, a due date is stamped and the customer has been notified.                                                                   |
+| `awaiting_verification` | <span class="pill amber">Awaiting Verification</span> | The customer says they sent a transfer and attached a comprobante — the proof of payment. **This is not paid.** The due date hasn't moved and the clock is still running.                                |
+| `paid`                  | <span class="pill green">Paid</span>                  | Settled. Every order on the bill flips to <span class="pill green">Paid</span> in the same movement, stamped with how the bill was settled — a bill settles all at once or not at all, never half of it. |
+
+The close runs on the period's clock at **03:00**, with no operator in the loop. That's what makes silence meaningful: nobody has to remember to close a period, so a bill that didn't close is a fault worth reporting. The due date is **7 days** after the close, and a reminder goes to the customer at 08:00 as it approaches.
+
+### The Period bills tab {#bills-tab}
+
+The last tab of [Needs Attention](#needs-attention) is the billing queue. **One row per bill, showing only the most urgent thing wrong with it** — a bill routinely matches more than one of the rows below, and the queue picks the loudest rather than listing it twice.
+
+| Badge                   | Urgency                                | What happened                                                                                                                                                                   | What you do                                                                                                                  |
+| ----------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Charge unresolved**   | <span class="pill red">Critical</span> | The customer pressed Pay and the gateway never said what happened. **Their money may already be gone while the bill still reads unpaid**, and nothing resolves this on its own. | Look for a charge against this bill in the gateway before anything else. Don't ask the customer to pay again until you know. |
+| **Overdue**             | <span class="pill amber">High</span>   | Past the due date and still owing. **The account is blocked from ordering.**                                                                                                    | Follow the money up. Verifying a declaration or recording a payment settles the bill and unblocks the account.               |
+| **Payment to verify**   | <span class="pill blue">Medium</span>  | The customer declared a transfer and attached a comprobante.                                                                                                                    | Find it in the bank, then approve or reject — see below.                                                                     |
+| **Unpaid, not yet due** | <span class="pill gray">Low</span>     | Closed a couple of days ago, unpaid, and not due yet.                                                                                                                           | Call them. **This is the valuable one** — nothing is wrong yet, and it's the state that prevents the other two.              |
+
+Rows are ordered most urgent first, then by oldest due date. The urgency counters above the list are the triage signal a flat list can't give you: they say how much of the queue is a customer's money possibly already gone versus a bill that's merely quiet.
+
+<div class="callout warn">
+<strong>Reading the queue is staff; acting on a bill is admin</strong>
+Any staff operator can open this tab and read a bill. <em>Verify</em>, <em>Approve</em>, <em>Reject</em> and <em>Record payment</em> are restricted to administrators — recording that money arrived on an account, and adjudicating a customer's claim that it did, are accounting acts rather than operational ones. If you can see a bill but not the buttons, that's the reason.
+</div>
+
+### Verifying a declared payment {#verify-declaration}
+
+A declaration is a **claim, not a payment**: the customer says they sent money and offers a reference and a comprobante. Nothing settles until somebody finds the transfer.
+
+Click `Verify` on the bill's row (or on the bill detail). The dialog gives you everything the search needs:
+
+1. **The method** — SINPE Móvil or Bank transfer. It tells you which rail to look in.
+2. **The reference**, with a copy button beside it. Copy it rather than re-typing it: the bank will only find the transfer on a character-for-character match, and re-typing from memory is where a verification goes wrong.
+3. **The amount to look for** — period total, credit applied, and net due in colones. If the customer paid in their own currency, the figure in _that_ currency is shown too, and that is the number that will be on the statement.
+4. **Where they were told to send it** — the destination the bill recorded, so you look in the right account. It's a snapshot the bill kept rather than a live row, so it stays readable even after that destination has been edited or deactivated.
+5. **The comprobante**, behind a button. It is **corroboration, not evidence**: what settles the question is finding the payment in the bank. It loads only when you ask for it, and its absence never blocks you.
+
+Then one of two outcomes:
+
+- **Approve** — the bill becomes <span class="pill green">Paid</span> and every order on it settles with it. A note is optional.
+- **Reject** — **a reason is required**, and the button stays disabled until you write one. That reason reaches the customer, and it is the whole point: a claim rejected without one comes straight back as the same file uploaded again.
+
+<div class="callout warn">
+<strong>The note field replaces what's already there</strong>
+Approving or rejecting overwrites the bill's note. Whatever note it carries is shown above the field but deliberately not pre-filled — read it before you write, and don't re-send someone else's sentence as your own.
+</div>
+
+### Recording a payment that arrived out of band {#record-bill-payment}
+
+Use `Record payment` when the money reached you some other way — cash across the counter, a transfer you've already matched in the bank, a card taken over the phone. This is you asserting a fact rather than filing a claim, so it settles the bill immediately, with no verification step behind it.
+
+| Field                   | Notes                                                                                                                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Payment method**      | Card, SINPE Móvil, Bank transfer or Cash.                                                                                                                                                   |
+| **Currency**            | Required — the form won't submit without it. It records _which_ of the bill's already-frozen figures was actually paid, not a rate looked up now.                                           |
+| **Payment destination** | Offered for SINPE Móvil and Bank transfer only, and filtered to the active destinations of that method. Changing the method clears the choice, because a destination belongs to one method. |
+| **Reference**           | Optional, and pre-filled from the bill when it already has one.                                                                                                                             |
+| **Proof of payment**    | Optional here. A customer declaring a transfer must attach one; you already received the money, so your record is the fact.                                                                 |
+| **Notes**               | Pre-filled from the bill, because submitting writes this field whatever you do — leave it blank and you'd silently erase a note an earlier act recorded, a rejection reason included.       |
+
+<div class="callout info">
+<strong>Account credit is not on the method list, on purpose</strong>
+Credit only counts as paid once the period's close has actually applied it against the bill, and nothing else applies it. Recording it by hand would mark a bill paid with money nothing was spent from, so the panel doesn't offer it.
+</div>
+
+Cash is on the operator's list and absent from the customer's, and the asymmetry is the point: **a customer cannot prove they handed over cash.** The administrator who received it is the only person who can say it happened at all. Card runs the other way round — the customer can pay by card themselves, in the app, and you can also record one you took elsewhere.
+
+### The bill detail screen {#bill-detail}
+
+`View` on any row opens the bill at `/period-bills/<code>`. **There is no bill list in the sidebar** — the _Period bills_ tab is how you reach one, and the back arrow returns you to it. The same `Verify` and `Record payment` buttons sit in the header, and only for a bill that can still take them: a bill already <span class="pill green">Paid</span> offers neither.
+
+Three parts:
+
+- **Period bill** — period total, credit applied, net due, the date it closed, the date it's due, and one row per currency the bill's lines were agreed in.
+- **Payment method** — appears only once there's something to show: the method, the copyable reference, the destination snapshot, the comprobante, the note.
+- **What this bill covers** — one row per order, with the order code, the currency it was agreed in, the exchange rate frozen on its quote, and the amount in both that currency and colones.
+
+<div class="callout info">
+<strong>Amounts are never re-converted</strong>
+A line agreed in colones carries one colón figure and needed no rate — which is why the rate column shows a dash on those rows rather than today's rate. A line agreed in another currency carries that amount, the rate frozen on its quote, and the colón amount derived from it at that moment. Nothing is looked up when the money arrives, so a bill can always state what it is owed before anyone pays it.
 </div>
 
 ---
@@ -569,7 +682,7 @@ Business accounts. Businesses can have:
 
 - Multiple authorized users who can create orders.
 - Negotiated tariffs different from the public rate.
-- Consolidated monthly billing.
+- Consolidated billing by period instead of per order — see [Billing on account](#period-bills).
 - Their own directory of frequent addresses.
 
 ---
@@ -647,10 +760,21 @@ Immutable record of every administrative action. Useful for:
 
 <figure>
   <img src="/guide/screenshots/15-settings.png" alt="General settings" />
-  <figcaption><em>Settings</em> screen. Three cards: <em>Language</em> (inline selector), <em>Currency Settings</em>, and <em>Service Window</em> (the latter two open sub-pages via the right-arrow).</figcaption>
+  <figcaption><em>Settings</em> screen. The screenshot predates three of the cards now on it — the current list is below.</figcaption>
 </figure>
 
-This is where global operational parameters live. Note: the list is intentionally short — only what an administrator needs to change by hand. The rest of the behavior (rates, per-order windows, dispatch feasibility) is modeled in its own sections.
+This is where global operational parameters live. The list is intentionally short — only what an administrator needs to change by hand. The rest of the behavior (rates, per-order windows, dispatch feasibility) is modeled in its own sections.
+
+The cards, top to bottom. The first three are edited in place; the last three carry a right-arrow and open a sub-page.
+
+| Card                        | What it sets                                                                                                                                                                                                                              |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Language**                | The interface language for the administrator using it — see below.                                                                                                                                                                        |
+| **Supported Vehicle Types** | Which vehicle types a driver in this fleet may be assigned. Tick the ones you operate and save.                                                                                                                                           |
+| **Waiting time**            | Rate per minute and tolerance beyond the estimate, for time a driver spends waiting at a stop past what it was quoted for. Set the rate to zero and waiting isn't charged at all. A price-list decision, made once — not a per-order one. |
+| **Currency Settings** →     | Which currencies the platform accepts, how rates are obtained, and how each rounds.                                                                                                                                                       |
+| **Payment destinations** →  | Where customers are told to send money for a period bill.                                                                                                                                                                                 |
+| **Service Window** →        | When the platform accepts new orders, and what happens to orders left without a driver.                                                                                                                                                   |
 
 ### Language
 
@@ -716,6 +840,27 @@ Rounding affects how amounts are presented to the customer, not how they're stor
 The rate is entered as <em>how many units of the base currency equal 1 unit of this currency</em>. If you accidentally enter it inverted (e.g. <code>0.002</code> instead of <code>490</code>), the preview paints an amber warning suggesting the inverse value.
 </div>
 
+### Payment destinations {#settings-payment-destinations}
+
+Declaring a transfer without a destination asks somebody to pay and doesn't say where, so this list is what makes SINPE Móvil and bank transfer usable at all. These are the company's own accounts, not anything the customer registers.
+
+The table lists every destination with its method, holder, account number (or phone number, for SINPE Móvil), currency and active state. `+ Create` opens the form; the pencil edits a row and the bin deletes one.
+
+The form's fields depend on the method:
+
+| Method            | Fields it takes                                                                                    |
+| ----------------- | -------------------------------------------------------------------------------------------------- |
+| **SINPE Móvil**   | Phone number. No currency — SINPE Móvil receives colones and nothing else.                         |
+| **Bank transfer** | Currency, bank name, account number, and IBAN if there is one.                                     |
+| **Both**          | Holder name and legal id (both required), a maximum amount, a sort order, and the _active_ switch. |
+
+The **maximum amount** is the per-transfer cap — SINPE Móvil has a real one, and a destination over it simply isn't offered for a bill that large. It's a filter on amount, not on which bills may use the method: a bill stated in dollars paid by SINPE Móvil is just being paid in colones.
+
+<div class="callout warn">
+<strong>Deactivate rather than delete, and create rather than re-point</strong>
+A bill records the destination it showed the customer as a <em>snapshot</em>, so deleting a row never rewrites an old bill — but a deactivated row stays legible to whoever is reading one. And the <em>method</em> can't be changed after creation: it decides which of the other fields the row may carry, so switching it in place would leave a destination holding the wrong method's details. To move a destination to another method, deactivate it and create a new one.
+</div>
+
 ### Service Window {#settings-service-window}
 
 <figure>
@@ -754,6 +899,8 @@ The threshold only counts hours inside the service window. An order arriving at 
 
 ## State glossary {#state-glossary}
 
+A bill's own states are not here — they live with the workflow that uses them, in [The life of a bill](#bill-states).
+
 ### Order states {#order-states}
 
 | Internal code                                             | Label                                                | Meaning                                                  |
@@ -775,12 +922,18 @@ The threshold only counts hours inside the service window. An order arriving at 
 
 ### Payment states {#payment-states}
 
-| Code            | Label                                         | Meaning                                            |
-| --------------- | --------------------------------------------- | -------------------------------------------------- |
-| `unpaid`        | <span class="pill amber">Unpaid</span>        | No payment recorded.                               |
-| `paid`          | <span class="pill green">Paid</span>          | Full charge received.                              |
-| `surcharge_due` | <span class="pill amber">Surcharge Due</span> | After reconciliation there's a balance to collect. |
-| `refunded`      | <span class="pill gray">Refunded</span>       | Full refund issued.                                |
+All eight, in the order the system declares them.
+
+| Code            | Label                                         | Meaning                                                                                                                                                                                               |
+| --------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `unpaid`        | <span class="pill amber">Unpaid</span>        | No payment recorded.                                                                                                                                                                                  |
+| `authorized`    | <span class="pill blue">Authorized</span>     | A card hold is placed for the quoted amount. **No money has moved** — a hold expires on its own, and reconciliation is what captures it.                                                              |
+| `paid`          | <span class="pill green">Paid</span>          | Full charge received.                                                                                                                                                                                 |
+| `on_account`    | <span class="pill blue">On Account</span>     | Billed to the account instead of charged: the order is a line on that period's bill, and becomes <span class="pill green">Paid</span> when the bill settles. See [Billing on account](#period-bills). |
+| `surcharge_due` | <span class="pill amber">Surcharge Due</span> | After reconciliation there's a balance to collect.                                                                                                                                                    |
+| `refunded`      | <span class="pill gray">Refunded</span>       | Full refund issued.                                                                                                                                                                                   |
+| `voided`        | <span class="pill gray">Voided</span>         | The card hold was released without ever being charged — a cancellation before capture.                                                                                                                |
+| `chargeback`    | <span class="pill red">Chargeback</span>      | The customer disputed the charge with their bank and the money was pulled back.                                                                                                                       |
 
 ---
 
@@ -813,6 +966,18 @@ Because reconciliation found the real product cost was higher than the initial q
 ### How are delivery PINs generated? {#faq-pin-generation}
 
 Automatically when the order is created — a unique 6-digit code per order. The customer sees it in their app and the driver asks for it on delivery. It's the recipient's identity check.
+
+### A customer says they paid their bill, but it still shows as unpaid — what now? {#faq-declared-not-paid}
+
+Check the bill's state first. <span class="pill amber">Awaiting Verification</span> means their claim arrived and is waiting on **us** — find the transfer in the bank and [approve it](#verify-declaration); the due date is still running until you do, so this is not a wait to leave sitting. If the bill is still <span class="pill blue">Issued</span> with no declaration on it, their payment never reached us as a claim: ask for the reference and the comprobante, or [record it yourself](#record-bill-payment) if you can already see the money.
+
+### Can I settle a bill with the customer's account credit? {#faq-credit-settle}
+
+No, and there's deliberately no option for it. Credit is applied by the period's close, automatically — the bill you're looking at already shows _Credit applied_ and a _Net due_ with the credit taken off. See [Account credit is not on the method list](#record-bill-payment) for why it can't be recorded by hand.
+
+### Why is this account blocked from ordering? {#faq-account-blocked}
+
+One of two reasons, and the account surface tells the customer which: a bill on the account is **past its due date**, or what the account is on the hook for — its unpaid bills plus what this period has run up so far — has reached the limit set for it. The block bites at order creation, so the customer sees it before assembling an order rather than after. Settling the overdue bill clears the first; raising the limit or settling bills clears the second.
 
 ### Can I create an order from the panel without the customer initiating one? {#faq-admin-create}
 

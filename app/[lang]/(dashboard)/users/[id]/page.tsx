@@ -69,10 +69,17 @@ export default function UserDetailPage() {
     });
   };
 
-  const handleChangeDebtCeiling = (next: number | null) => {
+  const handleChangeBalanceLimit = (next: number | null) => {
     updateUser.mutate({
       id: userId,
-      data: { balanceDebtCeiling: next },
+      data: { balanceLimit: next },
+    });
+  };
+
+  const handleChangeBillingCycle = (next: string) => {
+    updateUser.mutate({
+      id: userId,
+      data: { billingCycle: next as App.Enums.BillingCycle },
     });
   };
 
@@ -321,9 +328,13 @@ export default function UserDetailPage() {
         <BalanceCard
           ownerPublicId={user.publicId}
           canManage={isAdmin}
-          debtCeiling={user.balanceDebtCeiling}
-          onDebtCeilingChange={handleChangeDebtCeiling}
-          isSavingCeiling={updateUser.isPending}
+          balanceLimit={user.balanceLimit}
+          onBalanceLimitChange={handleChangeBalanceLimit}
+          isSavingLimit={updateUser.isPending}
+          billingCycle={user.billingCycle}
+          onBillingCycleChange={handleChangeBillingCycle}
+          isSavingBillingCycle={updateUser.isPending}
+          blockReason={user.blockReason}
         />
 
         {/* Timestamps */}

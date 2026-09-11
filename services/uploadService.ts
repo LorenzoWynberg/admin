@@ -1,39 +1,18 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.mandados.test:60';
+import { api } from '@/lib/api/client';
 
 export const UploadService = {
+  /**
+   * `upload/image` is a public route (needed during registration before an
+   * auth token exists) that also accepts an authenticated call, so this goes
+   * through the shared client's `postMultipart()` rather than a bespoke
+   * fetch: it already attaches the bearer token when one is present and
+   * omits it otherwise, which is exactly this endpoint's contract.
+   */
   async upload(file: File): Promise<string> {
     const formData = new FormData();
     formData.append('image', file);
 
-    const token = getToken();
-    const response = await fetch(`${API_URL}/upload/image`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to upload image');
-    }
-
-    const json = await response.json();
-    return json.url;
+    const response = await api.postMultipart<{ url: string }>('/upload/image', formData);
+    return response.url;
   },
 };
-
-function getToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const stored = localStorage.getItem('admin-auth-storage');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return parsed?.state?.token || null;
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}

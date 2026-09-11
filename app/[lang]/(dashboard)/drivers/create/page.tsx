@@ -198,9 +198,7 @@ export default function CreateDriverPage() {
           {/* Personal Info */}
           <Card>
             <CardHeader>
-              <CardTitle>
-                {t('drivers:personal_info', { defaultValue: 'Personal Information' })}
-              </CardTitle>
+              <CardTitle>{t('drivers:personal_info')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -367,9 +365,7 @@ export default function CreateDriverPage() {
           {/* License Info */}
           <Card>
             <CardHeader>
-              <CardTitle>
-                {t('drivers:license_info', { defaultValue: 'License Information' })}
-              </CardTitle>
+              <CardTitle>{t('drivers:license_info')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -422,11 +418,7 @@ export default function CreateDriverPage() {
                   name="licensePhotoFront"
                   render={() => (
                     <FormItem>
-                      <FormLabel>
-                        {t('drivers:license_photo_front', {
-                          defaultValue: 'License Photo (Front)',
-                        })}
-                      </FormLabel>
+                      <FormLabel>{t('drivers:license_photo_front')}</FormLabel>
                       <FormControl>
                         <div className="flex items-center gap-4">
                           <Input
@@ -457,9 +449,7 @@ export default function CreateDriverPage() {
                   name="licensePhotoBack"
                   render={() => (
                     <FormItem>
-                      <FormLabel>
-                        {t('drivers:license_photo_back', { defaultValue: 'License Photo (Back)' })}
-                      </FormLabel>
+                      <FormLabel>{t('drivers:license_photo_back')}</FormLabel>
                       <FormControl>
                         <div className="flex items-center gap-4">
                           <Input

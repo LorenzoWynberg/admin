@@ -142,27 +142,6 @@ declare namespace App.Data.Auth {
     password: string;
   };
 }
-declare namespace App.Data.Balance {
-  export type BalanceEntryData = {
-    id?: number;
-    publicId?: string;
-    type?: App.Enums.BalanceEntryType;
-    amount?: number;
-    originalAmount?: number | null;
-    originalCurrency?: string | null;
-    fxRate?: number | null;
-    sourceRefundId?: number | null;
-    appliedOrderId?: number | null;
-    notes?: string | null;
-    createdAt?: string;
-  };
-  export type StoreBalanceEntryData = {
-    ownerPublicId: string;
-    amount: number;
-    type: App.Enums.BalanceEntryType;
-    notes: string | null;
-  };
-}
 declare namespace App.Data.Business {
   export type BusinessData = {
     id: number;
@@ -174,7 +153,9 @@ declare namespace App.Data.Business {
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     balance?: number;
     dispatcherId?: number | null;
-    balanceDebtCeiling?: number | null;
+    balanceLimit?: number | null;
+    billingCycle?: App.Enums.BillingCycle;
+    blockReason?: App.Enums.AccountBlockReason | null;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -195,7 +176,8 @@ declare namespace App.Data.Business {
     usersCanApproveOwnOrders?: boolean;
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     dispatcherId?: number | null;
-    balanceDebtCeiling?: number | null;
+    balanceLimit?: number | null;
+    billingCycle?: App.Enums.BillingCycle;
   };
 }
 declare namespace App.Data.Catalog {
@@ -268,6 +250,27 @@ declare namespace App.Data.Chat {
     imageUrl: string | null;
     createdAt: string;
     user?: App.Data.User.UserData;
+  };
+}
+declare namespace App.Data.Credit {
+  export type CreditData = {
+    id?: number;
+    publicId?: string;
+    type?: App.Enums.CreditType;
+    amount?: number;
+    originalAmount?: number | null;
+    originalCurrency?: string | null;
+    fxRate?: number | null;
+    sourceRefundId?: number | null;
+    appliedOrderId?: number | null;
+    notes?: string | null;
+    createdAt?: string;
+  };
+  export type StoreCreditData = {
+    ownerPublicId: string;
+    amount: number;
+    type: App.Enums.CreditType;
+    notes: string | null;
   };
 }
 declare namespace App.Data.Currency {
@@ -634,7 +637,7 @@ declare namespace App.Data.Order {
   };
   export type StoreOrderData = {
     deliveryAddress: App.Data.Address.StoreSnapshotAddressData;
-    currencyCode: string;
+    currencyCode?: string;
     contactName?: string;
     contactPhone?: string;
     desiredDeliveryAt: string | null;
@@ -754,6 +757,131 @@ declare namespace App.Data.Payment {
     amount: number;
     method: App.Enums.RefundMethod;
     reason: string | null;
+  };
+}
+declare namespace App.Data.PaymentDestination {
+  export type PaymentDestinationData = {
+    id?: number;
+    method?: App.Enums.SettlementMethod;
+    currencyCode?: string | null;
+    phoneNumber?: string | null;
+    bankName?: string | null;
+    accountNumber?: string | null;
+    iban?: string | null;
+    holderName?: string;
+    legalId?: string;
+    maxAmount?: number | null;
+    active?: boolean;
+    sortOrder?: number;
+    createdAt?: string;
+    updatedAt?: string;
+    deletedAt?: string | null;
+  };
+  export type StorePaymentDestinationData = {
+    method: App.Enums.SettlementMethod;
+    currencyCode?: string | null;
+    phoneNumber?: string | null;
+    bankName?: string | null;
+    accountNumber?: string | null;
+    iban?: string | null;
+    holderName: string;
+    legalId: string;
+    maxAmount?: number | null;
+    active?: boolean;
+    sortOrder?: number | null;
+  };
+  export type UpdatePaymentDestinationData = {
+    currencyCode?: string | null;
+    phoneNumber?: string | null;
+    bankName?: string | null;
+    accountNumber?: string | null;
+    iban?: string | null;
+    holderName?: string;
+    legalId?: string;
+    maxAmount?: number | null;
+    active?: boolean;
+    sortOrder?: number | null;
+  };
+}
+declare namespace App.Data.PeriodBill {
+  export type ApprovePeriodBillDeclarationData = {
+    notes: string | null;
+  };
+  export type BillNeedsAttentionData = {
+    bill: App.Data.PeriodBill.PeriodBillData;
+    urgency: App.Enums.AttentionUrgency;
+    reason: App.Enums.BillAttentionReason;
+    ownerType: string;
+    ownerPublicId: string | null;
+    ownerName: string | null;
+  };
+  export type DeclarePeriodBillPaymentData = {
+    method: App.Enums.SettlementMethod;
+    currencyCode: string;
+    reference: string;
+    destinationId: number | null;
+    proof: any | null;
+  };
+  export type PayPeriodBillData = {
+    method: App.Enums.SettlementMethod;
+    currencyCode: string;
+    paymentMethodId: string | null;
+  };
+  export type PeriodBillData = {
+    id: number;
+    publicId: string;
+    cutoffAt: string;
+    dueAt: string | null;
+    baseAmount: number;
+    creditApplied: number;
+    netDue: number;
+    isOverdue: boolean;
+    currencyCode: string | null;
+    provider: App.Enums.PaymentProvider | null;
+    providerChargeId: string | null;
+    chargeUnresolvedAt: string | null;
+    status: App.Enums.PeriodBillStatus;
+    settlementMethod: App.Enums.SettlementMethod | null;
+    reference: string | null;
+    proofPath: string | null;
+    proofUrl: string | null;
+    settlementDestination: {
+      id: number;
+      method: string;
+      currencyCode: string | null;
+      phoneNumber: string | null;
+      bankName: string | null;
+      accountNumber: string | null;
+      iban: string | null;
+      holderName: string;
+      legalId: string;
+    } | null;
+    notes?: string | null;
+    perCurrencyTotals?: Record<string, { amount: number; baseAmount: number }>;
+    lines?: Array<App.Data.PeriodBill.PeriodBillLineData>;
+  };
+  export type PeriodBillDestinationQueryData = {
+    method: App.Enums.SettlementMethod;
+    currencyCode: string;
+  };
+  export type PeriodBillLineData = {
+    id: number;
+    orderPublicId: string;
+    amount: number;
+    currencyCode: string;
+    fxRate: number | null;
+    baseAmount: number;
+  };
+  export type RejectPeriodBillDeclarationData = {
+    notes: string;
+  };
+  export type SettlePeriodBillData = {
+    method: App.Enums.SettlementMethod;
+    currencyCode: string;
+    reference: string | null;
+    destinationId: number | null;
+    proof: any | null;
+    notes: string | null;
   };
 }
 declare namespace App.Data.Pricing {
@@ -916,6 +1044,7 @@ declare namespace App.Data.RefundRequest {
     refundId?: number | null;
     createdAt?: string;
     updatedAt?: string;
+    isCreditOnly?: boolean;
     order?: App.Data.Order.OrderData | null;
     user?: App.Data.User.UserData | null;
   };
@@ -1162,7 +1291,8 @@ declare namespace App.Data.User {
     allowedPaymentMethods?: Array<App.Enums.PaymentMethodType>;
     preferredCurrency?: string | null;
     dispatcherId?: number | null;
-    balanceDebtCeiling?: number | null;
+    balanceLimit?: number | null;
+    billingCycle?: App.Enums.BillingCycle;
     role?: string;
   };
   export type UserData = {
@@ -1179,7 +1309,9 @@ declare namespace App.Data.User {
     balance?: number;
     businessId?: number | null;
     dispatcherId?: number | null;
-    balanceDebtCeiling?: number | null;
+    balanceLimit?: number | null;
+    billingCycle?: App.Enums.BillingCycle;
+    blockReason?: App.Enums.AccountBlockReason | null;
     sexId?: number | null;
     isAdmin: boolean;
     isBusinessAccount: boolean;
@@ -1200,6 +1332,10 @@ declare namespace App.Data.User {
   };
 }
 declare namespace App.Enums {
+  export enum AccountBlockReason {
+    BalanceLimit = 'balance_limit',
+    SettlementOverdue = 'settlement_overdue',
+  }
   export enum AddressType {
     Saved = 'saved',
     Snapshot = 'snapshot',
@@ -1286,15 +1422,17 @@ declare namespace App.Enums {
     DELIVERY = 'delivery',
     INSTRUCTIONS = 'instructions',
   }
-  export enum BalanceEntryType {
-    RefundGrant = 'refund_grant',
-    AdminGrant = 'admin_grant',
-    OrderApplication = 'order_application',
-    ApplicationReversal = 'application_reversal',
-    AdminVoid = 'admin_void',
-    CancellationFee = 'cancellation_fee',
-    UnderCollection = 'under_collection',
-    DebtSettlement = 'debt_settlement',
+  export enum BillAttentionReason {
+    UnresolvedCharge = 'unresolved_charge',
+    Overdue = 'overdue',
+    DeclarationToVerify = 'declaration_to_verify',
+    Quiet = 'quiet',
+  }
+  export enum BillingCycle {
+    PerOrder = 'per_order',
+    Weekly = 'weekly',
+    Biweekly = 'biweekly',
+    Monthly = 'monthly',
   }
   export enum ChatChannel {
     Support = 'support',
@@ -1306,6 +1444,14 @@ declare namespace App.Enums {
     TimeSensitiveViolation = 'time_sensitive_violation',
     OutsideOperatingHours = 'outside_operating_hours',
     OutsideDriverShift = 'outside_driver_shift',
+  }
+  export enum CreditType {
+    RefundGrant = 'refund_grant',
+    AdminGrant = 'admin_grant',
+    OrderApplication = 'order_application',
+    ApplicationReversal = 'application_reversal',
+    AdminVoid = 'admin_void',
+    PeriodBillApplication = 'period_bill_application',
   }
   export enum CrudAction {
     Retrieved = 'retrieved',
@@ -1320,6 +1466,12 @@ declare namespace App.Enums {
     Approved = 'approved',
     Denied = 'denied',
     Sent = 'sent',
+  }
+  export enum DebtChargeResolution {
+    Settled = 'settled',
+    Freed = 'freed',
+    Unresolved = 'unresolved',
+    NotResolvable = 'not_resolvable',
   }
   export enum DeliveryTier {
     Expedited = 'expedited',
@@ -1414,6 +1566,7 @@ declare namespace App.Enums {
     Notification = 'notification',
     Payment = 'payment',
     PaymentMethod = 'payment_method',
+    PeriodBill = 'period_bill',
     Refund = 'refund',
     Route = 'route',
     RouteStop = 'route_stop',
@@ -1428,7 +1581,8 @@ declare namespace App.Enums {
     Invoice = 'invoice',
     InvoiceItem = 'invoice_item',
     RefundRequest = 'refund_request',
-    BalanceEntry = 'balance_entry',
+    Credit = 'credit',
+    PaymentDestination = 'payment_destination',
   }
   export enum NotificationAction {
     QuoteRequested = 'quote_requested',
@@ -1456,7 +1610,9 @@ declare namespace App.Enums {
     RefundRequestDenied = 'refund_request_denied',
     BalanceCredited = 'balance_credited',
     RefundDue = 'refund_due',
-    RefundSettled = 'refund_settled',
+    PeriodBillClosed = 'period_bill_closed',
+    PeriodBillDueSoon = 'period_bill_due_soon',
+    PeriodBillDeclarationResolved = 'period_bill_declaration_resolved',
   }
   export enum NotificationStatus {
     Unread = 'unread',
@@ -1512,10 +1668,26 @@ declare namespace App.Enums {
     UNPAID = 'unpaid',
     AUTHORIZED = 'authorized',
     PAID = 'paid',
+    ON_ACCOUNT = 'on_account',
     SURCHARGE_DUE = 'surcharge_due',
     REFUNDED = 'refunded',
     VOIDED = 'voided',
     CHARGEBACK = 'chargeback',
+  }
+  export enum PeriodBillChargeOutcome {
+    Settled = 'settled',
+    Declined = 'declined',
+    Unresolved = 'unresolved',
+    NoUsableCard = 'no_usable_card',
+    NotPayable = 'not_payable',
+    DeclarationPending = 'declaration_pending',
+    Unsupported = 'unsupported',
+  }
+  export enum PeriodBillStatus {
+    Open = 'open',
+    Issued = 'issued',
+    AwaitingVerification = 'awaiting_verification',
+    Paid = 'paid',
   }
   export enum PricingCalculationMode {
     CUMULATIVE = 'cumulative',
@@ -1556,6 +1728,7 @@ declare namespace App.Enums {
     Pending = 'pending',
     Approved = 'approved',
     Denied = 'denied',
+    Unresolved = 'unresolved',
   }
   export enum Role {
     BUSINESS_OWNER = 'business.owner',
@@ -1595,6 +1768,13 @@ declare namespace App.Enums {
   export enum ScheduleChangeReason {
     Reassigned = 'reassigned',
     Rescheduled = 'rescheduled',
+  }
+  export enum SettlementMethod {
+    Card = 'card',
+    SinpeMobile = 'sinpe_mobile',
+    Transferencia = 'transferencia',
+    Cash = 'cash',
+    Credit = 'credit',
   }
   export enum TipoIdentificacion {
     Fisica = '01',

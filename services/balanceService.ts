@@ -1,11 +1,11 @@
 import { api } from '@/lib/api/client';
 
-type BalanceEntryData = App.Data.Balance.BalanceEntryData;
+type CreditData = App.Data.Credit.CreditData;
 type Multiple<T> = Api.Response.Multiple<T>;
 type Single<T> = Api.Response.Single<T>;
 
 export interface BalanceLedger {
-  entries: BalanceEntryData[];
+  entries: CreditData[];
   /** Balance in base currency. */
   balance: number;
   baseCurrency: string | null;
@@ -27,7 +27,7 @@ export const BalanceService = {
    */
   async list(ownerPublicId?: string): Promise<BalanceLedger> {
     const query = ownerPublicId ? `?owner=${encodeURIComponent(ownerPublicId)}` : '';
-    const response = await api.get<Multiple<BalanceEntryData>>(`/balance${query}`);
+    const response = await api.get<Multiple<CreditData>>(`/balance${query}`);
 
     const extra = (response.extra ?? {}) as { balance?: number; baseCurrency?: string | null };
 
@@ -39,8 +39,8 @@ export const BalanceService = {
   },
 
   /** Add or remove balance by hand (admin only). */
-  async grant(data: AdjustBalanceParams): Promise<BalanceEntryData> {
-    const response = await api.post<Single<BalanceEntryData>>('/balance', {
+  async grant(data: AdjustBalanceParams): Promise<CreditData> {
+    const response = await api.post<Single<CreditData>>('/balance', {
       ownerPublicId: data.ownerPublicId,
       amount: data.amount,
       type: data.type,

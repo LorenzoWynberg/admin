@@ -75,29 +75,40 @@ La navigation principale vit dans la barre de gauche. Elle est organisée du plu
   <div class="card"><strong class="card-title">Règles de tarification</strong><p>Configuration des tarifs par distance, palier, fenêtre, etc.</p></div>
   <div class="card"><strong class="card-title">Notifications</strong><p>Événements système destinés aux opérations.</p></div>
   <div class="card"><strong class="card-title">Journaux d'audit</strong><p>Qui a fait quoi et quand.</p></div>
-  <div class="card"><strong class="card-title">Paramètres</strong><p>Devises, fenêtres de service, langue, profil.</p></div>
+  <div class="card"><strong class="card-title">Guide</strong><p>Ce manuel, à l'intérieur du panneau.</p></div>
+  <div class="card"><strong class="card-title">Paramètres</strong><p>Devises, destinations de paiement, fenêtres de service, langue.</p></div>
 </div>
+
+_Paramètres se tient à part, au pied de la barre, sous la liste._
 
 ---
 
 ## Demande l'attention <span class="pill green">l'écran le plus important</span> {#needs-attention}
 
-**C'est l'écran où un administrateur passe la majeure partie de la journée.** Toute commande qui exige une intervention manuelle apparaît ici, classée en onglets selon le type d'action.
+**C'est l'écran où un administrateur passe la majeure partie de la journée.** Tout ce qui exige une intervention manuelle apparaît ici — une commande, ou la facture d'un compte — classé en onglets selon le type d'action.
 
 <figure>
   <img src="/guide/screenshots/22-needs-attention.png" alt="Onglets de Demande l'attention" />
-  <figcaption>Onglets de <em>Demande l'attention</em>. Le nombre sur chaque onglet indique combien de commandes attendent une action.</figcaption>
+  <figcaption>Onglets de <em>Demande l'attention</em>. Le nombre sur chaque onglet indique combien de commandes attendent une action. Cette capture est antérieure au sixième onglet — la liste à jour est le tableau ci-dessous.</figcaption>
 </figure>
 
-### Les cinq onglets {#five-tabs}
+### Les onglets {#tabs}
 
-| Onglet                        | Contenu                                                                                                                                                                     | Action attendue                                                                           |
-| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **Conflits**                  | Commandes que le système n'a pas pu répartir automatiquement ou qui ont des problèmes de faisabilité (fenêtre impossible, aucun chauffeur disponible, distance hors plage). | Examiner le motif, réaffecter manuellement, ajuster la fenêtre ou écarter la commande.    |
-| **Conciliation**              | Commandes <span class="pill blue">Terminée</span> où le chauffeur a livré mais le montant facturé doit être ajusté au coût réel des produits achetés.                       | Ouvrir la boîte de conciliation, saisir les prix réels par ligne, générer le devis final. |
-| **Non Cotées**                | Commandes que le client vient de créer et qui n'ont pas encore de devis.                                                                                                    | Vérifier les adresses de chaque arrêt, créer le devis et l'envoyer au client.             |
-| **Non Payées**                | Commandes livrées mais non encore payées par le client.                                                                                                                     | Faire le suivi de l'encaissement, marquer comme payée le moment venu.                     |
-| **Demandes de remboursement** | Réclamations de clients demandant un remboursement total ou partiel.                                                                                                        | Examiner les preuves (preuve de livraison, photos), approuver ou rejeter.                 |
+Ils se lisent de gauche à droite, et le tableau ci-dessous a une ligne par onglet — si le panneau vous montre un onglet que ce tableau ne nomme pas, le guide est périmé et cela vaut la peine de le signaler.
+
+| Onglet                        | Contenu                                                                                                                                                                                                               | Action attendue                                                                                      |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Conflits**                  | Commandes que le système n'a pas pu répartir automatiquement ou qui ont des problèmes de faisabilité (fenêtre impossible, aucun chauffeur disponible, distance hors plage).                                           | Examiner le motif, réaffecter manuellement, ajuster la fenêtre ou écarter la commande.               |
+| **Conciliation**              | Commandes <span class="pill blue">Terminée</span> où le chauffeur a livré mais le montant facturé doit être ajusté au coût réel des produits achetés.                                                                 | Ouvrir la boîte de conciliation, saisir les prix réels par ligne, générer le devis final.            |
+| **Non Cotées**                | Commandes que le client vient de créer et qui n'ont pas encore de devis.                                                                                                                                              | Vérifier les adresses de chaque arrêt, créer le devis et l'envoyer au client.                        |
+| **Non Payées**                | Deux groupes, l'un sous l'autre : commandes qui ont un devis et restent impayées, et commandes réglées à la livraison (le chauffeur prend l'argent à la porte, en espèces ou par SINPE Móvil).                        | Faire le suivi de l'encaissement, marquer comme payée le moment venu.                                |
+| **Demandes de remboursement** | Réclamations de clients demandant un remboursement total ou partiel.                                                                                                                                                  | Examiner les preuves (preuve de livraison, photos), approuver ou rejeter.                            |
+| **Factures de période**       | Factures des comptes facturés par période plutôt qu'à la commande : un paiement déclaré à contrôler, une facture échue, une facture impayée en silence, ou un paiement par carte que la passerelle n'a jamais résolu. | [Traiter la facture](#period-bills) — vérifier la déclaration, ou enregistrer le paiement déjà reçu. |
+
+<div class="callout warn">
+<strong>Une commande sur compte n'est pas une commande impayée</strong>
+Les commandes facturées à un compte n'apparaissent jamais dans <em>Non Payées</em>. Elles portent <span class="pill blue">Sur Compte</span>, ce qui veut dire que quelqu'un les paie <em>bel et bien</em> — sur une facture de période. Celles-là se relancent depuis l'onglet <em>Factures de période</em>, pas depuis celui-ci.
+</div>
 
 ### Filtres de sévérité {#severity-filters}
 
@@ -369,7 +380,109 @@ Depuis le détail d'une commande terminée avec paiement autorisé, un bouton `C
 
 <div class="callout tip">
 <strong>Le paiement est « autorisé » avant la livraison</strong>
-Quand le devis est accepté, la passerelle de paiement autorise une retenue pour le montant coté mais <em>ne facture pas encore</em>. La conciliation déclenche la capture finale : au montant exact, ni plus ni moins. Cela évite les remboursements et les charges surprises.
+Quand le devis est accepté, la passerelle de paiement autorise une retenue pour le montant coté mais <em>ne facture pas encore</em>. La conciliation déclenche la capture finale : au montant exact, ni plus ni moins. Cela évite les remboursements et les charges surprises. <strong>C'est le parcours à la commande</strong> ; un compte facturé par période ne prend aucune retenue — voir <a href="#period-bills">Facturation sur compte</a>.
+</div>
+
+---
+
+## Facturation sur compte {#period-bills}
+
+La plupart des clients paient à la commande : le devis est autorisé quand ils l'acceptent et capturé à la [conciliation](#reconcile). **Un compte peut au contraire être facturé par période** — il commande toute la semaine ou tout le mois, rien n'est facturé par livraison, et une seule facture couvrant toutes les commandes de la période se clôture à la fin de celle-ci.
+
+Deux choses en découlent, et toutes deux changent ce que vous voyez à l'écran :
+
+- Une commande facturée ainsi porte <span class="pill blue">Sur Compte</span> et non <span class="pill amber">Non Payé</span>. Ce n'est **pas** une commande impayée : quelqu'un la paie, sur une facture qui n'est pas encore clôturée.
+- On ne demande à personne d'encaisser à la porte, donc l'étape d'encaissement du chauffeur est supprimée. C'est délibéré, ce n'est pas une invite manquante.
+
+<div class="callout info">
+<strong>Rien n'est facturé automatiquement</strong>
+La facture se clôture et s'envoie toute seule — c'est la seule part automatique. L'<em>argent</em> est toujours un acte qu'une personne accomplit : le client la paie depuis son application, ou un administrateur enregistre un paiement arrivé par une autre voie. <strong>Aucune carte enregistrée n'est jamais débitée en arrière-plan.</strong> Une carte enregistrée pour régler une livraison n'est pas une permission de solder le compte, donc une facture qui reste impayée est relancée par une personne, comme n'importe quelle autre facture.
+</div>
+
+### La vie d'une facture {#bill-states}
+
+| Code interne            | Étiquette                                               | Signification                                                                                                                                                                                          |
+| ----------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `open`                  | <span class="pill gray">Ouverte</span>                  | La période court encore. Les commandes rejoignent la facture au fur et à mesure qu'elles sont approuvées et le total bouge. **Rien n'est dû pour l'instant** — une facture ouverte n'a pas d'échéance. |
+| `issued`                | <span class="pill blue">Émise</span>                    | La période est clôturée. Le total est figé, le crédit du compte a été appliqué s'il y en avait, une échéance est apposée et le client a été notifié.                                                   |
+| `awaiting_verification` | <span class="pill amber">Vérification en Attente</span> | Le client dit avoir envoyé un virement et a joint un justificatif. **Ce n'est pas payé.** L'échéance n'a pas bougé et le compte à rebours continue.                                                    |
+| `paid`                  | <span class="pill green">Payé</span>                    | Soldée. Toutes les commandes de la facture passent à <span class="pill green">Payé</span> dans le même mouvement, avec le moyen de paiement apposé — une facture se solde entièrement ou pas du tout.  |
+
+La clôture suit l'horloge de la période, à **03:00**, sans opérateur dans la boucle. C'est ce qui donne du sens au silence : personne n'a à penser à clôturer une période, donc une facture qui ne s'est pas clôturée est une anomalie à signaler. L'échéance tombe **7 jours** après la clôture, et un rappel part au client à 08:00 à mesure qu'elle approche.
+
+### L'onglet Factures de période {#bills-tab}
+
+Le dernier onglet de [Demande l'attention](#needs-attention) est la file de facturation. **Une ligne par facture, ne montrant que le plus urgent de ce qui cloche** — une facture correspond couramment à plusieurs des lignes ci-dessous, et la file retient la plus forte plutôt que de la lister deux fois.
+
+| Badge                         | Urgence                                | Ce qui s'est passé                                                                                                                                                                                                     | Ce que vous faites                                                                                                          |
+| ----------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Paiement non résolu**       | <span class="pill red">Critique</span> | Le client a appuyé sur Payer et la passerelle n'a jamais dit ce qui s'était passé. **Son argent est peut-être déjà parti alors que la facture est toujours indiquée comme impayée**, et rien ne résout cela tout seul. | Cherchez d'abord un paiement contre cette facture dans la passerelle. Ne redemandez pas au client de payer avant de savoir. |
+| **En retard**                 | <span class="pill amber">Élevé</span>  | Échéance dépassée et somme toujours due. **Le compte est bloqué pour commander.**                                                                                                                                      | Relancez. Vérifier une déclaration ou enregistrer un paiement solde la facture et débloque le compte.                       |
+| **Paiement à vérifier**       | <span class="pill blue">Moyen</span>   | Le client a déclaré un virement et joint un justificatif.                                                                                                                                                              | Retrouvez-le à la banque, puis approuvez ou rejetez — voir ci-dessous.                                                      |
+| **Impayée, pas encore échue** | <span class="pill gray">Faible</span>  | Clôturée il y a deux ou trois jours, impayée, et pas encore échue.                                                                                                                                                     | Appelez-les. **C'est la précieuse** — rien ne cloche encore, et c'est l'état qui évite les deux autres.                     |
+
+Les lignes vont de la plus urgente à la moins, puis par échéance la plus ancienne. Les compteurs d'urgence au-dessus de la liste sont le signal de tri qu'une liste plate ne donne pas : ils disent quelle part de la file est de l'argent client peut-être déjà parti, et quelle part n'est qu'une facture silencieuse.
+
+<div class="callout warn">
+<strong>Lire la file relève du personnel ; agir sur une facture relève de l'administrateur</strong>
+N'importe quel opérateur du personnel peut ouvrir cet onglet et lire une facture. <em>Vérifier</em>, <em>Approuver</em>, <em>Rejeter</em> et <em>Enregistrer le Paiement</em> sont réservés aux administrateurs — constater que de l'argent est arrivé sur un compte, et trancher la réclamation d'un client affirmant que c'est le cas, sont des actes comptables et non opérationnels. Si vous voyez la facture mais pas les boutons, c'est la raison.
+</div>
+
+### Vérifier un paiement déclaré {#verify-declaration}
+
+Une déclaration est une **réclamation, pas un paiement** : le client dit avoir envoyé de l'argent et propose une référence et un justificatif. Rien n'est soldé tant que quelqu'un n'a pas retrouvé le virement.
+
+Cliquez sur `Vérifier` sur la ligne de la facture (ou sur son détail). La boîte de dialogue vous donne tout ce dont la recherche a besoin :
+
+1. **Le moyen** — SINPE Móvil ou Virement bancaire. Il vous dit dans quel canal chercher.
+2. **La référence**, avec un bouton de copie à côté. Copiez-la plutôt que de la retaper : la banque ne le retrouvera que sur une correspondance exacte, caractère pour caractère, et la retaper de mémoire est là où une vérification déraille.
+3. **Le montant à chercher** — total de la période, crédit appliqué et montant dû en colones. Si le client a payé dans sa propre devise, le chiffre dans _cette_ devise est montré aussi, et c'est celui qui figurera sur le relevé.
+4. **Où on lui a dit d'envoyer** — le destinataire que la facture a enregistré, pour que vous cherchiez dans le bon compte. C'est un instantané que la facture a gardé et non une ligne vivante, donc il reste lisible même après que ce destinataire a été modifié ou désactivé.
+5. **Le justificatif**, derrière un bouton. C'est une **corroboration, pas une preuve** : ce qui tranche, c'est de retrouver le paiement à la banque. Il ne se charge que si vous le demandez, et son absence ne vous bloque jamais.
+
+Puis l'une de deux issues :
+
+- **Approuver** — la facture passe à <span class="pill green">Payé</span> et toutes ses commandes se soldent avec elle. La note est facultative.
+- **Rejeter** — **un motif est obligatoire**, et le bouton reste désactivé tant que vous n'en écrivez pas un. Ce motif parvient au client, et c'est tout l'enjeu : une réclamation rejetée sans motif revient telle quelle, avec le même fichier téléversé à nouveau.
+
+<div class="callout warn">
+<strong>Le champ de notes remplace ce qui s'y trouve déjà</strong>
+Approuver ou rejeter écrase la note de la facture. La note qu'elle porte est affichée au-dessus du champ mais délibérément pas pré-remplie — lisez-la avant d'écrire, et ne renvoyez pas la phrase de quelqu'un d'autre comme la vôtre.
+</div>
+
+### Enregistrer un paiement arrivé par une autre voie {#record-bill-payment}
+
+Utilisez `Enregistrer le Paiement` quand l'argent vous est parvenu autrement — des espèces au comptoir, un virement que vous avez déjà rapproché à la banque, une carte prise par téléphone. Ici vous affirmez un fait plutôt que de déposer une réclamation, donc cela solde la facture immédiatement, sans vérification ultérieure.
+
+| Champ                        | Notes                                                                                                                                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Moyen de paiement**        | Carte, SINPE Móvil, Virement bancaire ou Espèces.                                                                                                                                          |
+| **Devise**                   | Obligatoire — le formulaire ne s'envoie pas sans elle. Elle enregistre _lequel_ des chiffres déjà figés de la facture a réellement été payé, pas un taux consulté maintenant.              |
+| **Destinataire du paiement** | Proposé pour SINPE Móvil et Virement bancaire seulement, et limité aux destinations actives de ce moyen. Changer de moyen efface le choix, car un destinataire appartient à un seul moyen. |
+| **Référence**                | Facultative, et pré-remplie depuis la facture quand elle en porte déjà une.                                                                                                                |
+| **Justificatif de paiement** | Facultatif ici. Un client qui déclare un virement doit en joindre une ; vous avez déjà reçu l'argent, donc votre enregistrement est le fait.                                               |
+| **Notes**                    | Pré-remplie depuis la facture, car l'envoi écrit ce champ quoi qu'il arrive — le laisser vide effacerait en silence une note laissée par un acte antérieur, motif de rejet compris.        |
+
+<div class="callout info">
+<strong>Le crédit du compte n'est pas dans la liste des moyens, et c'est voulu</strong>
+Le crédit ne compte comme payé qu'une fois que la clôture de la période l'a réellement appliqué à la facture, et rien d'autre ne l'applique. L'enregistrer à la main marquerait une facture payée avec de l'argent que rien n'a dépensé, donc le panneau ne le propose pas.
+</div>
+
+Les espèces sont dans la liste de l'opérateur et absentes de celle du client, et l'asymétrie est tout l'enjeu : **un client ne peut pas prouver qu'il a remis des espèces.** L'administrateur qui les a reçues est la seule personne à pouvoir dire que cela a eu lieu. La carte fonctionne à l'inverse — le client peut payer par carte lui-même, dans l'application, et vous pouvez aussi enregistrer un paiement pris ailleurs.
+
+### L'écran de détail de la facture {#bill-detail}
+
+`Voir` sur n'importe quelle ligne ouvre la facture à `/period-bills/<code>`. **Il n'y a pas de liste de factures dans la barre latérale** — l'onglet _Factures de période_ est le chemin vers une facture, et la flèche de retour vous y ramène. Les mêmes boutons `Vérifier` et `Enregistrer le Paiement` sont dans l'en-tête, et seulement pour une facture qui les admet encore : une facture déjà <span class="pill green">Payé</span> n'en propose aucun.
+
+Trois parties :
+
+- **Facture de période** — total de la période, crédit appliqué, montant dû, la date de clôture, la date d'échéance, et une ligne par devise dans laquelle ses lignes ont été convenues.
+- **Moyen de paiement** — n'apparaît qu'une fois qu'il y a quelque chose à montrer : le moyen, la référence copiable, l'instantané du destinataire, le justificatif, la note.
+- **Ce que couvre cette facture** — une ligne par commande, avec le code de la commande, la devise dans laquelle elle a été convenue, le taux de change figé sur son devis, et le montant dans cette devise comme en colones.
+
+<div class="callout info">
+<strong>Les montants ne sont jamais reconvertis</strong>
+Une ligne convenue en colones porte un seul chiffre en colones et n'a eu besoin d'aucun taux — c'est pourquoi la colonne du taux affiche un tiret sur ces lignes plutôt que le taux du jour. Une ligne convenue dans une autre devise porte ce montant, le taux figé sur son devis, et le montant en colones qui en découle à cet instant. Rien n'est consulté quand l'argent arrive, donc une facture peut toujours énoncer ce qui lui est dû avant que quiconque paie.
 </div>
 
 ---
@@ -569,7 +682,7 @@ Comptes d'entreprise. Les entreprises peuvent avoir :
 
 - Plusieurs utilisateurs autorisés à créer des commandes.
 - Des tarifs négociés différents de ceux du grand public.
-- Une facturation consolidée mensuelle.
+- Une facturation consolidée par période plutôt qu'à la commande — voir [Facturation sur compte](#period-bills).
 - Leur propre catalogue d'adresses fréquentes.
 
 ---
@@ -647,10 +760,21 @@ Registre immuable de toutes les actions administratives. Utile pour :
 
 <figure>
   <img src="/guide/screenshots/15-settings.png" alt="Paramètres généraux" />
-  <figcaption>Écran <em>Paramètres</em>. Trois cartes : <em>Langue</em> (sélecteur en ligne), <em>Paramètres de devise</em> et <em>Fenêtre de service</em> (les deux dernières ouvrent des sous-pages via la flèche droite).</figcaption>
+  <figcaption>Écran <em>Paramètres</em>. La capture est antérieure à trois des cartes qu'il porte aujourd'hui — la liste à jour est ci-dessous.</figcaption>
 </figure>
 
-C'est ici que vivent les paramètres globaux de l'opération. Attention : la liste est volontairement courte — seulement ce qu'un administrateur doit changer à la main. Le reste du comportement (tarifs, fenêtres par commande, faisabilité de la répartition) est modélisé dans ses propres sections.
+C'est ici que vivent les paramètres globaux de l'opération. La liste est volontairement courte — seulement ce qu'un administrateur doit changer à la main. Le reste du comportement (tarifs, fenêtres par commande, faisabilité de la répartition) est modélisé dans ses propres sections.
+
+Les cartes, de haut en bas. Les trois premières se modifient sur place ; les trois dernières portent une flèche droite et ouvrent une sous-page.
+
+| Carte                                | Ce qu'elle règle                                                                                                                                                                                                                                                           |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Langue**                           | La langue de l'interface pour l'administrateur qui l'utilise — voir ci-dessous.                                                                                                                                                                                            |
+| **Types de Véhicule Pris en Charge** | Quels types de véhicule un chauffeur de cette flotte peut se voir attribuer. Cochez ceux que vous exploitez et enregistrez.                                                                                                                                                |
+| **Temps d'attente**                  | Tarif à la minute et tolérance au-delà de l'estimation, pour le temps qu'un chauffeur passe à attendre à un arrêt au-delà de ce qui était coté. Mettez le tarif à zéro et l'attente n'est pas facturée. Une décision de liste de prix, prise une fois — pas à la commande. |
+| **Paramètres de devise** →           | Quelles devises la plateforme accepte, comment les taux sont obtenus, et comment chacune arrondit.                                                                                                                                                                         |
+| **Destinations de paiement** →       | Où l'on dit au client d'envoyer l'argent d'une facture de période.                                                                                                                                                                                                         |
+| **Fenêtre de service** →             | Quand la plateforme accepte de nouvelles commandes, et ce qu'il advient de celles laissées sans chauffeur.                                                                                                                                                                 |
 
 ### Langue
 
@@ -716,6 +840,27 @@ L'arrondi affecte la façon dont les montants sont présentés au client final, 
 Le taux se saisit comme <em>combien d'unités de la devise de base équivalent à 1 unité de cette devise</em>. Si on saisit par erreur à l'envers (p. ex. <code>0,002</code> au lieu de <code>490</code>), l'aperçu peint une alerte ambre suggérant la valeur inverse.
 </div>
 
+### Destinations de paiement {#settings-payment-destinations}
+
+Déclarer un virement sans destination demande à quelqu'un de payer sans dire où, donc cette liste est ce qui rend SINPE Móvil et le virement bancaire utilisables tout court. Ce sont les comptes de l'entreprise, pas quelque chose que le client enregistre.
+
+Le tableau liste chaque destination avec son moyen, son titulaire, son numéro de compte (ou de téléphone, pour SINPE Móvil), sa devise et son état actif. `+ Créer` ouvre le formulaire ; le crayon modifie une ligne et la corbeille en supprime une.
+
+Les champs du formulaire dépendent du moyen :
+
+| Moyen                 | Champs qu'il admet                                                                                                                  |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **SINPE Móvil**       | Numéro de téléphone. Pas de devise — SINPE Móvil reçoit des colones et rien d'autre.                                                |
+| **Virement bancaire** | Devise, nom de la banque, numéro de compte, et IBAN s'il y en a un.                                                                 |
+| **Les deux**          | Nom du titulaire et identifiant légal (les deux obligatoires), un montant maximum, un ordre d'affichage, et l'interrupteur _actif_. |
+
+Le **montant maximum** est le plafond par virement — SINPE Móvil en a un bien réel, et une destination en dessous du montant d'une facture n'est tout simplement pas proposée pour elle. C'est un filtre sur le montant, pas sur les factures qui peuvent utiliser le moyen : une facture libellée en dollars payée par SINPE Móvil est simplement payée en colones.
+
+<div class="callout warn">
+<strong>Désactiver plutôt que supprimer, et créer plutôt que réaffecter</strong>
+La facture enregistre comme <em>instantané</em> la destination qu'elle a montrée au client, donc supprimer une ligne ne réécrit jamais une ancienne facture — mais une ligne désactivée reste lisible pour qui en lit une. Et le <em>moyen</em> ne peut pas être changé après la création : il décide lesquels des autres champs la ligne peut porter, donc le changer sur place laisserait une destination avec les données du mauvais moyen. Pour basculer une destination vers un autre moyen, désactivez-la et créez-en une nouvelle.
+</div>
+
 ### Fenêtre de service {#settings-service-window}
 
 <figure>
@@ -754,6 +899,8 @@ Le seuil ne compte que les heures à l'intérieur de la fenêtre de service. Une
 
 ## Glossaire des états {#state-glossary}
 
+Les états d'une facture ne sont pas ici — ils vivent avec le flux qui les utilise, dans [La vie d'une facture](#bill-states).
+
 ### États de la commande {#order-states}
 
 | Code interne                                              | Étiquette                                                  | Signification                                                 |
@@ -775,12 +922,18 @@ Le seuil ne compte que les heures à l'intérieur de la fenêtre de service. Une
 
 ### États de paiement {#payment-states}
 
-| Code            | Étiquette                                            | Signification                                     |
-| --------------- | ---------------------------------------------------- | ------------------------------------------------- |
-| `unpaid`        | <span class="pill amber">Non payée</span>            | Aucun paiement enregistré.                        |
-| `paid`          | <span class="pill green">Payée</span>                | Encaissement complet reçu.                        |
-| `surcharge_due` | <span class="pill amber">Surcharge en attente</span> | Après conciliation il reste un solde à percevoir. |
-| `refunded`      | <span class="pill gray">Remboursée</span>            | Remboursement total exécuté.                      |
+Les huit, dans l'ordre où le système les déclare.
+
+| Code            | Étiquette                                      | Signification                                                                                                                                                                                                                       |
+| --------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `unpaid`        | <span class="pill amber">Non Payé</span>       | Aucun paiement enregistré.                                                                                                                                                                                                          |
+| `authorized`    | <span class="pill blue">Autorisé</span>        | Une retenue par carte est posée pour le montant coté. **Aucun argent n'a bougé** — une retenue expire d'elle-même, et la conciliation capture.                                                                                      |
+| `paid`          | <span class="pill green">Payé</span>           | Encaissement complet reçu.                                                                                                                                                                                                          |
+| `on_account`    | <span class="pill blue">Sur Compte</span>      | Facturée au compte au lieu d'être débitée : la commande est une ligne de la facture de cette période, et passe à <span class="pill green">Payé</span> quand cette facture est soldée. Voir [Facturation sur compte](#period-bills). |
+| `surcharge_due` | <span class="pill amber">Supplément Dû</span>  | Après conciliation il reste un solde à percevoir.                                                                                                                                                                                   |
+| `refunded`      | <span class="pill gray">Remboursé</span>       | Remboursement total exécuté.                                                                                                                                                                                                        |
+| `voided`        | <span class="pill gray">Annulé</span>          | La retenue par carte a été libérée sans jamais être débitée — une annulation avant capture.                                                                                                                                         |
+| `chargeback`    | <span class="pill red">Rétrofacturation</span> | Le client a contesté le paiement auprès de sa banque et l'argent a été repris.                                                                                                                                                      |
 
 ---
 
@@ -813,6 +966,18 @@ Parce que la conciliation a détecté que le coût réel des produits était sup
 ### Comment se génèrent les PIN de livraison ? {#faq-pin-generation}
 
 Automatiquement à la création de la commande — un code à 6 chiffres unique par commande. Il est montré au client dans son application et au chauffeur lors de la livraison. Il sert de vérification d'identité du destinataire.
+
+### Le client dit avoir payé sa facture, mais elle apparaît toujours impayée — que faire ? {#faq-declared-not-paid}
+
+Regardez d'abord l'état de la facture. <span class="pill amber">Vérification en Attente</span> veut dire que sa réclamation est arrivée et c'est à **nous** de la traiter — retrouvez le virement à la banque et [approuvez-le](#verify-declaration) ; l'échéance continue de courir entre-temps, donc ce n'est pas une attente à laisser traîner. Si la facture est encore <span class="pill blue">Émise</span> sans déclaration dessus, son paiement ne nous est jamais parvenu comme réclamation : demandez la référence et le justificatif, ou [enregistrez-le vous-même](#record-bill-payment) si vous voyez déjà l'argent.
+
+### Puis-je solder une facture avec le crédit du compte du client ? {#faq-credit-settle}
+
+Non, et il n'y a délibérément pas d'option pour le faire. Le crédit est appliqué par la clôture de la période, automatiquement — la facture que vous regardez affiche déjà _Crédit appliqué_ et un _Montant dû_ crédit déduit. Voir [Le crédit du compte n'est pas dans la liste des moyens](#record-bill-payment) pour la raison pour laquelle il ne peut pas être enregistré à la main.
+
+### Pourquoi ce compte est-il bloqué pour commander ? {#faq-account-blocked}
+
+Pour l'une de deux raisons, et l'écran du compte dit au client laquelle : une facture du compte est **échue**, ou ce que le compte engage — ses factures impayées plus ce que la période en cours a accumulé — a atteint la limite fixée pour lui. Le blocage agit à la création de la commande, donc le client le voit avant de la composer plutôt qu'après. Solder la facture échue règle la première ; relever la limite ou solder des factures règle la seconde.
 
 ### Puis-je créer une commande depuis le panneau sans que le client ne l'initie ? {#faq-admin-create}
 

@@ -75,29 +75,40 @@ La navegación principal vive en la barra izquierda. Está organizada de mayor a
   <div class="card"><strong class="card-title">Reglas de Precios</strong><p>Configuración de tarifas por distancia, tier, ventana, etc.</p></div>
   <div class="card"><strong class="card-title">Notificaciones</strong><p>Eventos del sistema dirigidos a operación.</p></div>
   <div class="card"><strong class="card-title">Registros de auditoría</strong><p>Quién hizo qué y cuándo.</p></div>
-  <div class="card"><strong class="card-title">Configuraciones</strong><p>Monedas, ventanas de servicio, idioma, perfil.</p></div>
+  <div class="card"><strong class="card-title">Guía</strong><p>Este manual, dentro del panel.</p></div>
+  <div class="card"><strong class="card-title">Configuraciones</strong><p>Monedas, destinos de pago, ventanas de servicio, idioma.</p></div>
 </div>
+
+_Configuraciones va aparte, al pie de la barra, debajo del listado._
 
 ---
 
 ## Necesita Atención <span class="pill green">la pantalla más importante</span> {#needs-attention}
 
-**Esta es la pantalla donde un administrador pasa la mayor parte de su día.** Cualquier orden que requiera intervención manual aparece aquí, organizada en pestañas por tipo de acción.
+**Esta es la pantalla donde un administrador pasa la mayor parte de su día.** Todo lo que requiera intervención manual aparece aquí — una orden, o la factura de una cuenta — organizado en pestañas por tipo de acción.
 
 <figure>
   <img src="/guide/screenshots/22-needs-attention.png" alt="Pestañas de Necesita Atención" />
-  <figcaption>Pestañas de <em>Necesita Atención</em>. El número en cada pestaña indica cuántas órdenes esperan acción.</figcaption>
+  <figcaption>Pestañas de <em>Necesita Atención</em>. El número en cada pestaña indica cuántas órdenes esperan acción. Esta captura es anterior a la sexta pestaña — el listado vigente es la tabla de abajo.</figcaption>
 </figure>
 
-### Las cinco pestañas {#five-tabs}
+### Las pestañas {#tabs}
 
-| Pestaña                      | Qué contiene                                                                                                                                                              | Acción esperada                                                                                   |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| **Conflictos**               | Órdenes que el sistema no pudo despachar automáticamente o que tienen problemas de factibilidad (ventana imposible, sin conductor disponible, distancia excede el rango). | Revisar el motivo, reasignar manualmente, ajustar la ventana o desestimar la orden.               |
-| **Conciliación**             | Órdenes <span class="pill blue">Completada</span> donde el conductor entregó pero el monto cobrado debe ajustarse al monto real de los productos comprados.               | Abrir el diálogo de conciliación, ingresar precios reales por línea, generar la cotización final. |
-| **Sin Cotizar**              | Órdenes que el cliente acaba de crear y que aún no tienen cotización.                                                                                                     | Verificar direcciones de cada parada, crear la cotización y enviarla al cliente.                  |
-| **Sin Pagar**                | Órdenes entregadas que aún no han sido pagadas por el cliente.                                                                                                            | Dar seguimiento al cobro, marcar como pagado cuando corresponda.                                  |
-| **Solicitudes de Reembolso** | Reclamos de clientes que solicitan devolución total o parcial.                                                                                                            | Revisar evidencia (prueba de entrega, fotos), aprobar o rechazar.                                 |
+Se leen de izquierda a derecha, y la tabla de abajo tiene una fila por pestaña — si el panel le muestra una pestaña que esta tabla no nombra, la guía está desactualizada y vale la pena reportarlo.
+
+| Pestaña                      | Qué contiene                                                                                                                                                                                                                | Acción esperada                                                                                    |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Conflictos**               | Órdenes que el sistema no pudo despachar automáticamente o que tienen problemas de factibilidad (ventana imposible, sin conductor disponible, distancia excede el rango).                                                   | Revisar el motivo, reasignar manualmente, ajustar la ventana o desestimar la orden.                |
+| **Conciliación**             | Órdenes <span class="pill blue">Completada</span> donde el conductor entregó pero el monto cobrado debe ajustarse al monto real de los productos comprados.                                                                 | Abrir el diálogo de conciliación, ingresar precios reales por línea, generar la cotización final.  |
+| **Sin Cotizar**              | Órdenes que el cliente acaba de crear y que aún no tienen cotización.                                                                                                                                                       | Verificar direcciones de cada parada, crear la cotización y enviarla al cliente.                   |
+| **Sin Pagar**                | Dos grupos, uno debajo del otro: órdenes que ya tienen cotización y siguen sin pagar, y órdenes marcadas para cobrar contra entrega (el conductor recibe el dinero en la puerta, en efectivo o por SINPE Móvil).            | Dar seguimiento al cobro, marcar como pagado cuando corresponda.                                   |
+| **Solicitudes de Reembolso** | Reclamos de clientes que solicitan devolución total o parcial.                                                                                                                                                              | Revisar evidencia (prueba de entrega, fotos), aprobar o rechazar.                                  |
+| **Facturas del período**     | Facturas de cuentas que se facturan por período en vez de por orden: un pago declarado pendiente de revisar, una factura vencida, una factura sin pagar en silencio, o un cobro con tarjeta que la pasarela nunca resolvió. | [Trabajar la factura](#period-bills) — verificar la declaración, o registrar el pago que ya entró. |
+
+<div class="callout warn">
+<strong>Una orden a cuenta no es una orden sin pagar</strong>
+Las órdenes facturadas a una cuenta nunca aparecen en <em>Sin Pagar</em>. Llevan <span class="pill blue">A Cuenta</span>, que significa que alguien <em>sí</em> las está pagando — en una factura del período. Esas se persiguen desde la pestaña <em>Facturas del período</em>, no desde esta.
+</div>
 
 ### Filtros de severidad {#severity-filters}
 
@@ -369,7 +380,109 @@ Al confirmar el diálogo, el sistema:
 
 <div class="callout tip">
 <strong>El pago se «autoriza» antes de la entrega</strong>
-Cuando la cotización es aceptada, la pasarela autoriza un cargo con el monto cotizado pero <em>no lo cobra todavía</em>. La conciliación es la que dispara la captura final: por el monto correcto, ni más ni menos. Esto evita reembolsos o cargos sorpresa.
+Cuando la cotización es aceptada, la pasarela autoriza un cargo con el monto cotizado pero <em>no lo cobra todavía</em>. La conciliación es la que dispara la captura final: por el monto correcto, ni más ni menos. Esto evita reembolsos o cargos sorpresa. <strong>Esta es la ruta por orden</strong>; una cuenta facturada por período no lleva ninguna autorización — vea <a href="#period-bills">Facturación a cuenta</a>.
+</div>
+
+---
+
+## Facturación a cuenta {#period-bills}
+
+La mayoría de los clientes paga por orden: la cotización se autoriza cuando la aceptan y se captura en la [conciliación](#reconcile). **Una cuenta puede en cambio facturarse por período** — pide toda la semana o todo el mes, no se cobra nada por entrega, y al final del período cierra una sola factura que cubre todas las órdenes.
+
+De ahí se desprenden dos cosas, y ambas cambian lo que usted ve en pantalla:
+
+- Una orden facturada así queda marcada <span class="pill blue">A Cuenta</span> y no <span class="pill amber">Sin Pagar</span>. **No** es una orden sin pagar: alguien sí la está pagando, en una factura que todavía no cierra.
+- A nadie se le pide cobrar en la puerta, así que el paso de cobro del conductor se suprime. Eso es deliberado, no un aviso que falta.
+
+<div class="callout info">
+<strong>Nada se cobra automáticamente</strong>
+La factura cierra y se envía sola — esa es la única parte automática. El <em>dinero</em> siempre es un acto que ejecuta una persona: el cliente la paga desde su app, o un administrador registra un pago que llegó por otra vía. <strong>Nunca se cobra en segundo plano una tarjeta guardada.</strong> Una tarjeta guardada para pagar una entrega no es permiso para saldar el balance de una cuenta, así que una factura que queda sin pagar la persigue una persona, como cualquier otra factura.
+</div>
+
+### La vida de una factura {#bill-states}
+
+| Código interno          | Etiqueta                                               | Significado                                                                                                                                                                                                  |
+| ----------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `open`                  | <span class="pill gray">Abierta</span>                 | El período sigue corriendo. Las órdenes se suman a la factura conforme se aprueban y el total se mueve. **Todavía no se debe nada** — una factura abierta no tiene fecha de vencimiento.                     |
+| `issued`                | <span class="pill blue">Emitida</span>                 | El período cerró. El total quedó congelado, se aplicó el crédito de la cuenta si había, se estampó la fecha de vencimiento y se notificó al cliente.                                                         |
+| `awaiting_verification` | <span class="pill amber">Verificación Pendiente</span> | El cliente dice que envió una transferencia y adjuntó un comprobante. **Esto no es pagado.** La fecha de vencimiento no se movió y el reloj sigue corriendo.                                                 |
+| `paid`                  | <span class="pill green">Pagado</span>                 | Saldada. Todas las órdenes de la factura pasan a <span class="pill green">Pagado</span> en el mismo movimiento, con el método de pago estampado — una factura se salda entera o no se salda, nunca a medias. |
+
+El cierre corre con el reloj del período a las **03:00**, sin operador de por medio. Eso es lo que hace que el silencio signifique algo: nadie tiene que acordarse de cerrar un período, así que una factura que no cerró es una falla que vale la pena reportar. El vencimiento es **7 días** después del cierre, y a las 08:00 sale un recordatorio al cliente conforme se acerca.
+
+### La pestaña Facturas del período {#bills-tab}
+
+La última pestaña de [Necesita Atención](#needs-attention) es la cola de facturación. **Una fila por factura, mostrando solo lo más urgente que tiene mal** — una factura calza rutinariamente con más de una de las filas de abajo, y la cola escoge la más fuerte en vez de listarla dos veces.
+
+| Distintivo                  | Urgencia                              | Qué pasó                                                                                                                                                                         | Qué hace usted                                                                                                             |
+| --------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Cobro sin resolver**      | <span class="pill red">Crítico</span> | El cliente presionó Pagar y la pasarela nunca dijo qué pasó. **Su dinero puede haber salido ya mientras la factura sigue diciendo sin pagar**, y nada resuelve esto por sí solo. | Busque un cobro contra esta factura en la pasarela antes que nada. No le pida al cliente que pague de nuevo hasta saberlo. |
+| **Vencida**                 | <span class="pill amber">Alto</span>  | Pasada la fecha de vencimiento y todavía con saldo pendiente. **La cuenta está bloqueada para pedir.**                                                                           | Dé seguimiento al dinero. Verificar una declaración o registrar un pago salda la factura y desbloquea la cuenta.           |
+| **Pago por verificar**      | <span class="pill blue">Medio</span>  | El cliente declaró una transferencia y adjuntó un comprobante.                                                                                                                   | Encuéntrela en el banco y luego apruebe o rechace — vea abajo.                                                             |
+| **Sin pagar, aún no vence** | <span class="pill gray">Bajo</span>   | Cerró hace un par de días, sin pagar, y todavía no vence.                                                                                                                        | Llámelos. **Esta es la valiosa** — todavía no hay nada mal, y es el estado que evita los otros dos.                        |
+
+Las filas van de más urgente a menos, y luego por vencimiento más viejo. Los contadores de urgencia arriba del listado son la señal de triaje que una lista plana no da: dicen cuánto de la cola es dinero de un cliente posiblemente ya perdido y cuánto es una factura simplemente callada.
+
+<div class="callout warn">
+<strong>Leer la cola es de staff; actuar sobre una factura es de administrador</strong>
+Cualquier operador de staff puede abrir esta pestaña y leer una factura. <em>Verificar</em>, <em>Aprobar</em>, <em>Rechazar</em> y <em>Registrar Pago</em> están restringidos a administradores — registrar que entró dinero a una cuenta, y resolver el reclamo de un cliente de que entró, son actos contables y no operativos. Si usted ve la factura pero no los botones, esa es la razón.
+</div>
+
+### Verificar un pago declarado {#verify-declaration}
+
+Una declaración es un **reclamo, no un pago**: el cliente dice que mandó dinero y ofrece una referencia y un comprobante. Nada se salda hasta que alguien encuentre la transferencia.
+
+Presione `Verificar` en la fila de la factura (o en el detalle de la factura). El diálogo le da todo lo que la búsqueda necesita:
+
+1. **El método** — SINPE Móvil o Transferencia bancaria. Le dice en qué canal buscar.
+2. **La referencia**, con un botón de copiar al lado. Cópiela en vez de volver a digitarla: el banco solo la encuentra si coincide carácter por carácter, y digitarla de memoria es donde se tuerce una verificación.
+3. **El monto que hay que buscar** — total del período, crédito aplicado y monto a pagar en colones. Si el cliente pagó en su propia moneda, también se muestra la cifra en _esa_ moneda, y ese es el número que va a estar en el estado de cuenta.
+4. **Dónde se le dijo que lo enviara** — el destino que la factura registró, para que busque en la cuenta correcta. Es una foto que la factura guardó y no una fila viva, así que sigue legible aunque ese destino se haya editado o desactivado.
+5. **El comprobante**, detrás de un botón. Es **corroboración, no evidencia**: lo que resuelve la pregunta es encontrar el pago en el banco. Carga solo cuando usted lo pide, y su ausencia nunca lo bloquea.
+
+Y luego uno de dos desenlaces:
+
+- **Aprobar** — la factura pasa a <span class="pill green">Pagado</span> y todas sus órdenes se saldan con ella. La nota es opcional.
+- **Rechazar** — **el motivo es obligatorio**, y el botón queda deshabilitado hasta que usted escriba uno. Ese motivo le llega al cliente, y ese es todo el punto: un reclamo rechazado sin motivo regresa igualito, con el mismo archivo subido de nuevo.
+
+<div class="callout warn">
+<strong>El campo de notas reemplaza lo que ya está</strong>
+Aprobar o rechazar sobrescribe la nota de la factura. La nota que traiga se muestra encima del campo pero a propósito no se precarga — léala antes de escribir, y no reenvíe la frase de otra persona como si fuera suya.
+</div>
+
+### Registrar un pago que entró por otra vía {#record-bill-payment}
+
+Use `Registrar Pago` cuando el dinero le llegó por otro lado — efectivo en el mostrador, una transferencia que usted ya concilió en el banco, una tarjeta cobrada por teléfono. Aquí usted está afirmando un hecho y no presentando un reclamo, así que salda la factura de inmediato, sin verificación posterior.
+
+| Campo                   | Notas                                                                                                                                                                                           |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Método de pago**      | Tarjeta, SINPE Móvil, Transferencia bancaria o Efectivo.                                                                                                                                        |
+| **Moneda**              | Obligatoria — el formulario no envía sin ella. Registra _cuál_ de las cifras ya congeladas de la factura fue la que se pagó, no un tipo de cambio consultado ahora.                             |
+| **Destino de pago**     | Se ofrece solo para SINPE Móvil y Transferencia bancaria, y limitado a los destinos activos de ese método. Cambiar el método limpia la selección, porque un destino pertenece a un solo método. |
+| **Referencia**          | Opcional, y precargada de la factura cuando ya trae una.                                                                                                                                        |
+| **Comprobante de pago** | Opcional aquí. Un cliente que declara una transferencia tiene que adjuntarlo; usted ya recibió el dinero, así que su registro es el hecho.                                                      |
+| **Notas**               | Precargada de la factura, porque enviar escribe este campo haga lo que haga — dejarlo en blanco borraría en silencio una nota que dejó un acto anterior, motivo de rechazo incluido.            |
+
+<div class="callout info">
+<strong>El crédito de la cuenta no está en la lista de métodos, a propósito</strong>
+El crédito solo cuenta como pagado una vez que el cierre del período lo aplicó de verdad contra la factura, y nada más lo aplica. Registrarlo a mano marcaría una factura como pagada con dinero que nunca se gastó, así que el panel no lo ofrece.
+</div>
+
+El efectivo está en la lista del operador y ausente en la del cliente, y la asimetría es el punto: **un cliente no puede probar que entregó efectivo.** El administrador que lo recibió es la única persona que puede decir que pasó. La tarjeta va al revés — el cliente puede pagar con tarjeta él mismo, en la app, y usted también puede registrar una que cobró por otro lado.
+
+### La pantalla de detalle de la factura {#bill-detail}
+
+`Ver` en cualquier fila abre la factura en `/period-bills/<código>`. **No hay listado de facturas en la barra lateral** — la pestaña _Facturas del período_ es como se llega a una, y la flecha de regreso lo devuelve ahí. Los mismos botones `Verificar` y `Registrar Pago` están en el encabezado, y solo para una factura que todavía los admite: una ya <span class="pill green">Pagado</span> no ofrece ninguno.
+
+Tres partes:
+
+- **Factura del período** — total del período, crédito aplicado, monto a pagar, la fecha en que cerró, la fecha en que vence, y una fila por cada moneda en que se acordaron sus líneas.
+- **Método de pago** — aparece solo cuando ya hay algo que mostrar: el método, la referencia copiable, la foto del destino, el comprobante, la nota.
+- **Qué cubre esta factura** — una fila por orden, con el código de la orden, la moneda en que se acordó, el tipo de cambio congelado en su cotización, y el monto tanto en esa moneda como en colones.
+
+<div class="callout info">
+<strong>Los montos nunca se reconvierten</strong>
+Una línea acordada en colones lleva una sola cifra en colones y no necesitó tipo de cambio — por eso la columna de tipo de cambio muestra un guion en esas filas y no el del día. Una línea acordada en otra moneda lleva ese monto, el tipo de cambio congelado en su cotización, y el monto en colones derivado de ahí en ese momento. Nada se consulta cuando llega el dinero, así que una factura siempre puede decir cuánto se le debe antes de que alguien pague.
 </div>
 
 ---
@@ -569,7 +682,7 @@ Cuentas de empresa. Las empresas pueden tener:
 
 - Múltiples usuarios autorizados a crear órdenes.
 - Tarifas negociadas distintas a las del público general.
-- Facturación consolidada mensual.
+- Facturación consolidada por período en vez de por orden — vea [Facturación a cuenta](#period-bills).
 - Catálogo de direcciones frecuentes propio.
 
 ---
@@ -647,10 +760,21 @@ Registro inmutable de todas las acciones administrativas. Útil para:
 
 <figure>
   <img src="/guide/screenshots/15-settings.png" alt="Configuraciones generales" />
-  <figcaption>Pantalla <em>Configuraciones</em>. Tres tarjetas: <em>Idioma</em> (selector inline), <em>Configuración de Moneda</em> y <em>Ventana de Servicio</em> (ambas abren subpáginas con la flecha derecha).</figcaption>
+  <figcaption>Pantalla <em>Configuraciones</em>. La captura es anterior a tres de las tarjetas que hoy tiene — el listado vigente está abajo.</figcaption>
 </figure>
 
-Aquí viven los parámetros globales de la operación. Ojo: la lista es corta a propósito — solo lo que un administrador necesita cambiar a mano. El resto del comportamiento (tarifas, ventanas por orden, factibilidad de despacho) se modela en sus propias secciones.
+Aquí viven los parámetros globales de la operación. La lista es corta a propósito — solo lo que un administrador necesita cambiar a mano. El resto del comportamiento (tarifas, ventanas por orden, factibilidad de despacho) se modela en sus propias secciones.
+
+Las tarjetas, de arriba abajo. Las tres primeras se editan ahí mismo; las tres últimas llevan flecha derecha y abren una subpágina.
+
+| Tarjeta                         | Qué configura                                                                                                                                                                                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Idioma**                      | El idioma de la interfaz para el administrador que la usa — vea abajo.                                                                                                                                                                               |
+| **Tipos de Vehículo Admitidos** | Qué tipos de vehículo puede tener asignado un conductor de esta flota. Marque los que opera y guarde.                                                                                                                                                |
+| **Tiempo de espera**            | Tarifa por minuto y tolerancia sobre lo estimado, para el tiempo que un conductor espera en una parada más allá de lo cotizado. Ponga la tarifa en cero y la espera no se cobra. Es una decisión de lista de precios, tomada una vez — no por orden. |
+| **Configuración de Moneda** →   | Qué monedas acepta la plataforma, cómo se obtienen los tipos de cambio y cómo redondea cada una.                                                                                                                                                     |
+| **Destinos de pago** →          | Dónde se le dice al cliente que envíe el dinero de una factura del período.                                                                                                                                                                          |
+| **Ventana de Servicio** →       | Cuándo acepta la plataforma nuevas órdenes, y qué pasa con las que se quedan sin conductor.                                                                                                                                                          |
 
 ### Idioma
 
@@ -716,6 +840,27 @@ El redondeo afecta cómo se presentan los importes al cliente final, no cómo se
 La tasa se ingresa como <em>cuántas unidades de la moneda base equivalen a 1 unidad de esta moneda</em>. Si por error se ingresa al revés (p. ej. <code>0.002</code> en lugar de <code>490</code>), la vista previa pinta una alerta ámbar sugiriendo el valor inverso.
 </div>
 
+### Destinos de pago {#settings-payment-destinations}
+
+Declarar una transferencia sin destino le pide a alguien que pague y no le dice adónde, así que este listado es lo que hace usables SINPE Móvil y la transferencia bancaria. Son las cuentas de la empresa, no algo que registre el cliente.
+
+La tabla lista cada destino con su método, titular, número de cuenta (o número de teléfono, para SINPE Móvil), moneda y estado activo. `+ Crear` abre el formulario; el lápiz edita una fila y el basurero la elimina.
+
+Los campos del formulario dependen del método:
+
+| Método                     | Campos que admite                                                                                                     |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **SINPE Móvil**            | Número de teléfono. Sin moneda — SINPE Móvil recibe colones y nada más.                                               |
+| **Transferencia bancaria** | Moneda, nombre del banco, número de cuenta, e IBAN si lo hay.                                                         |
+| **Ambos**                  | Nombre del titular e identificación legal (ambos obligatorios), un monto máximo, un orden, y el interruptor _activo_. |
+
+El **monto máximo** es el tope por transferencia — SINPE Móvil tiene uno real, y un destino por debajo de lo que cuesta la factura simplemente no se ofrece. Es un filtro sobre el monto, no sobre qué facturas pueden usar el método: una factura expresada en dólares pagada por SINPE Móvil solo se está pagando en colones.
+
+<div class="callout warn">
+<strong>Desactivar en vez de borrar, y crear en vez de reapuntar</strong>
+La factura registra como <em>foto</em> el destino que le mostró al cliente, así que borrar una fila nunca reescribe una factura vieja — pero una fila desactivada sigue siendo legible para quien lea esa factura. Y el <em>método</em> no se puede cambiar después de creado: decide cuáles de los otros campos puede llevar la fila, así que cambiarlo ahí mismo dejaría un destino con los datos del método equivocado. Para pasar un destino a otro método, desactívelo y cree uno nuevo.
+</div>
+
 ### Ventana de Servicio {#settings-service-window}
 
 <figure>
@@ -754,6 +899,8 @@ El umbral se cuenta solo durante horas dentro de la ventana de servicio. Una ord
 
 ## Glosario de estados {#state-glossary}
 
+Los estados de la factura no están aquí — viven junto al flujo que los usa, en [La vida de una factura](#bill-states).
+
 ### Estados de la orden {#order-states}
 
 | Código interno                                            | Etiqueta                                               | Significado                                                     |
@@ -775,12 +922,18 @@ El umbral se cuenta solo durante horas dentro de la ventana de servicio. Una ord
 
 ### Estados de pago {#payment-states}
 
-| Código          | Etiqueta                                             | Significado                               |
-| --------------- | ---------------------------------------------------- | ----------------------------------------- |
-| `unpaid`        | <span class="pill amber">Sin Pagar</span>            | Sin pago registrado.                      |
-| `paid`          | <span class="pill green">Pagado</span>               | Cobro completo recibido.                  |
-| `surcharge_due` | <span class="pill amber">Sobrecargo Pendiente</span> | Tras conciliación quedó saldo por cobrar. |
-| `refunded`      | <span class="pill gray">Reembolsada</span>           | Devolución total ejecutada.               |
+Los ocho, en el orden en que el sistema los declara.
+
+| Código          | Etiqueta                                          | Significado                                                                                                                                                                                                          |
+| --------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `unpaid`        | <span class="pill amber">Sin Pagar</span>         | Sin pago registrado.                                                                                                                                                                                                 |
+| `authorized`    | <span class="pill blue">Autorizado</span>         | Hay una retención de tarjeta por el monto cotizado. **No se ha movido dinero** — una retención vence sola, y la conciliación es la que captura.                                                                      |
+| `paid`          | <span class="pill green">Pagado</span>            | Cobro completo recibido.                                                                                                                                                                                             |
+| `on_account`    | <span class="pill blue">A Cuenta</span>           | Facturada a la cuenta en vez de cobrada: la orden es una línea de la factura de ese período, y pasa a <span class="pill green">Pagado</span> cuando esa factura se salda. Vea [Facturación a cuenta](#period-bills). |
+| `surcharge_due` | <span class="pill amber">Recargo Pendiente</span> | Tras conciliación quedó saldo por cobrar.                                                                                                                                                                            |
+| `refunded`      | <span class="pill gray">Reembolsado</span>        | Devolución total ejecutada.                                                                                                                                                                                          |
+| `voided`        | <span class="pill gray">Anulado</span>            | La retención de tarjeta se liberó sin llegar a cobrarse — una cancelación antes de la captura.                                                                                                                       |
+| `chargeback`    | <span class="pill red">Contracargo</span>         | El cliente disputó el cobro con su banco y el dinero se devolvió.                                                                                                                                                    |
 
 ---
 
@@ -813,6 +966,18 @@ Porque la conciliación detectó que el monto real de productos fue mayor a la c
 ### ¿Cómo se generan los PIN de entrega? {#faq-pin-generation}
 
 Automáticamente al crear la orden — un código de 6 dígitos único por orden. Se muestra al cliente en su app y al conductor durante la entrega. Sirve como verificación de identidad del receptor.
+
+### El cliente dice que pagó su factura, pero sigue apareciendo sin pagar — ¿qué hago? {#faq-declared-not-paid}
+
+Primero revise el estado de la factura. <span class="pill amber">Verificación Pendiente</span> significa que su reclamo llegó y ahora nos toca resolverlo a **nosotros** — encuentre la transferencia en el banco y [apruébela](#verify-declaration); el vencimiento sigue corriendo mientras tanto, así que no es un pendiente para dejar de lado. Si la factura sigue <span class="pill blue">Emitida</span> y sin declaración encima, el pago nunca nos llegó como reclamo: pida la referencia y el comprobante, o [regístrelo usted](#record-bill-payment) si ya puede ver el dinero.
+
+### ¿Puedo saldar una factura con el crédito de la cuenta del cliente? {#faq-credit-settle}
+
+No, y a propósito no hay opción para hacerlo. El crédito lo aplica el cierre del período, automáticamente — la factura que está viendo ya muestra _Crédito aplicado_ y un _Monto a pagar_ con el crédito descontado. Vea [El crédito de la cuenta no está en la lista de métodos](#record-bill-payment) para saber por qué no se puede registrar a mano.
+
+### ¿Por qué está bloqueada esta cuenta para pedir? {#faq-account-blocked}
+
+Por una de dos razones, y la pantalla de la cuenta le dice al cliente cuál: una factura de la cuenta está **vencida**, o lo que la cuenta tiene comprometido — sus facturas sin pagar más lo que lleva acumulado este período — llegó al límite fijado para ella. El bloqueo actúa al crear la orden, así que el cliente lo ve antes de armarla y no después. Saldar la factura vencida resuelve lo primero; subir el límite o saldar facturas resuelve lo segundo.
 
 ### ¿Puedo crear una orden desde el panel sin que el cliente la inicie? {#faq-admin-create}
 

@@ -16,8 +16,12 @@ app/admin/
 │   │   ├── businesses/   # Business management
 │   │   ├── catalogs/     # Catalog management
 │   │   ├── pricing/      # Pricing rules
+│   │   ├── period-bills/ # Period bill detail (deferred billing)
 │   │   ├── notifications/# Notification history
 │   │   └── settings/     # Admin settings
+│   │       ├── currencies/
+│   │       ├── payment-destinations/  # Where customers are told to send money
+│   │       └── service-window/
 │   └── layout.tsx        # Root layout with providers
 ├── components/
 │   ├── ui/               # shadcn/ui components
@@ -244,6 +248,60 @@ NotificationService.markAllAsRead(); // PATCH /notifications/read-all
 NotificationService.destroy(id); // DELETE /notifications/{id}
 ```
 
+### Period Bill Service
+
+```typescript
+import { PeriodBillService } from '@/services/periodBillService';
+
+PeriodBillService.needsAttention(); // GET /period-bills/needs-attention (staff)
+PeriodBillService.getById(publicId); // GET /period-bills/{publicId}
+PeriodBillService.settle(publicId, data); // POST .../settle   (admin, multipart)
+PeriodBillService.approveDeclaration(publicId, notes); // POST .../approve (admin)
+PeriodBillService.rejectDeclaration(publicId, notes); // POST .../reject  (admin)
+PeriodBillService.fetchProof(publicId); // GET .../proof  → Blob
+```
+
+Two things about this service are load-bearing:
+
+- **`needsAttention()` is a pass-through and must stay one.** The api returns one
+  row per bill at its most urgent reason, already sorted: `BillAttentionReason`
+  declares its cases in precedence order (unresolved charge → overdue →
+  declaration to verify → quiet) and the endpoint sorts by urgency then due
+  date. An unresolved charge outranks an overdue bill because the customer's
+  money may already be gone while the bill still reads unpaid. **Never re-sort
+  these rows client-side** — it silently discards a ranking nothing else states.
+- **`fetchProof()` bypasses `api.get()`, and no longer needs to.**
+  `PeriodBillData.proofUrl` names an authenticated stream route on a private
+  disk, not a storage URL: rendered as a plain `href` or `<img src>` the browser
+  sends no Authorization header and the api answers 401. `api.get()` parses JSON
+  and returns `{}` for a byte stream, so the bytes are fetched here with the
+  token attached and handed to `useBillProof()`, which wraps them in an object
+  URL and revokes it on unmount.
+
+  **New code does not copy this.** `api.getBlob()` now carries a byte stream
+  through the client itself — with the shared 401 handling and api error message
+  that a service doing its own `fetch` loses — behind `FileService.fetchFile()`
+  and `useAuthorizedFile()`, which is what every evidence file (payment proof,
+  POD photo and signature, receipt file, invoice PDF) is read through. Folding
+  `fetchProof()` and `uploadService.ts` onto it is [admin#44].
+
+### Payment Destination Service
+
+```typescript
+import { PaymentDestinationService } from '@/services/paymentDestinationService';
+
+PaymentDestinationService.list(); // GET /payment-destinations (staff, walks pages)
+PaymentDestinationService.create(data); // POST   (admin)
+PaymentDestinationService.update(id, data); // PATCH  (admin) — `method` is immutable
+PaymentDestinationService.destroy(id); // DELETE (admin) — soft delete
+```
+
+Addressed by numeric `id`, not a public id. The api paginates the index at a
+fixed 15 and reads no `per_page`, so `list()` walks the pages rather than
+truncating. `method` decides which other fields a row may carry and cannot be
+changed after creation — swapping one means deactivating the row and creating a
+new one.
+
 ### Other Services
 
 - `DriverService` - Driver CRUD + approval
@@ -423,6 +481,45 @@ const { data, isLoading } = useNotifications({
 
 // Unread count (for bell badge)
 const { data: count } = useUnreadCount();
+```
+
+### Period Bills
+
+```typescript
+import {
+  useBillsNeedingAttention,
+  usePeriodBill,
+  useSettlePeriodBill,
+  useApproveDeclaration,
+  useRejectDeclaration,
+  useBillProof,
+} from '@/hooks/periodBills';
+
+// The sixth Needs Attention tab. Rows arrive ordered by the api — render them
+// as they come; see the Period Bill Service note above.
+const { data } = useBillsNeedingAttention(); // { items, summary } keyed by AttentionUrgency
+
+// The detail. The queue loads no lines, so `perCurrencyTotals` and `lines` are
+// absent on a queue row and present only here.
+const { data: bill } = usePeriodBill(publicId);
+
+// The comprobante, fetched through the authenticated route and revoked on unmount.
+const proof = useBillProof(publicId, isViewerOpen); // { url, contentType, isLoading, isError }
+```
+
+Query key is `['period-bills', ...]`; every act invalidates the whole key,
+because approving, rejecting or recording a payment all change which bills need
+a person.
+
+### Payment Destinations
+
+```typescript
+import {
+  usePaymentDestinations,
+  useCreatePaymentDestination,
+  useUpdatePaymentDestination,
+  useDeletePaymentDestination,
+} from '@/hooks/paymentDestinations';
 ```
 
 ---

@@ -109,7 +109,7 @@ export function ScheduleEventDialog({
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <Label className="text-sm">{t('common:start', { defaultValue: 'Start' })}</Label>
+                <Label className="text-sm">{t('common:start')}</Label>
                 <Input
                   type="time"
                   value={startTime}
@@ -118,7 +118,7 @@ export function ScheduleEventDialog({
                 />
               </div>
               <div className="flex-1">
-                <Label className="text-sm">{t('common:end', { defaultValue: 'End' })}</Label>
+                <Label className="text-sm">{t('common:end')}</Label>
                 <Input
                   type="time"
                   value={endTime}
@@ -130,8 +130,8 @@ export function ScheduleEventDialog({
             {!isTimeValid && (
               <p className="text-destructive text-xs">
                 {t('validation:after', {
-                  attribute: t('common:end', { defaultValue: 'End' }),
-                  date: t('common:start', { defaultValue: 'Start' }),
+                  attribute: t('common:end'),
+                  date: t('common:start'),
                   defaultValue: 'End time must be after start time',
                 })}
               </p>
@@ -139,9 +139,7 @@ export function ScheduleEventDialog({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm">
-              {t('drivers:schedule.vehicle_override', { defaultValue: 'Vehicle Override' })}
-            </Label>
+            <Label className="text-sm">{t('drivers:schedule.vehicle_override')}</Label>
             <Select
               value={vehicleType ?? USE_DEFAULT_VEHICLE}
               onValueChange={(value) =>
@@ -153,9 +151,7 @@ export function ScheduleEventDialog({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={USE_DEFAULT_VEHICLE}>
-                  {t('drivers:schedule.use_default_vehicle', {
-                    defaultValue: 'Use default vehicle',
-                  })}
+                  {t('drivers:schedule.use_default_vehicle')}
                 </SelectItem>
                 {Object.values(Enums.VehicleType).map((vt) => (
                   <SelectItem key={vt} value={vt}>

@@ -75,7 +75,15 @@ export function OrderActivityCard({ order }: OrderActivityCardProps) {
             <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
           </div>
         ) : timeline.length > 0 ? (
-          <div className={`space-y-1${hasSchedule ? 'border-t pt-3' : ''}`}>
+          // The space separating the two halves stays outside the ternary.
+          // prettier-plugin-tailwindcss sorts every class string it finds and
+          // trims its edges, so a leading space written inside the branch is
+          // deleted on the next format pass — which is how `space-y-1border-t`
+          // once shipped here, killing both classes.
+          <div
+            data-testid="activity-trail"
+            className={`space-y-1 ${hasSchedule ? 'border-t pt-3' : ''}`}
+          >
             {timeline.map((entry) => (
               <div key={entry.id} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">

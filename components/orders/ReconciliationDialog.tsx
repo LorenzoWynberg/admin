@@ -11,7 +11,7 @@ import {
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { ExternalLink, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,14 +20,15 @@ import { useTranslation } from 'react-i18next';
 import { useOrderReceipts, useReconcileOrder } from '@/hooks/orders';
 import { useIdleTime } from '@/hooks/settings';
 import { QuoteLineItemsEditor } from '@/components/quotes/QuoteLineItemsEditor';
-import { ImagePreviewDialog } from '@/components/orders/ImagePreviewDialog';
+import { ReceiptPreviewDialog } from '@/components/orders/ReceiptPreviewDialog';
+import { EvidenceImage } from '@/components/evidence/EvidenceImage';
 import {
   computeReconciliationTotal,
   totalBillableMinutes,
   idleCharge,
 } from '@/utils/reconciliation';
 import { formatCurrency } from '@/utils/format';
-import { actionLabel, validationAttribute } from '@/utils/lang';
+import { actionLabel, modelLabel, validationAttribute } from '@/utils/lang';
 
 type OrderReceiptData = App.Data.Order.OrderReceiptData;
 type QuoteData = App.Data.Quote.QuoteData;
@@ -58,6 +59,16 @@ interface FeeInputs {
   discountRate: string;
 }
 
+/**
+ * One receipt in the strip an admin scans while reconciling.
+ *
+ * Both kinds open the same viewer now. The PDF used to be an `<a href>` to the
+ * file's route and the image an `<img src>` at it; neither carries the bearer
+ * token that route requires, so the image is fetched through
+ * {@link EvidenceImage} and the file itself opened through the dialog. The
+ * fetched bytes are cached by url, so opening a thumbnail full size does not
+ * fetch it a second time.
+ */
 function ReceiptThumbnail({
   receipt,
   onPreview,
@@ -66,39 +77,33 @@ function ReceiptThumbnail({
   onPreview: (receipt: OrderReceiptData) => void;
 }) {
   const isImage = receipt.mimeType?.startsWith('image/');
-
-  if (isImage && receipt.fileUrl) {
-    return (
-      <button
-        type="button"
-        onClick={() => onPreview(receipt)}
-        className="h-20 w-20 shrink-0 overflow-hidden rounded-md border transition-opacity hover:opacity-80"
-        title={receipt.originalName || receipt.publicId}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={receipt.fileUrl}
-          alt={receipt.originalName || receipt.publicId || ''}
-          className="h-full w-full object-cover"
-        />
-      </button>
-    );
-  }
+  const label = receipt.originalName || receipt.publicId;
 
   return (
-    <a
-      href={receipt.fileUrl ?? undefined}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="hover:bg-muted flex h-20 w-20 shrink-0 flex-col items-center justify-center gap-1 rounded-md border p-2 transition-colors"
-      title={receipt.originalName || receipt.publicId}
+    <button
+      type="button"
+      onClick={() => onPreview(receipt)}
+      disabled={!receipt.fileUrl}
+      className="hover:bg-muted h-20 w-20 shrink-0 overflow-hidden rounded-md border transition-opacity hover:opacity-80 disabled:pointer-events-none disabled:opacity-50"
+      title={label}
     >
-      <FileText className="text-muted-foreground h-6 w-6" />
-      <ExternalLink className="text-muted-foreground h-3 w-3" />
-      <span className="text-muted-foreground w-full truncate text-center text-xs">
-        {receipt.originalName || 'PDF'}
-      </span>
-    </a>
+      {isImage && receipt.fileUrl ? (
+        <EvidenceImage
+          source={receipt.fileUrl}
+          alt={label || ''}
+          resourceLabel={modelLabel('order_receipt', 1, false)}
+          className="h-full w-full object-cover"
+          compact
+        />
+      ) : (
+        <span className="text-muted-foreground flex h-full w-full flex-col items-center justify-center gap-1 p-2">
+          <FileText className="h-6 w-6" />
+          <span className="w-full truncate text-center text-xs">
+            {receipt.originalName || 'PDF'}
+          </span>
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -446,7 +451,7 @@ export function ReconciliationDialog({
 
             {/* Notes */}
             <div className="space-y-2">
-              <Label>{t('common:notes', { defaultValue: 'Notes' })}</Label>
+              <Label>{t('common:notes')}</Label>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -472,7 +477,7 @@ export function ReconciliationDialog({
         </DialogContent>
       </Dialog>
 
-      <ImagePreviewDialog receipt={previewReceipt} onClose={() => setPreviewReceipt(null)} />
+      <ReceiptPreviewDialog receipt={previewReceipt} onClose={() => setPreviewReceipt(null)} />
     </>
   );
 }

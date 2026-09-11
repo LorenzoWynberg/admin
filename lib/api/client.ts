@@ -13,6 +13,19 @@ interface FetchOptions {
 }
 
 /**
+ * Absolute urls pass through untouched; anything else resolves against the api
+ * root.
+ *
+ * The api's stored-file accessors — `proofUrl`, `podPhotoUrl`,
+ * `podSignatureUrl`, `fileUrl` — are built with Laravel's `route()` helper and
+ * therefore already carry a scheme and a host. Prefixing `API_URL` to one of
+ * those would produce a doubled address that resolves to nothing.
+ */
+function resolveUrl(endpoint: string): string {
+  return /^https?:\/\//i.test(endpoint) ? endpoint : `${API_URL}${endpoint}`;
+}
+
+/**
  * Get auth token from localStorage
  */
 function getToken(): string | null {
@@ -105,44 +118,57 @@ function buildMultipartRequestOptions(formData: FormData, options: FetchOptions 
   return requestInit;
 }
 
+function isJsonResponse(response: Response): boolean {
+  return response.headers.get('content-type')?.includes('application/json') ?? false;
+}
+
+/**
+ * Raise a failed response as an `ApiError`, clearing auth state on a 401.
+ *
+ * Shared by every reader of a response, JSON and binary alike, so that a file
+ * request which 401s logs the operator out and surfaces the api's own message
+ * exactly as a JSON one does — rather than a bare status code with no account
+ * of whether the session died or the policy said no.
+ */
+async function throwApiError(response: Response): Promise<never> {
+  // Clear auth state on 401 Unauthorized
+  if (response.status === 401) {
+    useAuthStore.getState().logout();
+    // Clear auth cookie
+    if (typeof document !== 'undefined') {
+      document.cookie = 'auth-token=; path=/; max-age=0';
+      // Redirect to login
+      window.location.href = '/login';
+    }
+  }
+
+  let errorData: unknown = null;
+  if (isJsonResponse(response)) {
+    try {
+      errorData = await response.json();
+    } catch {
+      // Ignore JSON parse error
+    }
+  }
+
+  const parsed = parseErrorResponse(errorData);
+  throw new ApiError(parsed.message, response.status, {
+    details: parsed.details,
+    errors: parsed.errors,
+    extra: parsed.extra,
+    raw: errorData,
+  });
+}
+
 /**
  * Handle API response
  */
 async function handleResponse<T>(response: Response): Promise<T> {
-  const contentType = response.headers.get('content-type');
-  const isJson = contentType?.includes('application/json');
-
   if (!response.ok) {
-    // Clear auth state on 401 Unauthorized
-    if (response.status === 401) {
-      useAuthStore.getState().logout();
-      // Clear auth cookie
-      if (typeof document !== 'undefined') {
-        document.cookie = 'auth-token=; path=/; max-age=0';
-        // Redirect to login
-        window.location.href = '/login';
-      }
-    }
-
-    let errorData: unknown = null;
-    if (isJson) {
-      try {
-        errorData = await response.json();
-      } catch {
-        // Ignore JSON parse error
-      }
-    }
-
-    const parsed = parseErrorResponse(errorData);
-    throw new ApiError(parsed.message, response.status, {
-      details: parsed.details,
-      errors: parsed.errors,
-      extra: parsed.extra,
-      raw: errorData,
-    });
+    await throwApiError(response);
   }
 
-  if (!isJson) {
+  if (!isJsonResponse(response)) {
     return {} as T;
   }
 
@@ -195,6 +221,40 @@ export const api = {
     const url = `${API_URL}${endpoint}`;
     const response = await fetch(url, buildMultipartRequestOptions(formData, options));
     return handleResponse<T>(response);
+  },
+
+  /**
+   * GET a file as raw bytes.
+   *
+   * `get()` cannot carry one: `handleResponse` returns `{}` for any non-JSON
+   * body, so a byte stream reaches the caller as an empty object. And the
+   * files this exists for — payment proofs, POD photos and signatures, receipt
+   * files, invoice PDFs — are served by authorized routes off a private disk,
+   * so they cannot be pointed at from an `<img src>` or an `<a href>` either:
+   * the browser sends no Authorization header there and the api answers 401.
+   *
+   * So the bytes are pulled here with the token attached. Wrap them in an
+   * object URL to render them — `useAuthorizedFile` does exactly that, and
+   * revokes it, which is what callers should reach for rather than this.
+   */
+  async getBlob(endpoint: string, options: FetchOptions = {}): Promise<Blob> {
+    const response = await fetch(
+      resolveUrl(endpoint),
+      // `application/json` is not what comes back on success, but it has to
+      // stay first in the list: Laravel reads the leading type to decide
+      // whether a *failure* is rendered as JSON, and that is what lets
+      // `throwApiError` report the api's message instead of an HTML page.
+      buildRequestOptions('GET', undefined, {
+        ...options,
+        headers: { Accept: 'application/json, */*', ...options.headers },
+      })
+    );
+
+    if (!response.ok) {
+      await throwApiError(response);
+    }
+
+    return response.blob();
   },
 };
 

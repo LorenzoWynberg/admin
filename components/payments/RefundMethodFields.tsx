@@ -19,19 +19,25 @@ export function getRefundMethodLabel(t: TFunction, method?: string | null): stri
 }
 
 /**
- * Default settlement for a payment.
+ * Default settlement for a refund.
  *
- * A manually-settled payment can only go to balance. A card payment defaults
- * to reversing the card — turning someone's card payment into account balance
- * is a deliberate choice, not a default.
+ * `balanceOnly` means there is no gateway charge behind this money, so there
+ * is nothing a provider could send back — the refund can only become credit.
+ * Anything else defaults to reversing the card: turning someone's card payment
+ * into account balance is a deliberate choice, not a default.
  */
-export function getDefaultRefundMethod(isManual: boolean): string {
-  return isManual ? Enums.RefundMethod.Balance : Enums.RefundMethod.Gateway;
+export function getDefaultRefundMethod(balanceOnly: boolean): string {
+  return balanceOnly ? Enums.RefundMethod.Balance : Enums.RefundMethod.Gateway;
 }
 
 interface RefundMethodFieldsProps {
-  /** Whether the underlying payment was settled manually (provider === Manual). */
-  isManual: boolean;
+  /**
+   * Whether credit is the only settlement the API will accept — no gateway
+   * charge stands behind the money. True for a manually-settled payment
+   * (provider === Manual) and for a delivery billed to an account, which has
+   * no payment row at all.
+   */
+  balanceOnly: boolean;
   method: string;
   onMethodChange: (method: string) => void;
 }
@@ -40,20 +46,24 @@ interface RefundMethodFieldsProps {
  * How a refund is settled.
  *
  * A card payment may be reversed to the card or kept on the customer's
- * balance — the admin picks, since they speak to the customer directly. A
- * manually-settled payment can only go to balance: there was no charge to
- * reverse, and money is never sent back out by hand, so the select locks.
+ * balance — the admin picks, since they speak to the customer directly. When
+ * no card was ever charged the select locks to balance: there is nothing to
+ * reverse, and money is never sent back out by hand.
  */
-export function RefundMethodFields({ isManual, method, onMethodChange }: RefundMethodFieldsProps) {
+export function RefundMethodFields({
+  balanceOnly,
+  method,
+  onMethodChange,
+}: RefundMethodFieldsProps) {
   const { t } = useTranslation();
-  const options = isManual
+  const options = balanceOnly
     ? [Enums.RefundMethod.Balance]
     : [Enums.RefundMethod.Gateway, Enums.RefundMethod.Balance];
 
   return (
     <div className="grid gap-2">
       <Label htmlFor="refund-method">{t('payments:refund.method_label')} *</Label>
-      <Select value={method} onValueChange={onMethodChange} disabled={isManual}>
+      <Select value={method} onValueChange={onMethodChange} disabled={balanceOnly}>
         <SelectTrigger id="refund-method" className="w-full">
           <SelectValue placeholder={t('payments:refund.method_placeholder')} />
         </SelectTrigger>
@@ -65,7 +75,7 @@ export function RefundMethodFields({ isManual, method, onMethodChange }: RefundM
           ))}
         </SelectContent>
       </Select>
-      {isManual && (
+      {balanceOnly && (
         <p className="text-muted-foreground text-xs">{t('payments:refund.balance_only_hint')}</p>
       )}
     </div>

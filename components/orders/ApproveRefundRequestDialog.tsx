@@ -25,11 +25,22 @@ import { Enums } from '@/data/app-enums';
 interface ApproveRefundRequestDialogProps {
   publicId: string;
   orderPublicId: string;
+  /**
+   * The API's own verdict that this refund can only be given back as credit,
+   * off `RefundRequestData`. It is the answer rather than the facts behind
+   * it: `Order::refundIsCreditOnly()` decides it, `approve()` branches on
+   * that same method, and this dialog reads the result. Re-deriving it here
+   * from a payment status is what shipped a Gateway default the server
+   * refused every time — a settled period bill moves the order to `PAID`, so
+   * the status no longer tells this apart from an ordinary card delivery.
+   */
+  isCreditOnly?: boolean;
 }
 
 export function ApproveRefundRequestDialog({
   publicId,
   orderPublicId,
+  isCreditOnly,
 }: ApproveRefundRequestDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -47,9 +58,16 @@ export function ApproveRefundRequestDialog({
     .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))[0];
   const isManual = settledPayment?.provider === Enums.PaymentProvider.Manual;
 
+  // Two independent reasons no card charge stands behind this money, and
+  // either one locks the settlement to credit. A manually-settled payment is
+  // visible from here — the row above says so. Whether the delivery was
+  // billed to an account is not, and is not meant to be: the API states that
+  // verdict outright so this dialog never has to reassemble it.
+  const balanceOnly = isCreditOnly || isManual;
+
   // The method the admin hasn't explicitly overridden — recomputed from the
   // loaded payment each render rather than synced via an effect.
-  const defaultMethod = getDefaultRefundMethod(isManual);
+  const defaultMethod = getDefaultRefundMethod(balanceOnly);
 
   const [formData, setFormData] = useState({
     method: null as string | null,
@@ -101,7 +119,7 @@ export function ApproveRefundRequestDialog({
 
         <div className="grid gap-4 py-4">
           <RefundMethodFields
-            isManual={isManual}
+            balanceOnly={balanceOnly}
             method={method}
             onMethodChange={(value) => setFormData((prev) => ({ ...prev, method: value }))}
           />

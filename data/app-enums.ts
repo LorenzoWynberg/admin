@@ -1,6 +1,10 @@
 // AUTO-GENERATED. Do not edit.
 // Source: /types/generated.d.ts -> App.Enums
 export const Enums = {
+  AccountBlockReason: {
+    BalanceLimit: 'balance_limit',
+    SettlementOverdue: 'settlement_overdue',
+  },
   AddressType: {
     Saved: 'saved',
     Snapshot: 'snapshot',
@@ -87,15 +91,17 @@ export const Enums = {
     DELIVERY: 'delivery',
     INSTRUCTIONS: 'instructions',
   },
-  BalanceEntryType: {
-    RefundGrant: 'refund_grant',
-    AdminGrant: 'admin_grant',
-    OrderApplication: 'order_application',
-    ApplicationReversal: 'application_reversal',
-    AdminVoid: 'admin_void',
-    CancellationFee: 'cancellation_fee',
-    UnderCollection: 'under_collection',
-    DebtSettlement: 'debt_settlement',
+  BillAttentionReason: {
+    UnresolvedCharge: 'unresolved_charge',
+    Overdue: 'overdue',
+    DeclarationToVerify: 'declaration_to_verify',
+    Quiet: 'quiet',
+  },
+  BillingCycle: {
+    PerOrder: 'per_order',
+    Weekly: 'weekly',
+    Biweekly: 'biweekly',
+    Monthly: 'monthly',
   },
   ChatChannel: {
     Support: 'support',
@@ -107,6 +113,14 @@ export const Enums = {
     TimeSensitiveViolation: 'time_sensitive_violation',
     OutsideOperatingHours: 'outside_operating_hours',
     OutsideDriverShift: 'outside_driver_shift',
+  },
+  CreditType: {
+    RefundGrant: 'refund_grant',
+    AdminGrant: 'admin_grant',
+    OrderApplication: 'order_application',
+    ApplicationReversal: 'application_reversal',
+    AdminVoid: 'admin_void',
+    PeriodBillApplication: 'period_bill_application',
   },
   CrudAction: {
     Retrieved: 'retrieved',
@@ -121,6 +135,12 @@ export const Enums = {
     Approved: 'approved',
     Denied: 'denied',
     Sent: 'sent',
+  },
+  DebtChargeResolution: {
+    Settled: 'settled',
+    Freed: 'freed',
+    Unresolved: 'unresolved',
+    NotResolvable: 'not_resolvable',
   },
   DeliveryTier: {
     Expedited: 'expedited',
@@ -215,6 +235,7 @@ export const Enums = {
     Notification: 'notification',
     Payment: 'payment',
     PaymentMethod: 'payment_method',
+    PeriodBill: 'period_bill',
     Refund: 'refund',
     Route: 'route',
     RouteStop: 'route_stop',
@@ -229,7 +250,8 @@ export const Enums = {
     Invoice: 'invoice',
     InvoiceItem: 'invoice_item',
     RefundRequest: 'refund_request',
-    BalanceEntry: 'balance_entry',
+    Credit: 'credit',
+    PaymentDestination: 'payment_destination',
   },
   NotificationAction: {
     QuoteRequested: 'quote_requested',
@@ -257,7 +279,9 @@ export const Enums = {
     RefundRequestDenied: 'refund_request_denied',
     BalanceCredited: 'balance_credited',
     RefundDue: 'refund_due',
-    RefundSettled: 'refund_settled',
+    PeriodBillClosed: 'period_bill_closed',
+    PeriodBillDueSoon: 'period_bill_due_soon',
+    PeriodBillDeclarationResolved: 'period_bill_declaration_resolved',
   },
   NotificationStatus: {
     Unread: 'unread',
@@ -313,10 +337,26 @@ export const Enums = {
     UNPAID: 'unpaid',
     AUTHORIZED: 'authorized',
     PAID: 'paid',
+    ON_ACCOUNT: 'on_account',
     SURCHARGE_DUE: 'surcharge_due',
     REFUNDED: 'refunded',
     VOIDED: 'voided',
     CHARGEBACK: 'chargeback',
+  },
+  PeriodBillChargeOutcome: {
+    Settled: 'settled',
+    Declined: 'declined',
+    Unresolved: 'unresolved',
+    NoUsableCard: 'no_usable_card',
+    NotPayable: 'not_payable',
+    DeclarationPending: 'declaration_pending',
+    Unsupported: 'unsupported',
+  },
+  PeriodBillStatus: {
+    Open: 'open',
+    Issued: 'issued',
+    AwaitingVerification: 'awaiting_verification',
+    Paid: 'paid',
   },
   PricingCalculationMode: {
     CUMULATIVE: 'cumulative',
@@ -357,6 +397,7 @@ export const Enums = {
     Pending: 'pending',
     Approved: 'approved',
     Denied: 'denied',
+    Unresolved: 'unresolved',
   },
   Role: {
     BUSINESS_OWNER: 'business.owner',
@@ -396,6 +437,13 @@ export const Enums = {
   ScheduleChangeReason: {
     Reassigned: 'reassigned',
     Rescheduled: 'rescheduled',
+  },
+  SettlementMethod: {
+    Card: 'card',
+    SinpeMobile: 'sinpe_mobile',
+    Transferencia: 'transferencia',
+    Cash: 'cash',
+    Credit: 'credit',
   },
   TipoIdentificacion: {
     Fisica: '01',

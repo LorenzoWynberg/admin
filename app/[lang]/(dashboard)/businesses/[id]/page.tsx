@@ -43,10 +43,17 @@ export default function BusinessDetailPage() {
     });
   };
 
-  const handleChangeDebtCeiling = (next: number | null) => {
+  const handleChangeBalanceLimit = (next: number | null) => {
     updateBusiness.mutate({
       id: businessId,
-      data: { balanceDebtCeiling: next },
+      data: { balanceLimit: next },
+    });
+  };
+
+  const handleChangeBillingCycle = (next: string) => {
+    updateBusiness.mutate({
+      id: businessId,
+      data: { billingCycle: next as App.Enums.BillingCycle },
     });
   };
 
@@ -205,9 +212,13 @@ export default function BusinessDetailPage() {
         <BalanceCard
           ownerPublicId={business.publicId}
           canManage={isAdmin}
-          debtCeiling={business.balanceDebtCeiling}
-          onDebtCeilingChange={handleChangeDebtCeiling}
-          isSavingCeiling={updateBusiness.isPending}
+          balanceLimit={business.balanceLimit}
+          onBalanceLimitChange={handleChangeBalanceLimit}
+          isSavingLimit={updateBusiness.isPending}
+          billingCycle={business.billingCycle}
+          onBillingCycleChange={handleChangeBillingCycle}
+          isSavingBillingCycle={updateBusiness.isPending}
+          blockReason={business.blockReason}
         />
 
         {/* Dispatcher */}

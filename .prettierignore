@@ -9,9 +9,8 @@ package-lock.json
 pnpm-lock.yaml
 yarn.lock
 
-# Generated in the api repo (`php artisan typescript:transform`) and copied here
-# byte-identical. Formatting them here rewrites the copy and destroys the `diff`
-# that detects real drift against the api source. See the workspace CLAUDE.md.
+# API-owned declaration files (byte-identical copies from api/resources/types —
+# never formatted or edited here; see CLAUDE.md cross-project sync)
 types/generated.d.ts
 types/response.d.ts
 types/notifications.d.ts

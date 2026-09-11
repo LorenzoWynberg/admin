@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { Camera, CheckCircle, PenLine } from 'lucide-react';
-import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EvidenceImage } from '@/components/evidence/EvidenceImage';
 import { OrderService } from '@/services/orderService';
+import { validationAttribute } from '@/utils/lang';
 import { formatDateTime } from '@/utils/format';
 
 type RouteStopData = App.Data.Route.RouteStopData;
@@ -47,13 +48,12 @@ export function ProofOfDeliveryCard({ orderPublicId }: ProofOfDeliveryCardProps)
               <Camera className="h-4 w-4" />
               {t('routes:pod.photo_title', { defaultValue: 'Photo Proof' })}
             </div>
-            <div className="relative h-48 w-full overflow-hidden rounded-lg">
-              <Image
-                src={pod.podPhotoUrl}
+            <div className="bg-muted h-48 w-full overflow-hidden rounded-lg">
+              <EvidenceImage
+                source={pod.podPhotoUrl}
                 alt={t('routes:pod.photo_title', { defaultValue: 'Photo Proof' })}
-                fill
-                className="object-cover"
-                unoptimized
+                resourceLabel={validationAttribute('pod_photo', false)}
+                className="h-full w-full object-cover"
               />
             </div>
           </div>
@@ -65,13 +65,12 @@ export function ProofOfDeliveryCard({ orderPublicId }: ProofOfDeliveryCardProps)
               <PenLine className="h-4 w-4" />
               {t('routes:pod.signature_title', { defaultValue: 'Signature' })}
             </div>
-            <div className="bg-muted relative h-32 w-full overflow-hidden rounded-lg">
-              <Image
-                src={pod.podSignatureUrl}
+            <div className="bg-muted h-32 w-full overflow-hidden rounded-lg">
+              <EvidenceImage
+                source={pod.podSignatureUrl}
                 alt={t('routes:pod.signature_title', { defaultValue: 'Signature' })}
-                fill
-                className="object-contain"
-                unoptimized
+                resourceLabel={validationAttribute('pod_signature', false)}
+                className="h-full w-full object-contain"
               />
             </div>
           </div>
