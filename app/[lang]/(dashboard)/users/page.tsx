@@ -73,6 +73,7 @@ export default function UsersPage() {
     },
     { value: 'client', label: t('users:role.client', { defaultValue: 'Client' }) },
     { value: 'driver', label: t('users:role.driver', { defaultValue: 'Driver' }) },
+    { value: 'dispatch', label: t('users:role.dispatch', { defaultValue: 'Dispatch' }) },
   ];
 
   return (
