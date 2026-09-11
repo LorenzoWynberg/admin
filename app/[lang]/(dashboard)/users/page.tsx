@@ -34,14 +34,14 @@ import { useRole } from '@/hooks/auth';
 import { RoleBadge } from '@/components/users/RoleBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Search, Users } from 'lucide-react';
 
 type Role = App.Enums.Role;
 
 export default function UsersPage() {
   const { t, ready } = useTranslation();
   const router = useRouter();
-  const { isDispatch } = useRole();
+  const { isAdmin, isDispatch } = useRole();
   const [page, setPage] = useState(1);
   const [role, setRole] = useState<string>('all');
   const [search, setSearch] = useState('');
@@ -86,6 +86,12 @@ export default function UsersPage() {
             {t('users:manage_description', { defaultValue: 'Manage user accounts' })}
           </p>
         </div>
+        {isAdmin && (
+          <Button onClick={() => router.push('/staff/create')}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('resource:create_one', { resource: t('common:staff', { defaultValue: 'Staff' }) })}
+          </Button>
+        )}
       </div>
 
       {/* Filters */}
