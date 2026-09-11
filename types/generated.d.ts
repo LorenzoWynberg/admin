@@ -1263,6 +1263,16 @@ declare namespace App.Data.User {
     langCode: string;
     avatar?: string;
   };
+  export type StoreStaffData = {
+    name: string;
+    email: string;
+    dateOfBirth: any;
+    phone: string;
+    sexId: number;
+    langCode: string;
+    role: App.Enums.Role;
+    avatar?: string;
+  };
   export type StoreUserData = {
     name: string;
     email: string;
