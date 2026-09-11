@@ -13,6 +13,7 @@ app/admin/
 │   │   ├── quotes/       # Quote management
 │   │   ├── users/        # User management
 │   │   ├── drivers/      # Driver management
+│   │   ├── staff/        # Staff (dispatch/admin) account creation
 │   │   ├── businesses/   # Business management
 │   │   ├── catalogs/     # Catalog management
 │   │   ├── pricing/      # Pricing rules
@@ -305,6 +306,7 @@ new one.
 ### Other Services
 
 - `DriverService` - Driver CRUD + approval
+- `StaffService` - Creates a `dispatch` or `admin` account (`POST /staff`, no password — the API generates one and emails an invite)
 - `BusinessService` - Business CRUD
 - `AddressService` - Address CRUD
 - `CatalogService` - Product catalog CRUD
@@ -449,6 +451,10 @@ import {
   useUpdateDriver,
   useDeleteDriver,
 } from '@/hooks/drivers';
+
+// Staff (dispatch/admin account creation — there is no Staff model, so
+// creation invalidates and reads back through ['users'] / @/hooks/users)
+import { useCreateStaff } from '@/hooks/staff';
 
 // Businesses
 import {
