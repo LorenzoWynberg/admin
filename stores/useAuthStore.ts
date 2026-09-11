@@ -79,8 +79,13 @@ export const useAuthStore = create<AuthStore>()(
           token: state.token,
         }),
         onRehydrateStorage: () => () => {
-          // Always set hydrated to true after rehydration attempt
-          useAuthStore.setState({ hydrated: true });
+          // Always set hydrated to true after rehydration attempt. Deferred:
+          // localStorage rehydrates synchronously inside create(), before
+          // `useAuthStore` is assigned — a direct call throws, zustand
+          // swallows it, and `hydrated` never flips.
+          setTimeout(() => {
+            useAuthStore.setState({ hydrated: true });
+          }, 0);
         },
       }
     )
