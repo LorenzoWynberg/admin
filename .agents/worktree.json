@@ -4,6 +4,7 @@
   "gate": "npm run check && npm run test:run",
   "scopedCheck": "npm run check",
   "format": "npm run format",
+  "upstreamFindings": true,
   "sharedResources": [],
   "frameworkSkills": [
     {
