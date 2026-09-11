@@ -397,6 +397,7 @@ export const Enums = {
     Pending: 'pending',
     Approved: 'approved',
     Denied: 'denied',
+    Unresolved: 'unresolved',
   },
   Role: {
     BUSINESS_OWNER: 'business.owner',

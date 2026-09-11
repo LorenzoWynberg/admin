@@ -1728,6 +1728,7 @@ declare namespace App.Enums {
     Pending = 'pending',
     Approved = 'approved',
     Denied = 'denied',
+    Unresolved = 'unresolved',
   }
   export enum Role {
     BUSINESS_OWNER = 'business.owner',
