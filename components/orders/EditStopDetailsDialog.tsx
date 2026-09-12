@@ -27,6 +27,7 @@ import { actionLabel, validationAttribute } from '@/utils/lang';
 
 type OrderStopData = App.Data.Order.OrderStopData;
 
+// No validation message to translate here: every field is optional and carries no check.
 const formSchema = z.object({
   contactName: z.string().optional(),
   contactPhone: z.string().optional(),

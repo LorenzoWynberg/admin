@@ -31,7 +31,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateStop } from '@/hooks/orders';
-import { actionLabel, capitalize } from '@/utils/lang';
+import { actionLabel, capitalize, validationMessageLazy } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
 import {
   MapAddressPicker,
@@ -42,7 +42,7 @@ import {
 type OrderStopData = App.Data.Order.OrderStopData;
 
 const formSchema = z.object({
-  type: z.string().min(1),
+  type: z.string().min(1, { error: validationMessageLazy('required', 'type') }),
   contactName: z.string().optional(),
   contactPhone: z.string().optional(),
   instructions: z.string().optional(),

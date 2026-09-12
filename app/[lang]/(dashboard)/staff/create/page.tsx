@@ -12,7 +12,9 @@ import { useCreateStaff } from '@/hooks/staff';
 import { CatalogService } from '@/services/catalogService';
 import { UploadService } from '@/services/uploadService';
 import { applyApiErrorsToForm } from '@/utils/form';
-import { actionLabel, validationAttribute } from '@/utils/lang';
+import { actionLabel, validationAttribute, validationMessageLazy } from '@/utils/lang';
+import { formatDateOnly, toDateString } from '@/utils/format';
+import i18n from '@/config/i18next';
 import { Enums } from '@/data/app-enums';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,20 +48,27 @@ const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), to
 const STAFF_ROLES = [Enums.Role.DISPATCH, Enums.Role.ADMIN] as const;
 
 const formSchema = z.object({
-  name: z.string().min(3),
-  email: z.string().email(),
-  phone: z.string().regex(/^\+[\d\s\-]{7,20}$/),
+  name: z.string().min(3, { error: validationMessageLazy('min.string', 'name', { min: 3 }) }),
+  email: z.string().email({ error: validationMessageLazy('email', 'email') }),
+  phone: z.string().regex(/^\+[\d\s\-]{7,20}$/, { error: validationMessageLazy('regex', 'phone') }),
   dateOfBirth: z.string().refine(
     (val) => {
       const date = new Date(val);
       return date <= eighteenYearsAgo;
     },
-    { message: 'Must be at least 18 years old' }
+    // NOTE: this form requires 18, while the API's StoreUserData::rules() only requires 13 for a
+    // non-driver — so the date named here is the stricter client rule, not what the server
+    // enforces. Raised with the dispatcher; the threshold is a product decision, not changed here.
+    {
+      error: validationMessageLazy('before_or_equal', 'dateOfBirth', () => ({
+        date: formatDateOnly(toDateString(eighteenYearsAgo), i18n.language),
+      })),
+    }
   ),
   avatar: z.string().optional(),
-  sexId: z.number().min(1),
-  langCode: z.string().min(1),
-  role: z.enum(STAFF_ROLES),
+  sexId: z.number().min(1, { error: validationMessageLazy('required', 'sex') }),
+  langCode: z.string().min(1, { error: validationMessageLazy('required', 'langCode') }),
+  role: z.enum(STAFF_ROLES, { error: validationMessageLazy('in', 'role') }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
