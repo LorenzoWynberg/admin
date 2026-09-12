@@ -78,7 +78,11 @@ export function CreateQuoteDialog({
   const calculateDistance = useCalculateDistance();
 
   // Fetch feasibility when dialog is open
-  const { data: feasibility, isLoading: feasibilityLoading } = useFeasibilityCheck({
+  const {
+    data: feasibility,
+    isLoading: feasibilityLoading,
+    isError: feasibilityIsError,
+  } = useFeasibilityCheck({
     orderPublicId,
     enabled: open,
   });
@@ -118,21 +122,32 @@ export function CreateQuoteDialog({
   const idleMinuteRate = idleData?.idleMinuteRate ?? 0;
   const includedMinutes = idleData?.includedMinutes ?? 0;
 
-  // Compute effective proposed times: feasibility suggestions override defaults when not editing
+  // Compute effective proposed times: feasibility suggestions override defaults when not
+  // editing. A failed check is NOT a "no suggestion" — it must never fall through to the
+  // hardcoded placeholders in getDefaultFormData(), so it resolves to blank instead. Blank
+  // fails the submit-button guard below, which forces an explicit manual entry rather than
+  // silently persisting an invented time onto a real quote.
   const effectivePickup =
     !editingTimes && feasibility?.suggestedPickup
       ? toDateTimeLocal(new Date(feasibility.suggestedPickup))
-      : formData.pickupProposedFor;
+      : !editingTimes && feasibilityIsError
+        ? ''
+        : formData.pickupProposedFor;
 
   const effectiveDelivery =
     !editingTimes && feasibility?.suggestedDelivery
       ? toDateTimeLocal(new Date(feasibility.suggestedDelivery))
-      : formData.deliveryProposedFor;
+      : !editingTimes && feasibilityIsError
+        ? ''
+        : formData.deliveryProposedFor;
 
   // Top-ranked candidate is the system suggestion; an explicit choice (a driver
   // id, or null for "none") overrides it. An untouched selector accepts the
-  // suggestion.
-  const suggestedDriverId = feasibility?.candidates?.[0]?.driverId ?? null;
+  // suggestion. A failed check leaves this undefined rather than null — null
+  // means "the system suggests no driver", which a failure never asserted.
+  const suggestedDriverId = feasibilityIsError
+    ? undefined
+    : (feasibility?.candidates?.[0]?.driverId ?? null);
   const effectivePreferredDriverId =
     preferredDriverId === undefined ? suggestedDriverId : preferredDriverId;
 
@@ -153,6 +168,20 @@ export function CreateQuoteDialog({
       }));
     }
   }, [calculateDistance.data]);
+
+  // A failed check can land after the admin has already switched to manual
+  // entry — e.g. they clicked the pencil while the check was still loading,
+  // which seeds the editable fields from whatever effectivePickup/Delivery
+  // held at that instant. The `!editingTimes` guard above only blanks the
+  // read-only display; it does nothing once editingTimes is already true, so
+  // without this the seeded (invented) default would keep sitting in the
+  // inputs right next to a banner that says no time was suggested. Scrub the
+  // underlying state directly so it can't leak through either path.
+  useEffect(() => {
+    if (open && feasibilityIsError) {
+      setFormData((prev) => ({ ...prev, pickupProposedFor: '', deliveryProposedFor: '' }));
+    }
+  }, [open, feasibilityIsError]);
 
   // Reset form with fresh defaults when dialog opens
   const handleOpenChange = (isOpen: boolean) => {
@@ -371,6 +400,18 @@ export function CreateQuoteDialog({
                   defaultValue: 'Checking driver availability...',
                 })}
               </span>
+            </div>
+          ) : feasibilityIsError ? (
+            <div className="flex flex-col gap-1 pt-2">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="text-destructive h-4 w-4 shrink-0" />
+                <span className="text-destructive text-sm font-medium">
+                  {t('quotes:feasibility.check_failed')}
+                </span>
+              </div>
+              <p className="text-muted-foreground pl-6 text-xs">
+                {t('quotes:feasibility.check_failed_hint')}
+              </p>
             </div>
           ) : feasibility ? (
             <div className="pt-2">
@@ -766,7 +807,7 @@ export function CreateQuoteDialog({
           {feasibility && (
             <QuoteDriverSelector
               candidates={feasibility.candidates ?? []}
-              suggestedDriverId={suggestedDriverId}
+              suggestedDriverId={suggestedDriverId ?? null}
               value={preferredDriverId}
               onChange={setPreferredDriverId}
               initialDate={
@@ -869,11 +910,14 @@ export function CreateQuoteDialog({
           <Button
             variant="outline"
             onClick={() => handleSubmit(false)}
-            disabled={isPending || !distanceKm}
+            disabled={isPending || !distanceKm || !effectivePickup || !effectiveDelivery}
           >
             {t('quotes:create.save_draft', { defaultValue: 'Save as Draft' })}
           </Button>
-          <Button onClick={() => handleSubmit(true)} disabled={isPending || !distanceKm}>
+          <Button
+            onClick={() => handleSubmit(true)}
+            disabled={isPending || !distanceKm || !effectivePickup || !effectiveDelivery}
+          >
             <Send className="mr-2 h-4 w-4" />
             {t('quotes:create.create_send', { defaultValue: 'Create & Send' })}
           </Button>

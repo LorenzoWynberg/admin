@@ -26,7 +26,7 @@ import { useDriverList } from '@/hooks/drivers';
 import { useAssignOrder } from '@/hooks/orders';
 import { actionLabel, vehicleTypeLabel, dispatchPolicyLabel } from '@/utils/lang';
 import { formatDateTime } from '@/utils/format';
-import { ChevronDown, UserPlus, Users } from 'lucide-react';
+import { AlertTriangle, ChevronDown, UserPlus, Users } from 'lucide-react';
 
 type DriverCandidate = App.Data.Feasibility.DriverCandidate;
 
@@ -47,7 +47,11 @@ export function AssignDriverModal({ order }: AssignDriverModalProps) {
   const [overrideOpen, setOverrideOpen] = useState(false);
   const [overrideDriverId, setOverrideDriverId] = useState<string>('');
 
-  const { data: feasibility, isLoading } = useFeasibilityCheck({
+  const {
+    data: feasibility,
+    isLoading,
+    isError: feasibilityIsError,
+  } = useFeasibilityCheck({
     orderPublicId: order.publicId,
     enabled: open,
   });
@@ -104,6 +108,15 @@ export function AssignDriverModal({ order }: AssignDriverModalProps) {
           {isLoading ? (
             <div className="text-muted-foreground py-8 text-center text-sm">
               {t('common:loading', { defaultValue: 'Loading...' })}
+            </div>
+          ) : feasibilityIsError ? (
+            // A failed check is not "no candidates" — that reads as a real
+            // negative result and nudges toward outsourcing, which this
+            // project avoids where possible. Say the check failed instead;
+            // the override select below still works for a manual pick.
+            <div className="border-destructive/30 bg-destructive/10 flex items-start gap-2 rounded-md border p-3">
+              <AlertTriangle className="text-destructive mt-0.5 h-4 w-4 shrink-0" />
+              <p className="text-destructive text-sm">{t('quotes:feasibility.check_failed')}</p>
             </div>
           ) : candidates.length === 0 ? (
             <div className="text-muted-foreground rounded-md border border-dashed py-8 text-center text-sm">
