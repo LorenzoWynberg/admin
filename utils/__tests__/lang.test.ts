@@ -5,6 +5,7 @@ import {
   getModelGender,
   validationAttribute,
   validationMessage,
+  validationMessageLazy,
   resourceMessage,
   crudSuccessMessage,
   crudErrorMessage,
@@ -131,6 +132,62 @@ describe('validationMessage', () => {
     mockT.mockReturnValue('validation:min');
     const result = validationMessage('min');
     expect(result).toBe('validation:min');
+  });
+});
+
+describe('validationMessageLazy', () => {
+  beforeEach(() => {
+    mockT.mockImplementation((key: string, options?: Record<string, unknown>) => {
+      if (key === 'validation:attributes.email') return 'email';
+      if (key === 'validation:required') {
+        return `The ${options?.attribute} field is required.`;
+      }
+      if (key === 'validation:min.string') {
+        return `The ${options?.attribute} field must be at least ${options?.min} characters.`;
+      }
+      return key;
+    });
+  });
+
+  it('does not touch i18next until the thunk is called', () => {
+    mockT.mockClear();
+    const resolveMessage = validationMessageLazy('required', 'email');
+
+    expect(mockT).not.toHaveBeenCalled();
+
+    expect(resolveMessage()).toBe('The email field is required.');
+    expect(mockT).toHaveBeenCalled();
+  });
+
+  it('resolves against the translations present at call time, not at creation time', () => {
+    // Stands in for i18next before init: i18next 26 returns undefined for every key
+    // until the locale JSON has been fetched.
+    mockT.mockReturnValue(undefined);
+    const resolveMessage = validationMessageLazy('required', 'email');
+    expect(resolveMessage()).toBeUndefined();
+
+    // ...and once it has, the same thunk yields the translation.
+    mockT.mockImplementation((key: string, options?: Record<string, unknown>) => {
+      if (key === 'validation:attributes.email') return 'correo';
+      if (key === 'validation:required') return `El campo ${options?.attribute} es obligatorio.`;
+      return key;
+    });
+    expect(resolveMessage()).toBe('El campo correo es obligatorio.');
+  });
+
+  it('forwards the attribute and the interpolation values', () => {
+    expect(validationMessageLazy('min.string', 'email', { min: 8 })()).toBe(
+      'The email field must be at least 8 characters.'
+    );
+  });
+
+  it('defers a thunk passed as the interpolation values', () => {
+    let min = 8;
+    const resolveMessage = validationMessageLazy('min.string', 'email', () => ({ min }));
+
+    min = 12;
+
+    expect(resolveMessage()).toBe('The email field must be at least 12 characters.');
   });
 });
 
