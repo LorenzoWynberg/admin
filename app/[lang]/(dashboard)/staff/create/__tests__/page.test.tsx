@@ -43,6 +43,9 @@ vi.mock('react-i18next', () => ({
 vi.mock('@/utils/lang', () => ({
   actionLabel: (key: string) => key,
   validationAttribute: (key: string) => key,
+  // The page's module-scope schema calls this at import and hands the thunk to zod,
+  // so the stub has to return a function rather than a string.
+  validationMessageLazy: (key: string) => () => key,
 }));
 
 const mutateAsync = vi.fn();

@@ -29,28 +29,64 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { applyApiErrorsToForm } from '@/utils/form';
-import { actionLabel, validationAttribute } from '@/utils/lang';
+import { actionLabel, validationAttribute, validationMessageLazy } from '@/utils/lang';
 import { Enums } from '@/data/app-enums';
 
 const tierSchema = z.object({
-  minKm: z.number().min(0),
-  maxKm: z.number().min(0).nullable(),
-  flatFee: z.number().min(0).nullable(),
-  perKmRate: z.number().min(0).nullable(),
-  order: z.number().min(0),
+  minKm: z
+    .number({ error: validationMessageLazy('numeric', 'minKm') })
+    .min(0, { error: validationMessageLazy('min.numeric', 'minKm', { min: 0 }) }),
+  maxKm: z
+    .number({ error: validationMessageLazy('numeric', 'maxKm') })
+    .min(0, { error: validationMessageLazy('min.numeric', 'maxKm', { min: 0 }) })
+    .nullable(),
+  flatFee: z
+    .number({ error: validationMessageLazy('numeric', 'flatFee') })
+    .min(0, { error: validationMessageLazy('min.numeric', 'flatFee', { min: 0 }) })
+    .nullable(),
+  perKmRate: z
+    .number({ error: validationMessageLazy('numeric', 'perKmRate') })
+    .min(0, { error: validationMessageLazy('min.numeric', 'perKmRate', { min: 0 }) })
+    .nullable(),
+  order: z
+    .number({ error: validationMessageLazy('numeric', 'order') })
+    .min(0, { error: validationMessageLazy('min.numeric', 'order', { min: 0 }) }),
 });
 
 const formSchema = z.object({
-  name: z.string().min(1).max(255),
-  serviceFee: z.number().min(0),
-  taxRate: z.number().min(0).max(1),
+  name: z
+    .string()
+    .min(1, { error: validationMessageLazy('required', 'name') })
+    .max(255, { error: validationMessageLazy('max.string', 'name', { max: 255 }) }),
+  serviceFee: z
+    .number({ error: validationMessageLazy('numeric', 'serviceFee') })
+    .min(0, { error: validationMessageLazy('min.numeric', 'serviceFee', { min: 0 }) }),
+  taxRate: z
+    .number({ error: validationMessageLazy('numeric', 'taxRate') })
+    .min(0, { error: validationMessageLazy('min.numeric', 'taxRate', { min: 0 }) })
+    .max(1, { error: validationMessageLazy('max.numeric', 'taxRate', { max: 1 }) }),
+  // `calculationMode` has no `validation:attributes.*` entry on the API — its label reaches for
+  // `pricing:calculation_mode` instead — so it keeps zod's default. Unreachable from the UI in
+  // any case: the Select is bound to this same list and defaults to a valid member.
   calculationMode: z.enum([
     Enums.PricingCalculationMode.DISCRETE,
     Enums.PricingCalculationMode.CUMULATIVE,
   ]),
-  expeditedMultiplier: z.number().min(0.01),
-  regularMultiplier: z.number().min(0.01),
-  cheapestMultiplier: z.number().min(0.01),
+  expeditedMultiplier: z
+    .number({ error: validationMessageLazy('numeric', 'expeditedMultiplier') })
+    .min(0.01, {
+      error: validationMessageLazy('min.numeric', 'expeditedMultiplier', { min: 0.01 }),
+    }),
+  regularMultiplier: z
+    .number({ error: validationMessageLazy('numeric', 'regularMultiplier') })
+    .min(0.01, {
+      error: validationMessageLazy('min.numeric', 'regularMultiplier', { min: 0.01 }),
+    }),
+  cheapestMultiplier: z
+    .number({ error: validationMessageLazy('numeric', 'cheapestMultiplier') })
+    .min(0.01, {
+      error: validationMessageLazy('min.numeric', 'cheapestMultiplier', { min: 0.01 }),
+    }),
   notes: z.string().nullable(),
   activate: z.boolean(),
   tiers: z.array(tierSchema),

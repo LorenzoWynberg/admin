@@ -70,6 +70,7 @@ Coverage target: 100% on all tested utility files.
 3. **API errors**: Use `applyApiErrorsToForm()` to bridge API → form errors
 4. **i18n**: Always use namespaces. **Do not add `defaultValue` to a key that exists** — see below
 5. **Queries**: Invalidate queries after mutations for fresh data
+6. **Zod messages**: Every check needs one, and a **module-scope** schema needs a lazy one — see below
 
 ---
 
@@ -94,6 +95,39 @@ dangerous rather than merely redundant:
 If a key you need is missing from api's `lang/`, ask for it there — do not invent
 a fallback here. Existing call sites that still pass `defaultValue` predate this
 rule and are not worth churning on their own.
+
+### Zod validation messages must be lazy at module scope
+
+A zod check with no message falls back to **zod's own English**, in every locale, forever. So give
+every check a message from `validation:` — and when the schema sits at **module scope**, make it
+lazy:
+
+```typescript
+// module scope — the body runs at import, before i18next has fetched anything
+const schema = z.object({
+  name: z.string().min(3, { error: validationMessageLazy('min.string', 'name', { min: 3 }) }),
+});
+```
+
+i18next initialises asynchronously over HTTP; i18next 26 returns `undefined` until it resolves, zod
+reads `undefined` as "no message" and prints its English default, and the string never updates when
+the language changes. `validationMessageLazy()` returns a thunk that zod calls at parse time.
+Use plain `validationMessage()` only inside a component body, where the schema re-evaluates on
+render. Pass it as zod's `error` option — `message` does not accept a function.
+
+Give the **type** a message too wherever the bound input can hand zod the wrong one — an
+`<Input type="number" {...field} />` stores a string, which fails `z.number()` before any check
+runs, so a message on `.min()` alone never renders:
+
+```typescript
+z.number({ error: validationMessageLazy('numeric', 'minKm') }).min(0, { error: ... });
+```
+
+The attribute argument is a `validation:attributes.*` key, and **this repo cannot add one** (the
+locale JSON is the api's). If a field has none, leave its message off and raise the missing key —
+never pass a key that does not resolve, which renders `attributes.foo` to the user. Note that
+`data/app-enums.ts`'s `Attributes` enum is **not** a reliable check — it lags the api's
+`validation.php` badly; verify against the api's `lang/{en,es,fr}/validation.php` itself.
 
 ### Placeholder Capitalization
 

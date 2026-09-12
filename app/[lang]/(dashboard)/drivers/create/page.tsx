@@ -17,9 +17,12 @@ import {
   capitalize,
   modelLabel,
   validationAttribute,
+  validationMessageLazy,
   vehicleTypeLabel,
   dispatchPolicyLabel,
 } from '@/utils/lang';
+import { formatDateOnly, toDateString } from '@/utils/format';
+import i18n from '@/config/i18next';
 import { Enums } from '@/data/app-enums';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,28 +49,49 @@ const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), to
 
 const formSchema = z.object({
   user: z.object({
-    name: z.string().min(3),
-    email: z.string().email(),
-    phone: z.string().regex(/^\+[\d\s\-]{7,20}$/),
-    password: z.string().min(8),
+    name: z.string().min(3, { error: validationMessageLazy('min.string', 'name', { min: 3 }) }),
+    email: z.string().email({ error: validationMessageLazy('email', 'email') }),
+    phone: z
+      .string()
+      .regex(/^\+[\d\s\-]{7,20}$/, { error: validationMessageLazy('regex', 'phone') }),
+    password: z
+      .string()
+      .min(8, { error: validationMessageLazy('min.string', 'password', { min: 8 }) }),
     dateOfBirth: z.string().refine(
       (val) => {
         const date = new Date(val);
         return date <= eighteenYearsAgo;
       },
-      { message: 'Must be at least 18 years old' }
+      {
+        error: validationMessageLazy('before_or_equal', 'dateOfBirth', () => ({
+          date: formatDateOnly(toDateString(eighteenYearsAgo), i18n.language),
+        })),
+      }
     ),
-    avatar: z.string().min(1),
-    sexId: z.number().min(1),
-    langCode: z.string().min(1),
+    avatar: z.string().min(1, { error: validationMessageLazy('required', 'avatar') }),
+    sexId: z.number().min(1, { error: validationMessageLazy('required', 'sex') }),
+    langCode: z.string().min(1, { error: validationMessageLazy('required', 'langCode') }),
   }),
-  licenseNumber: z.string().regex(/^\d-?\d{4}-?\d{4}|\d{12}$/),
-  licensePlateNumber: z.string().regex(/^[A-Z0-9]{3}-\d{3}$/),
-  licenseExpirationDate: z
+  licenseNumber: z.string().regex(/^\d-?\d{4}-?\d{4}|\d{12}$/, {
+    error: validationMessageLazy('regex', 'licenseNumber'),
+  }),
+  licensePlateNumber: z
     .string()
-    .refine((val) => new Date(val) > today, { message: 'Must be a future date' }),
+    .regex(/^[A-Z0-9]{3}-\d{3}$/, { error: validationMessageLazy('regex', 'licensePlate') }),
+  licenseExpirationDate: z.string().refine((val) => new Date(val) > today, {
+    error: validationMessageLazy('after', 'licenseExpires', () => ({
+      date: formatDateOnly(toDateString(today), i18n.language),
+    })),
+  }),
+  // `licensePhotoFront` / `licensePhotoBack` have no `validation:attributes.*` entry on the API,
+  // and the labels above reach for `drivers:license_photo_*` instead. Supplying a message here
+  // would have to name an attribute that does not resolve, so these stay on zod's own default
+  // until the API gains the keys. See the hand-back for the list.
   licensePhotoFront: z.string().min(1),
   licensePhotoBack: z.string().min(1),
+  // `defaultVehicleType` and `dispatchPolicy` have no `validation:attributes.*` entry either, and
+  // like `calculationMode` on the pricing pages they are unreachable from the UI anyway: each
+  // Select is bound to this same member list and defaults to a valid one. Left on zod's default.
   defaultVehicleType: z.enum([
     Enums.VehicleType.Motorcycle,
     Enums.VehicleType.Car,

@@ -44,6 +44,36 @@ export const validationMessage = (
     ...(extra ?? {}),
   });
 
+/**
+ * Lazy variant of {@link validationMessage}, for schemas declared at module scope.
+ *
+ * i18next initialises asynchronously — it fetches the locale JSON over HTTP — while a module
+ * body runs at import. A `validationMessage()` call evaluated there therefore resolves before
+ * any translation exists: i18next 26 returns `undefined` in that window, a validation library
+ * reads `undefined` as "no message" and falls back to its own built-in English default, and the
+ * string stays frozen that way even after the user switches language.
+ *
+ * Returning a thunk defers the lookup to parse time, which is always after init and always in
+ * the language currently selected. Pass it as zod's `error` option, which accepts a function:
+ * `z.string().min(3, { error: validationMessageLazy('min.string', 'name', { min: 3 }) })`.
+ *
+ * `extra` may itself be a function, for interpolation values that are themselves
+ * locale-dependent — a formatted date, say. Passing those as a plain object would evaluate them
+ * in the module body and freeze them in whatever language was loaded then, which is the same bug
+ * one level down.
+ *
+ * A schema built inside a component body re-evaluates on every render and does not need this;
+ * `validationMessage()` is correct there.
+ */
+export const validationMessageLazy =
+  (
+    key: string,
+    attributeKey?: string,
+    extra?: Record<string, unknown> | (() => Record<string, unknown>)
+  ) =>
+  () =>
+    validationMessage(key, attributeKey, typeof extra === 'function' ? extra() : extra);
+
 export const resourceMessage = (
   key: string,
   resourceKey: string,

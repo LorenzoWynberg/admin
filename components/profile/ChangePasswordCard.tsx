@@ -19,23 +19,29 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { applyApiErrorsToForm } from '@/utils/form';
-import { validationMessage } from '@/utils/lang';
+import { validationMessageLazy } from '@/utils/lang';
 import { useUpdatePasswordMutation } from '@/hooks/auth';
 
 const passwordSchema = z
   .object({
-    currentPassword: z.string().min(1, validationMessage('required', 'currentPassword')),
+    currentPassword: z
+      .string()
+      .min(1, { error: validationMessageLazy('required', 'currentPassword') }),
     password: z
       .string()
-      .min(8, validationMessage('min.string', 'password', { min: 8 }))
-      .regex(/[a-zA-Z]/, validationMessage('password.letters', 'password'))
-      .regex(/(?=.*[a-z])(?=.*[A-Z])/, validationMessage('password.mixed', 'password'))
-      .regex(/\d/, validationMessage('password.numbers', 'password'))
-      .regex(/[^A-Za-z0-9]/, validationMessage('password.symbols', 'password')),
-    passwordConfirmation: z.string().min(1, validationMessage('required', 'passwordConfirmation')),
+      .min(8, { error: validationMessageLazy('min.string', 'password', { min: 8 }) })
+      .regex(/[a-zA-Z]/, { error: validationMessageLazy('password.letters', 'password') })
+      .regex(/(?=.*[a-z])(?=.*[A-Z])/, {
+        error: validationMessageLazy('password.mixed', 'password'),
+      })
+      .regex(/\d/, { error: validationMessageLazy('password.numbers', 'password') })
+      .regex(/[^A-Za-z0-9]/, { error: validationMessageLazy('password.symbols', 'password') }),
+    passwordConfirmation: z
+      .string()
+      .min(1, { error: validationMessageLazy('required', 'passwordConfirmation') }),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
-    message: validationMessage('confirmed', 'password'),
+    error: validationMessageLazy('confirmed', 'password'),
     path: ['passwordConfirmation'],
   });
 
