@@ -567,6 +567,7 @@ if (hasValidationErrors(err)) {
 ```typescript
 import {
   validationMessage,
+  validationMessageLazy,
   resourceMessage,
   crudSuccessMessage,
   crudErrorMessage,
@@ -575,6 +576,7 @@ import {
 } from '@/utils/lang';
 
 validationMessage('required', 'email'); // "The email field is required"
+validationMessageLazy('required', 'email'); // () => "The email field is required"
 resourceMessage('created', 'order'); // "Order created"
 crudSuccessMessage('created', 'order'); // "Order created successfully"
 crudErrorMessage('delete', 'order'); // "Failed to delete order"
@@ -605,10 +607,11 @@ applyRounding(12, 'nearest', 5); // 10
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { validationMessageLazy } from '@/utils/lang'
 
 const schema = z.object({
-  email: z.string().email(),
-  name: z.string().min(1),
+  email: z.string().email({ error: validationMessageLazy('email', 'email') }),
+  name: z.string().min(1, { error: validationMessageLazy('required', 'name') }),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -636,6 +639,39 @@ function MyForm() {
   )
 }
 ```
+
+### Validation messages
+
+A zod check with no message argument falls back to **zod's own English string**, in every locale,
+permanently — so every check that a user can trip needs one.
+
+Which helper depends on where the schema is declared:
+
+| Schema declared…              | Helper                    | Why                                                                 |
+| ----------------------------- | ------------------------- | ------------------------------------------------------------------- |
+| at **module scope**           | `validationMessageLazy()` | The module body runs at import, before i18next has fetched anything |
+| inside the **component body** | `validationMessage()`     | Re-evaluated on every render, always after init                     |
+
+The JSDoc on `validationMessageLazy` in `utils/lang.ts` carries the mechanism. Pass it as zod's
+`error` option — `message` does not take a function:
+
+```typescript
+z.string().min(3, { error: validationMessageLazy('min.string', 'name', { min: 3 }) });
+z.string().refine(isAdult, {
+  error: validationMessageLazy('before_or_equal', 'dateOfBirth', () => ({ date })),
+});
+
+// Put one on the TYPE too wherever the bound input can hand zod the wrong type — an
+// `<Input type="number" {...field} />` gives react-hook-form a string, which fails
+// `z.number()` before any check runs:
+z.number({ error: validationMessageLazy('numeric', 'minKm') }).min(0, {
+  error: validationMessageLazy('min.numeric', 'minKm', { min: 0 }),
+});
+```
+
+The second argument is an `attributes.*` key. **The locale JSON lives in the api repo, so this repo
+cannot add one** — if a field has no entry there, leave that field's message off and raise the
+missing key rather than passing a key that does not resolve, which renders the raw key to the user.
 
 ---
 
