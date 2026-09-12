@@ -249,7 +249,18 @@ export default function EditPricingRulePage() {
                     <FormItem>
                       <FormLabel>{validationAttribute('serviceFee', true)}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" min="0" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === '' ? undefined : Number(e.target.value)
+                            )
+                          }
+                        />
                       </FormControl>
                       <FormDescription>{t('service_fee_help')}</FormDescription>
                       <FormMessage />
@@ -286,9 +297,7 @@ export default function EditPricingRulePage() {
                 name="calculationMode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      {t('calculation_mode', { defaultValue: 'Calculation Mode' })}
-                    </FormLabel>
+                    <FormLabel>{t('calculation_mode')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -297,19 +306,14 @@ export default function EditPricingRulePage() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value={Enums.PricingCalculationMode.DISCRETE}>
-                          {t('calculation_mode_discrete', { defaultValue: 'Discrete' })}
+                          {t('calculation_mode_discrete')}
                         </SelectItem>
                         <SelectItem value={Enums.PricingCalculationMode.CUMULATIVE}>
-                          {t('calculation_mode_cumulative', { defaultValue: 'Cumulative' })}
+                          {t('calculation_mode_cumulative')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>
-                      {t('calculation_mode_help', {
-                        defaultValue:
-                          'Discrete: one tier applies. Cumulative: fees stack through tiers.',
-                      })}
-                    </FormDescription>
+                    <FormDescription>{t('calculation_mode_help')}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -350,7 +354,18 @@ export default function EditPricingRulePage() {
                     <FormItem>
                       <FormLabel>{t('expedited_multiplier')}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" min="0.01" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === '' ? undefined : Number(e.target.value)
+                            )
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -364,7 +379,18 @@ export default function EditPricingRulePage() {
                     <FormItem>
                       <FormLabel>{t('regular_multiplier')}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" min="0.01" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === '' ? undefined : Number(e.target.value)
+                            )
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -378,7 +404,18 @@ export default function EditPricingRulePage() {
                     <FormItem>
                       <FormLabel>{t('cheapest_multiplier')}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" min="0.01" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === '' ? undefined : Number(e.target.value)
+                            )
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -423,7 +460,18 @@ export default function EditPricingRulePage() {
                       <FormItem className="flex-1">
                         <FormLabel>{validationAttribute('minKm', true)}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.1" min="0" {...field} />
+                          <Input
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            {...field}
+                            value={field.value ?? ''}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value === '' ? undefined : Number(e.target.value)
+                              )
+                            }
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
