@@ -256,9 +256,7 @@ export default function EditPricingRulePage() {
                           {...field}
                           value={field.value ?? ''}
                           onChange={(e) =>
-                            field.onChange(
-                              e.target.value === '' ? undefined : Number(e.target.value)
-                            )
+                            field.onChange(e.target.value === '' ? null : Number(e.target.value))
                           }
                         />
                       </FormControl>
@@ -281,8 +279,16 @@ export default function EditPricingRulePage() {
                           min="0"
                           max="100"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value) / 100)}
-                          value={field.value * 100}
+                          value={
+                            Number.isFinite(field.value)
+                              ? Number((field.value * 100).toFixed(4))
+                              : ''
+                          }
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === '' ? null : Number(e.target.value) / 100
+                            )
+                          }
                         />
                       </FormControl>
                       <FormDescription>{t('tax_rate_help')}</FormDescription>
@@ -361,9 +367,7 @@ export default function EditPricingRulePage() {
                           {...field}
                           value={field.value ?? ''}
                           onChange={(e) =>
-                            field.onChange(
-                              e.target.value === '' ? undefined : Number(e.target.value)
-                            )
+                            field.onChange(e.target.value === '' ? null : Number(e.target.value))
                           }
                         />
                       </FormControl>
@@ -386,9 +390,7 @@ export default function EditPricingRulePage() {
                           {...field}
                           value={field.value ?? ''}
                           onChange={(e) =>
-                            field.onChange(
-                              e.target.value === '' ? undefined : Number(e.target.value)
-                            )
+                            field.onChange(e.target.value === '' ? null : Number(e.target.value))
                           }
                         />
                       </FormControl>
@@ -411,9 +413,7 @@ export default function EditPricingRulePage() {
                           {...field}
                           value={field.value ?? ''}
                           onChange={(e) =>
-                            field.onChange(
-                              e.target.value === '' ? undefined : Number(e.target.value)
-                            )
+                            field.onChange(e.target.value === '' ? null : Number(e.target.value))
                           }
                         />
                       </FormControl>
@@ -467,9 +467,7 @@ export default function EditPricingRulePage() {
                             {...field}
                             value={field.value ?? ''}
                             onChange={(e) =>
-                              field.onChange(
-                                e.target.value === '' ? undefined : Number(e.target.value)
-                              )
+                              field.onChange(e.target.value === '' ? null : Number(e.target.value))
                             }
                           />
                         </FormControl>
