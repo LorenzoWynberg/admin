@@ -70,9 +70,16 @@ export default function CurrencySettingsPage() {
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyData | null>(null);
+  // roundingIncrement is held as the raw typed string, like manualRate below —
+  // parsing it into a number on every keystroke is what let React's controlled
+  // <input type="number"> re-assert a coerced value onto the DOM mid-edit,
+  // making the field unclearable. It is only parsed and validated against the
+  // minimum (0.01) at read time, below — never coerced while the box is
+  // being typed into. An invalid value disables Save rather than being
+  // silently rewritten.
   const [editForm, setEditForm] = useState({
     roundingMode: 'nearest',
-    roundingIncrement: 0.01,
+    roundingIncrement: '0.01',
     manualRate: '',
   });
 
@@ -86,6 +93,12 @@ export default function CurrencySettingsPage() {
 
   const currencies = data?.items || [];
   const baseCurrency = currencies.find((c) => c.isBase);
+
+  // Parsed and validated only here, at read time — never on every keystroke —
+  // so the field can be cleared and multi-digit edits aren't clobbered.
+  const parsedRoundingIncrement = parseFloat(editForm.roundingIncrement);
+  const isRoundingIncrementValid =
+    !isNaN(parsedRoundingIncrement) && parsedRoundingIncrement >= 0.01;
 
   if (!ready) {
     return null;
@@ -103,7 +116,8 @@ export default function CurrencySettingsPage() {
     setSelectedCurrency(currency);
     setEditForm({
       roundingMode: currency.roundingMode || 'nearest',
-      roundingIncrement: currency.roundingIncrement || 0.01,
+      roundingIncrement:
+        currency.roundingIncrement != null ? String(currency.roundingIncrement) : '0.01',
       manualRate: currency.manualRate != null ? String(currency.manualRate) : '',
     });
     setEditDialogOpen(true);
@@ -114,7 +128,7 @@ export default function CurrencySettingsPage() {
 
     const payload: Record<string, unknown> = {
       roundingMode: editForm.roundingMode,
-      roundingIncrement: editForm.roundingIncrement,
+      roundingIncrement: parsedRoundingIncrement,
     };
 
     if (isManualMode && !selectedCurrency.isBase) {
@@ -501,7 +515,7 @@ export default function CurrencySettingsPage() {
                 onChange={(e) =>
                   setEditForm((f) => ({
                     ...f,
-                    roundingIncrement: parseFloat(e.target.value) || 0.01,
+                    roundingIncrement: e.target.value,
                   }))
                 }
               />
@@ -517,7 +531,10 @@ export default function CurrencySettingsPage() {
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
               {actionLabel('cancel')}
             </Button>
-            <Button onClick={handleSaveRounding} disabled={updateMutation.isPending}>
+            <Button
+              onClick={handleSaveRounding}
+              disabled={updateMutation.isPending || !isRoundingIncrementValid}
+            >
               {actionLabel('save')}
             </Button>
           </DialogFooter>
