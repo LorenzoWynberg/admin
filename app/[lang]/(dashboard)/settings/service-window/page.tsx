@@ -64,14 +64,27 @@ function ServiceWindowForm({ data }: { data: SettingData }) {
   const [noServiceStart, setNoServiceStart] = useState(data.noServiceStart.slice(0, 5));
   const [noServiceEnd, setNoServiceEnd] = useState(data.noServiceEnd.slice(0, 5));
   const [autoCancelEnabled, setAutoCancelEnabled] = useState(data.unassignedAutoCancelEnabled);
-  const [escalationHours, setEscalationHours] = useState(data.unassignedEscalationHours);
+  // Held as the raw typed string, like the other numeric drafts in this repo
+  // (idle rate on settings/page.tsx, balance limit on BalanceCard) — clamping
+  // it to [1, 24] on every keystroke is what made the box unclearable.
+  // Parsing and validating happen only here, at read time.
+  const [escalationHoursDraft, setEscalationHoursDraft] = useState(
+    String(data.unassignedEscalationHours)
+  );
+
+  const parsedEscalationHours = Number(escalationHoursDraft);
+  const isEscalationHoursValid =
+    escalationHoursDraft.trim() !== '' &&
+    !isNaN(parsedEscalationHours) &&
+    parsedEscalationHours >= 1 &&
+    parsedEscalationHours <= 24;
 
   const isDirty =
     enabled !== data.serviceWindowEnabled ||
     noServiceStart !== data.noServiceStart.slice(0, 5) ||
     noServiceEnd !== data.noServiceEnd.slice(0, 5) ||
     autoCancelEnabled !== data.unassignedAutoCancelEnabled ||
-    escalationHours !== data.unassignedEscalationHours;
+    parsedEscalationHours !== data.unassignedEscalationHours;
 
   const handleSave = () => {
     updateMutation.mutate({
@@ -79,7 +92,7 @@ function ServiceWindowForm({ data }: { data: SettingData }) {
       noServiceEnd,
       serviceWindowEnabled: enabled,
       unassignedAutoCancelEnabled: autoCancelEnabled,
-      unassignedEscalationHours: escalationHours,
+      unassignedEscalationHours: parsedEscalationHours,
     });
   };
 
@@ -207,10 +220,8 @@ function ServiceWindowForm({ data }: { data: SettingData }) {
                 type="number"
                 min={1}
                 max={24}
-                value={escalationHours}
-                onChange={(e) =>
-                  setEscalationHours(Math.max(1, Math.min(24, Number(e.target.value))))
-                }
+                value={escalationHoursDraft}
+                onChange={(e) => setEscalationHoursDraft(e.target.value)}
                 disabled={!autoCancelEnabled}
                 className="w-24"
               />
@@ -221,7 +232,10 @@ function ServiceWindowForm({ data }: { data: SettingData }) {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={!isDirty || updateMutation.isPending}>
+        <Button
+          onClick={handleSave}
+          disabled={!isDirty || !isEscalationHoursValid || updateMutation.isPending}
+        >
           {updateMutation.isPending
             ? t('common:loading', { defaultValue: 'Loading...' })
             : actionLabel('save')}
