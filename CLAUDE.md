@@ -180,6 +180,34 @@ cp ../api/resources/types/notifications.d.ts types/notifications.d.ts
 npm run gen:enums
 ```
 
+### The wire is camelCase, in both directions
+
+**The API sends and receives camelCase. snake_case exists only inside the
+database.** The DTO is the boundary that converts, and `api/docs/dto-conventions.md`
+is where the rule lives:
+
+> **NO** `MapInputName` — frontend sends camelCase, Spatie hydrates directly
+> into camelCase props
+
+That applies to **validation error keys too**, which is the place it is most
+often got wrong. A 422 comes back keyed `dateOfBirth`, `sexId`, `serviceFee` —
+never `date_of_birth`. So an `applyApiErrorsToForm` field map keyed in
+snake_case matches nothing:
+
+```typescript
+// WRONG — never matches; the API never sends this key
+applyApiErrorsToForm(error, form.setError, { service_fee: 'serviceFee' });
+
+// RIGHT — and usually unnecessary, since applyApiErrorsToForm falls back to
+// the raw API key, which already equals the form field name
+applyApiErrorsToForm(error, form.setError);
+```
+
+Pass a map **only** where a form field name genuinely differs from its API key.
+⚠️ Do not copy this pattern from a sibling page without checking it — several
+pages carry dead snake_case maps that work by accident, and reading them as the
+house style is how the mistake spreads.
+
 Runtime enums (for comparisons):
 
 ```typescript
