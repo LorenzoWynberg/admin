@@ -252,6 +252,39 @@ declare namespace App.Data.Chat {
     user?: App.Data.User.UserData;
   };
 }
+declare namespace App.Data.Contact {
+  export type ContactData = {
+    publicId: string;
+    name: string;
+    phone: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    placeId: string | null;
+    additionalInfo: string | null;
+    humanReadableAddress: string | null;
+  };
+  export type ContactSuggestionData = {
+    publicId: string | null;
+    source: App.Enums.ContactSuggestionSource;
+    name: string;
+    phone: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    placeId: string | null;
+    additionalInfo: string | null;
+    humanReadableAddress: string | null;
+  };
+  export type StoreContactData = {
+    name: string;
+    phone?: string;
+    address?: App.Data.Address.StoreSnapshotAddressData | null;
+  };
+  export type UpdateContactData = {
+    name?: string;
+    phone?: string | null;
+    address?: App.Data.Address.StoreSnapshotAddressData | null;
+  };
+}
 declare namespace App.Data.Credit {
   export type CreditData = {
     id?: number;
@@ -646,6 +679,7 @@ declare namespace App.Data.Order {
     requiresPhoto: boolean;
     requiresSignature: boolean;
     isContactless: boolean;
+    saveAsContact: boolean;
     deliveryTier: App.Enums.DeliveryTier;
     timeSensitive: boolean;
     requestedVehicleType: App.Enums.VehicleType | null;
@@ -1455,6 +1489,10 @@ declare namespace App.Enums {
     OutsideOperatingHours = 'outside_operating_hours',
     OutsideDriverShift = 'outside_driver_shift',
   }
+  export enum ContactSuggestionSource {
+    Saved = 'saved',
+    Recent = 'recent',
+  }
   export enum CreditType {
     RefundGrant = 'refund_grant',
     AdminGrant = 'admin_grant',
@@ -1566,6 +1604,7 @@ declare namespace App.Enums {
     Driver = 'driver',
     User = 'user',
     Address = 'address',
+    Contact = 'contact',
     Location = 'location',
     Currency = 'currency',
     Order = 'order',

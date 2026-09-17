@@ -114,6 +114,10 @@ export const Enums = {
     OutsideOperatingHours: 'outside_operating_hours',
     OutsideDriverShift: 'outside_driver_shift',
   },
+  ContactSuggestionSource: {
+    Saved: 'saved',
+    Recent: 'recent',
+  },
   CreditType: {
     RefundGrant: 'refund_grant',
     AdminGrant: 'admin_grant',
@@ -225,6 +229,7 @@ export const Enums = {
     Driver: 'driver',
     User: 'user',
     Address: 'address',
+    Contact: 'contact',
     Location: 'location',
     Currency: 'currency',
     Order: 'order',
