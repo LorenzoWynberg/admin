@@ -14,7 +14,7 @@ npm run typecheck  # 2. Fix type errors
 npm run format     # 3. Format (LAST step)
 ```
 
-Then commit **only when the user asks** — run `/simplify` first, and never auto-push. See `docs/strict-rules.md` for all rules.
+Commits, branches, pushes and merges follow the orchestration flow's rules (the pipeline skills), which carry their own review step. See the workspace `docs/strict-rules.md` for all rules.
 
 ---
 
