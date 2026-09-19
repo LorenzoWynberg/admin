@@ -441,6 +441,7 @@ export const Enums = {
   ScheduleChangeReason: {
     Reassigned: 'reassigned',
     Rescheduled: 'rescheduled',
+    Deferred: 'deferred',
   },
   SettlementMethod: {
     Card: 'card',

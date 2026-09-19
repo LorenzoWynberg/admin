@@ -1818,6 +1818,7 @@ declare namespace App.Enums {
   export enum ScheduleChangeReason {
     Reassigned = 'reassigned',
     Rescheduled = 'rescheduled',
+    Deferred = 'deferred',
   }
   export enum SettlementMethod {
     Card = 'card',
