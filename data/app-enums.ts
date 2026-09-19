@@ -265,7 +265,7 @@ export const Enums = {
     StopAssigned: 'stop_assigned',
     DelayFlagged: 'delay_flagged',
     StopFailed: 'stop_failed',
-    OrderPendingApproval: 'order_pending_approval',
+    QuotePendingApproval: 'quote_pending_approval',
     Welcome: 'welcome',
     OrderConfirmed: 'order_confirmed',
     DeliveryCompleted: 'delivery_completed',
@@ -293,7 +293,6 @@ export const Enums = {
     Read: 'read',
   },
   OrderStatus: {
-    PENDING_OWNER_APPROVAL: 'pending_owner_approval',
     PENDING: 'pending',
     ESTIMATED: 'estimated',
     APPROVED: 'approved',

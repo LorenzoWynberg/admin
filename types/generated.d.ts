@@ -569,6 +569,7 @@ declare namespace App.Data.Order {
     status?: App.Enums.OrderStatus;
     paymentStatus?: App.Enums.PaymentStatus;
     canAnswerQuote: boolean;
+    canRequestQuote: boolean;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -1641,7 +1642,7 @@ declare namespace App.Enums {
     StopAssigned = 'stop_assigned',
     DelayFlagged = 'delay_flagged',
     StopFailed = 'stop_failed',
-    OrderPendingApproval = 'order_pending_approval',
+    QuotePendingApproval = 'quote_pending_approval',
     Welcome = 'welcome',
     OrderConfirmed = 'order_confirmed',
     DeliveryCompleted = 'delivery_completed',
@@ -1669,7 +1670,6 @@ declare namespace App.Enums {
     Read = 'read',
   }
   export enum OrderStatus {
-    PENDING_OWNER_APPROVAL = 'pending_owner_approval',
     PENDING = 'pending',
     ESTIMATED = 'estimated',
     APPROVED = 'approved',

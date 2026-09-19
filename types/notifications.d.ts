@@ -39,6 +39,17 @@ declare namespace Api.Broadcast {
     orderPublicId: string;
   }
 
+  /** quote.pending_approval */
+  export interface QuotePendingApproval extends Base {
+    modelId: number;
+    modelName: string;
+    orderId: number;
+    orderPublicId: string;
+    quoteId: number;
+    quoteTotal: number;
+    quoteCurrency: string;
+  }
+
   /** order.confirmed */
   export interface OrderConfirmed extends Base {
     orderId: number;
@@ -51,14 +62,6 @@ declare namespace Api.Broadcast {
     orderPublicId: string;
     refundAmount: number | null;
     cancelFee: number | null;
-  }
-
-  /** order.pending_approval */
-  export interface OrderPendingApproval extends Base {
-    modelId: number;
-    modelName: string;
-    orderId: number;
-    orderPublicId: string;
   }
 
   /** order.updated */
@@ -265,9 +268,9 @@ declare namespace Api.Broadcast {
     | QuoteSent
     | QuoteExpired
     | QuoteRequested
+    | QuotePendingApproval
     | OrderConfirmed
     | OrderCancelled
-    | OrderPendingApproval
     | OrderUpdated
     | DeliveryCompleted
     | StopAssigned
