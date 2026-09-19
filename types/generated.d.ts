@@ -568,6 +568,7 @@ declare namespace App.Data.Order {
     isExclusive?: boolean;
     status?: App.Enums.OrderStatus;
     paymentStatus?: App.Enums.PaymentStatus;
+    canAnswerQuote: boolean;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
